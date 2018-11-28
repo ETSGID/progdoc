@@ -71,7 +71,7 @@ Existen dos bases de datos una para almacenar las sesiones y otra con la informa
 Deben configurarse los archivos donde se le pase las variables de entorno para la creación y conexión de la aplicación
 
 ## Ejecución
-Una vez configuradas las variables de entorno y el puerto correctamente, para desplegar la aplicación, hay que ir al directorio `InterContacta`, y desde ahí ejecutar el siguiente comando:
+Una vez configuradas las variables de entorno y el puerto correctamente, para desplegar la aplicación, hay que ir al directorio `progDoc`, y desde ahí ejecutar el siguiente comando:
 
 
 ```
