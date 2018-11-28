@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+
+  db:
+    image: postgres:9.6
+    restart: always
+    volumes:
+      - dbdata:/var/lib/postgres
+
+  volumes:
+    dbdata:
+
+
+
+    

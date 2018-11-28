@@ -49,9 +49,10 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-//despliegue y local
+app.use(contextPath + "pdfs", express.static(path.join(process.env.PATH_PDF, 'pdfs')));
 app.use(contextPath, express.static(path.join(__dirname, 'public')));
+
+
 
 // Configuracion de la session para almacenarla en BBDD usando Sequelize.
 let sessionStore = new SequelizeStore({

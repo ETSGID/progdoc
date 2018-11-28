@@ -2,12 +2,6 @@ version: '2'
 
 services: 
 
-  db:
-    image: postgres:9.6
-    volumes:
-      - ./dbdata:/var/lib/postgres
-    restart: always
-
   dbsession:
       image: postgres:9.6
       volumes:
@@ -18,13 +12,15 @@ services:
     privileged: true
     build: 
       context: .
-#     dockerfile: ServerDockerfile
     restart: always
+    volumes:
+      - progdoc:/storage/progdoc
     ports: 
       - "3000:3000"
     depends_on:
       - db
       - dbsession
 
-volumes:
-  dbdata:
+  volumes:
+    dbdata2:
+    progdoc:
