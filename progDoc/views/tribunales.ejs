@@ -1,0 +1,180 @@
+<script src="<%=contextPath%>js/autocomplete.js"></script>
+<%- include cumplimentar.ejs %>
+<div id="hermanoNuevoProfesorForm">
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+  <p><%=permisoDenegado%></p>
+<%}else{
+  if(estadoTribunales[departamentoID] === estadosTribunal.abierto || estadoProgDoc === estadosProgDoc.incidencia) {%>
+<form id="formulario" autocomplete="off" action="<%= aprobarpath %>" method="post" onsubmit="return Enviar()" >
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Asignatura</th>
+      <th scope="col">Presidente</th>
+      <th scope="col">Vocal</th>
+      <th scope="col">Secretario</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% for(var i=0; i < tribunales.length; i++) { %>
+    <tr>
+      <th scope="row">
+        <% if (tribunales[i].acronimo !== null){ %>
+        <%= tribunales[i].acronimo%>
+        <% }else{%>
+        <%= tribunales[i].nombre%>
+        <% } %> 
+      </th>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Presidente' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Presidente')">
+      <% if(tribunales[i].presidenteNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'><%= tribunales[i].presidenteNombre%></p>
+      <input id='tribunal_<%=tribunales[i].tribunalId%>_Presidente' type="hidden" name="noCambio" value="<%=tribunales[i].tribunalId%>_<%= tribunales[i].presidenteNombre %>_Presidente" placeholder="<%= tribunales[i].presidenteNombre %>" >
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'>-</p>
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Presidente" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
+      <% } %> 
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Vocal' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Vocal')">
+      <% if(tribunales[i].vocalNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'><%= tribunales[i].vocalNombre%></p>
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Vocal" type="hidden" name="noCambio" value="<%=tribunales[i].tribunalId%>_<%= tribunales[i].vocalNombre %>_Vocal" placeholder="<%= tribunales[i].vocalNombre %>" >
+      <% } else{ %>
+       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'>-</p>
+        <input id="tribunal_<%=tribunales[i].tribunalId%>_Vocal" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
+      <% } %>
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Secretario' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Secretario')">
+      <% if(tribunales[i].secretarioNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'><%= tribunales[i].secretarioNombre%></p>
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Secretario" type="hidden" name="noCambio" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].secretarioNombre %>_Secretario" placeholder="<%= tribunales[i].secretarioNombre %>" >
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'>-</p>
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Secretario" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
+      <% } %>
+      </td>
+    </tr>
+<% } %> 
+  </tbody>
+</table>
+<%if(estadoTribunales[departamentoID] === estadosTribunal.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
+<input type="submit" value='Guardar y Aprobar Asignación Tribunales'>
+<%}%>
+<button type="button" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
+<button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+</form>
+<% }else{ %>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Asignatura</th>
+      <th scope="col">Presidente</th>
+      <th scope="col">Vocal</th>
+      <th scope="col">Secretario</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% for(var i=0; i < tribunales.length; i++) { %>
+    <tr>
+      <th scope="row">
+          <%if (tribunales[i].acronimo !== null){ %>
+            <%= tribunales[i].acronimo%>
+          <% }else{%>
+          <%= tribunales[i].nombre%>
+          <% } %> 
+      </th>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Presidente'>
+      <% if(tribunales[i].presidenteNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'><%= tribunales[i].presidenteNombre%></p>
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'>-</p>
+      <% } %> 
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Vocal'>
+      <% if(tribunales[i].vocalNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'><%= tribunales[i].vocalNombre%></p>
+      <% } else{ %>
+       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'>-</p>
+      <% } %>
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Secretario'>
+      <% if(tribunales[i].secretarioNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'><%= tribunales[i].secretarioNombre%></p>
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'>-</p>
+      <% } %>
+      </td>
+    </tr>
+<% } %> 
+  </tbody>
+</table>
+<% } %>
+    <% if(estadoTribunales[departamentoID] === estadosTribunal.aprobadoResponsable && estadoProgDoc === estadosProgDoc.abierto) { %>
+    <form id="formDecision" action="<%= aprobarpath %>" method="post">
+    <input id="decision" type="hidden" name="decision" value='aceptar'>
+    <button type="button" onclick="Decidir('aceptar')">Aceptar Asignación Tribunales</button>
+    <button type="button" onclick="Decidir('rechazar')">No aceptar Asignación Tribunales</button>
+    </form>
+    <% } 
+    }%>
+</div>
+<%- include nuevoProfesor.ejs %>
+<script>
+let form = document.getElementById("formulario");
+let estado = <%-JSON.stringify(estado)%>
+let profesores = <%-JSON.stringify(profesores)%>
+let profesores2 ="";
+if(estado === null){
+  
+  
+  profesores2 = quitAcents(profesores)
+  //document.getElementsByTagName('body')[0].onload = changeSelect();
+}
+function mostrar(id){
+  let celda = document.getElementById("td_"+id);
+  //debo hacer lo de p y p2 pq al aceptar en el buscador me vuelve a entrar aqui uso el id de p como flag 
+  let p = document.getElementById("p_"+id);
+  let p2 = document.getElementById("p_"+id+"_provisional")
+  let input = document.getElementById(id)
+  let nameInput = input.getAttribute('name');
+  if (p){
+    //creo el div para encapsular la busqueda
+    let div = document.createElement('div');
+    div.innerHTML = '<div class="autocomplete" style="width:500px;"></div>'
+    let nuevo = div.firstChild;
+    celda.appendChild(nuevo)
+    nuevo.appendChild(input)
+    celda.removeChild(p);
+    let nuevoValor = input.getAttribute('placeholder')
+    if (input.getAttribute('value')){
+      input.setAttribute('value', '' )
+    }
+    input.setAttribute('type', 'text')
+    autocomplete(input, profesores, profesores2, 'tribunales');
+  }else if(p2){
+    p2.setAttribute('id', "p_"+id);
+  }
+  input.focus();
+}
+function Volver(cancelarpath){
+  window.location.replace(cancelarpath);
+}
+function Guardar(nuevopath){
+  let form2 = document.getElementById("formulario");
+  form2.setAttribute('action', nuevopath);
+  form2.submit();
+}
+
+function Enviar(){
+  return confirm("Una vez aprobada la asignación de tribunales no podrá modificarla  ¿Seguro que quiere aprobarla?")
+}
+
+function Decidir(decision){
+  let dec = document.getElementById('decision');
+  dec.setAttribute('value', decision)
+  if(confirm("Esta acción no se podrá deshacer. ¿Está seguro de que quiere continuar?")){
+    document.getElementById("formDecision").submit();
+  }
+}
+</script>

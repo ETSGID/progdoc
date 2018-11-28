@@ -1,0 +1,239 @@
+<%- include consultar.ejs %>
+<div>
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else{%>
+        <div>
+            <% for (let i=0 ; i<asignacionsExamen.length; i++){%>
+                <h2><%= asignacionsExamen[i].periodoNombre %>
+                <button type="button" class="btn btn-default" onclick = "MostrarOcultar('div_<%=asignacionsExamen[i].periodo%>')">
+                <span id ='button_div_<%=asignacionsExamen[i].periodo%>'  class="glyphicon glyphicon-plus"></span> 
+                </button>
+                <button type="button" id='buttonCalendario_div_<%=asignacionsExamen[i].periodo%>' class="btn btn-default hidden" onclick = "mostrarCalendario('calendario_<%=asignacionsExamen[i].periodo%>')">
+                Calendario
+                </button></h2>
+                <div class="hidden" id="div_<%=asignacionsExamen[i].periodo%>">
+                    <table class="table" id="table_<%=asignacionsExamen[i].periodo%>">
+                        <thead>
+                            <tr>
+                            <th scope="col">Asignatura</th>
+                            <th scope="col">Curso</th>
+                            <th scope="col">Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <% for (let j=0 ; j<asignacionsExamen[i].asignaturas.length; j++){%>
+                        <tr>
+                            <th scope="row">
+                                <%if (asignacionsExamen[i].asignaturas[j].acronimo !== null){ %>
+                                    <%= asignacionsExamen[i].asignaturas[j].acronimo%>
+                                <% }else{%>
+                                <%= asignacionsExamen[i].asignaturas[j].nombre%>
+                                <% } %> 
+                            </th>
+                            <td>
+                                <%= asignacionsExamen[i].asignaturas[j].curso%>
+                            </td>
+                            <td>
+                            <% let f = "-"
+                                if (asignacionsExamen[i].asignaturas[j].examen.fecha !== null){ 
+                                    f= asignacionsExamen[i].asignaturas[j].examen.fecha.split("-")[2]+"/"+asignacionsExamen[i].asignaturas[j].examen.fecha.split("-")[1]+"/"+asignacionsExamen[i].asignaturas[j].examen.fecha.split("-")[0]
+                                }%>
+                                <%=f%>
+                            </td>
+                        </tr>
+                        <%}%>
+                        </tbody>
+                    </table>
+                    <table class="table" style="display: none;" id="table_calendario_<%=asignacionsExamen[i].periodo%>">
+                        <thead>
+                            <tr>
+                            <th scope="col">Día</th>
+                            <% for (let k=0 ; k<cursos.length; k++){%>
+                                <th scope="col">Curso <%=cursos[k]%></th>
+                            <%}%> 
+                            </tr>
+                        </thead>
+                        <tbody id="body_table_calendario_<%=asignacionsExamen[i].periodo%>">
+                        </tbody>
+                    </table>
+                </div>
+            <%}%>
+        </div>
+    <%}%>
+
+</div>
+
+<script>
+let periodos = <%-JSON.stringify(periodosExamen)%>
+let pdID = <%-JSON.stringify(pdID)%>
+let cursos = <%-JSON.stringify(cursos)%>
+//el multiselect del layout funciona con jquery
+let estado = <%-JSON.stringify(estado)%>
+let asignacionsExamen = <%-JSON.stringify(asignacionsExamen)%>;
+let anoInicial;
+let anoFinal;
+let fechasLimite;
+if(pdID && periodos){
+anoInicial = 2000+ Number(pdID.split("_")[2][2]+""+pdID.split("_")[2][3])
+anoFinal = 2000+ Number(pdID.split("_")[2][4]+""+pdID.split("_")[2][5])
+//las fecha limite para poner los exámenes
+fechasLimite ={S1_O:["01/01/"+anoFinal, "31/01/"+anoFinal], S1_E:["01/06/"+anoFinal,"31/07/"+anoFinal], 
+S2_O:["01/05/"+anoFinal,"30/06/"+anoFinal], S2_E:["01/06/"+anoFinal,"31/07/"+anoFinal]}
+}
+
+
+function MostrarOcultar(id){
+    let div = document.getElementById(id);
+    let buttonSpan = document.getElementById('button_'+id)
+    let buttonCalendario = document.getElementById('buttonCalendario_'+id)
+    let clases = div.className.split(" ");
+    let clases2 = buttonCalendario.className.split(" ");
+    let oculto = clases.find(function (obj) { return obj === 'hidden'});
+    //si estaba oculto debo quitarlo
+    if (oculto){
+        div.className = "";
+        buttonCalendario.className = "";
+        for (let i =0; i<clases.length; i++){
+            if (clases[i] !== 'hidden'){
+                div.className += " " +clases[i]
+            }    
+        }
+        for (let i =0; i<clases2.length; i++){
+            if (clases2[i] !== 'hidden'){
+                buttonCalendario.className += " " + clases2[i]
+            }    
+        }
+        
+        buttonSpan.className = "glyphicon glyphicon-minus"
+    }
+    //debo ocultarlo
+    else{
+        div.className += " hidden"
+        buttonCalendario.className += " hidden"
+        buttonSpan.className = "glyphicon glyphicon-plus"
+
+    }
+
+}
+
+function mostrarCalendario(id){
+    let estadoExamenes=[];
+    let table = document.getElementById("table_"+id);
+    let tableBody = document.getElementById("body_table_"+id);
+    let cellsOfRow="";
+    let found=false;
+    let periodo = id.split("_")[1]
+    let tableDatos = document.getElementById("table_"+periodo)
+    let buttonCalendario = document.getElementById('buttonCalendario_div_'+periodo)
+    let text = buttonCalendario.innerHTML.trim();
+    let primeroEncontrado = false;
+    let ultimoEncontrado = -1;
+    let periodoKey;
+    for(let i in periodos){
+        if(periodos[i] === periodo){
+            periodoKey = i;
+        }
+    }
+    // Recorremos todas las filas con contenido de la tabla en la que metemos los datos
+    for (let j = 1; j < tableDatos.rows.length; j++){
+        cellsOfRow = tableDatos.rows[j].getElementsByTagName('th');
+        cellsOfRow2 = tableDatos.rows[j].getElementsByTagName('td');
+        // Recorremos todas las celdas fe la fila que me interesan
+        let nuevoExamen = {};
+        nuevoExamen.asignatura = cellsOfRow[0].innerHTML.trim();
+        nuevoExamen.curso = cellsOfRow2[0].innerHTML.trim();
+        nuevoExamen.fecha = cellsOfRow2[1].innerHTML.trim() 
+        estadoExamenes.push(nuevoExamen);
+
+    }
+    let fechaLimiteInicio = fechasLimite[periodoKey][0]
+    let fechaLimiteFinal = fechasLimite[periodoKey][1]
+    if(text === 'Calendario'){
+        let body = document.getElementById("body_table_"+id)
+        //borro lo que había en el body para repintarlo
+        while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
+        }
+        let fechaFila = fechaLimiteInicio
+                
+        // Recorremos todas las filas con contenido de la tabla
+        while (fechaFila !== aumentarDia(fechaLimiteFinal)){
+            if(!primeroEncontrado){
+                let coincidenciasFecha = estadoExamenes.filter(
+                //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                ex => (ex.fecha === fechaFila)
+                );
+                coincidenciasFecha.length === 0 ? primeroEncontrado = false : primeroEncontrado = true;
+            }
+            if(primeroEncontrado){
+                let row = tableBody.insertRow();
+                let cell0 = row.insertCell();
+                cell0.innerHTML = getDia(fechaFila)+ " " +fechaFila.split("/")[0];
+                for(let k=0; k<cursos.length; k++){
+                    let cell = row.insertCell();
+                    cell.innerHTML =""
+                    let coincidencias = estadoExamenes.filter(
+                    //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                    ex => (ex.fecha === fechaFila && Number(ex.curso)===Number(cursos[k]))
+                    );
+                    for (let l=0; l<coincidencias.length; l++){
+                        if(l>0){
+                            cell.innerHTML+= " / "+coincidencias[l].asignatura;
+                        }else{
+                            ultimoEncontrado = tableBody.rows.length -1;
+                            cell.innerHTML+= coincidencias[l].asignatura;
+                        }
+                    }
+
+                }
+            }
+
+            fechaFila = aumentarDia(fechaFila)
+        }
+        //borro las últimas filas que no hay
+        if(ultimoEncontrado !== -1){
+            for (let m=tableBody.rows.length -1; m>ultimoEncontrado; m--){
+                tableBody.deleteRow(m);
+            }
+        }
+        buttonCalendario.innerHTML = 'Ocultar Calendario'
+        tableDatos.style.display = "none";
+        table.style.display = "block";
+    }else{
+        buttonCalendario.innerHTML = 'Calendario'
+        tableDatos.style.display = "block";
+        table.style.display = "none";
+    }
+}
+//aumenta un dia a la fecha
+function aumentarDia(fecha){
+   let ano = fecha.split("/")[2]
+   let mes = fecha.split("/")[1]
+   let dia = fecha.split("/")[0]
+   let d = new Date (mes+"/"+dia+"/"+ano)
+   let nextDay = new Date(d);
+   nextDay.setDate(d.getDate()+1);
+   //Devuelve la fecha en formato dd/mm/yyyy
+   return(("0" + nextDay.getDate()).slice(-2)+"/"+("0" + (nextDay.getMonth() + 1)).slice(-2)+"/"+nextDay.getFullYear())
+}
+//la fecha la paso como dd/mm/yyyy (puedo pasarla como 5/8/2018)
+function getDia(fecha) {
+    let ano = fecha.split("/")[2]
+    let mes = fecha.split("/")[1]
+    let dia = fecha.split("/")[0]
+    //debo darle la vuelta al formato ingles
+    let d = new Date(mes+"/"+dia+"/"+ano);
+    let weekday = new Array(7);
+    weekday[0] = "D";
+    weekday[1] = "L";
+    weekday[2] = "M";
+    weekday[3] = "X";
+    weekday[4] = "J";
+    weekday[5] = "V";
+    weekday[6] = "S";
+
+    return weekday[d.getDay()];
+    
+}
+</script>

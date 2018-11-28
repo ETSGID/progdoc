@@ -1,0 +1,35 @@
+body{
+    font-size: 8pt;
+    }         
+table{
+width:100%;
+font-size: 5pt;
+border: rgb(51, 50, 50) 1pt solid;
+border-collapse: collapse;
+}
+td,th{
+    border: rgb(51, 50, 50) 1pt solid;
+    border-collapse: collapse; 
+}
+
+.tdSombreado{
+    border: rgb(51, 50, 50) 1pt solid;
+    border-collapse: collapse;
+    background-color: rgb(209, 206, 206); 
+}
+
+th{
+    background-color: rgb(182, 177, 177);
+}
+.tableText {
+    font-size: 5pt;
+}
+thead{
+    text-align: left;
+}
+.cuidado {
+    background-color: rgb(186, 82, 82); 
+}
+.nuevaAsignatura {
+    background-color: rgb(129, 186, 82); 
+}

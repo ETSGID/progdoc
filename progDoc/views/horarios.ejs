@@ -1,0 +1,429 @@
+<%- include cumplimentar.ejs %>
+<div>
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+  <p><%=permisoDenegado%></p>
+<%}else{%>
+        <form id="formulario" autocomplete="off" action="<%=aprobarpath%>" method="post" onsubmit="return Enviar()" >
+            <% for (let i=0 ; i<asignacionsHorario.length; i++){%>
+                <div>
+                    <h2>Curso <%= asignacionsHorario[i].curso %></h2>
+                    <% for (let j=0 ; j<asignacionsHorario[i].semestres.length; j++){%>
+                        <h3>Semestre <%= asignacionsHorario[i].semestres[j].semestre %></h3>
+                        <% for (let k=0 ; k<asignacionsHorario[i].semestres[j].grupos.length; k++){%>
+                            <h4><%= asignacionsHorario[i].semestres[j].grupos[k].grupoNombre %> <%= asignacionsHorario[i].semestres[j].grupos[k].nombreItinerario  %>
+                            <button type="button" class="btn btn-default" onclick = "MostrarOcultar('div_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
+                            <span id ='button_div_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>'  class="glyphicon glyphicon-plus"></span> 
+                            </button>
+                            <button type="button" id='buttonSimplificar_table_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>' class="btn btn-default hidden" onclick = "simplificar('table_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
+                            Simplificar 
+                            </button></h4>
+                            <div class="hidden" id="div_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>">
+                                <% let getAsignacions = function (hora,dia){
+                                        let found = asignacionsHorario[i].semestres[j].grupos[k].asignaciones.filter(
+                                            //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                                            asign => (asign.horaInicio && (asign.horaInicio.split(':')[0] === ""+l || asign.horaInicio.split(':')[0] === "0"+l) && asign.dia === dia)
+                                        );
+                                        return found;
+                                }%>
+                                <% let getNotas = function (){
+                                        let found = asignacionsHorario[i].semestres[j].grupos[k].asignaciones.filter(
+                                            //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                                            asign => ((asign.nota && asign.nota.trim() !== ""))
+                                        );
+                                        return found;
+                                }%>
+                                <table class="table" id="table_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>">
+                                    <thead>
+                                        <tr>
+                                        <th scope="col">Hora</th>
+                                        <th scope="col">Lunes</th>
+                                        <th scope="col">Martes</th>
+                                        <th scope="col">Miércoles</th>
+                                        <th scope="col">Jueves</th>
+                                        <th scope="col">Viernes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <%  let l = 8;
+                                            while (l <= 20){ %> 
+                                        <tr>
+                                        <td scope="col"><%= ""+l+"-"+(l+1) %></td>
+                                        <% let dias = ['L','M','X','J','V'];
+                                            for(let d = 0; d<dias.length; d++){%>
+                                                <td scope="col" id='horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%=asignacionsHorario[i].semestres[j].semestre%>' onclick="mostrar('horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%=asignacionsHorario[i].semestres[j].semestre%>')">
+                                                <% let found = getAsignacions(l,dias[d])
+                                                    if (found.length === 0){%>
+                                                        <span>-</span>
+                                                    <%}
+                                                    for (let m=0; m< found.length; m++){
+                                                        if(m>0){%>
+                                                            <span> / </span>
+                                                        <%}%>
+                                                        <span id='p_horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%m%>'> 
+                                                        <%if(found[m].asignaturaAcronimo !== null){ %>
+                                                            <%=found[m].asignaturaAcronimo%>
+                                                        <%} else{%>
+                                                            <%=found[m].asignaturaNombre%>
+                                                        <% } %>
+                                                        </span>
+                                                        <input type='hidden' name='momentaneo' id='horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%=found[m].asignaturaIdentificador%>_<%=found[m].identificador%>' value='<%=found[m].identificador%>'>
+                                                    <% } %>
+                                                </td>
+                                        <%}%>
+                                        </tr>
+                                        <% l++; }%>
+                                    </tbody>
+                                </table>
+                                <div style="border: ridge  2px; padding: 5px;">
+                                    <p><b>Notas:</b>
+                                        <button type="button" class="btn btn-default" onclick = "anadirNota('nota_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
+                                        Añadir Nota
+                                        </button>
+                                    </p>
+                                    
+                                    <div id='nota_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>'>
+                                        <% let foundNotas = getNotas();
+                                        for (let n=0; n< foundNotas.length; n++){ %>
+                                            <input type='hidden' name='momentaneo' id='horario_<%=asignacionsHorario[i].curso%>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=foundNotas[n].asignaturaIdentificador%>_<%=foundNotas[n].identificador%>' value='<%=foundNotas[n].identificador%>'>
+                                            <p id='nota_horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=foundNotas[n].asignaturaIdentificador%>_<%=foundNotas[n].identificador%>'> 
+                                            <% if (foundNotas[n].asignaturaAcronimo){ %>
+                                                (<%=foundNotas[n].asignaturaAcronimo%>)
+                                            <%}else{%>
+                                                (<%=foundNotas[n].asignaturaNombre%>)
+                                            <%}%>
+                                            <button type="button" class="btn btn-default" onclick = "eliminarNota('horario_<%=asignacionsHorario[i].curso%>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=foundNotas[n].asignaturaIdentificador%>_<%=foundNotas[n].identificador%>')">
+                                            <span class="glyphicon glyphicon-trash"></span> 
+                                            </button>
+                                        <%=foundNotas[n].nota%></p>
+                                        <%}%>
+                                    </div>
+                                </div>
+                            </div>
+                        <%}
+                    }%>
+                </div>
+
+            <%}%>
+            <%if(estadoHorarios === estadosHorario.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
+            <input type="submit" value='Guardar y Aprobar Asignación Horarios'>
+            <%}%>
+            <button type="button" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
+            <button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+        </form>
+    <%}%>
+
+</div>
+<script>
+
+//el multiselect del layout funciona con jquery
+let estado = <%-JSON.stringify(estado)%>
+let asignacionsHorario = <%-JSON.stringify(asignacionsHorario)%>;
+let notas = 0;
+let pulsado = 0;
+let pulsado2 = false;
+function mostrar(id){
+    //solo dejo un select picker activo a la vez
+    if( pulsado === 0 && document.getElementsByClassName("selectpicker").length === 0){ 
+        pulsado =1;
+        let asignacions = [];
+        let parent = document.getElementById(id);
+        let children = document.getElementById(id).children;
+        let childrenToBorrar = [];
+        let habiaP = false;
+        let momentaneo = [];
+        for(let i =0; i<children.length; i++){
+            if(children[i].tagName === 'SPAN'){
+                habiaP = true;
+                let text =children[i].innerHTML.trim()
+                if (text && text !== '/' && text !==""){
+                    asignacions.push(text)
+                } 
+                childrenToBorrar.push(children[i]);
+            }
+            if (children[i].tagName === 'INPUT' && children[i].getAttribute("name") !== 'momentaneo'){
+                childrenToBorrar.push(children[i]);
+            }
+            if (children[i].tagName === 'INPUT' && children[i].getAttribute("name") === 'momentaneo'){
+                let m = {};
+                m.identificadorAsignatura = Number(children[i].getAttribute("id").split("_")[5]);
+                m.identificadorAsignacion = Number(children[i].getAttribute("id").split("_")[6]);
+                momentaneo.push(m);
+            }
+        
+            
+        }
+        for ( let i=0; i<childrenToBorrar.length; i++){
+            parent.removeChild(childrenToBorrar[i]);
+        }
+        if(habiaP){
+            let curso = id.split("_")[1];
+            let grupo = Number(id.split("_")[2]);
+            let dia = id.split("_")[3];
+            let semestre = Number(id.split("_")[5]);
+            let horaInicio = id.split("_")[4];
+            let cursoArray = asignacionsHorario.find(function (obj) { return obj.curso === curso});
+            let semestreArray = cursoArray.semestres.find(function (obj) { return obj.semestre === semestre})
+            let grupoArray = semestreArray.grupos.find(function (obj) { return obj.grupoCodigo === grupo})
+            
+            let asignaturas = grupoArray.asignaturas;
+            //let asignacions = asignacionsHorario[curso][grupo].asignaciones;        
+            let div = document.createElement('div');
+            let options = '';
+            for (let i = 0; i<asignaturas.length; i++){
+                let s1 = semestre === 1 && (asignaturas[i].semestre === '1S' || asignaturas[i].semestre === '1S-2S' || asignaturas[i].semestre === 'A' || asignaturas[i].semestre === 'I')
+                let s2 = semestre === 2 && (asignaturas[i].semestre === '2S' || asignaturas[i].semestre === '1S-2S' || asignaturas[i].semestre === 'A' || asignaturas[i].semestre === 'I')
+                if (s1 || s2){
+                let n = "";
+                asignaturas[i].acronimo !== null ? n=asignaturas[i].acronimo : n=asignaturas[i].nombre;
+                options+='<option>'+n+'</option>'
+                }
+
+            }
+            div.innerHTML = '<select id="select_'+id.replace(".","-")+'" class="selectpicker" multiple>'+options+'</select>'
+            let nuevo = div.firstChild;
+            parent.appendChild(nuevo);
+            //hago el replace pq el pto lo detecta como clase y no lo encuentra
+            $("#select_" + id.replace(".","-")).selectpicker('render');
+            $("#select_" + id.replace(".","-")).selectpicker('val', asignacions);
+            //$("#select_" + id.replace(".","-")).selectpicker('toggle');
+        
+            //evento cuando se cierra
+           $("#select_" + id.replace(".","-")).on('hidden.bs.select', function (sel) {
+              if(pulsado2){
+             
+                let div2 = document.createElement('div');
+                let selected = getSelectValues(nuevo); // devuelve un array cono los seleccionados
+                if (selected.length === 0){
+                    div2.innerHTML ="<span>-</span>"
+                    parent.appendChild(div2.firstChild)
+                }
+                for (let l=0; l<selected.length; l++){
+                    if(l>0){
+
+                        div2.innerHTML = "<span>/</span>"
+                        parent.appendChild(div2.firstChild);
+                    }
+                    div2.innerHTML = "<span id='p_horario_"+curso+"_"+grupo+"_"+dia+"_"+horaInicio+"_"+l+"'>"+selected[l]+"</span>"
+                    parent.appendChild(div2.firstChild);
+                    let asign = asignaturas.find(function (obj) { return (obj.nombre === selected[l] || obj.acronimo === selected[l]) })
+                    let momentaneoAsign;
+                    if (asign){
+                        momentaneoAsign = momentaneo.find(function(obj) {return obj.identificadorAsignatura === asign.identificador;});
+                    }
+                    //se añadirán las que no estaban en momentaneo, que eran las que tengo en la bbdd
+                    if (asign && !momentaneoAsign){
+                        div2.innerHTML = "<input type='hidden' name='anadir' id='"+id+"_"+asign.identificador+"' value='"+id+"_"+asign.identificador+"'>"
+                        parent.appendChild(div2.firstChild);
+                    }
+                }
+                //debo mandar a borrar en la bbdd las antiguas que he quitado
+               for (let j=0; j<momentaneo.length; j++){
+                    let momentaneoAsign = asignaturas.find(function (obj) { return obj.identificador === momentaneo[j].identificadorAsignatura })
+                    let asign = ""
+                    if(momentaneoAsign){
+                        asign =  selected.find(function (obj) { return (obj === momentaneoAsign.nombre || obj === momentaneoAsign.acronimo) })
+                    }
+                    if (!asign && momentaneoAsign){
+                        div2.innerHTML = "<input type='hidden' name='eliminar' id='"+id+"_"+momentaneo[j].identificadorAsignacion+"' value='"+id+"_"+momentaneo[j].identificadorAsignacion+"'>"
+                        parent.appendChild(div2.firstChild);   
+                    }
+                }
+                parent.removeChild(nuevo.parentNode)//borro el select y el dropdown que lo capsula
+                pulsado2 = false;
+              }
+            });
+            asyncCall($('[data-id=select_'+id).parent());
+        }
+        pulsado = 0;
+    }
+
+}
+
+function sleep(){
+    return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(true);
+                },100)
+            })
+}
+
+async function asyncCall(element){
+    pulsado2=await sleep();
+    element.addClass("open")
+}
+
+function getSelectValues(select) {
+  let result = [];
+  let options = select && select.options;
+  let opt;
+
+  for (let i=0, iLen=options.length; i<iLen; i++) {
+    opt = options[i];
+
+    if (opt.selected) {
+      result.push(opt.value || opt.text);
+    }
+  }
+  return result;
+}
+
+function MostrarOcultar(id){
+    let table = document.getElementById(id);
+    let buttonSpan = document.getElementById('button_'+id)
+    let buttonSimplificar = document.getElementById('buttonSimplificar_table_'+id.split("_")[1])
+    let clases = table.className.split(" ");
+    let clases2 = buttonSimplificar.className.split(" ");
+    let oculto = clases.find(function (obj) { return obj === 'hidden'});
+    //si estaba oculto debo quitarlo
+    if (oculto){
+        table.className = "";
+        buttonSimplificar.className = "";
+        for (let i =0; i<clases.length; i++){
+            if (clases[i] !== 'hidden'){
+                table.className += " " +clases[i]
+            }    
+        }
+        for (let i =0; i<clases2.length; i++){
+            if (clases2[i] !== 'hidden'){
+                buttonSimplificar.className += " " + clases2[i]
+            }    
+        }
+        
+        buttonSpan.className = "glyphicon glyphicon-minus"
+    }
+    //debo ocultarlo
+    else{
+        table.className += " hidden"
+        buttonSimplificar.className += " hidden"
+        buttonSpan.className = "glyphicon glyphicon-plus"
+
+    }
+
+}
+
+function simplificar(id){
+    let table = document.getElementById(id);
+    let cellsOfRow="";
+    let found=false;
+    let buttonSimplificar = document.getElementById('buttonSimplificar_'+id)
+    let text = buttonSimplificar.innerHTML.trim();
+    if(text === 'Simplificar'){
+        // Recorremos todas las filas con contenido de la tabla
+        for (let i = 1; i < table.rows.length; i++){
+            cellsOfRow = table.rows[i].getElementsByTagName('td');
+            found = false;
+            // Recorremos todas las celdas fe la fila que me interesan
+            for (let j = 1; j < cellsOfRow.length && !found; j++){   
+                if (!cellsOfRow[j].innerHTML.includes("<span>-</span>")){
+                    found = true;
+                }
+            }
+            if(!found){
+                table.rows[i].className = 'hidden';
+            } 
+        }
+        buttonSimplificar.innerHTML = 'Expandir'
+    }else{
+        // Recorremos todas las filas de la tabla y las hacemos visibles
+        for (let i = 1; i < table.rows.length; i++){
+            cellsOfRow = table.rows[i].getElementsByTagName('td');
+            table.rows[i].className = '';  
+        }
+        buttonSimplificar.innerHTML = 'Simplificar'
+    }
+}
+
+function anadirNota(id){
+  let div = document.createElement('div');
+  //Utilizo un numero para identificar las nuevas notas (acompañado de un string para evitar que pueda coincidir con un número de la bbdd)
+  notas++;
+  let curso = id.split("_")[1];
+  let grupo = Number(id.split("_")[3]);
+  let semestre = Number(id.split("_")[2]);
+  let cursoArray = asignacionsHorario.find(function (obj) { return obj.curso === curso});
+  let semestreArray = cursoArray.semestres.find(function (obj) { return obj.semestre === semestre})
+  let grupoArray = semestreArray.grupos.find(function (obj) { return obj.grupoCodigo === grupo})
+  let asignaturas = grupoArray.asignaturas;
+  let options='';
+  for (let i = 0; i<asignaturas.length; i++){ 
+     let s1 = semestre === 1 && (asignaturas[i].semestre === '1S' || asignaturas[i].semestre === '1S-2S' || asignaturas[i].semestre === 'A' || asignaturas[i].semestre === 'I')
+     let s2 = semestre === 2 && (asignaturas[i].semestre === '2S' || asignaturas[i].semestre === '1S-2S' || asignaturas[i].semestre === 'A' || asignaturas[i].semestre === 'I')    
+     if(s1 || s2){
+        let n = "";
+        asignaturas[i].acronimo !== null ? n=asignaturas[i].acronimo : n=asignaturas[i].nombre;
+        options+='<option value='+n+'>'+n+'</option>'    
+     }
+    }
+  div.innerHTML =`<p id="nota_horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}">
+  <input type="hidden" name="momentaneo" id="horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}" value="">
+  <select id="select_nuevaNota${notas}">${options}</select>
+  <button type="button" class="btn btn-default" onclick = "guardarNota('horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}')">
+  <span class="glyphicon glyphicon-ok"></span>
+  </button> 
+  <button type="button" class="btn btn-default" onclick = "eliminarNota('horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}')">
+  <span class="glyphicon glyphicon-trash"></span>
+  </button> 
+  <textarea name="textarea" id="text_horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}" cols="80" rows="4" placeholder="Introducir nota" maxlength="300"></textarea>
+  </p>`
+  let node = div.firstChild;
+  let contenedor = document.getElementById(id)
+  contenedor.appendChild(node)
+
+}
+
+function guardarNota(id){
+    let curso = id.split("_")[1];
+    let nuevaNota = id.split("_")[4];
+    let grupo = Number(id.split("_")[3]);
+    let semestre = Number(id.split("_")[2]);
+    let asignaturaNombreOAcronimo = document.getElementById("select_"+nuevaNota).value
+    let cursoArray = asignacionsHorario.find(function (obj) { return obj.curso === curso});
+    let semestreArray = cursoArray.semestres.find(function (obj) { return obj.semestre === semestre})
+    let grupoArray = semestreArray.grupos.find(function (obj) { return obj.grupoCodigo === grupo})
+    let asignatura = grupoArray.asignaturas.find(function (obj) { return (obj.acronimo === asignaturaNombreOAcronimo || obj.nombre === asignaturaNombreOAcronimo )});
+    let text = document.getElementById("text_"+id).value;
+
+    if(text && asignatura &&text.trim() !== ""){
+        let div = document.createElement('div');
+        let p = document.getElementById("nota_"+id);
+        p.parentNode.removeChild(p)
+        div.innerHTML = `<p id="nota_horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}">
+        <input type="hidden" name="anadir" id="horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}" value="${asignatura.identificador}_${grupo}_${text}"> 
+        (${asignaturaNombreOAcronimo})
+        <button type="button" class="btn btn-default" onclick = "eliminarNota('horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}')">
+        <span class="glyphicon glyphicon-trash"></span> 
+        </button>
+        ${text}
+        </p>`
+        
+        let node = div.firstChild;
+        let contenedor = document.getElementById("nota_"+curso+"_"+semestre+"_"+grupo)
+        contenedor.appendChild(node)
+    }
+
+}
+
+function eliminarNota(id){
+    let inputHidden = document.getElementById(id);
+    //en el caso de notas que añadi nuevas da igual cambiar esto porque al eliminar p elimino el hidden tambien
+    //no puedo poner eliminiarNota pq se ralla con la función que tiene el mismo nombre
+    inputHidden.setAttribute('name', 'eliminar')
+    let p = document.getElementById("nota_"+id)
+    p.parentNode.removeChild(p); 
+}
+
+function Volver(cancelarpath){
+  window.location.replace(cancelarpath);
+}
+function Guardar(nuevopath){
+  let form2 = document.getElementById("formulario");
+  form2.setAttribute('action', nuevopath);
+  form2.submit();
+}
+
+function Enviar(){
+  return confirm("Una vez aprobados los horarios no podrá modificarlos ¿Seguro que quiere aprobarlos?")
+}
+</script>

@@ -1,0 +1,111 @@
+<div style="page-break-after:always;"></div>
+<div>
+<%function getDia(fecha) {
+    let ano = fecha.split("/")[2]
+    let mes = fecha.split("/")[1]
+    let dia = fecha.split("/")[0]
+    //debo darle la vuelta al formato ingles
+    let d = new Date(mes+"/"+dia+"/"+ano);
+    let weekday = new Array(7);
+    weekday[0] = "D";
+    weekday[1] = "L";
+    weekday[2] = "M";
+    weekday[3] = "X";
+    weekday[4] = "J";
+    weekday[5] = "V";
+    weekday[6] = "S";
+    return weekday[d.getDay()];
+}
+function getPeriodoKey(value){
+    for(let i in periodos){
+        if(periodos[i] === value){
+            return i
+        }
+    }
+    return -1;
+}
+function aumentarDia(fecha){
+   let ano = fecha.split("/")[2]
+   let mes = fecha.split("/")[1]
+   let dia = fecha.split("/")[0]
+   let d = new Date (mes+"/"+dia+"/"+ano)
+   let nextDay = new Date(d);
+   nextDay.setDate(d.getDate()+1);
+   //Devuelve la fecha en formato dd/mm/yyyy
+   return(("0" + nextDay.getDate()).slice(-2)+"/"+("0" + (nextDay.getMonth() + 1)).slice(-2)+"/"+nextDay.getFullYear())
+}
+
+let anoInicial;
+let anoFinal;
+let fechasLimite;
+if(pdID && periodos){
+anoInicial = 2000+ Number(pdID.split("_")[2][2]+""+pdID.split("_")[2][3])
+anoFinal = 2000+ Number(pdID.split("_")[2][4]+""+pdID.split("_")[2][5])
+//las fecha limite para poner los exámenes
+fechasLimite ={S1_O:["01/01/"+anoFinal, "31/01/"+anoFinal], S1_E:["01/06/"+anoFinal,"31/07/"+anoFinal], 
+S2_O:["01/05/"+anoFinal,"30/06/"+anoFinal], S2_E:["01/06/"+anoFinal,"31/07/"+anoFinal]}
+}%>
+
+<h2>4.Exámenes</h2>
+    <% for (let i=0 ; i<asignacionsExamen.length; i++){%>
+    <%if(i>0){%>
+                <div style="page-break-after:always;"></div>
+            <%}%>
+        <h3><%= asignacionsExamen[i].periodoNombre %></h3>
+            <table class="table" id="table_calendario_<%=asignacionsExamen[i].periodo%>">
+                <thead>
+                    <tr>
+                    <th scope="col" width="10%">Día</th>
+                    <% for (let k=0 ; k<cursosConGrupos.length; k++){%>
+                        <th scope="col" width="90/<%=cursosConGrupos.length%>%">Curso <%=cursosConGrupos[k].curso%></th>
+                    <%}%> 
+                    </tr>
+                </thead>
+                <tbody id="body_table_calendario_<%=asignacionsExamen[i].periodoNombre%>">
+                    <%let p = getPeriodoKey(asignacionsExamen[i].periodo)
+                    let fechaLimiteInicial = fechasLimite[p][0]
+                    let fechaLimiteFinal = fechasLimite[p][1]
+                    let fechaFila = fechaLimiteInicial
+                    let primeroEncontrado = false;
+                    let ultimoEncontrado = 0;
+                    while (fechaFila !== aumentarDia(fechaLimiteFinal) && ultimoEncontrado !== asignacionsExamen[i].examenes.length ){
+                        if(!primeroEncontrado){
+                            let coincidenciasFecha = asignacionsExamen[i].examenes.filter(
+                            //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                            ex => (ex.fecha === fechaFila)
+                            );
+                            coincidenciasFecha.length === 0 ? primeroEncontrado = false : primeroEncontrado = true;
+                        }
+                        if(primeroEncontrado){%>
+                            <tr>
+                                <td width="10%"><%=getDia(fechaFila)+ " " +fechaFila.split("/")[0];%></td>
+                                <%for (let k=0 ; k<cursosConGrupos.length; k++){
+                                    let coincidencias = asignacionsExamen[i].examenes.filter(
+                                    //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                                    ex => (ex.fecha === fechaFila && Number(ex.curso)===Number(cursosConGrupos[k].curso))
+                                    );
+                                    if (coincidencias.length === 0){%>
+                                        <td width="90/<%=cursosConGrupos.length%>%">-</td>
+                                    <%}else{%>
+                                        <td width="90/<%=cursosConGrupos.length%>%">
+                                            <%for (let l=0; l<coincidencias.length; l++){
+                                                if(l>0){
+                                                    ultimoEncontrado++%>
+                                                    / <%=coincidencias[l].asignatura%>
+                                                <%}else{
+                                                    ultimoEncontrado++%>
+                                                    <%=coincidencias[l].asignatura%>
+                                                <%}
+                                            }%>
+                                       </td>
+                                    <%}
+                                }%>
+                            </tr>                            
+                        <%}
+                        fechaFila = aumentarDia(fechaFila)
+                    }%>
+                </tbody>
+            </table>
+    <%}%>
+
+</div>

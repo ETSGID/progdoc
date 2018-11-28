@@ -1,0 +1,206 @@
+<div>
+<% let getAsignaturaCodigo = function (identificador){
+  let found = asignaturas.find(function (obj) { return obj.identificador === identificador; });
+return found;
+}
+let getAsignaturaCodigoNombre = function (identificador){
+  let found = asignaturas.find(function (obj) { return obj.identificador === identificador; });
+  let nombreOAcronimo;
+  if (found){
+    if(found.acronimo !== null){ 
+        return found.acronimo;
+    }else{
+        return found.nombre
+    }    
+  }else{
+      return null;
+  }
+}
+let getAsignaturaCodigoIdentificador = function (identificador){
+  let found = asignaturas.find(function (obj) { return obj.identificador === identificador; });
+  let nombreOAcronimo;
+  if (found){
+    return found.codigo;     
+  }else{
+      return null;
+  }
+}
+
+let getNombre = function (identificador){
+    let persona = profesores.find(function (obj) { return obj.identificador === identificador; });
+    if (persona){
+      return persona.nombre;
+    }else {
+      return "-"
+    }
+}
+let sortProfesorCorregido = function (a, b) {
+    if (getNombre(a) < getNombre(b))
+        return -1;
+    if (getNombre(a) > getNombre(b))
+        return 1;
+    return 0;
+}
+
+let sortAsignaturasCodigo = function (a, b) {
+    if (getAsignaturaCodigoIdentificador(a.asignaturaId) < getAsignaturaCodigoIdentificador(b.asignaturaId))
+        return -1;
+    if (getAsignaturaCodigoIdentificador(a.asignaturaId) > getAsignaturaCodigoIdentificador(b.asignaturaId))
+        return 1;
+    return 0;
+}
+let getNumeroGruposNoOptativas = function (grupos){
+  let found =grupos.filter(
+  //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+  grupo => (!grupo.nombre.toUpperCase().includes("OPT"))
+  );
+  return found.length;
+}%>
+
+<div style="page-break-after:always;"></div>
+<h2>2.Previsión de Grupos</h2>
+<p>La previsión de grupos de teoría por curso, es:</p>
+<% for(let i=0; i < cursosConGrupos.length; i++) { %>
+  <p>Curso <%=cursosConGrupos[i].curso%>:</p>
+  <ul>
+  <% for(let j=0; j < cursosConGrupos[i].semestres.length; j++) { %>
+      <li>Semestre <%=cursosConGrupos[i].semestres[j].semestre%>: <%=getNumeroGruposNoOptativas(cursosConGrupos[i].semestres[j].grupos)%> 
+      <%let text;
+      getNumeroGruposNoOptativas(cursosConGrupos[i].semestres[j].grupos) === 1 ? text = 'grupo' : text='grupos'%>
+      <%=text%>
+      </li>
+  <% } %>
+  </ul>
+<% } %>
+<div style="page-break-after:always;"></div>
+<h2>3.Horarios</h2>
+<p>La previsión de horarios por curso, es:</p>
+            <% for (let i=0 ; i<cursosConGrupos.length; i++){%>
+                <div>
+                    <p>Curso <%= cursosConGrupos[i].curso %></p>
+                    <% for (let j=0 ; j<cursosConGrupos[i].semestres.length; j++){%>
+                        <p>Semestre <%= cursosConGrupos[i].semestres[j].semestre %></p>
+                        <% for (let k=0 ; k<cursosConGrupos[i].semestres[j].grupos.length; k++){
+                            cursosConGrupos[i].semestres[j].grupos[k].horarios.sort(sortAsignaturasCodigo)
+                            %>
+                            
+                            <% let getAsignacions = function (hora,dia){
+                                    let found = cursosConGrupos[i].semestres[j].grupos[k].horarios.filter(
+                                        //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                                        asign => (asign.horaInicio && (asign.horaInicio.split(':')[0] === ""+l || asign.horaInicio.split(':')[0] === "0"+l) && asign.dia === dia)
+                                    );
+                                    return found;
+                            }%>
+                            <% let getNotas = function (){
+                                    let found = cursosConGrupos[i].semestres[j].grupos[k].horarios.filter(
+                                        //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                                        asign => ((asign.nota && asign.nota.trim() !== ""))
+                                    );
+                                    return found;
+                            }%>
+                            <table>
+                              <caption style="text-align: left;">Grupo <%= cursosConGrupos[i].semestres[j].grupos[k].nombre %></caption>
+                                <thead>
+                                    <tr>
+                                    <th scope="col" width="10%">Hora</th>
+                                    <th scope="col" width="90/5%">Lunes</th>
+                                    <th scope="col" width="90/5%">Martes</th>
+                                    <th scope="col" width="90/5%">Miércoles</th>
+                                    <th scope="col" width="90/5%">Jueves</th>
+                                    <th scope="col" width="90/5%">Viernes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <%  let l = 8;
+                                        while (l <= 20){ %> 
+                                    <tr>
+                                    <td scope="col" width="10%"><%= ""+l+"-"+(l+1) %></td>
+                                    <% let dias = ['L','M','X','J','V'];
+                                        for(let d = 0; d<dias.length; d++){%>
+                                            
+                                            <% let found = getAsignacions(l,dias[d])
+                                                if (found.length === 0){%>
+                                                <td scope="col" class="tdSombreado" width="(90/5)%">
+                                                    <span>-</span>
+                                                <%}else{%>
+                                                    <td scope="col" width="90/5%">
+                                                    <%for (let m=0; m< found.length; m++){
+                                                    if(getAsignaturaCodigo(found[m].asignaturaId)){
+                                                        let asignat = getAsignaturaCodigo(found[m].asignaturaId)
+                                                        if(m>0){%>
+                                                            <span>/</span>
+                                                        <%}%> 
+                                                        <%if(asignat.acronimo !== null){ %>
+                                                            <%=asignat.acronimo%>
+                                                        <%} else{%>
+                                                            <%=asignat.nombre%>
+                                                        <% } %>
+                                                        </span>
+                                                    <%}
+                                                    }
+                                                } %>
+
+                                            </td>
+                                    <%}%>
+                                    </tr>
+                                    <% l++; }%>
+                                </tbody>
+                            </table>
+                            <div style="border: ridge  2px; padding: 0.5mm;" class="tableText">
+                                <p><b>Notas:</b></p>
+                                <% let foundNotas = getNotas();
+                                foundNotas.sort(sortAsignaturasCodigo)
+                                for (let n=0; n< foundNotas.length; n++){ %>
+                                    <p> 
+                                    <%if(getAsignaturaCodigo(foundNotas[n].asignaturaId)){
+                                    let asignat = getAsignaturaCodigo(foundNotas[n].asignaturaId) 
+                                    if(asignat.acronimo !== null){ %>
+                                        (<%=asignat.acronimo%>)
+                                    <%} else{%>
+                                        (<%=asignat.nombre%>)
+                                    <% } %>
+                                    
+                                    <%}%>
+                                    <%=foundNotas[n].nota%></p>
+                                <%}%>
+                            </div>
+                            <div style="border: ridge  2px; padding: 0.5mm;" class="tableText">
+                                <p><b>Profesores:</b></p>
+                                <% cursosConGrupos[i].semestres[j].grupos[k].asignaturas.sort(sortAsignaturasCodigo)
+                                for(let l = 0; l<cursosConGrupos[i].semestres[j].grupos[k].asignaturas.length; l++){
+                                    let asignat = cursosConGrupos[i].semestres[j].grupos[k].asignaturas[l];%>
+                                    <p><b><%=getAsignaturaCodigoNombre(asignat.asignaturaId)%>:</b>
+                                    <% asignat.asignacions.sort(sortProfesorCorregido)
+                                    for(let m = 0; m<asignat.asignacions.length; m++){
+                                        if(m === asignat.asignacions.length -1 ){%>
+                                            <span><%=getNombre(asignat.asignacions[m])%></span>
+                                        <%}else{%>     
+                                            <span><%=getNombre(asignat.asignacions[m])%>; </span>
+                                        <%}
+                                }%>
+                                    </p>                 
+                                <%}%>
+                            </div>
+                            <div style="border: ridge  2px; padding: 0.5mm;" class="tableText">
+                                <p><b>Guías de aprendizaje:</b></p>
+                                <% let ano = pdID.split("_")[2];
+                                    ano = ano.substring(0,4)+"-"+ano.substring(4,6)
+                                    let plan = pdID.split("_")[1]
+                                    let sem = cursosConGrupos[i].semestres[j].semestre + "S"
+                                for(let l = 0; l<cursosConGrupos[i].semestres[j].grupos[k].asignaturas.length; l++){
+                                    let asignat = cursosConGrupos[i].semestres[j].grupos[k].asignaturas[l];
+                                    let url = "https://www.upm.es/comun_gauss/publico/guias/"+ano+"/"+sem+"/GA_"+plan+"_"+ getAsignaturaCodigoIdentificador(asignat.asignaturaId)+"_"+sem+"_"+ano+".pdf"%>
+                                    <p><b><%=getAsignaturaCodigoNombre(asignat.asignaturaId)%>:</b>
+                                        <a href="<%=url%>" target="_blank"><%=url%></a>
+                                    </p>                 
+                                <%}%>
+                            </div>
+                          <%if(!(i===cursosConGrupos.length-1 && j===cursosConGrupos[i].semestres.length-1 && k===cursosConGrupos[i].semestres[j].grupos.length-1)){%>
+                                <div style="page-break-after:always;"></div>
+                            <%}
+                        }
+                    }%>
+                </div>
+
+            <%}%>
+</div>

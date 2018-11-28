@@ -1,0 +1,165 @@
+    
+    <body>
+    <p>Cumplimentar Programación</p>
+    <div class="row col-sm space-above-below">
+         <select id="selectPlan" onchange="cambiarPD()">
+                <% for(let i=0; i < planEstudios.length; i++) { 
+                    if (planEstudios[i].nombre !== null){ %>
+                    <option value="<%=planEstudios[i].codigo%>"><%=planEstudios[i].nombre%></option> 
+                    <%}else {%>
+                    <option value="<%=planEstudios[i].codigo%>"data-toggle="tooltip" title="hola"><%=planEstudios[i].codigo%></option> 
+                    <%}
+                }%>
+         </select>
+    <% if (locals.departamentoID && locals.departamentosResponsables && (locals.submenu === "Profesores" || locals.submenu === "Tribunales")) { %>
+     <input id='departamentoResponsable' type="hidden" value="<%=departamentoID%>">
+         <select id="selectDepartamento"  onchange="cambiarDepart()">
+            <% for(let i=0; i < departamentosResponsables.length; i++) { 
+                if (departamentosResponsables[i].acronimo !== null){ %>
+                    <option value="<%=departamentosResponsables[i].codigo%>"><%=departamentosResponsables[i].acronimo%></option> 
+                    <%}else {%>
+                    <option value="<%=departamentosResponsables[i].codigo%>"><%=departamentosResponsables[i].codigo%></option> 
+                <%}%>   
+            <%}%>
+         </select>
+    </div>
+
+  <%}%>
+    <div class="tab">
+        <button id='Estado' class="tablinks" onclick="cambiarSubmenu(event, 'Estado')">Estado</button>
+        <!--<button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>-->
+        <button id='Profesores' class="tablinks" onclick="cambiarSubmenu(event, 'Profesores')">Profesores</button>
+        <button id='Tribunales' class="tablinks" onclick="cambiarSubmenu(event, 'Tribunales')">Tribunales</button>
+        <button id='Horarios' class="tablinks" onclick="cambiarSubmenu(event, 'Horarios')">Horarios</button>
+        <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Examenes</button>
+    </div>
+    <% if (locals.planID) { %>
+     <input id='plan' type="hidden" value="<%=planID%>">
+  <%} else {%>
+    <input id='plan' type="hidden">
+  <%}%>
+    <% if (locals.submenu) { %>
+     <input id='submenu' type="hidden" value="<%=submenu%>">
+  <%} else {%>
+    <input id='submenu' type="hidden">
+  <%}%>
+  <% if (locals.departamentoID) { %>
+     <input id='departamento' type="hidden" value="<%=departamentoID%>">
+  <%} else {%>
+    <input id='departamento' type="hidden">
+  <%}%>
+
+<script>
+function cambiarSubmenu(evt, submenu) {
+    let pAcronimo = document.getElementById("selectPlan").value;
+    let departamento = document.getElementById('departamento');
+    if(departamento){
+        selectDepartamentoValue = departamento.value;
+        }
+    let i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(submenu).style.display = "block";
+    evt.currentTarget.className += " active";
+    
+    if(submenu === 'Profesores'){
+        let url = "<%=contextPath%>respDoc/profesores?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        window.location.replace(url);
+    }
+    if (submenu === 'Tribunales'){
+        let url = "<%=contextPath%>respDoc/tribunales?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        window.location.replace(url);
+    }
+    if (submenu === 'Horarios'){
+        let url = "<%=contextPath%>coordinador/horarios?planID="+pAcronimo
+        window.location.replace(url);
+    }
+    if (submenu === 'Examenes'){
+        let url = "<%=contextPath%>coordinador/examenes?planID="+pAcronimo
+        window.location.replace(url);
+    }
+    if (submenu === 'Estado'){
+        let url = "<%=contextPath%>estado?planID="+pAcronimo
+        window.location.replace(url);
+    }
+
+
+}
+function cambiarPD(){
+    let pAcronimo = document.getElementById("selectPlan").value;
+    let search = parseQueryString();
+    delete search.pdID;
+    search.planID = pAcronimo;
+    let url = parseStringQuery(search);
+    window.location.replace(url);
+    
+}
+
+function cambiarDepart(){
+    let depart = document.getElementById("selectDepartamento").value;
+    let search = parseQueryString();
+    search.departamentoID = depart;
+    let url = parseStringQuery(search);
+    window.location.replace(url);
+}
+
+let parseQueryString = function() {
+
+    let str = window.location.search;
+    let objURL = {};
+
+    str.replace(
+        new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
+        function( $0, $1, $2, $3 ){
+            objURL[ $1 ] = $3;
+        }
+    );
+    return objURL;
+};
+
+let parseStringQuery = function ( obj ) {
+  return '?'+Object.keys(obj).reduce(function(a,k){a.push(k+'='+encodeURIComponent(obj[k]));return a},[]).join('&')
+}
+
+
+document.getElementsByTagName('body')[0].onload = actualizarSelectyBarra();
+function actualizarSelectyBarra() {
+    let selectValue = document.getElementById('plan').value
+    if(!selectValue) {
+        selectValue= "09TT"
+    }
+    document.getElementById('selectPlan').value = selectValue;
+
+    let departamento = document.getElementById('departamento');
+    let selectDepartamento = document.getElementById('selectDepartamento');
+    if(departamento && selectDepartamento){
+        let selectDepartamentoValue = departamento.value;
+        if(!selectDepartamentoValue){
+            selectDepartamentoValue = "D520"
+        }
+        document.getElementById('selectDepartamento').value = selectDepartamentoValue;
+    }
+        
+    let submenu = document.getElementById('submenu').value
+    if(!submenu) {
+        submenu= "Estado"
+    }
+    document.getElementById(submenu).style.display = "block";
+    document.getElementById(submenu).className += " active";
+}
+
+</script>
+     
+</body>
+
+
+
+
+
+   

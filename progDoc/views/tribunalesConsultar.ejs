@@ -1,0 +1,53 @@
+<%- include consultar.ejs %>
+<div>
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else{%>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Asignatura</th>
+      <th scope="col">Presidente</th>
+      <th scope="col">Vocal</th>
+      <th scope="col">Secretario</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% for(let i=0; i < tribunales.length; i++) { %>
+    <tr>
+      <th scope="row">
+          <%if (tribunales[i].acronimo !== null){ %>
+            <%= tribunales[i].acronimo%>
+          <% }else{%>
+          <%= tribunales[i].nombre%>
+          <% } %> 
+      </th>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Presidente'>
+      <% if(tribunales[i].presidenteNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'><%= tribunales[i].presidenteNombre%></p>
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'>-</p>
+      <% } %> 
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Vocal'>
+      <% if(tribunales[i].vocalNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'><%= tribunales[i].vocalNombre%></p>
+      <% } else{ %>
+       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'>-</p>
+      <% } %>
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Secretario'>
+      <% if(tribunales[i].secretarioNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'><%= tribunales[i].secretarioNombre%></p>
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'>-</p>
+      <% } %>
+      </td>
+    </tr>
+<% } %> 
+  </tbody>
+</table>
+<% } %>
+</div>
+

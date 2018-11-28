@@ -1,0 +1,348 @@
+<script src="<%=contextPath%>js/autocomplete.js"></script>
+<%- include gestion.ejs %>
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else if(locals.permisoDenegado && locals.permisoDenegado!== null){%>
+  <p><%=permisoDenegado%></p>
+<%}else{ %>
+<table class="table" style="width:70%">
+<tbody>
+<% for(let i=0; i < pds.length; i++) { %> 
+<tr>
+
+  <% if (pds[i].nombre !== null) { %>
+    <th><span data-toggle="tooltip" title="<%=pds[i].nombreCompleto%>"><%=pds[i].nombre%></span></th>                 
+  <% } else { %>
+    <th><span data-toggle="tooltip" title="<%=pds[i].nombreCompleto%>"><%=pds[i].PlanEstudioId%></span></th>
+  <% } %>
+
+  <% if(pds[i].estadoProGDoc ===estadosProgDoc.cerrado) { %>
+     <% switch(pds[i].semestre){
+      case '1S' : %>
+         <td>
+         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control">
+            <option value='<%=pds[i].anoAcademico%>'><%=pds[i].anoAcademico%></option>
+         </select>
+        </td>
+        <td>
+         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control">
+            <option value='2S'>2S</option>
+         </select>
+        </td>
+        <% break;
+
+        case '2S' : %>
+         <td>
+         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control">
+            <option value="<%=pds[i].siguienteAnoAcademico%>"><%=pds[i].siguienteAnoAcademico%></option>
+         </select>
+        </td>
+        <td>
+         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control">
+            <option value='1S'>1S</option>
+            <option value='I'>I</option>
+         </select>
+        </td>
+        <% break;
+
+      case 'I' : %>
+         <td>
+         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control">
+            <option value="<%=pds[i].siguienteAnoAcademico%>"><%=pds[i].siguienteAnoAcademico%></option>
+         </select>
+        </td>
+        <td>
+         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control">
+            <option value='I'>I</option>
+            <option value='1S'>1S</option>
+         </select>
+        </td>
+        <% break;
+      case null : %>
+        <td>
+         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control">
+            <option value='<%=anos[0]%>'><%=anos[0]%></option>
+            <option value='<%=anos[1]%>'><%=anos[1]%></option>
+         </select>
+        </td>
+        <td>
+         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control">
+            <option value='I'>I</option>
+            <option value='1S'>1S</option>
+            <option value='2S'>2S</option>
+         </select>
+        </td>
+        <% break; 
+    }%>      
+    <td>
+      <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
+      <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
+      <input type="hidden" id="ocultoanoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="">
+      <input type="hidden" id="ocultosemestre_<%=pds[i].PlanEstudioId%>" name="semestre" value="">        
+      <button type="button" class="btn" onclick="Abrir('plan_<%=pds[i].PlanEstudioId%>_gestionar', '<%=abrirpath%>')">Abrir</button>
+      </form>
+    </td>
+    
+      <% if (pds[i].identificador !== null){ %>
+      <td>
+        <form id="plan_<%=pds[i].PlanEstudioId%>_incidencia" action="/hola" method="post">
+        <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
+        <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
+        <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
+        <input type="hidden" id="ocultosemestreIncidencia_<%=pds[i].PlanEstudioId%>" name="semestre" value="<%=pds[i].semestre%>">        
+        <button type="button" class="btn" onclick="AbrirIncidencia('plan_<%=pds[i].PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>')" data-toggle="tooltip"  title="<%=pds[i].identificador%>">
+        Abrir Incidencia
+        </button>
+        </form>
+      </td>
+        <% if (pds[i].semestre === 'I' && pds[i].reabierto !== 1){%>
+      <td>
+        <form id="plan_<%=pds[i].PlanEstudioId%>_reabierto" action="/hola" method="post">
+        <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
+        <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
+        <input type="hidden" id="ocultoanoAcademicoReabierto_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
+        <input type="hidden" id="ocultosemestreReabierto_<%=pds[i].PlanEstudioId%>" name="semestre" value="<%=pds[i].semestre%>">        
+        <button type="button" class="btn" onclick="AbrirReabierto('plan_<%=pds[i].PlanEstudioId%>_reabierto', '<%=reabrirpath%>')" data-toggle="tooltip">
+        Reabrir 2º Semestre
+        </button>
+        </form>
+      </td>
+        <%}else{%>
+        <td>
+          <button type="button" class="btn" disabled data-toggle="tooltip" title="No se puede reabrir">Reabrir 2º Semestre</button>
+        </td>
+        <%}
+      }else{ %>
+      <td>
+        <button type="button" class="btn" disabled data-toggle="tooltip" title="No hay programación docente anterior">Abrir Incidencia</button>
+      </td>
+      <%}%>
+    
+  <% }  else if(pds[i].estadoProGDoc === estadosProgDoc.listo) { %>
+    <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>"> 
+    
+    <td><%=pds[i].anoAcademico%></td>
+    <td><%=pds[i].semestre%></td>
+    <td>
+      <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
+      <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
+      <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
+      <input type="hidden" id="ocultoanoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
+      <input type="hidden" id="ocultosemestre_<%=pds[i].PlanEstudioId%>" name="semestre" value="<%=pds[i].semestre%>"> 
+      <button type="button" class="btn" onclick="Cerrar('plan_<%=pds[i].PlanEstudioId%>_gestionar', '<%=cerrarpath%>')">Cerrar</button>
+      </form>
+    </td>
+    <td>
+      <% let pdAnterior = pdsAnteriores.find(function (obj) { return obj.PlanEstudioId === pds[i].PlanEstudioId })
+        if (pdAnterior){ %>
+          <form id="plan_<%=pdAnterior.PlanEstudioId%>_incidencia" action="/hola" method="post">
+          <input type="hidden" name="plan" value="<%=pdAnterior.PlanEstudioId%>">
+          <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pdAnterior.identificador%>">
+          <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pdAnterior.PlanEstudioId%>" name="anoAcademico" value="<%=pdAnterior.anoAcademico%>">
+          <input type="hidden" id="ocultosemestreIncidencia_<%=pdAnterior.PlanEstudioId%>" name="semestre" value="<%=pdAnterior.semestre%>">     
+          <%if (pdAnterior.estadoProGDoc === estadosProgDoc.cerrado){%>
+            <button type="button" class="btn" onclick="AbrirIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>')" data-toggle="tooltip"  title="<%=pdAnterior.identificador%>">
+            Abrir Incidencia
+            </button>
+          <%}if (pdAnterior.estadoProGDoc === estadosProgDoc.incidencia){%>
+            <button type="button" class="btn" onclick="CerrarIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=cerrarincidenciapath%>')"  data-placement="top" title="<%=pdAnterior.identificador%>">
+            Cerrar Incidencia
+            </button>
+          <%}%>
+          </form>
+        <%}else{%>
+          <button type="button" class="btn" disabled data-toggle="tooltip"  title="No hay programación docente anterior">Abrir Incidencia</button>
+        <%}%>
+    </td>
+  <% } else if(pds[i].estadoProGDoc === estadosProgDoc.abierto) { %>
+    <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>"> 
+    <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>"> 
+    <td><%=pds[i].anoAcademico%></td>
+    <td><%=pds[i].semestre%></td>
+    <td>
+      <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
+      <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
+      <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>"> 
+      <button type="button" class="btn" onclick="Consultar('<%=pds[i].PlanEstudioId%>_<%=pds[i].nombre%>', '<%=consultarpath%>')">Consultar</button>
+      </form>
+    </td>
+    <td>
+      <% let pdAnterior = pdsAnteriores.find(function (obj) { return obj.PlanEstudioId === pds[i].PlanEstudioId })
+        if (pdAnterior){ %>
+          <form id="plan_<%=pdAnterior.PlanEstudioId%>_incidencia" action="/hola" method="post">
+          <input type="hidden" name="plan" value="<%=pdAnterior.PlanEstudioId%>">
+          <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pdAnterior.identificador%>">
+          <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pdAnterior.PlanEstudioId%>" name="anoAcademico" value="<%=pdAnterior.anoAcademico%>">
+          <input type="hidden" id="ocultosemestreIncidencia_<%=pdAnterior.PlanEstudioId%>" name="semestre" value="<%=pdAnterior.semestre%>"> 
+          <%if (pdAnterior.estadoProGDoc === estadosProgDoc.cerrado){%>
+            <button type="button" class="btn" onclick="AbrirIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>')" data-toggle="tooltip" title="<%=pdAnterior.identificador%>">
+            Abrir Incidencia
+            </button>
+          <%}else if (pdAnterior.estadoProGDoc === estadosProgDoc.incidencia){%>
+            <button type="button" class="btn" onclick="CerrarIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=cerrarincidenciapath%>')" data-toggle="tooltip" title="<%=pdAnterior.identificador%>">
+            Cerrar Incidencia
+            </button>
+          <%}%>
+          </form>
+        <%}else{%>
+          <button type="button" class="btn" disabled data-toggle="tooltip" title="No hay programación docente anterior">Abrir Incidencia</button>
+        <%}%>
+    </td>
+  <% }else if(pds[i].estadoProGDoc === estadosProgDoc.incidencia){%>
+      <% switch(pds[i].semestre){
+      case '1S' : %>
+         <td>
+         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control" disabled>
+            <option value='<%=pds[i].anoAcademico%>'><%=pds[i].anoAcademico%></option>
+         </select>
+        </td>
+        <td>
+         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control" disabled>
+            <option value='2S'>2S</option>
+         </select>
+        </td>
+        <% break;
+        case '2S' : %>
+         <td>
+         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control" disabled>
+            <option value="<%=pds[i].siguienteAnoAcademico%>"><%=pds[i].siguienteAnoAcademico%></option>
+         </select>
+        </td>
+        <td>
+         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control"disabled>
+            <option value='1S'>1S</option>
+            <option value='I'>I</option>
+         </select>
+        </td>
+        <% break;
+      case 'I' : %>
+         <td>
+         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control" disabled>
+            <option value="<%=pds[i].siguienteAnoAcademico%>"><%=pds[i].siguienteAnoAcademico%></option>
+         </select>
+        </td>
+        <td>
+         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control" disabled>
+            <option value='I'>I</option>
+            <option value='1S'>1S</option>
+         </select>
+        </td>
+        <% break;
+      case null : %>
+        <td>
+         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control" disabled>
+            <option value='<%=anos[0]%>'><%=anos[0]%></option>
+            <option value='<%=anos[1]%>'><%=anos[1]%></option>
+         </select>
+        </td>
+        <td>
+         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control" disabled>
+            <option value='I'>I</option>
+            <option value='1S'>1S</option>
+            <option value='2S'>2S</option>
+         </select>
+        </td>
+        <% break; 
+    }%>      
+    <td>
+      <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
+      <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
+      <input type="hidden" id="ocultoanoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="">
+      <input type="hidden" id="ocultosemestre_<%=pds[i].PlanEstudioId%>" name="semestre" value="">        
+      <button type="button" class="btn" onclick="Abrir('plan_<%=pds[i].PlanEstudioId%>_gestionar', '<%=abrirpath%>')" disabled>Abrir</button>
+      </form>
+    </td>
+    <td>
+      <form id="plan_<%=pds[i].PlanEstudioId%>_incidencia" action="/hola" method="post">
+      <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
+      <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
+      <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
+      <input type="hidden" id="ocultosemestreIncidencia_<%=pds[i].PlanEstudioId%>" name="semestre" value="<%=pds[i].semestre%>">        
+      <button type="button" class="btn" onclick="CerrarIncidencia('plan_<%=pds[i].PlanEstudioId%>_incidencia', '<%=cerrarincidenciapath%>')" data-toggle="tooltip" title="<%=pds[i].identificador%>">
+      Cerrar Incidencia
+      </button>
+      </form>
+    </td>
+  <%}%>
+</tr>
+<% } %>
+</tbody>
+</table>
+<%}%>
+<script>
+//debo hacerlo así para lanzar el form que quiero
+function Abrir(formID,abrirPath){
+  let form = document.getElementById(formID);
+  let planEstudioId = formID.split("_")[1];
+  let anoAcademico = document.getElementById("anoAcademico_"+planEstudioId).value;
+  let semestre = document.getElementById("semestre_"+planEstudioId).value;
+  let formSemestre = document.getElementById("ocultosemestre_"+planEstudioId);
+  let formAnoAcademico = document.getElementById("ocultoanoAcademico_"+planEstudioId);
+  formSemestre.value = semestre;
+  formAnoAcademico.value = anoAcademico;
+  if (confirm("¿Está seguro de que quiere abrir la programación docente de " +planEstudioId+ " para el año " +anoAcademico+ " y semestre " +semestre+ "? No podrá deshacer esta acción")){
+    form.setAttribute('action', abrirPath);
+    form.submit();
+  }
+}
+function Cerrar(formID,cerrarPath){
+  let form = document.getElementById(formID);
+  let planEstudioId = formID.split("_")[1];
+  let semestre = document.getElementById("ocultosemestre_"+planEstudioId).value;
+  let anoAcademico = document.getElementById("ocultoanoAcademico_"+planEstudioId).value;
+  if (confirm("¿Está seguro de que quiere cerrar la programación docente de " +planEstudioId+ " para el año " +anoAcademico+ " y semestre " +semestre+ "? No podrá deshacer esta acción")){
+    form.setAttribute('action', cerrarPath);
+    form.submit();
+  }
+}
+
+function AbrirIncidencia(formID,abrirIncidenciaPath){
+  let form = document.getElementById(formID);
+  let planEstudioId = formID.split("_")[1];
+  let semestre = document.getElementById("ocultosemestreIncidencia_"+planEstudioId).value;
+  let anoAcademico = document.getElementById("ocultoanoAcademicoIncidencia_"+planEstudioId).value;
+  if (confirm("¿Está seguro de que quiere abrir incidencia de la programación docente de " +planEstudioId+ " para el año " +anoAcademico+ " y semestre " +semestre+ "? No podrá deshacer esta acción")){
+    form.setAttribute('action', abrirIncidenciaPath);
+    form.submit();
+  }
+}
+
+function AbrirReabierto(formID,reabrirPath){
+  let form = document.getElementById(formID);
+  let planEstudioId = formID.split("_")[1];
+  let semestre = 'I';
+  let anoAcademico = document.getElementById("ocultoanoAcademicoReabierto_"+planEstudioId).value;
+  if (confirm("¿Está seguro de que quiere reabrir la programación docente de " +planEstudioId+ " para el año " +anoAcademico+ " y semestre 2 ? No podrá deshacer esta acción")){
+    form.setAttribute('action', reabrirPath);
+    form.submit();
+  }
+}
+
+function CerrarIncidencia(formID,cerrarPath){
+  let form = document.getElementById(formID);
+  let planEstudioId = formID.split("_")[1];
+  let semestre = document.getElementById("ocultosemestreIncidencia_"+planEstudioId).value;
+  let anoAcademico = document.getElementById("ocultoanoAcademicoIncidencia_"+planEstudioId).value;
+  if (confirm("¿Está seguro de que quiere cerrar la incidencia de la programación docente de " +planEstudioId+ " para el año " +anoAcademico+ " y semestre " +semestre+ "? No podrá deshacer esta acción")){
+    form.setAttribute('action', cerrarPath);
+    form.submit();
+  }
+}
+
+function Consultar(plan,cerrarPath){
+  let nombre = plan.split("_")[1];
+  let url;
+  url = cerrarPath+"?planID="+plan.split("_")[0];
+  
+  
+  window.location.replace(url);
+}
+
+</script>
+
+
+
+      
+
+
+    

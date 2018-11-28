@@ -1,0 +1,55 @@
+<%- include consultar.ejs %>
+<div>
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+  <p><%=permisoDenegado%></p>
+<%}else{%>
+    <ul style="list-style-type:none">
+    <% for(let i=0; i < asignacion.length; i++) { %> 
+      <% if(i===0) { %>
+        <li>
+        <h2>Curso <%= asignacion[i].curso %></h2>
+      <% } %>
+      <% if(i>=1 && asignacion[i].curso !== asignacion[i-1].curso) { %>
+      </li>
+      <li>
+        <h2>Curso <%= asignacion[i].curso %></h2>
+        <% } %>
+        <ul style="list-style-type:none">
+          <li>
+            <% if (asignacion[i].acronimo !== null){ %>
+              <h3><%= asignacion[i].acronimo %></h3>
+            <% }else{%>
+              <h3><%= asignacion[i].nombre%></h3>
+            <% } %>
+           
+          <ul style="list-style-type:none">
+          <li>
+            <span> Coordinador: <%= asignacion[i].coordinador.nombreCorregido %> </span>
+          </li>
+        <% for(var j=0; j< asignacion[i].grupos.length; j++){ %>
+        
+            <li>
+          <% if (asignacion[i].grupos[j].grupoPerteneciente === true){%>
+              <span> Grupo <%= asignacion[i].grupos[j].GrupoNombre %> <%= asignacion[i].grupos[j].nombreItinerario %>: </span>
+            <%} else{%>
+              <span class="cuidado"> Grupo <%= asignacion[i].grupos[j].GrupoNombre %> <%= asignacion[i].grupos[j].nombreItinerario %>: </span>
+            <%}%>
+          <%for(var k=0; k< asignacion[i].grupos[j].profesors.length; k++){ 
+            if(k === asignacion[i].grupos[j].profesors.length -1 ){%>
+              <span><%= asignacion[i].grupos[j].profesors[k].nombreCorregido %></span>
+            <%}else{%>     
+              <span><%= asignacion[i].grupos[j].profesors[k].nombreCorregido %>; </span>
+            <%}
+          } %>
+            </li>
+      <% } %> 
+        </ul>
+        </li>
+    </ul>  
+    <% } %>
+    </li>
+    </ul>
+<% } %>
+</div>

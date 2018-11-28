@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8"> 
+  <!-- Despliegue -->
+  <link rel='stylesheet' type="text/css" href='<%=contextPath%>stylesheets/style.css' />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://dev.etsit.upm.es/portal-pdi/static-button-gestiondoc"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+  <title>Portal del Profesor</title>
+</head>
+<body>
+  <div class="sidenav">
+  <h2> Portal Profesor </h2>
+  <button id='drop_ProgDoc' class="dropdown-btn">Programación Docente 
+     <i class="glyphicon glyphicon-plus fa fa-caret-down" aria-hidden="true"></i>
+  </button>
+  <div class="dropdown-container">
+    <a id='element_ProgDocConsultar' href="<%=contextPath%>Consultar">Consultar</a>
+    <a id='element_ProgDocCumplimentar' href="<%=contextPath%>Cumplimentar">Cumplimentar</a>
+    <a id='element_ProgDocGestion' href="<%=contextPath%>Gestion">Gestion</a>
+    <a id='element_ProgDocHistorial' href="<%=contextPath%>Historial">Historial</a>
+    <a href="<%=contextPath%>ayuda.pdf" download>Ayuda</a>
+  </div>
+</div>
+<% if (locals.menu) { %>
+    <% for(var i=0; i< menu.length; i++){ %>
+      <input type="hidden" name="menu" value="<%=menu[i]%>">
+    <% }%>
+
+  <%} else {%>
+    <input type="hidden" name="menu">
+  <%}%>
+
+<div class="main">
+
+ <div id="buttonMenuPortales123"></div>
+  <%- body %>
+</div>
+<script>
+/* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+let dropdown = document.getElementsByClassName("dropdown-btn");
+let i;
+let contextPath = <%-contextPath%>;
+for (i = 0; i < dropdown.length; i++) {
+  dropdown[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    $(this).find('i').toggleClass('glyphicon-plus').toggleClass('glyphicon-minus');
+    let dropdownContent = this.nextElementSibling;
+    if (dropdownContent.style.display === "block") {
+      dropdownContent.style.display = "none";
+    } else {
+      dropdownContent.style.display = "block";
+    }
+  });
+} 
+
+document.getElementsByTagName('body')[0].onload = actualizarMenu();
+function actualizarMenu(){
+let menu = document.getElementsByName("menu");
+menu.forEach(function(element,index){
+  if (element.value === ""){
+    return
+  }else{
+    if (element.value.split("_")[0] === "drop"){
+      let el = document.getElementById(element.value)
+      el.className += " active";
+      $(el).find('i').toggleClass('glyphicon-plus').toggleClass('glyphicon-minus');
+      let dropdownContent = el.nextElementSibling;
+      if (dropdownContent.style.display === "block") {
+        dropdownContent.style.display = "none";
+      } else {
+        dropdownContent.style.display = "block";
+      }
+    }if (element.value.split("_")[0] === "element"){
+      let el = document.getElementById(element.value)
+      el.className += " activeMenu";
+    }
+
+  }
+  });
+}
+$(document).ready(function(){
+ //   $('[data-toggle="tooltip"]').tooltip({'delay': { show: 1500}, placement: "auto"});  
+  //  dibujarmenulateral("buttonMenuPortales123", contextPath+"logout"); 
+});
+</script>
+
+</body>
+</html>

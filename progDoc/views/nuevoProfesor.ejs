@@ -1,0 +1,101 @@
+<!-- debe ir dentro de un formulario -->
+<!-- el onsubmit debe ser propio de cada sitio en el que se utilice.-->
+<div>
+    <form id="nuevoProfesorForm" style="display:none" action = "#" onsubmit="return MeterEnForm()">
+    <fieldset>
+        <legend>Añadir profesor al sistema</legend>
+        <p>Añada un profesor al sistema</p>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>Nombre</label>
+                <input type="text" class="form-control" id='nombreProfesor' name="nombreProfesor" placeholder="Introduzca el nombre" required ></label></p>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Apellidos</label>
+                <input type="text" class="form-control" id='apellidosProfesor' name="apellidosProfesor" placeholder="Introduzca los apellidos" required ></label></p>                
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input class="form-control" type="email" id='emailProfesor' name='emailProfesor' required
+          placeholder="usuario@upm.es" pattern=".+@upm.es"
+          title="La dirección proporcionada debe ser @upm.es">
+        </div>
+      <input type='submit' value='OK'>
+      <button type="button" onclick="Cancel()">Cancelar</button>
+    <fieldset>
+    </form>
+</div>
+
+<script>
+let rExps2 = [
+        { re: /[\xC0-\xC6]/g, ch: "A" },
+        { re: /[\xE0-\xE6]/g, ch: "a" },
+        { re: /[\xC8-\xCB]/g, ch: "E" },
+        { re: /[\xE8-\xEB]/g, ch: "e" },
+        { re: /[\xCC-\xCF]/g, ch: "I" },
+        { re: /[\xEC-\xEF]/g, ch: "i" },
+        { re: /[\xD2-\xD6]/g, ch: "O" },
+        { re: /[\xF2-\xF6]/g, ch: "o" },
+        { re: /[\xD9-\xDC]/g, ch: "U" },
+        { re: /[\xF9-\xFC]/g, ch: "u" },
+        { re: /[\x56]/g, ch: "B" },
+        { re: /[\x76]/g, ch: "b" },
+        //insensible a h
+        { re: /[\x68]/g, ch: "" },
+        { re: /[\x48]/g, ch: "" },
+        { re: /[\xD1]/g, ch: "N" },
+        { re: /[\xF1]/g, ch: "n" }
+    ];
+function Cancel(){
+    let form = document.getElementById('nuevoProfesorForm');
+    let nombre = document.getElementById('nombreProfesor');
+    let apellidos = document.getElementById('apellidosProfesor');
+    let email = document.getElementById('emailProfesor');
+    nombre.value="";
+    apellidos.value="";
+    email.value="";
+    form.style.display="none";
+    let divhermano = document.getElementById('hermanoNuevoProfesorForm');
+    divhermano.style.display="block";
+}
+//el form debe definirse en el ejs que se utiliza es el formulario global que se envia, lo mismo con profesores y profesores2
+function MeterEnForm(){
+  let formNuevo = form
+  let div = document.createElement('div');
+  let nombre = document.getElementById('nombreProfesor').value.trim();
+  let apellidos = document.getElementById('apellidosProfesor').value.trim();
+  let email = document.getElementById('emailProfesor').value.trim(); 
+  div.innerHTML = '<input type="hidden" name="nuevoProfesor" value="'+nombre+'_'+apellidos+'_'+email+'">'
+  let node = div.firstChild;
+  let profesor = {};
+  profesor.nombre = apellidos+" "+nombre;
+  profesor.correo = email;
+  profesor.nombreCorregido = apellidos + ", " + nombre
+  let profesorExistente = profesores.find(function (obj) { return obj.correo === email; });
+  if(profesorExistente){
+      console.log(profesorExistente)
+      alert("El profesor ya está en el sistema es:" +profesorExistente.nombre+ " " +profesorExistente.apellido+"")
+  }else{
+   profesores.push(profesor);
+  let profesorQuitAcentsNombre = profesor.nombre;
+  for(let i = 0; i<rExps2.length; i++){
+        profesorQuitAcentsNombre = profesorQuitAcentsNombre.replace(rExps2[i].re, rExps2[i].ch);
+        profesorQuitAcentsNombre = profesorQuitAcentsNombre.trim();
+  }
+  let profesorQuitAcents = {};
+  profesorQuitAcents.nombre = profesorQuitAcentsNombre;
+  profesorQuitAcents.correo = profesor.correo;
+  profesores2.push(profesorQuitAcents);
+  //lo añado al formulario global
+  formNuevo.appendChild(node)
+  }
+  //debo hacerlo con push sino no se actualizan automaticamente
+ 
+  //para ocultar y resetear formulario todo
+  Cancel();
+  //no quiero que haga el submit*/
+return false
+
+}
+</script>

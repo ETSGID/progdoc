@@ -1,0 +1,84 @@
+<body>
+    <p>Historial</p>
+    <% let ano = null;
+        let codig = null;
+    %>
+    <div class="row col-sm space-above-below">
+         <select id="selectPlan" onchange="cambiar()">
+                <% for(let i=0; i < planEstudios.length; i++) {
+                    if (planEstudios[i].nombre !== null && pdSeleccionada && pdSeleccionada.includes(planEstudios[i].codigo)){ 
+                        codig = planEstudios[i].codigo%>
+                        <option selected value="<%=planEstudios[i].codigo%>" data-toggle="tooltip" title="<%=planEstudios[i].nombreCompleto%>"><%=planEstudios[i].nombre%></option> 
+                    <%}else if(planEstudios[i].nombre !== null) {%>
+                        <option value="<%=planEstudios[i].codigo%>" data-toggle="tooltip" title="<%=planEstudios[i].nombreCompleto%>"><%=planEstudios[i].nombre%></option> 
+                    <%}else if(planEstudios[i].nombre !== null && pdSeleccionada && pdSeleccionada.includes(planEstudios[i].codigo)){
+                        codig = planEstudios[i].codigo%>
+                        <option selected value="<%=planEstudios[i].codigo%>" data-toggle="tooltip" title="<%=planEstudios[i].nombreCompleto%>"><%=planEstudios[i].codigo%></option> 
+                    <%}else{%>
+                        <option value="<%=planEstudios[i].codigo%>" data-toggle="tooltip" title="<%=planEstudios[i].nombreCompleto%>"><%=planEstudios[i].codigo%></option> 
+                    <%}
+                }%>
+         </select>
+          <select id="selectAno" onchange="cambiar()">
+                <% for(let i=0; i < anosExistentes.length; i++) { 
+                    if(pdSeleccionada && pdSeleccionada.includes(anosExistentes[i])){
+                        ano = anosExistentes[i]%>
+                        <option selected value="<%=anosExistentes[i]%>"> <%=anosExistentes[i]%></option>  
+                    <%}else{%>
+                        <option value="<%=anosExistentes[i]%>"> <%=anosExistentes[i]%></option> 
+                    <%}
+                }%>
+         </select>
+         <select id="selectPd" >
+                <% if (pdSeleccionada){%>
+                    <option disabled>Seleccione programación docente</option>
+                <%}else{%>
+                    <option disabled selected>Seleccione programación docente</option>
+                <%}
+                for(let i=0; i < PDsWithPdf.length; i++) { 
+                    if (PDsWithPdf[i].identificador.includes(codig) && PDsWithPdf[i].identificador.includes(ano) && PDsWithPdf[i].identificador === pdSeleccionada){ %>
+                        <option selected value="<%=PDsWithPdf[i].identificador%>"><%=PDsWithPdf[i].identificador%></option> 
+                    <%}else if(PDsWithPdf[i].identificador.includes(codig) && PDsWithPdf[i].identificador.includes(ano)){%>
+                        <option value="<%=PDsWithPdf[i].identificador%>"><%=PDsWithPdf[i].identificador%></option> 
+                    <%} else if(!codig && !ano && PDsWithPdf[i].identificador.includes(planEstudios[0].codigo) && PDsWithPdf[i].identificador.includes(anosExistentes[0])){%>
+                        <option value="<%=PDsWithPdf[i].identificador%>"><%=PDsWithPdf[i].identificador%></option>
+                    <%} else { %>
+                        <option style="display:none"  value="<%=PDsWithPdf[i].identificador%>"><%=PDsWithPdf[i].identificador%></option>
+                    <%}
+                }%>
+         </select>
+         <button type="button" onclick="buscar()">
+         <span class="glyphicon glyphicon-download-alt"></span> 
+         Descargar PDF
+         </button>         
+    </div>
+    <% if (pdSeleccionada){%>
+            <iframe src="<%=contextPath%>pdfs/<%=fileSeleccionado%>.pdf" style="width:100%; height: 87%;" ></iframe>
+         <%}%>
+
+</body>
+
+<script>
+function cambiar(){
+    let planID = document.getElementById("selectPlan").value;
+    let year =  document.getElementById("selectAno").value;
+    let pdSelect = document.getElementById("selectPd")
+    pdSelect.selectedIndex = "0";
+    for(let i = 1; i< pdSelect.options.length; i++){
+        if(pdSelect.options[i].value.includes(year) && pdSelect.options[i].value.includes(planID)){
+            pdSelect.options[i].style.display = "block";
+        }else{
+            pdSelect.options[i].style.display = "none";
+        }
+    }
+}
+function buscar(){
+    let pdSelect =  document.getElementById("selectPd")
+    let pdSeleccionada = document.getElementById("selectPd").value;
+    if(pdSeleccionada !== pdSelect.options[0].value){
+        let url = window.location.protocol + '//' + window.location.host + window.location.pathname
+        url = url+"?pdSeleccionada="+pdSeleccionada
+        window.location.replace(url);
+    }
+}
+</script>
