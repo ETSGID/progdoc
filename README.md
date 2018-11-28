@@ -11,7 +11,7 @@ Dentro de la carpeta  se encuentra todos los ficheros necesarios para el correct
 
 Son necesariuos tres archivos para configurar el entorno
 
-`progDoc/prod.yml`
+`progDoc.prod.yml`
 
 ```
 version: '2'
@@ -62,7 +62,7 @@ Dentro de la carpeta `progDoc`, está el código de la aplicación.
 
 Son necesariuos cuatro archivos para configurar el entorno
 
-`progDoc/prod.yml`
+`progDoc.prod.yml`
 
 ```
 version: '2'
@@ -142,6 +142,9 @@ docker-compose -f docker-compose.yml -f ../progDoc.prod.yml build
 
 # Arrancar los contenedores llamando a los ficheros de configuracón creados en la carpeta externa al proyecto
 docker-compose -f docker-compose.yml -f ../progDoc.prod.yml up -d
+
+#para llenar la base de datos
+psql -U [userpostgres] -h localhost  [database] < [file.sql]
 ```
 
 ## Ejecución en desarrollo
@@ -154,6 +157,9 @@ docker-compose -f docker-compose.yml -f ./docker-compose_dev.yml -f ../progDoc.p
 
 # Arrancar los contenedores llamando a los ficheros de configuracón creados en la carpeta externa al proyecto
 docker-compose -f docker-compose.yml -f ./docker-compose_dev.yml -f ../progDoc.prod.yml up -d
+
+#para llenar la base de datos
+psql -U [userpostgres] -h localhost  [database] < [file.sql]
 
 ```
 

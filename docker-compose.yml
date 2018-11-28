@@ -3,10 +3,10 @@ version: '2'
 services: 
 
   dbsession:
-      image: postgres:9.6
-      volumes:
-        - ./dbdata2:/var/lib/postgres
-      restart: always
+    image: postgres:9.6
+    volumes:
+      - dbdata2:/var/lib/postgres
+    restart: always
     
   progdoc:
     privileged: true
@@ -21,6 +21,6 @@ services:
       - db
       - dbsession
 
-  volumes:
-    dbdata2:
-    progdoc:
+volumes:
+  dbdata2:
+  progdoc:
