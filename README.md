@@ -7,7 +7,7 @@ Aplicación del portal de profesores para crear/ver/modificar las programaciones
 Dentro de la carpeta  se encuentra todos los ficheros necesarios para el correcto despliegue de la aplicación. Posteriormente se comentarán en detalle.
 
 
-#### Variables de entorno en producción
+## Variables de entorno en producción
 
 Son necesariuos tres archivos para configurar el entorno
 
@@ -58,7 +58,7 @@ POSTGRES_PASSWORD=xxxx
 Se proporciona un Dockerfile para la imagen que alojará el servidor, un script para la puesta en marcha de las bases de datos y el servidor, y un `docker-compose.yml` para el despliegue de toda la aplicación. 
 Dentro de la carpeta `progDoc`, está el código de la aplicación.
 
-#### Variables de entorno en desarrollo
+## Variables de entorno en desarrollo
 
 Son necesariuos cuatro archivos para configurar el entorno
 
@@ -127,7 +127,7 @@ El puerto en el que corre la aplicación dentro del contenedor es el `3000` (Ver
 Existen dos bases de datos una para almacenar las sesiones y otra con la información de la aplicación. Por ahora la conexión es a travéś de una red privada.
 Deben configurarse los archivos donde se le pase las variables de entorno para la creación y conexión de la aplicación
 
-##Almacenamiento de pdfs
+## Almacenamiento de pdfs
 Los pdfs se almacenan en el volumen progdoc:/storage/progdoc
 Si se desea cambiar la carpeta: `/storage/progdoc` debe hacerse tanto en `progDoc.env` como en `docker-compose.yml`
 Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/porgdoc/pdfs/`
