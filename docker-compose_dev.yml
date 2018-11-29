@@ -7,6 +7,10 @@ services:
     restart: always
     volumes:
       - dbdata:/var/lib/postgres
+  
+  progdoc:
+    depends_on:
+      - db
 
 volumes:
   dbdata:
