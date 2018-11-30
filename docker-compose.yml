@@ -9,7 +9,6 @@ services:
     restart: always
     
   progdoc:
-    privileged: true
     build: 
       context: .
     restart: always

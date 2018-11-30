@@ -33,6 +33,7 @@ services:
 POSTGRES_DB=progdoc
 DB_USERNAME=user db con información
 DB_PASSWORD=xxxx
+DB_HOST=host en la que esta la bbdd el puerto es 5432 (el de postgres). Ejemplo: localhost
 POSTGRESSESION_DB=progdocsession
 DBSESSION_USERNAME=user db de sesiones
 DBSESSION_PASSWORD=xxxx
@@ -88,6 +89,7 @@ services:
 POSTGRES_DB=progdoc
 DB_USERNAME=user db con información
 DB_PASSWORD=xxxx
+DB_HOST=db (obligatoriamente)
 POSTGRESSESION_DB=progdocsession
 DBSESSION_USERNAME=user db de sesiones
 DBSESSION_PASSWORD=xxxx
