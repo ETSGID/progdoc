@@ -14,7 +14,7 @@ Son necesariuos tres archivos para configurar el entorno
 `progDoc.prod.yml`
 
 ```
-version: '2'
+version: '3'
 
 services:
 
@@ -37,11 +37,11 @@ DB_HOST=host en la que esta la bbdd el puerto es 5432 (el de postgres). Ejemplo:
 POSTGRESSESION_DB=progdocsession
 DBSESSION_USERNAME=user db de sesiones
 DBSESSION_PASSWORD=xxxx
-SERVICE=url servicio
-CAS=url servidor cas
+SERVICE=url servicio sin contexto ejemplo:https://pruebas.etsit.upm.es 
+CAS=url servidor cas: ejemplo:https://repo.etsit.upm.es/cas-upm
 SESSION_SECRET=Secreto_para_las_sesiones
-CONTEXT=/progdoc/
-PATH_PDF=/storage/progdoc
+CONTEXT=/progdoc/ debe empezar con barra y terminar con barra
+PATH_PDF=/storage/progdoc/ debe terminar con barra
 DEV=false
 DOCKER=true
 PORT=3000
@@ -66,7 +66,7 @@ Son necesariuos cuatro archivos para configurar el entorno
 `progDoc.prod.yml`
 
 ```
-version: '2'
+version: '3'
 
 services:
 
@@ -93,11 +93,11 @@ DB_HOST=db (obligatoriamente)
 POSTGRESSESION_DB=progdocsession
 DBSESSION_USERNAME=user db de sesiones
 DBSESSION_PASSWORD=xxxx
-SERVICE=url servicio
-CAS=url servidor cas
+SERVICE=url servicio sin contexto ejemplo:https://pruebas.etsit.upm.es 
+CAS=url servidor cas: ejemplo:https://repo.etsit.upm.es/cas-upm
 SESSION_SECRET=Secreto_para_las_sesiones
-CONTEXT=/progdoc/
-PATH_PDF=/storage/progdoc
+CONTEXT=/progdoc/ debe empezar con barra y terminar con barra
+PATH_PDF=/storage/progdoc/ debe terminar con barra
 DEV=false
 DOCKER=true
 PORT=3000
@@ -131,8 +131,8 @@ Deben configurarse los archivos donde se le pase las variables de entorno para l
 
 ## Almacenamiento de pdfs
 Los pdfs se almacenan en el volumen progdoc:/storage/progdoc
-Si se desea cambiar la carpeta: `/storage/progdoc` debe hacerse tanto en `progDoc.env` como en `docker-compose.yml`
-Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/porgdoc/pdfs/`
+Si se desea cambiar la carpeta: `/storage/progdoc/` debe hacerse tanto en `progDoc.env` como en `docker-compose.yml`
+Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/progdoc/pdfs/`
 
 ## Ejecución en producción
 Una vez configuradas las variables de entorno y el puerto correctamente, para desplegar la aplicación, hay que ir al directorio `progDoc`, y desde ahí ejecutar el siguiente comando:
