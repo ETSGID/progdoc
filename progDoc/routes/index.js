@@ -24,6 +24,7 @@ router.all('*', function(req,res,next){
   if (process.env.DEV === 'true') {
     res.locals.rols.push({ rol: enumsPD.rols.Admin, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   }
+  res.locals.rols.push({ rol: enumsPD.rols.SubdirectorPosgrado, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next();
 })
 
