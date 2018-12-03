@@ -6,16 +6,16 @@ let app = require('../app')
 let Sequelize = require('sequelize');
 
 //    DATABASE_URL = postgres://user:passwd@host:port/database
-
+let logs = process.env.DEV === 'true' ? true : false
 let sequelize;
 let sequelizeSession;
 if (process.env.DOCKER === 'true'){
-    sequelize = new Sequelize('postgres://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST +':5432/' + process.env.POSTGRES_DB);
-    sequelizeSession = new Sequelize('postgres://' + process.env.DBSESSION_USERNAME + ':' + process.env.DBSESSION_PASSWORD + '@dbsession:5432/' + process.env.POSTGRESSESION_DB);
+    sequelize = new Sequelize('postgres://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + ':5432/' + process.env.POSTGRES_DB,{logging:logs});
+    sequelizeSession = new Sequelize('postgres://' + process.env.DBSESSION_USERNAME + ':' + process.env.DBSESSION_PASSWORD + '@dbsession:5432/' + process.env.POSTGRESSESION_DB,{logging:logs});
 }
 else{
-    sequelize = new Sequelize('postgres://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST +':5432/' + process.env.POSTGRES_DB);
-    sequelizeSession = new Sequelize('postgres://' + process.env.DBSESSION_USERNAME + ':' + process.env.DBSESSION_PASSWORD + '@localhost:5432/' + process.env.POSTGRESSESION_DB)
+    sequelize = new Sequelize('postgres://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST +':5432/' + process.env.POSTGRES_DB,{logging:logs});
+    sequelizeSession = new Sequelize('postgres://' + process.env.DBSESSION_USERNAME + ':' + process.env.DBSESSION_PASSWORD + '@localhost:5432/' + process.env.POSTGRESSESION_DB,{logging:logs})
 }
 
 
