@@ -56,16 +56,16 @@ function cambiarSubmenu(evt, submenu) {
     document.getElementById(submenu).style.display = "block";
     evt.currentTarget.className += " active";
     if(submenu === 'AbrirCerrar'){
-        let url = "<%=contextPath%>AbrirCerrar"
+        let url = "<%=contextPath%>/AbrirCerrar"
         window.location.replace(url);
     }
    
     if (submenu === 'Grupos'){
-    let url = "<%=contextPath%>gestionGrupos/getGrupos?planID="+pAcronimo
+    let url = "<%=contextPath%>/gestionGrupos/getGrupos?planID="+pAcronimo
     window.location.replace(url);
     } 
     if (submenu === 'Roles'){
-    let url = "<%=contextPath%>gestionRoles"
+    let url = "<%=contextPath%>/gestionRoles"
     window.location.replace(url);
     }
     

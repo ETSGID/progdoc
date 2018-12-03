@@ -68,31 +68,31 @@ function cambiarSubmenu(evt, submenu) {
     evt.currentTarget.className += " active";
     
     if(submenu === 'Profesores'){
-        let url = "<%=contextPath%>consultar/profesores?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        let url = "<%=contextPath%>/consultar/profesores?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
         window.location.replace(url);
     }
     if (submenu === 'Tribunales'){
-        let url = "<%=contextPath%>consultar/tribunales?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        let url = "<%=contextPath%>/consultar/tribunales?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
         window.location.replace(url);
     }
     if (submenu === 'Horarios'){
-        let url = "<%=contextPath%>consultar/horarios?planID="+pAcronimo
+        let url = "<%=contextPath%>/consultar/horarios?planID="+pAcronimo
         window.location.replace(url);
     }
         if (submenu === 'PDF'){
-        let url = "<%=contextPath%>consultar/PDF?planID="+pAcronimo
+        let url = "<%=contextPath%>/consultar/PDF?planID="+pAcronimo
         window.location.replace(url);
     }
         if (submenu === 'Examenes'){
-        let url = "<%=contextPath%>consultar/examenes?planID="+pAcronimo
+        let url = "<%=contextPath%>/consultar/examenes?planID="+pAcronimo
         window.location.replace(url);
     }
         if (submenu === 'Estado'){
-        let url = "<%=contextPath%>consultar/estado?planID="+pAcronimo
+        let url = "<%=contextPath%>/consultar/estado?planID="+pAcronimo
         window.location.replace(url);
     }
         if (submenu === 'Grupos'){
-        let url = "<%=contextPath%>consultar/grupos?planID="+pAcronimo
+        let url = "<%=contextPath%>/consultar/grupos?planID="+pAcronimo
         window.location.replace(url);
     }
 

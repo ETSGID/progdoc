@@ -379,9 +379,7 @@ exports.generarPDF = function (req, res, next) {
                                 let elements = pdID.split("_")
                                 let borrador = req.originalUrl.toLowerCase().includes("consultar") ? 'borrador/' : ''
                                 file = elements[1] + "/" + elements[2] + "/" + elements[3] + "/" + borrador + file
-                                let ruta = process.env.PATH_PDF+'pdfs/' + file
-                                console.log("eoooooooooooooo")
-                                console.log(ruta);
+                                let ruta = app.pathPDF+'/pdfs/' + file
                                 let options = {
                                     'text': 'draft',
                                     'dstPath': ruta

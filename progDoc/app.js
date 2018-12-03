@@ -1,6 +1,6 @@
 let createError = require('http-errors');
 let express = require('express');
-
+const normalize = require('normalize-path');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
@@ -9,16 +9,19 @@ let partials = require('express-partials');
 //context path para la aplicacion en el servidor
 let session = require('express-session');
 var SequelizeStore = require('connect-session-sequelize')(session.Store);
-const contextPath = process.env.CONTEXT;
+const contextPath = normalize(process.env.CONTEXT);
 exports.contextPath = contextPath;
 const local = process.env.DEV;
 exports.local = local;
+const pathPDF = normalize(process.env.PATH_PDF);
+exports.pathPDF = pathPDF;
 let contador = 0;
 //cas autentication
 let CASAuthentication = require('cas-authentication');
 // Create a new instance of CASAuthentication.
 let service = process.env.SERVICE;
 let cas_url = process.env.CAS;
+
 let cas = new CASAuthentication({
   cas_url: cas_url,
   //local o despliegue
@@ -49,7 +52,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(contextPath + "pdfs", express.static(path.join(process.env.PATH_PDF, 'pdfs')));
+app.use(contextPath + "/pdfs", express.static(path.join(pathPDF, 'pdfs')));
 app.use(contextPath, express.static(path.join(__dirname, 'public')));
 
 
@@ -72,9 +75,9 @@ app.use(session({
 // autologout
 
   // Rutas que no empiezan por /api/
-  app.use(contextPath+'api/', routerApi);
+  app.use(contextPath+'/api/', routerApi);
   //exit del cas el primero para que no entre en bucle. El cas es el encargado de eliminar la sesión
-  app.get(contextPath + "logout", cas.logout);
+  app.get(contextPath + "/logout", cas.logout);
   
 
   // Helper dinamico:
@@ -119,11 +122,9 @@ app.use(session({
         },
         raw: true
       }).each((rol) => {
-        console.log(rol)
         req.session.user.rols.push(rol)
       })
         .then((rols) => {
-          console.log(req.session.user.rols)
           next();
         })
         .catch(function (error) {

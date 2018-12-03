@@ -69,23 +69,23 @@ function cambiarSubmenu(evt, submenu) {
     evt.currentTarget.className += " active";
     
     if(submenu === 'Profesores'){
-        let url = "<%=contextPath%>respDoc/profesores?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        let url = "<%=contextPath%>/respDoc/profesores?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
         window.location.replace(url);
     }
     if (submenu === 'Tribunales'){
-        let url = "<%=contextPath%>respDoc/tribunales?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        let url = "<%=contextPath%>/respDoc/tribunales?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
         window.location.replace(url);
     }
     if (submenu === 'Horarios'){
-        let url = "<%=contextPath%>coordinador/horarios?planID="+pAcronimo
+        let url = "<%=contextPath%>/coordinador/horarios?planID="+pAcronimo
         window.location.replace(url);
     }
     if (submenu === 'Examenes'){
-        let url = "<%=contextPath%>coordinador/examenes?planID="+pAcronimo
+        let url = "<%=contextPath%>/coordinador/examenes?planID="+pAcronimo
         window.location.replace(url);
     }
     if (submenu === 'Estado'){
-        let url = "<%=contextPath%>estado?planID="+pAcronimo
+        let url = "<%=contextPath%>/estado?planID="+pAcronimo
         window.location.replace(url);
     }
 
