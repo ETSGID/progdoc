@@ -5,6 +5,7 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 let partials = require('express-partials');
+let morgan = require('morgan');
 
 //context path para la aplicacion en el servidor
 let session = require('express-session');
@@ -45,14 +46,16 @@ let permisosControllerProgDoc = require('./controllers/permisos_controllerProgDo
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
+app.use(morgan('combined', {
+  skip: function (req, res) {return res.statusCode < 400 }
+}))
 app.use(partials());
 
-app.use(logger('dev'));
+//app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(contextPath + "/pdfs", express.static(path.join(pathPDF, 'pdfs')));
+app.use(path.join(contextPath, 'pdfs'), express.static(path.join(pathPDF, 'pdfs')));
 app.use(contextPath, express.static(path.join(__dirname, 'public')));
 
 
@@ -75,9 +78,9 @@ app.use(session({
 // autologout
 
   // Rutas que no empiezan por /api/
-  app.use(contextPath+'/api/', routerApi);
+  app.use(path.join(contextPath, 'api'), routerApi);
   //exit del cas el primero para que no entre en bucle. El cas es el encargado de eliminar la sesión
-  app.get(contextPath + "/logout", cas.logout);
+  app.get(path.join(contextPath, 'logout'), cas.logout);
   
 
   // Helper dinamico:
