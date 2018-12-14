@@ -324,7 +324,7 @@ exports.guardarAsignacion = function (req, res, next) {
         .then(function (as) {
             //que es la progdoc correspondiente ya se ve en que debe de estar abierta / incidencia en el modulo de permisos
             if (!as[0] || !as[0].DepartamentoResponsable || as[0].DepartamentoResponsable !== departamentoID) {
-                res.locals.permisoDenegado = "No tiene permiso contacte con su Director/a de Departamento o con el Jefe de Estudios" //lo unico que hara será saltarse lo siguiente 
+                res.locals.permisoDenegado = "No tiene permiso contacte el Jefe de Estudios si debería tenerlo" //lo unico que hara será saltarse lo siguiente 
             }
             if (!res.locals.permisoDenegado) {
                 if (coordinador) {

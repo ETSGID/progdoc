@@ -41,7 +41,7 @@ exports.comprobarRols = function (req, res, next) {
             }
         })
         if (rolsCoincidentes.length === 0) {
-            res.locals.permisoDenegado = "No tiene permiso"
+            res.locals.permisoDenegado = "No tiene permiso contacte el Jefe de Estudios si debería tenerlo"
         }
         res.locals.rolsCoincidentes = rolsCoincidentes
         next();
