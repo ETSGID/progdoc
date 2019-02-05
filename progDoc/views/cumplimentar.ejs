@@ -1,13 +1,17 @@
-    
-    <body>
-    <p>Cumplimentar Programación</p>
-    <div class="row col-sm space-above-below">
+<body>
+<div class="myHeader sticky">
+    <p>Cumplimentar Programación:
+    <% if ( session && session.pdID){ %>
+        <%= session.pdID %>
+    <% } %>
+    </p>
+    <div class="row col-sm"  style="margin-left:0px">
          <select id="selectPlan" onchange="cambiarPD()">
                 <% for(let i=0; i < planEstudios.length; i++) { 
                     if (planEstudios[i].nombre !== null){ %>
-                    <option value="<%=planEstudios[i].codigo%>"><%=planEstudios[i].nombre%></option> 
+                    <option value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option> 
                     <%}else {%>
-                    <option value="<%=planEstudios[i].codigo%>"data-toggle="tooltip" title="hola"><%=planEstudios[i].codigo%></option> 
+                    <option value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].codigo%></option> 
                     <%}
                 }%>
          </select>
@@ -16,22 +20,21 @@
          <select id="selectDepartamento"  onchange="cambiarDepart()">
             <% for(let i=0; i < departamentosResponsables.length; i++) { 
                 if (departamentosResponsables[i].acronimo !== null){ %>
-                    <option value="<%=departamentosResponsables[i].codigo%>"><%=departamentosResponsables[i].acronimo%></option> 
+                    <option value="<%=departamentosResponsables[i].codigo%>" title="<%=departamentosResponsables[i].nombre%>"><%=departamentosResponsables[i].acronimo%></option> 
                     <%}else {%>
-                    <option value="<%=departamentosResponsables[i].codigo%>"><%=departamentosResponsables[i].codigo%></option> 
+                    <option value="<%=departamentosResponsables[i].codigo%>" title="<%=departamentosResponsables[i].nombre%>"><%=departamentosResponsables[i].codigo%></option> 
                 <%}%>   
             <%}%>
          </select>
+        <%}%>
     </div>
-
-  <%}%>
     <div class="tab">
         <button id='Estado' class="tablinks" onclick="cambiarSubmenu(event, 'Estado')">Estado</button>
         <!--<button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>-->
         <button id='Profesores' class="tablinks" onclick="cambiarSubmenu(event, 'Profesores')">Profesores</button>
         <button id='Tribunales' class="tablinks" onclick="cambiarSubmenu(event, 'Tribunales')">Tribunales</button>
         <button id='Horarios' class="tablinks" onclick="cambiarSubmenu(event, 'Horarios')">Horarios</button>
-        <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Examenes</button>
+        <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Exámenes</button>
     </div>
     <% if (locals.planID) { %>
      <input id='plan' type="hidden" value="<%=planID%>">
@@ -48,6 +51,7 @@
   <%} else {%>
     <input id='departamento' type="hidden">
   <%}%>
+</div>
 
 <script>
 function cambiarSubmenu(evt, submenu) {
@@ -153,6 +157,7 @@ function actualizarSelectyBarra() {
     document.getElementById(submenu).style.display = "block";
     document.getElementById(submenu).className += " active";
 }
+
 
 </script>
      

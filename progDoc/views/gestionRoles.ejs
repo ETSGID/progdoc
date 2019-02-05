@@ -2,12 +2,14 @@
 <!-- despliegue -->
 <script src="<%=contextPath%>/js/autocomplete.js"></script>
 <%- include gestion.ejs %>
+<div class="contenido">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
 <%}else if(locals.permisoDenegado && locals.permisoDenegado!== null){%>
   <p><%=permisoDenegado%></p>
 <%}else{ %>
 <h3>Gestion Roles Aplicacion</h3>
+<h3><em>Roles comunes a todas las titulaciones</em></h3>
 <div id='hermanoNuevoProfesorForm'>
     <div class="container">
         <div class="row col-sm space-above-below">
@@ -73,7 +75,7 @@
                     }%>
                 <form id="<%=roles[i].rol %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
                 <div class="row col-sm space-above-below">
-                    <div class="col-sm-5">Secretario Jefe De Estudios</div>
+                    <div class="col-sm-5">Secretaría Jefe De Estudios</div>
                     <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'
                         onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
                         <p id='p_<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
@@ -94,7 +96,7 @@
                 </div>
                 <% for(var i=0; i < roles.length; i++) { %>
                     <% for(var j=0; j < departamentos.length; j++) {
-                        departamentos[j].nombre = departamentos[j].acronimo !== null ? departamentos[j].acronimo : departamentos[j].nombre %>
+                        departamentos[j].nom = departamentos[j].acronimo !== null ? departamentos[j].acronimo : departamentos[j].codigo %>
                         <% if(roles[i].DepartamentoCodigo===departamentos[j].codigo&&roles[i].rol==='DirectorDepartamento'){ %>
                             <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
                             <% if(!prof){
@@ -104,7 +106,8 @@
                             }%>
                 <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
                 <div class="row col-sm space-above-below">
-                    <div class="col-sm-5"><%=departamentos[j].nombre.toLowerCase()%></div>
+                            
+                    <div class="col-sm-5"><span title="<%=departamentos[j].nombre.toLowerCase()%>"><%=departamentos[j].nom%></span></div>
                     <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'  
                     onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
                         <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
@@ -125,20 +128,20 @@
         </div>
         <div class="row col-sm-12 space-above-below dropdown">
                 <div class="row col-sm space-above-below">
-                    <span class="col-sm-4">Responsables De Titulacion</span>
+                    <h3><em><span class="col-sm-4">Roles específicos de titulación</span></em></h3>
                         <span clas="col-sm-3">
                     </span>
                     <span>
                         <Select id="selectCoordinador" >
                             <% for(let i=0; i < planEstudios.length; i++) { 
                                 if (planEstudios[i].nombre !== null && (planID !== planEstudios[i].codigo)){ %>
-                            <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>"><%=planEstudios[i].nombre%></option>
+                            <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option>
                                 <% }else if (planEstudios[i].nombre !== null && (planID === planEstudios[i].codigo)){ %>
-                            <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" selected><%=planEstudios[i].nombre%></option>  
+                            <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)" selected><%=planEstudios[i].nombre%></option>  
                                 <%}else if (planEstudios[i].nombre === null && (planID !== planEstudios[i].codigo)) {%>
-                            <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>"><%=planEstudios[i].codigo%></option>
+                            <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].codigo%></option>
                             <%}else{%>
-                            <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" selected><%=planEstudios[i].codigo%></option>
+                            <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>"  title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"selected><%=planEstudios[i].codigo%></option>
                                 <%}
                             }%>
                         </Select>
@@ -219,9 +222,9 @@
                         <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
                             <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">
                                 <% for(let p=0; p < departamentos.length; p++){ 
-                                    departamentos[p].nombre = departamentos[p].acronimo !== null ? departamentos[p].acronimo : departamentos[p].nombre%>
+                                    departamentos[p].nom = departamentos[p].acronimo !== null ? departamentos[p].acronimo : departamentos[p].codigo%>
                                     <% if(roles[i].DepartamentoCodigo === departamentos[p].codigo){ %>
-                                        <div class="col-sm-5"><%=departamentos[p].nombre%></div>
+                                        <div class="col-sm-5"><span title="<%=departamentos[p].nombre.toLowerCase()%>"><%=departamentos[p].nom%></span></div>
                                     <% }%> 
                                 <% }%>
                                 <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5" 
@@ -250,9 +253,9 @@
                         <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
                             <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">
                                 <% for(var p=0; p < departamentos.length; p++){ 
-                                    departamentos[p].nombre = departamentos[p].acronimo !== null ? departamentos[p].acronimo : departamentos[p].nombre%>
+                                    departamentos[p].nom = departamentos[p].acronimo !== null ? departamentos[p].acronimo : departamentos[p].codigo%>
                                     <% if(roles[i].DepartamentoCodigo === departamentos[p].codigo){ %>
-                                        <div class="col-sm-5"><%=departamentos[p].nombre%></div>
+                                        <div class="col-sm-5"><span title="<%=departamentos[p].nombre.toLowerCase()%>"><%=departamentos[p].nom%></span></div>
                                     <% }%> 
                                 <%}%>
                                 <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5" 
@@ -286,7 +289,7 @@
 </div> 
 <%- include nuevoProfesor.ejs %>
 <%}%>
-
+</div>
 <script>
     let profesores = <%-JSON.stringify(profesores)%>
     let planID = <%-JSON.stringify(planID)%>
@@ -351,7 +354,6 @@ $(function() {
     $('*#' +'ResponsableDocente_'+ planID).show();
     
 });
-
     
 </script>
 

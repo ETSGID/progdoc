@@ -35,6 +35,15 @@ exports.sortDepartamentos = function (a, b) {
     return 0;
 }
 
+/*ordena los roles por departamentos*/
+exports.sortRolesporDepartamento = function (a,b){
+    if (a.DepartamentoCodigo < b.DepartamentoCodigo)
+        return -1;
+    if (a.DepartamentoCodigo > b.DepartamentoCodigo)
+        return 1;
+    return 0;
+}
+
 /* ordena los profesores por nombreCorregido ascendente
 un profesor tendrá entre sus atributos {nombreCorregido: "apellido apellido, nombre" ...}
 */
@@ -45,6 +54,9 @@ exports.sortProfesorCorregido = function (a, b) {
         return 1;
     return 0;
 }
+
+
+
 
 /* ordena las asignaturas por curos y después acronimo o nombre si no la tienen ascendente
 un profesor tendrá entre sus atributos {nombreCorregido: "apellido apellido, nombre" ...}

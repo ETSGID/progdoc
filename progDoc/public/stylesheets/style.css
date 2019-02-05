@@ -2,7 +2,7 @@ html {
     height:100%  
   }
   body {
-    padding: 5px;
+    padding: 0px;
     font: 14px "Lucida Grande", Helvetica, sans-serif, Arial;
     height:100%
     
@@ -40,6 +40,7 @@ html {
       outline: none;
      
   }
+
   
   .activeMenu{
       color: #dddddd !important
@@ -53,13 +54,59 @@ html {
       background-color:#dddddd;
       color:#333131;
   }
+
+
+
+
+  /*menus superiores*/
+ .myHeader{
+  padding: 10px 16px;
+  background: white;
+  height: 140px;
+  top:0;
+  overflow: hidden;
+  width:100%; 
+  z-index: 3;
+ }
+
+
+ .myHeader2 {
+  padding: 10px 16px;
+  background: white;
+  z-index:3;
+  overflow: hidden;
+  top: 140px;
+  height: 60px;
+  width:100%;
+  z-index: 3;
+}
+
+  
+  /* Menu superior estatico */
+  .sticky {
+  position: fixed;
+}
+
   
   /* Main content */
   .main {
       height: 100%;
       margin-left: 215px; /* Same as the width of the sidenav */
       font-size: 20px; /* Increased text to enable scrolling */
-      padding: 0px 10px;
+      padding: 0px 0px;
+  }
+  /*Contendio bajo el menú superior" */
+  .contenido{
+    padding: 150px 15px 10px;
+    height: 100%;
+  }
+  .contenido2{
+    padding: 200px 15px 10px;
+    height: 100%;
+  }
+  .contenido3{
+    padding: 15px 15px;
+    height: 100%;
   }
   
   

@@ -1,95 +1,137 @@
 <script src="<%=contextPath%>/js/autocomplete.js"></script>
-<div id="hermanoNuevoProfesorForm">
-<form id="asignacionCumplimentarForm" autocomplete="off" action="<%= nuevopath %>" method="post" >
-<input type="hidden" name="asignaturaId" value="<%= asign.identificador %>">
-<% if (asign.acronimo !== null){ %>
-  <h1><%= asign.acronimo %></h1>
-  <% }else{%>
-  <h1><%= asign.nombre %></h1>
-  <% }%>
-
-<ul style="list-style-type:none">
-    <li>Coordinador:
-    <div class="autocomplete" style="width:500px;">
-    <input id="coordinador" type="text" name="coordinador" value="<%= asign.coordinador.nombreCorregido %>" placeholder="<%= asign.coordinador.nombreCorregido %>" onclick= 'LimpiaCoordinador()'>
-    </div> 
-    </li>
-    <% for(var i=0; i< asign.grupos.length; i++){ %>
-        <li>
-      <% if (asign.grupos[i].grupoPerteneciente === true){%>
-        <h2> <span> Grupo <%= asign.grupos[i].GrupoNombre %>  <%= asign.grupos[i].nombreItinerario %>: </span></h2>
-      <%} else{%>
-         <h2> <span class="cuidado"> Grupo <%= asign.grupos[i].GrupoNombre %>  <%= asign.grupos[i].nombreItinerario %>: </span></h2>
-      <%}%>
-      <ul style="list-style-type:none">
-      <%for(var j=0; j< asign.grupos[i].profesors.length; j++){ %>
-      <li id="asignacion_<%= asign.grupos[i].profesors[j].asignacion %>">
-      <%= asign.grupos[i].profesors[j].nombreCorregido %> <button type="button" onclick="Eliminar('asignacion_<%= asign.grupos[i].profesors[j].asignacion %>')">Eliminar</button>
-      </li>
+<%- include cumplimentar.ejs %>
+<div class="contenido2">
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+  <% switch(estadoProfesores[departamentoID]){
+      case estadosProfesor.abierto : %>
+        <p>Las asignaciones de profesores están siendo cubiertas por el responsable docente del departamento del plan de estudios</p>
+        <% break;
+      case estadosProfesor.aprobadoResponsable: %>
+        <p>Las asignaciones de profesores deben ser aprobadas por el director del departamento</p>
+        <% break;
+      case estadosProfesor.aprobadoDirector: %>
+        <p>La asignación de profesores ya ha sido aprobada por el director del departamento</p>
+        <% break;
+      default:
+      break;
+  }%> 
+  <p><%=permisoDenegado%></p>
+  <br/>
+  <p>Permisos en función del estado</p>
+  <ul>
+    <li>Abierto: el responsable docente del departamento en el plan </li>
+    <li>Aprobado por el rosponsable docente: el director del departamento </li>
+    <li>Aprobado: nadie tiene permiso</li>
+    <li>Incidencia: el jefe de estudios</li>
+  </ul>
+<%}else{%>
+    <% if(estadoProfesores[departamentoID] === estadosProfesor.abierto && estadoProgDoc === estadosProgDoc.abierto ) { %>
+    <form action="<%= aprobarpath %>" method="post" onsubmit="return Enviar()" class="myHeader2 sticky">
+    <input type='submit' value='Aprobar Asignación Profesores'>
+    </form>
     <% } %>
-    <div id = 'anadir_profesor_<%= asign.grupos[i].GrupoId %>'></div>
-    <button type="button" onclick="AnadirProfesor('anadir_profesor_<%= asign.grupos[i].GrupoId %>')">Añadir Profesor</button>
+    <% if(estadoProfesores[departamentoID] === estadosProfesor.aprobadoResponsable && estadoProgDoc === estadosProgDoc.abierto) { %>
+    <form id="formDecision" action="<%= aprobarpath %>" method="post">
+    <input id="decision" type="hidden" name="decision" value='aceptar'>
+    <button type="button" onclick="Decidir('aceptar')">Aceptar Asignación Profesores</button>
+    <button type="button" onclick="Decidir('rechazar')">No aceptar Asignación Profesores</button>
+    </form>
+    <% } if(estadosProgDoc === estadosProgDoc.incidencia){%>
+
+    <% }%>
+    <ul style="list-style-type:none">
+    <% for(let i=0; i < asignacion.length; i++) { %> 
+      <% if(i===0) { %>
+        <li>
+        <h2>Curso <%= asignacion[i].curso %></h2>
+      <% } %>
+      <% if(i>=1 && asignacion[i].curso !== asignacion[i-1].curso) { %>
+      </li>
+      <li>
+        <h2>Curso <%= asignacion[i].curso %></h2>
+        <% } %>
+        <ul style="list-style-type:none">
+          <li>
+        <% if(estadoProfesores[departamentoID] === estadosProfesor.abierto || estadoProgDoc === estadosProgDoc.incidencia ) { %>
+          <form action="<%= nuevopath %>" method="get">
+           <% if (asignacion[i].acronimo !== null){ %>
+          <input type="hidden", name = 'acronimo', value='<%= asignacion[i].acronimo %>'>
+          <% }else{%>
+          <input type="hidden", name = 'acronimo', value='<%= asignacion[i].nombre %>'>
+          <% } %>
+          <% if (asignacion[i].acronimo !== null){ %>
+               <h3><span  title="<%=asignacion[i].nombre%>"> <%= asignacion[i].acronimo %></span> <input type="submit" value="Editar"></h3>
+            <% }else{%>
+               <h3><span  title="<%=asignacion[i].nombre%>"> <%= asignacion[i].nombre %></span> <input type="submit" value="Editar"></h3>
+            <% } %>
+          </form>
+          <% } else{%>
+            <% if (asignacion[i].acronimo !== null){ %>
+              <h3><span  title="<%=asignacion[i].nombre%>"><%= asignacion[i].acronimo %></span></h3>
+            <% }else{%>
+              <h3><span  title="<%=asignacion[i].nombre%>"><%= asignacion[i].nombre%></span></h3>
+            <% }
+           }%>
+          <ul style="list-style-type:none">
+          <li>
+            <span> Coordinador: <%= asignacion[i].coordinador.nombreCorregido %> </span>
+          </li>
+        <% for(var j=0; j< asignacion[i].grupos.length; j++){ %>
+        
+            <li>
+            <% if (asignacion[i].grupos[j].grupoPerteneciente === true){%>
+              <span> Grupo <%= asignacion[i].grupos[j].GrupoNombre %> <%= asignacion[i].grupos[j].nombreItinerario %>: </span>
+            <%} else{%>
+              <span class="cuidado"> Grupo <%= asignacion[i].grupos[j].GrupoNombre %> <%= asignacion[i].grupos[j].nombreItinerario %>: </span>
+            <%}%>
+          
+          <%for(var k=0; k< asignacion[i].grupos[j].profesors.length; k++){
+            if(k === asignacion[i].grupos[j].profesors.length -1 ){%>
+              <span><%= asignacion[i].grupos[j].profesors[k].nombreCorregido %></span>
+            <%}else{%>     
+              <span><%= asignacion[i].grupos[j].profesors[k].nombreCorregido %>; </span>
+            <%}
+          } %>
+            </li>
+      <% } %> 
         </ul>
         </li>
-  <% } %> 
+    </ul>  
+    <% } %>
+    </li>
     </ul>
-    <input type='submit' value='Guardar'>
-    <button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
-</form> 
+
+  <%}%>
+
 </div>
-<%- include nuevoProfesor.ejs %>
-
 <script>
-let form = document.getElementById("asignacionCumplimentarForm")
-let numeroIncrementable = 0;
-let profesores = <%- JSON.stringify(profesores) %>
-let profesores2 = quitAcents(profesores)
 
-autocomplete(document.getElementById("coordinador"), profesores, profesores2);
-
-function Eliminar(id) {
-   document.getElementById(id).innerHTML = '<input name="eliminar" id="momentaneo" type="hidden" value="">'
-   let memomentaneo = document.getElementById(momentaneo)
-   momentaneo.setAttribute('value', "eliminar_"+id) 
-   momentaneo.setAttribute('id', "") 
+let estado = <%-JSON.stringify(estado)%>
+let profesores = <%-JSON.stringify(profesores)%>
+let profesores2 ="";
+if(estado === null){
+  profesores2 = quitAcents(profesores)
+  //document.getElementsByTagName('body')[0].onload = changeSelect();
 }
 
-function Eliminar2(id){
-  let input = document.getElementById(id);
-  let liste = document.getElementById("list_"+id);
-  input.parentNode.removeChild(input);
-  liste.parentNode.removeChild(liste);
+
+
+function Enviar(){
+  return confirm("Una vez aprobada la asignación de profesores no podrá modificarla ¿Seguro que quiere aprobarla?")
+}
+
+function Decidir(decision){
+  let dec = document.getElementById('decision');
+  dec.setAttribute('value', decision)
+  if(confirm("Esta acción no se podrá deshacer. ¿Está seguro de que quiere continuar?")){
+    document.getElementById("formDecision").submit();
+  }
   
 }
 
-function AnadirProfesor(id){
- let div = document.createElement('div');
-  div.innerHTML = '<div id="'+id+'_vacio" class="autocomplete" style="width:500px;"><input id="momentaneo" type="text" name="vacio" value="" placeholder="Seleccionar Profesor"></div>'
-  let node = div.firstChild;
-  /*No se puede usar innerHtml directamente pq si añades varios buscadores en un mismo grupo desaparece la funcionalidad de los primeros
-  buscadores. Con javascript debes crear primero un elemento, la forma más sencislla para hacerlo con un string es esa
-  Alternativaemtne se podría hacer con jquery así
-  */
-  //$( "#"+id ).append('<div class="autocomplete" style="width:500px;"><input id="momentaneo" type="text" name="anadir" value="" placeholder="Seleccionar Profesor"></div> ' ); 
-  let contenedor = document.getElementById(id)
-  //solo permite un input por grupo hasta que se rellene
-  if(!document.getElementById(id+"_vacio")){
-   contenedor.appendChild(node)
-   let memomentaneo = document.getElementById(momentaneo)
-   momentaneo.setAttribute('id', numeroIncrementable)
-   document.getElementById(numeroIncrementable).focus();
-   autocomplete(document.getElementById(numeroIncrementable), profesores, profesores2, 'asignacionProfesores');
-   numeroIncrementable++; 
-  }
-     
-}
-
-function Volver(cancelarpath){
-  window.location.replace(cancelarpath);
-}
-
-function LimpiaCoordinador(){
-  document.getElementById('coordinador').setAttribute('value', "");
-}
-
 </script>
+
+
+    

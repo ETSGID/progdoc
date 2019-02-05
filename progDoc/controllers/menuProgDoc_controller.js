@@ -90,6 +90,8 @@ exports.getProgramacionDocente = function (req, res, next) {
             } else if (progDocAbierta !== null) {
                 res.locals.progDoc = progDocAbierta;
                 req.session.pdID = progDocAbierta['ProgramacionDocentes.identificador']
+            } else{
+                req.session.pdID = null
             }
             if (res.locals.progDoc) {
                 let query = 'SELECT distinct  "DepartamentoResponsable", public."Departamentos".nombre, public."Departamentos".acronimo FROM public."Asignaturas" p  inner join public."Departamentos" on p."DepartamentoResponsable" = public."Departamentos".codigo WHERE p."ProgramacionDocenteIdentificador" = :pdId ';

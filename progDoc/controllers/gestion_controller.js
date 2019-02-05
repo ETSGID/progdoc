@@ -105,16 +105,14 @@ exports.getRoles = function (req, res, next) {
                 //despues otro metodo que llama a tabla de asignaturas de cada indentificador de PD y guarda en un array con los departamentos de cada indentificador de PD
                 //ahora ya tienes los departamentos que intervienen
                 //compruebas en la tabla de roles si estos estan o no, si no estan los creas
-
-
                 let nuevopath = "" + req.baseUrl + "/gestionRoles/guardarRoles";
                 res.render('gestionRoles', {
                     contextPath: app.contextPath,
-                    roles: cargos,
+                    roles: cargos.sort(funciones.sortRolesporDepartamento),
                     profesores: profesores,
                     nuevopath: nuevopath,
                     submenu: req.session.submenu,
-                    departamentos: departamentos,
+                    departamentos: departamentos.sort(funciones.sortDepartamentos),
                     planID: req.session.planID,
                     planEstudios: res.locals.planEstudios,
                     programacionesDocentes: programacionesDocentes,

@@ -1,5 +1,5 @@
 <%- include consultar.ejs %>
-<div>
+<div class="contenido">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
 <%}else{%>
@@ -18,9 +18,9 @@
     <tr>
       <th scope="row">
           <%if (tribunales[i].acronimo !== null){ %>
-            <%= tribunales[i].acronimo%>
+            <span title="<%=tribunales[i].nombre%>"><%= tribunales[i].acronimo%></span>
           <% }else{%>
-          <%= tribunales[i].nombre%>
+          <span title="<%=tribunales[i].nombre%>"><%= tribunales[i].nombre%></span>
           <% } %> 
       </th>
       <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Presidente'>

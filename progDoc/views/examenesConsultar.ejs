@@ -1,5 +1,5 @@
 <%- include consultar.ejs %>
-<div>
+<div class="contenido">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
 <%}else{%>
@@ -26,9 +26,9 @@
                         <tr>
                             <th scope="row">
                                 <%if (asignacionsExamen[i].asignaturas[j].acronimo !== null){ %>
-                                    <%= asignacionsExamen[i].asignaturas[j].acronimo%>
+                                    <span title="<%=asignacionsExamen[i].asignaturas[j].nombre%>"><%= asignacionsExamen[i].asignaturas[j].acronimo%></span>
                                 <% }else{%>
-                                <%= asignacionsExamen[i].asignaturas[j].nombre%>
+                                <span  title="<%=asignacionsExamen[i].asignaturas[j].nombre%>"><%= asignacionsExamen[i].asignaturas[j].nombre%></span>
                                 <% } %> 
                             </th>
                             <td>

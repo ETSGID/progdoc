@@ -3,7 +3,6 @@ let router = express.Router();
 let asignaturasApi = require('../api/asignaturas');
 
 router.all('*', function (req,res,next){
-    console.log("Usando la API")
     next();
 })
 router.get('/asignaturas/:progDocID',

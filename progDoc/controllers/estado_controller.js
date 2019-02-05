@@ -13,10 +13,10 @@ exports.getEstado = function (req, res, next) {
     let departamentosList = [];
     //si no hay progDoc o no hay departamentosResponsables de dicha progDoc
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-        let view = req.originalUrl.toLowerCase().includes("consultar") ? "estadoConsultar" : "estado"
+        let view = req.originalUrl.toLowerCase().includes("consultar") ? "estadoConsultar" : "estadoCumplimentar"
         res.render(view, {
             contextPath: app.contextPath,
-            estado: "Programacion docente no abierta",
+            estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -45,7 +45,7 @@ exports.getEstado = function (req, res, next) {
 
         //si no estaba inicializada la inicializo.
         req.session.departamentoID = departamentoID;
-        let view = req.originalUrl.toLowerCase().includes("consultar") ? "estadoConsultar" : "estado"
+        let view = req.originalUrl.toLowerCase().includes("consultar") ? "estadoConsultar" : "estadoCumplimentar"
         models.Departamento.findAll({
             attributes: ['codigo', 'nombre', 'acronimo'],
 
@@ -80,6 +80,12 @@ exports.getEstado = function (req, res, next) {
                     fechaHorarios: fechaHorarios,
                     estadoExamenes: estadoExamenes,
                     fechaExamenes: fechaExamenes,
+                    estadosProfesor: estados.estadoProfesor,
+                    estadosTribunal: estados.estadoTribunal,
+                    estadosHorario: estados.estadoHorario,
+                    estadosExamen: estados.estadoExamen,
+                    estadosCalendario: estados.estadoCalendario,
+                    estadosProgDoc: estados.estadoProgDoc,
                     pdID: pdID
                 });
             })

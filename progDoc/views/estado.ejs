@@ -1,20 +1,13 @@
-<%- include cumplimentar.ejs %>
-<div>
-<% if (locals.estado && locals.estado !== null) { %>
-  <p><%=estado%></p>
-<%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
-  <p><%=permisoDenegado%></p>
-<%}else{%>
-    <div class="table-responsive">
+ <div class="table-responsive">
         <table>
           <tr class=" espacio">
             <td class="col-sm-7"></td>
             <td class="col-sm-2">Estado</td>
-            <td class="col-sm-3">Ultima Modificacion</td>
+            <td class="col-sm-3">Última Modificación</td>
           </tr>
           <tr class=" espacio" >
-            <td class="col-sm-7">Programacion Docente</td>
-            <% if (estadoProgDoc===1) { %>
+            <td class="col-sm-7"><u>Programación Docente</u></td>
+            <% if (estadoProgDoc===estadosProgDoc.abierto) { %>
             <td class="col-sm-2">
             <table>
               <tr><td >Abierto</td></tr>
@@ -22,15 +15,15 @@
             </table>
             </td>
             <%}%>
-            <% if (estadoProgDoc===2) { %>
+            <% if (estadoProgDoc===estadosProgDoc.listo) { %>
             <td class="col-sm-2">
             <table>
-              <tr><td >Completada</td></tr>
-              <tr><td ><progress  value="100" max="100"></progress></td></tr>
+              <tr><td>Completada</td></tr>
+              <tr><td><progress  value="100" max="100"></progress></td></tr>
             </table>
             </td>
             <%}%>
-            <% if (estadoProgDoc===4) { %>
+            <% if (estadoProgDoc===estadosProgDoc.incidencia) { %>
             <td class="col-sm-2">
             <table>
               <tr><td class="incidencia">Incidencia</tr></td>
@@ -38,16 +31,16 @@
             </table>
             </tr>
             <%}%>
-            <% if (estadoProgDoc !== 4) { %>
-            <td class="col-sm-3"><%=fechaProgDoc.toString().substring(0,15)%></td>
+            <% if (estadoProgDoc !== estadosProgDoc.incidencia && fechaProgDoc) { %>
+            <td class="col-sm-3"><%=fechaProgDoc.getDate()+'/'+(+fechaProgDoc.getMonth()+1)+'/'+fechaProgDoc.getFullYear()%></td>
             <%}%>
-            <% if (estadoProgDoc ===4) { %>
+            <% if (estadoProgDoc === estadosProgDoc.incidencia) { %>
             <td class="incidencia col-sm-3">Incidencia</td>
             <%}%>
           </tr>
           <tr class=" espacio">
-            <td class="col-sm-7">Horarios</td>
-            <% if (estadoHorarios===1) { %>
+            <td class="col-sm-7"><u>Horarios</u></td>
+            <% if (estadoHorarios=== estadosHorario.abierto) { %>
             <td class="col-sm-2">
             <table>
               <tr><td>Abierto</td></tr>
@@ -55,24 +48,24 @@
               </table>
             </td>
             <%}%>
-            <% if (estadoHorarios===2) { %>
+            <% if (estadoHorarios===estadosHorario.aprobadoCoordinador) { %>
             <td class="col-sm-2">
             <table>
-              <tr><td >Aprobado Coordinador</tr></td >
+              <tr><td>Aprobado Coordinador</tr></td >
               <tr><td ><progress  value="100" max="100"></progress></td></tr>
             </table>
             </td>
             <%}%>
-            <% if (estadoProgDoc !==4) { %>
-            <td class="col-sm-3" ><%=fechaHorarios.toString().substring(0,15)%></td>
+            <% if (estadoProgDoc !== estadosProgDoc.incidencia && fechaHorarios) { %>
+            <td class="col-sm-3" ><%=fechaHorarios.getDate()+'/'+(+fechaHorarios.getMonth()+1)+'/'+fechaHorarios.getFullYear()%></td>
             <%}%>
-            <% if (estadoProgDoc ===4) { %>
+            <% if (estadoProgDoc === estadosProgDoc.incidencia) { %>
             <td class="incidencia col-sm-3">Incidencia</td>
             <%}%>
           </tr>
           <tr class=" espacio">
-            <td class="col-sm-7">Examenes</td>
-            <% if (estadoExamenes===1) { %>
+            <td class="col-sm-7"><u>Exámenes</u></td>
+            <% if (estadoExamenes === estadosExamen.abierto) { %>
             <td class="col-sm-2">
             <table>
               <tr><td>Abierto</td></tr>
@@ -80,7 +73,7 @@
             </table>
             </td>
             <%}%>
-            <% if (estadoExamenes===2) { %>
+            <% if (estadoExamenes === estadosExamen.aprobadoCoordinador) { %>
             <td class="col-sm-2">
             <table>
               <tr><td>Aprobado Coordinador</td></tr>
@@ -88,21 +81,21 @@
             </table>
             </td>
             <%}%>
-            <% if (estadoProgDoc !==4) { %>
-            <td class="col-sm-3" ><%=fechaExamenes.toString().substring(0,15)%></td>
+            <% if (estadoProgDoc !== estadosProgDoc.incidencia && fechaExamenes) { %>
+            <td class="col-sm-3" ><%=fechaExamenes.getDate()+'/'+(+fechaExamenes.getMonth()+1)+'/'+fechaExamenes.getFullYear()%></td>
             <%}%>
-            <% if (estadoProgDoc ===4) { %>
+            <% if (estadoProgDoc === estadosProgDoc.incidencia) { %>
             <td class="incidencia col-sm-3">Incidencia</td>
             <%}%>
           </tr>
   
           <tr class=" espacio">
-            <td class="col-sm-7"> Profesores</td>
+            <td class="col-sm-7"><u>Profesores</u></td>
             <td class="col-sm-2"></td>
-            <% if (estadoProgDoc !==4) { %>
-            <td class="col-sm-3"><%=fechaProfesores.toString().substring(0,15)%></td>
+            <% if (estadoProgDoc !== estadosProgDoc.incidencia && fechaProfesores) { %>
+            <td class="col-sm-3"><%=fechaProfesores.getDate()+'/'+(+fechaProfesores.getMonth()+1)+'/'+fechaProfesores.getFullYear()%></td>
             <%}%>
-            <% if (estadoProgDoc ===4) { %>
+            <% if (estadoProgDoc === estadosProgDoc.incidencia) { %>
             <td class="incidencia col-sm-3">Incidencia</td>
             <%}%>
           </tr>
@@ -111,11 +104,15 @@
             <% Object.keys(estadoProfesores).forEach(function(key){%>
             <% var value = estadoProfesores[key];%>
               <% for(var j=0; j < departamentos.length; j++) { %>
-                <% if (key === departamentos[j].codigo) { %>
-                <td class="col-sm-7">Dpto de <%=departamentos[j].nombre.toLowerCase();%></>
+                <% if (key === departamentos[j].codigo) { 
+                  if (departamentos[j].acronimo !== null){ %>
+                      <td class="col-sm-7"><span title="<%=departamentos[j].nombre%>"><%=departamentos[j].acronimo%></span></td>
+                    <%}else {%>
+                      <td class="col-sm-7"><span title="<%=departamentos[j].nombre%>"><%=departamentos[j].codigo%></span></td> 
+                    <%}%> 
                 <% } %>
               <% } %>
-              <% if (value === 1) { %>
+              <% if (value === estadosProfesor.abierto) { %>
               <td class="col-sm-2">
               <table>
                 <tr><td >Abierto</td></tr>
@@ -123,37 +120,37 @@
               </table>
               </td>
               <%}%>
-              <% if (value === 2) { %>
+              <% if (value === estadosProfesor.aprobadoResponsable) { %>
               <td class="col-sm-2">
               <table>
-                <tr><td ><Aprobado por Responsable Docente</td></tr>
-                <tr><td ><<progress  value="60" max="100"></progress></td></tr>
+                <tr><td>Aprobado por Responsable Docente</td></tr>
+                <tr><td><progress  value="60" max="100"></progress></td></tr>
               </table>
               </td>
               <%}%>
-              <% if (value === 3) { %>
+              <% if (value === estadosProfesor.aprobadoDirector) { %>
               <td class="col-sm-2">
               <table>
-                <tr><td><Aprobado por Director</td></tr>
+                <tr><td>Aprobado por Director</td></tr>
                 <tr><td><progress value="100" max="100"></progress></td></tr>
               </table>
               </td>
               <%}%>
-              <% if (estadoProgDoc !==4) { %>
-              <td class="col-sm-3"><%=fechaProfesores.toString().substring(0,15)%></td></tr>
+              <% if (estadoProgDoc !== estadosProgDoc.incidencia && fechaProfesores) { %>
+              <td class="col-sm-3"></td></tr>
               <%}%>
-              <% if (estadoProgDoc ===4) { %>
+              <% if (estadoProgDoc === estadosProgDoc.incidencia) { %>
               <td class="incidencia col-sm-3">Incidencia</td>
             <%}%>
           <% });%>
           </tr>
           <tr class=" espacio">
-            <td class="col-sm-7"> Tribunales</td>
+            <td class="col-sm-7"><u>Tribunales</u></td>
             <td class="col-sm-2"></td>
-            <% if (estadoProgDoc !==4) { %>
-            <td class="col-sm-3"><%=fechaTribunales.toString().substring(0,15)%></td>
+            <% if (estadoProgDoc !== estadosProgDoc.incidencia && fechaTribunales) { %>
+            <td class="col-sm-3"><%=fechaTribunales.getDate()+'/'+(+fechaTribunales.getMonth()+1)+'/'+fechaTribunales.getFullYear()%></td>
             <%}%>
-            <% if (estadoProgDoc ===4) { %>
+            <% if (estadoProgDoc === estadosProgDoc.incidencia) { %>
             <td class="incidencia col-sm-3">Incidencia</td>
             <%}%>
           </tr>
@@ -162,11 +159,15 @@
             <% Object.keys(estadoTribunales).forEach(function(key){%>
             <% var value = estadoTribunales[key];%>
             <% for(var j=0; j < departamentos.length; j++) { %>
-              <% if (key === departamentos[j].codigo) { %>
-                <td class="col-sm-7">Dpto de <%=departamentos[j].nombre.toLowerCase();%></>
+              <% if (key === departamentos[j].codigo) { 
+                if (departamentos[j].acronimo !== null){ %>
+                      <td class="col-sm-7"><span title="<%=departamentos[j].nombre%>"><%=departamentos[j].acronimo%></span></td>
+                    <%}else {%>
+                      <td class="col-sm-7"><span title="<%=departamentos[j].nombre%>"><%=departamentos[j].codigo%></span></td> 
+                    <%}%> 
                 <% } %>
               <% } %>
-              <% if (value === 1) { %>
+              <% if (value === estadosTribunal.abierto) { %>
               <td class="col-sm-2">
               <table>
                 <tr><td >Abierto</td></tr>
@@ -174,30 +175,29 @@
               </table>
               </td>
               <%}%>
-              <% if (value === 2) { %>
+              <% if (value === estadosTribunal.aprobadoResponsable) { %>
               <td class="col-sm-2">
               <table>
-                <tr><td ><Aprobado por Responsable Docente</td></tr>
-                <tr><td ><<progress  value="60" max="100"></progress></td></tr>
+                <tr><td>Aprobado por Responsable Docente</td></tr>
+                <tr><td><progress  value="60" max="100"></progress></td></tr>
               </table>
               </td>
               <%}%>
-              <% if (value === 3) { %>
+              <% if (value === estadosTribunal.aprobadoDirector) { %>
               <td class="col-sm-2">
               <table>
-                <tr><td><Aprobado por Director</td></tr>
+                <tr><td>Aprobado por Director</td></tr>
                 <tr><td><progress value="100" max="100"></progress></td></tr>
               </table>
               </td>
               <%}%>
-              <% if (estadoProgDoc !==4) { %>
-              <td class="col-sm-3"><%=fechaTribunales.toString().substring(0,15)%></td></tr>
+              <% if (estadoProgDoc !== estadosProgDoc.incidencia && fechaTribunales) { %>
+              <td class="col-sm-3"></td></tr>
               <%}%>
-              <% if (estadoProgDoc ===4) { %>
+              <% if (estadoProgDoc === estadosProgDoc.incidencia) { %>
               <td class="incidencia col-sm-3">Incidencia</td>
             <%}%>
           <% });%>
           </tr>
-        <table>
-      </div>
-<%}%>
+        </table>
+</div>

@@ -15,10 +15,10 @@ exports.getHorario = function (req, res, next) {
 
     //si no hay progDoc o no hay departamentosResponsables de dicha progDoc
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-        let view = req.originalUrl.toLowerCase().includes("consultar") ? "horariosConsultar" : "horarios"
+        let view = req.originalUrl.toLowerCase().includes("consultar") ? "horariosConsultar" : "horariosCumplimentar"
         res.render(view, {
             contextPath: app.contextPath,
-            estado: "Programacion docente no abierta",
+            estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -31,7 +31,7 @@ exports.getHorario = function (req, res, next) {
     //hay que comprobar que no sea una url de consultar.
     else if (estados.estadoHorario.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoHorarios']
         && res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto && !req.originalUrl.toLowerCase().includes("consultar")) {
-        res.render("horarios", {
+        res.render("horariosCumplimentar", {
             contextPath: app.contextPath,
             estado: "Asignación de horarios ya se realizó",
             permisoDenegado: res.locals.permisoDenegado,
@@ -40,6 +40,7 @@ exports.getHorario = function (req, res, next) {
             planID: req.session.planID,
             departamentoID: req.session.departamentoID,
             planEstudios: res.locals.planEstudios,
+            estadoHorarios: res.locals.progDoc['ProgramacionDocentes.estadoHorarios'],
             asignacionsHorario: null
         })
     } else {
@@ -221,7 +222,7 @@ exports.getHorario = function (req, res, next) {
                 .then(function (e) {
                     let cancelarpath = "" + req.baseUrl + "/coordinador/horarios?planID=" + req.session.planID
                     let nuevopath = "" + req.baseUrl + "/coordinador/guardarHorarios"
-                    let view = req.originalUrl.toLowerCase().includes("consultar") ? "horariosConsultar" : "horarios"
+                    let view = req.originalUrl.toLowerCase().includes("consultar") ? "horariosConsultar" : "horariosCumplimentar"
                     res.render(view,
                         {
                             contextPath: app.contextPath,
@@ -451,10 +452,10 @@ exports.getExamenes = function (req, res, next) {
 
     //si no hay progDoc o no hay departamentosResponsables de dicha progDoc. Ojo también comprueba que no esté en incidencia para el JE
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-        let view = req.originalUrl.toLowerCase().includes("consultar") ? "examenesConsultar" : "examenes"
+        let view = req.originalUrl.toLowerCase().includes("consultar") ? "examenesConsultar" : "examenesCumplimentar"
         res.render(view, {
             contextPath: app.contextPath,
-            estado: "Programacion docente no abierta",
+            estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -470,7 +471,7 @@ exports.getExamenes = function (req, res, next) {
     //hay que comprobar que no sea una url de consultar.
     else if (estados.estadoExamen.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoExamenes']
         && res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto && !req.originalUrl.toLowerCase().includes("consultar")) {
-        res.render("examenes", {
+        res.render("examenesCumplimentar", {
             contextPath: app.contextPath,
             estado: "Asignación de exámenes ya se realizó",
             permisoDenegado: res.locals.permisoDenegado,
@@ -479,6 +480,7 @@ exports.getExamenes = function (req, res, next) {
             planID: req.session.planID,
             departamentoID: req.session.departamentoID,
             planEstudios: res.locals.planEstudios,
+            estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
             asignacionsExamen: null,
             periodosExamen: null,
             cursos: null,
@@ -630,7 +632,7 @@ exports.getExamenes = function (req, res, next) {
                 .then(function (e) {
                     let cancelarpath = "" + req.baseUrl + "/coordinador/examenes?planID=" + req.session.planID
                     let nuevopath = "" + req.baseUrl + "/coordinador/guardarExamenes"
-                    let view = req.originalUrl.toLowerCase().includes("consultar") ? "examenesConsultar" : "examenes"
+                    let view = req.originalUrl.toLowerCase().includes("consultar") ? "examenesConsultar" : "examenesCumplimentar"
                     res.render(view,
                         {
                             contextPath: app.contextPath,

@@ -15,10 +15,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
   <title>Portal del Profesor</title>
+  <style>
+    .open-6659b527b8d152af596e174303b316a7{
+      position: fixed !important;
+      
+    }
+  </style>
 </head>
 <body>
   <div class="sidenav">
-  <h2> Portal Profesor </h2>
+  <h2> Aplicación Programación Docente </h2>
   <button id='drop_ProgDoc' class="dropdown-btn">Programación Docente 
      <i class="glyphicon glyphicon-plus fa fa-caret-down" aria-hidden="true"></i>
   </button>
@@ -41,7 +47,7 @@
 
 <div class="main">
 
- <div id="buttonMenuPortales123"></div>
+ <div id="buttonMenuPortales123" style="position:fixed; z-index:4; text-align: right"></div>
   <%- body %>
 </div>
 <script>
@@ -87,9 +93,8 @@ menu.forEach(function(element,index){
   }
   });
 }
-$(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip({'delay': { show: 1500}, placement: "auto"});  
-   dibujarmenulateral("buttonMenuPortales123", contextPath+"/logout"); 
+$(document).ready(function(){  
+  dibujarmenulateral("buttonMenuPortales123", contextPath+"/logout"); 
 });
 </script>
 

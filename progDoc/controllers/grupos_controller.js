@@ -12,7 +12,7 @@ exports.getGrupos = function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         res.render(view, {
             contextPath: app.contextPath,
-            estado: "Programacion docente no abierta",
+            estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -27,7 +27,7 @@ exports.getGrupos = function (req, res, next) {
         && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("gruposJE", {
             contextPath: app.contextPath,
-            estado: "Programacion docente no abierta",
+            estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,

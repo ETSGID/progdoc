@@ -1,13 +1,37 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
 <%- include cumplimentar.ejs %>
-<div>
+<div class="contenido2">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
 <%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+    <% switch(estadoExamenes){
+      case estadosExamen.abierto : %>
+        <p>Los exámenes están siendo cubiertos por el coordinador del plan de estudios</p>
+        <% break;
+      case estadosExamen.aprobadoCoordinador : %>
+        <p>Los horarios han sido aprobados por el coordinador del plan de estudios</p>
+        <% break;
+      default:
+      break;
+    }%> 
   <p><%=permisoDenegado%></p>
+  </br>
+  <p>Permisos en función del estado</p>
+  <ul>
+    <li>Abierto: el coordinador del plan de estudios </li>
+    <li>Aprobado: nadie tiene permiso </li>
+    <li>Incidencia: el jefe de estudios</li>
+  </ul>
 <%}else{%>
         <form id="formulario" autocomplete="off" action="<%=aprobarpath%>" method="post" onsubmit="return Enviar()" >
+                <div class="myHeader2 sticky">
+                    <%if(estadoExamenes === estadosExamen.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
+                    <input type="submit" value='Guardar y Aprobar Asignación Examenes'>
+                    <%}%>
+                    <button type="button" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
+                    <button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+                </div>
                 <div>
                     <% for (let i=0 ; i<asignacionsExamen.length; i++){%>
                         <h2><%= asignacionsExamen[i].periodoNombre %>
@@ -31,9 +55,9 @@
                                 <tr>
                                     <th scope="row">
                                         <%if (asignacionsExamen[i].asignaturas[j].acronimo !== null){ %>
-                                            <%= asignacionsExamen[i].asignaturas[j].acronimo%>
+                                            <span title="<%=asignacionsExamen[i].asignaturas[j].nombre%>"><%= asignacionsExamen[i].asignaturas[j].acronimo%></span>
                                         <% }else{%>
-                                        <%= asignacionsExamen[i].asignaturas[j].nombre%>
+                                        <span  title="<%=asignacionsExamen[i].asignaturas[j].nombre%>"><%= asignacionsExamen[i].asignaturas[j].nombre%></span>
                                         <% } %> 
                                     </th>
                                     <td>
@@ -66,11 +90,6 @@
                         </div>
                     <%}%>
                 </div>
-            <%if(estadoExamenes === estadosExamen.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
-            <input type="submit" value='Guardar y Aprobar Asignación Examenes'>
-            <%}%>
-            <button type="button" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
-            <button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
         </form>
     <%}%>
 
@@ -228,10 +247,11 @@ function mostrarCalendario(id){
     for (let j = 1; j < tableDatos.rows.length; j++){
         cellsOfRow = tableDatos.rows[j].getElementsByTagName('th');
         cellsOfRow2 = tableDatos.rows[j].getElementsByTagName('td');
-        // Recorremos todas las celdas fe la fila que me interesan
+        // Recorremos todas las celdas de la fila que me interesan
         let nuevoExamen = {};
         nuevoExamen.asignatura = cellsOfRow[0].innerHTML.trim();
         nuevoExamen.curso = cellsOfRow2[0].innerHTML.trim();
+        nuevoExamen.asignaturaNombre = cellsOfRow[0].title
         cellsOfRow2[1].children[0].value.trim() === "" ? nuevoExamen.fecha = cellsOfRow2[1].children[0].placeholder : nuevoExamen.fecha =cellsOfRow2[1].children[0].value;
         estadoExamenes.push(nuevoExamen);
 

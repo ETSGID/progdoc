@@ -1,6 +1,6 @@
 <!-- debe ir dentro de un formulario -->
 <!-- el onsubmit debe ser propio de cada sitio en el que se utilice.-->
-<div>
+<div class="contenido">
     <form id="nuevoProfesorForm" style="display:none" action = "#" onsubmit="return MeterEnForm()">
     <fieldset>
         <legend>Añadir profesor al sistema</legend>
@@ -74,7 +74,6 @@ function MeterEnForm(){
   profesor.nombreCorregido = apellidos + ", " + nombre
   let profesorExistente = profesores.find(function (obj) { return obj.correo === email; });
   if(profesorExistente){
-      console.log(profesorExistente)
       alert("El profesor ya está en el sistema es:" +profesorExistente.nombre+ " " +profesorExistente.apellido+"")
   }else{
    profesores.push(profesor);

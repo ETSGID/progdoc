@@ -20,6 +20,7 @@ let enumsPD = require('../enumsPD');
 
 
 router.all('*', function(req,res,next){
+  //roles que pueden hacer todo son admin y subdirector de posgrado
   res.locals.rols = [];
   if (process.env.DEV === 'true') {
     res.locals.rols.push({ rol: enumsPD.rols.Admin, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });

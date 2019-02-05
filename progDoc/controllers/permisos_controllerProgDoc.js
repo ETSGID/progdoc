@@ -7,7 +7,6 @@ exports.comprobarRols = function (req, res, next) {
     let rols = req.session.user.rols;
     let rolsCoincidentes = [];
     let pdID = req.session.pdID;
-    console.log(pdID)
     return models.ProgramacionDocente.findOne({ where: { identificador: pdID } }).then(pd => {
         //cambio en la bbdd remiendo
         if (pd) {
@@ -22,12 +21,14 @@ exports.comprobarRols = function (req, res, next) {
                         let condic = r.condiciones[i].condicion.trim().split('[')
                         switch (condic.length) {
                             case 1:
-                                if ("" + pd[condic[0]] !== "" + r.condiciones[i].resultado) {
+                                //hay que comprobar que existe pd
+                                if (!pd || ("" + pd[condic[0]] !== "" + r.condiciones[i].resultado)) {
                                     cumple = false;
                                 }
                                 break;
                             case 2:
-                                if ("" + pd[condic[0]][condic[1]] !== "" + r.condiciones[i].resultado) {
+                                //hay que comprobar que existe pd
+                                if (!pd || ("" + pd[condic[0]][condic[1]] !== "" + r.condiciones[i].resultado)) {
                                     cumple = false;
                                 }
                                 break;
@@ -41,12 +42,12 @@ exports.comprobarRols = function (req, res, next) {
             }
         })
         if (rolsCoincidentes.length === 0) {
-            res.locals.permisoDenegado = "No tiene permiso contacte el Jefe de Estudios si debería tenerlo"
+            res.locals.permisoDenegado = "No tiene permiso contacte con el Jefe de Estudios si debería tenerlo"
         }
         res.locals.rolsCoincidentes = rolsCoincidentes
         next();
     })
-
+    
 
 }
 
@@ -54,19 +55,21 @@ exports.comprobarRols = function (req, res, next) {
 exports.comprobarRolYPersona = function (req, res, next) {
     let role = req.session.user.employeetype;
     let id = req.session.user.PersonaId;
-
     //comprobamos en la tabla de persona si esta o no esta
-    models.Persona.findById(id).then(persona => {
-        if (persona) {
+        if (id !== null) {
             next();
         }
-        if (!persona) {
-            res.render('noPermitido', {
-                contextPath: app.contextPath,
-                layout: false
-            });
+        if (id === null) {
+            //profesor que no está en el sistema pero puede ver las cosas
+            if (req.session.user.employeetype && typeof req.session.user.employeetype === "string" && req.session.user.employeetype.includes("D")) {
+                next();
+            }
+            else{
+                    res.render('noPermitido', {
+                    contextPath: app.contextPath,
+                    layout: false
+                });
+            }
         }
-    })
-
 };
 

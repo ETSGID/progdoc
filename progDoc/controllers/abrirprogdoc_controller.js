@@ -391,7 +391,7 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                         depResponsable = element["codigo_departamento"]
                     }
                 });
-                // nueva asignatura a anadir. Es una asignatura si tiene grupo, semestre y departamentoResponsable ¿? duda y solo cojo las asignaturas que interesan
+                // nueva asignatura a anadir. Es una asignatura si tiene curso, semestre y departamentoResponsable ¿? duda y solo cojo las asignaturas que interesan
                 if (!asignExisteBBDD && apiAsignEncontrada['curso'] !== "" && semestre !== "" && (tipoPD === "I" || (tipoPD === '1S' && semestre !== '2S') || (tipoPD === '2S' && semestre !== '1S'))) {
                     let nuevaAsign = {};
                     nuevaAsign.anoAcademico = ano;
@@ -834,6 +834,4 @@ WHERE "ProgramacionDocenteIdentificador" is null;
 WHERE "GrupoId" is null;
     delete FROM public."Examens" e 
     WHERE e."AsignaturaIdentificador" is null;
-    delete  FROM public."PlanEstudios"
-WHERE "nombre" is null;
     */

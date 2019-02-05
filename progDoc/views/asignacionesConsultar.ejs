@@ -1,5 +1,5 @@
 <%- include consultar.ejs %>
-<div>
+<div class="contenido">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
 <%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
@@ -19,9 +19,9 @@
         <ul style="list-style-type:none">
           <li>
             <% if (asignacion[i].acronimo !== null){ %>
-              <h3><%= asignacion[i].acronimo %></h3>
+              <h3><span  title="<%=asignacion[i].nombre%>"><%= asignacion[i].acronimo %></span></h3>
             <% }else{%>
-              <h3><%= asignacion[i].nombre%></h3>
+              <h3><span  title="<%=asignacion[i].nombre%>"><%= asignacion[i].nombre%></span></h3>
             <% } %>
            
           <ul style="list-style-type:none">
@@ -40,7 +40,7 @@
             if(k === asignacion[i].grupos[j].profesors.length -1 ){%>
               <span><%= asignacion[i].grupos[j].profesors[k].nombreCorregido %></span>
             <%}else{%>     
-              <span><%= asignacion[i].grupos[j].profesors[k].nombreCorregido %>; </span>
+              <span><%= asignacion[i].grupos[j].profesors[k].nombreCorregido %> </span>
             <%}
           } %>
             </li>

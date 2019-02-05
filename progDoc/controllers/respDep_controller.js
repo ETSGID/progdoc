@@ -14,10 +14,10 @@ exports.getAsignaciones = function (req, res, next) {
     req.session.submenu = "Profesores"
     //si no hay progDoc o no hay departamentosResponsables de dicha progDoc
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-        let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignaciones"
+        let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignacionesCumplimentar"
         res.render(view, {
             contextPath: app.contextPath,
-            estado: "Programacion docente no abierta",
+            estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             profesores: null,
             menu: req.session.menu,
@@ -34,7 +34,7 @@ exports.getAsignaciones = function (req, res, next) {
     else if (!comprobarEstadoCumpleUno(estados.estadoProfesor.abierto, res.locals.progDoc['ProgramacionDocentes.estadoProfesores'])
         && !comprobarEstadoCumpleUno(estados.estadoProfesor.aprobadoResponsable, res.locals.progDoc['ProgramacionDocentes.estadoProfesores'])
         && res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto && !req.originalUrl.toLowerCase().includes("consultar")) {
-        res.render("asignaciones", {
+        res.render("asignacionesCumplimentar", {
             contextPath: app.contextPath,
             estado: "Asignación de profesores ya se realizó",
             permisoDenegado: res.locals.permisoDenegado,
@@ -46,6 +46,7 @@ exports.getAsignaciones = function (req, res, next) {
             departamentosResponsables: res.locals.departamentosResponsables,
             estadosProfesor: estados.estadoProfesor,
             estadosProgDoc: estados.estadoProgDoc,
+            estadoProfesores: res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
             planEstudios: res.locals.planEstudios
         })
     } else {
@@ -55,10 +56,10 @@ exports.getAsignaciones = function (req, res, next) {
         let departamentoID = req.session.departamentoID;
         let departamentoExisteEnElPlan = res.locals.departamentosResponsables.find(function (obj) { return obj.codigo === departamentoID; });
         if (!departamentoExisteEnElPlan) {
-            let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignaciones"
+            let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignacionesCumplimentar"
             res.render(view, {
                 contextPath: app.contextPath,
-                estado: "El departamento seleccionado no es responsable de ninguna asignatura del plan",
+                estado: "El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior",
                 permisoDenegado: res.locals.permisoDenegado,
                 profesores: null,
                 menu: req.session.menu,
@@ -68,12 +69,13 @@ exports.getAsignaciones = function (req, res, next) {
                 departamentosResponsables: res.locals.departamentosResponsables,
                 estadosProfesor: estados.estadoProfesor,
                 estadosProgDoc: estados.estadoProgDoc,
+                estadoProfesores: res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
                 planEstudios: res.locals.planEstudios
             })
         }
         else {
             if (res.locals.permisoDenegado) {
-                let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignaciones"
+                let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignacionesCumplimentar"
                 res.render(view, {
                     contextPath: app.contextPath,
                     estado: null,
@@ -85,8 +87,9 @@ exports.getAsignaciones = function (req, res, next) {
                     planID: req.session.planID,
                     departamentoID: req.session.departamentoID,
                     departamentosResponsables: res.locals.departamentosResponsables,
-                    estadosProfesor: estados.estadoTribunal,
+                    estadosProfesor: estados.estadoProfesor,
                     estadosProgDoc: estados.estadoProgDoc,
+                    estadoProfesores: res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
                     planEstudios: res.locals.planEstudios
                 })
             }
@@ -100,7 +103,7 @@ exports.getAsignaciones = function (req, res, next) {
                     .then(function (asignacions) {
                         asignacion = asignacions
                         let nuevopath = "" + req.baseUrl + "/respdoc/editAsignacion"
-                        let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignaciones"
+                        let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignacionesCumplimentar"
                         res.render(view,
                             {
                                 contextPath: app.contextPath,
@@ -153,7 +156,7 @@ exports.editAsignacion = function (req, res, next) {
             .then(function (asignacions) {
                 asignacion = asignacions
                 let asign = asignacion.find(function (obj) { return (obj.acronimo === acronimo || obj.nombre === acronimo); });
-                res.render('asignacionesCumplimentar',
+                res.render('asignacionesCumplimentarAsignatura',
                     {
                         contextPath: app.contextPath,
                         asign: asign,
@@ -167,6 +170,7 @@ exports.editAsignacion = function (req, res, next) {
                         profesores: profesores,
                         estadosProfesor: estados.estadoProfesor,
                         estadosProgDoc: estados.estadoProgDoc,
+                        estadoProfesores: res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
                         planEstudios: res.locals.planEstudios
                     })
             })
@@ -324,7 +328,7 @@ exports.guardarAsignacion = function (req, res, next) {
         .then(function (as) {
             //que es la progdoc correspondiente ya se ve en que debe de estar abierta / incidencia en el modulo de permisos
             if (!as[0] || !as[0].DepartamentoResponsable || as[0].DepartamentoResponsable !== departamentoID) {
-                res.locals.permisoDenegado = "No tiene permiso contacte el Jefe de Estudios si debería tenerlo" //lo unico que hara será saltarse lo siguiente 
+                res.locals.permisoDenegado = "No tiene permiso contacte con el Jefe de Estudios si debería tenerlo" //lo unico que hara será saltarse lo siguiente 
             }
             if (!res.locals.permisoDenegado) {
                 if (coordinador) {
@@ -492,10 +496,10 @@ exports.getTribunales = function (req, res, next) {
 
     //si no hay progDoc o no hay departamentosResponsables de dicha progDoc
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-        let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunales"
+        let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
         res.render(view, {
             contextPath: app.contextPath,
-            estado: "Programacion docente no abierta",
+            estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             profesores: null,
             menu: req.session.menu,
@@ -512,7 +516,7 @@ exports.getTribunales = function (req, res, next) {
     else if (!comprobarEstadoCumpleUno(estados.estadoTribunal.abierto, res.locals.progDoc['ProgramacionDocentes.estadoTribunales'])
         && !comprobarEstadoCumpleUno(estados.estadoTribunal.aprobadoResponsable, res.locals.progDoc['ProgramacionDocentes.estadoTribunales'])
         && res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto && !req.originalUrl.toLowerCase().includes("consultar")) {
-        res.render("tribunales", {
+        res.render("tribunalesCumplimentar", {
             contextPath: app.contextPath,
             estado: "Asignación de tribunales ya se realizó",
             permisoDenegado: res.locals.permisoDenegado,
@@ -524,6 +528,7 @@ exports.getTribunales = function (req, res, next) {
             departamentosResponsables: res.locals.departamentosResponsables,
             estadosTribunal: estados.estadoTribunal,
             estadosProgDoc: estados.estadoProgDoc,
+            estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
             planEstudios: res.locals.planEstudios
         })
     }
@@ -533,10 +538,10 @@ exports.getTribunales = function (req, res, next) {
         let departamentoID = req.session.departamentoID;
         let departamentoExisteEnElPlan = res.locals.departamentosResponsables.find(function (obj) { return obj.codigo === departamentoID; });
         if (!departamentoExisteEnElPlan) {
-            let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunales"
+            let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
             res.render(view, {
                 contextPath: app.contextPath,
-                estado: "El departamento seleccionado no es responsable de ninguna asignatura del plan",
+                estado: "El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior",
                 permisoDenegado: res.locals.permisoDenegado,
                 profesores: null,
                 menu: req.session.menu,
@@ -546,11 +551,12 @@ exports.getTribunales = function (req, res, next) {
                 departamentosResponsables: res.locals.departamentosResponsables,
                 estadosTribunal: estados.estadoTribunal,
                 estadosProgDoc: estados.estadoProgDoc,
+                estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
                 planEstudios: res.locals.planEstudios
             })
         } else {
             if (res.locals.permisoDenegado) {
-                let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunales"
+                let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
                 res.render(view, {
                     contextPath: app.contextPath,
                     estado: null,
@@ -563,6 +569,7 @@ exports.getTribunales = function (req, res, next) {
                     departamentosResponsables: res.locals.departamentosResponsables,
                     estadosTribunal: estados.estadoTribunal,
                     estadosProgDoc: estados.estadoProgDoc,
+                    estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
                     planEstudios: res.locals.planEstudios
                 })
             }
@@ -620,7 +627,7 @@ exports.getTribunales = function (req, res, next) {
 
                     })
                     .then(function (e) {
-                        let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunales"
+                        let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
                         let nuevopath = "" + req.baseUrl + "/respdoc/guardarTribunales"
                         let cancelarpath = "" + req.baseUrl + "/respdoc/tribunales?planID=" + req.session.planID + "&departamentoID=" + DepartamentoResponsable
                         res.render(view,

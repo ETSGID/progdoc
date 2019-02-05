@@ -1,11 +1,14 @@
 <%- include gestion.ejs %>
-<div>
+<div class ="contenido2">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
 <%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
   <p><%=permisoDenegado%></p>
 <%}else{%>
         <form id="asignacionCumplimentarForm" autocomplete="off" action="<%= nuevopath %>" method="post" >
+            <div class="myHeader2 sticky">
+                <input type='submit' value='Guardar'>
+            </div>
             <input type='hidden' name=pdID value='<%=pdID%>'>
             <% for (let i=0 ; i<grupos.length; i++){%>
                 <div>
@@ -117,8 +120,7 @@
                     <%}%>
                 </div>
 
-            <%}%>
-            <input type='submit' value='Guardar'> 
+            <%}%> 
         </form>
     <%}%>
 

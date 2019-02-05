@@ -1,5 +1,5 @@
 <%- include consultar.ejs %>
-<div>
+<div class="contenido">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
 <%}else{%>
@@ -60,9 +60,9 @@
                                                         <%}%>
                                                         <span id='p_horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%m%>'> 
                                                         <%if(found[m].asignaturaAcronimo !== null){ %>
-                                                            <%=found[m].asignaturaAcronimo%>
+                                                            <span title="<%=found[m].asignaturaNombre%>"><%=found[m].asignaturaAcronimo%></span>
                                                         <%} else{%>
-                                                            <%=found[m].asignaturaNombre%>
+                                                            <span title="<%=found[m].asignaturaNombre%>"><%=found[m].asignaturaNombre%></span>
                                                         <% } %>
                                                         </span>
                                                     <% } %>
@@ -78,9 +78,9 @@
                                     for (let n=0; n< foundNotas.length; n++){ %>
                                         <p> 
                                         <% if (foundNotas[n].asignaturaAcronimo){ %>
-                                            (<%=foundNotas[n].asignaturaAcronimo%>)
+                                            <span title="<%=foundNotas[n].asignaturaNombre%>">(<%=foundNotas[n].asignaturaAcronimo%>)</span>
                                         <%}else{%>
-                                            (<%=foundNotas[n].asignaturaNombre%>)
+                                            <span title="<%=foundNotas[n].asignaturaNombre%>">(<%=foundNotas[n].asignaturaNombre%>)</span>
                                         <%}%>
                                         <%=foundNotas[n].nota%></p>
                                     <%}%>

@@ -16,7 +16,6 @@ const local = process.env.DEV;
 exports.local = local;
 const pathPDF = normalize(process.env.PATH_PDF);
 exports.pathPDF = pathPDF;
-let contador = 0;
 //cas autentication
 let CASAuthentication = require('cas-authentication');
 // Create a new instance of CASAuthentication.
@@ -46,6 +45,8 @@ let permisosControllerProgDoc = require('./controllers/permisos_controllerProgDo
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+//solo te imprime las peticiones incorrectas
 app.use(morgan('combined', {
   skip: function (req, res) {return res.statusCode < 400 }
 }))

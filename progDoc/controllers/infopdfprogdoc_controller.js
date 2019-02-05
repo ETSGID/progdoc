@@ -57,7 +57,7 @@ exports.generarPDF = function (req, res, next) {
     if (view === "pdfDraftGenerado" && (!res.locals.progDoc || !res.locals.departamentosResponsables)) {
         res.render(view, {
             contextPath: app.contextPath,
-            estado: "Programacion docente no abierta",
+            estado: "Programación docente no abierta",
             menu: req.session.menu,
             submenu: req.session.submenu,
             planID: req.session.planID,
@@ -69,7 +69,7 @@ exports.generarPDF = function (req, res, next) {
     else if (view === "pdfDraftGenerado" && estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] && estados.estadoProgDoc.listo !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) {
         res.render(view, {
             contextPath: app.contextPath,
-            estado: "Programacion docente no abierta",
+            estado: "Programación docente no abierta",
             menu: req.session.menu,
             submenu: req.session.submenu,
             planID: req.session.planID,

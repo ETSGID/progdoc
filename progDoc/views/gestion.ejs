@@ -1,124 +1,124 @@
-    
-    <body>
+<body>
+<div class="myHeader sticky">
     <p>Gestión</p>
     <%if (locals.planID && locals.planEstudios && (locals.submenu === "Grupos")) { %>
-    <div class="row col-sm space-above-below">
+    <div class="row col-sm"  style="margin-left:0px">
         <div clas="container">
-         <select id="selectPlan" onchange="cambiarPD()">
+            <select id="selectPlan" onchange="cambiarPD()">
                 <% for(let i=0; i < planEstudios.length; i++) { 
                     if (planEstudios[i].nombre !== null){ %>
-                    <option value="<%=planEstudios[i].codigo%>"><%=planEstudios[i].nombre%></option> 
+                    <option value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option> 
                     <%}else {%>
-                    <option value="<%=planEstudios[i].codigo%>"><%=planEstudios[i].codigo%></option> 
+                    <option value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].codigo%></option> 
                     <%}
                 }%>
-         </select>
+            </select>
         </div>
     </div>
     <%}%>
-    
+
     <div class="tab">
         <button id='AbrirCerrar' class="tablinks" onclick="cambiarSubmenu(event, 'AbrirCerrar')">Abrir/Cerrar</button>
         <button id='Roles' class="tablinks" onclick="cambiarSubmenu(event, 'Roles')">Roles</button>
-        <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')">Calendario</button>
+        <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')" title="Próximamente" disabled>Calendario</button>
         <button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>
     </div>
 
     <% if (locals.planID) { %>
-     <input id='plan' type="hidden" value="<%=planID%>">
-  <%} else {%>
+        <input id='plan' type="hidden" value="<%=planID%>">
+    <%} else {%>
     <input id='plan' type="hidden">
-  <%}%>
+    <%}%>
     <% if (locals.submenu) { %>
-     <input id='submenu' type="hidden" value="<%=submenu%>">
-  <%} else {%>
+        <input id='submenu' type="hidden" value="<%=submenu%>">
+    <%} else {%>
     <input id='submenu' type="hidden">
-  <%}%>
-
+    <%}%>
+</div>
 <script>
 function cambiarSubmenu(evt, submenu) {
-    let elementPlan = document.getElementById("selectPlan")
-    let pAcronimo = 'GITST';
-    if (elementPlan){
-        pAcronimo = document.getElementById("selectPlan").value
-    }else if (document.getElementById("plan").value){
-        pAcronimo = document.getElementById("plan").value
-    }
-    let i, tabcontent, tablinks;
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-    document.getElementById(submenu).style.display = "block";
-    evt.currentTarget.className += " active";
-    if(submenu === 'AbrirCerrar'){
-        let url = "<%=contextPath%>/AbrirCerrar"
-        window.location.replace(url);
-    }
-   
-    if (submenu === 'Grupos'){
-    let url = "<%=contextPath%>/gestionGrupos/getGrupos?planID="+pAcronimo
+let elementPlan = document.getElementById("selectPlan")
+let pAcronimo = 'GITST';
+if (elementPlan){
+    pAcronimo = document.getElementById("selectPlan").value
+}else if (document.getElementById("plan").value){
+    pAcronimo = document.getElementById("plan").value
+}
+let i, tabcontent, tablinks;
+tabcontent = document.getElementsByClassName("tabcontent");
+for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+}
+tablinks = document.getElementsByClassName("tablinks");
+for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+}
+document.getElementById(submenu).style.display = "block";
+evt.currentTarget.className += " active";
+if(submenu === 'AbrirCerrar'){
+    let url = "<%=contextPath%>/AbrirCerrar"
     window.location.replace(url);
-    } 
-    if (submenu === 'Roles'){
-    let url = "<%=contextPath%>/gestionRoles"
-    window.location.replace(url);
-    }
-    
-    
-    
+}
+
+if (submenu === 'Grupos'){
+let url = "<%=contextPath%>/gestionGrupos/getGrupos?planID="+pAcronimo
+window.location.replace(url);
+} 
+if (submenu === 'Roles'){
+let url = "<%=contextPath%>/gestionRoles"
+window.location.replace(url);
+}
+
+
+
 }
 function cambiarPD(){
-    let pAcronimo = document.getElementById("selectPlan").value;
-    let search = parseQueryString();
-    delete search.pdID;
-    search.planID = pAcronimo;
-    let url = parseStringQuery(search);
-    window.location.replace(url);
-    
+let pAcronimo = document.getElementById("selectPlan").value;
+let search = parseQueryString();
+delete search.pdID;
+search.planID = pAcronimo;
+let url = parseStringQuery(search);
+window.location.replace(url);
+
 }
 
 let parseQueryString = function() {
 
-    let str = window.location.search;
-    let objURL = {};
+let str = window.location.search;
+let objURL = {};
 
-    str.replace(
-        new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
-        function( $0, $1, $2, $3 ){
-            objURL[ $1 ] = $3;
-        }
-    );
-    return objURL;
+str.replace(
+    new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
+    function( $0, $1, $2, $3 ){
+        objURL[ $1 ] = $3;
+    }
+);
+return objURL;
 };
 
 let parseStringQuery = function ( obj ) {
-  return '?'+Object.keys(obj).reduce(function(a,k){a.push(k+'='+encodeURIComponent(obj[k]));return a},[]).join('&')
+return '?'+Object.keys(obj).reduce(function(a,k){a.push(k+'='+encodeURIComponent(obj[k]));return a},[]).join('&')
 }
 
 
 document.getElementsByTagName('body')[0].onload = actualizarSelectyBarra();
 function actualizarSelectyBarra() {
-    let selectValue = document.getElementById('plan').value
-    if(!selectValue) {
-        selectValue= "09TT"
-    }
-    let element2 = document.getElementById('selectPlan')
-    if (element2){
-        document.getElementById('selectPlan').value = selectValue;
-    }     
-    let submenu = document.getElementById('submenu').value
-    if(!submenu) {
-        submenu= "AbrirCerrar"
-    }
-    document.getElementById(submenu).style.display = "block";
-    document.getElementById(submenu).className += " active";
+let selectValue = document.getElementById('plan').value
+if(!selectValue) {
+    selectValue= "09TT"
+}
+let element2 = document.getElementById('selectPlan')
+if (element2){
+    document.getElementById('selectPlan').value = selectValue;
+}     
+let submenu = document.getElementById('submenu').value
+if(!submenu) {
+    submenu= "AbrirCerrar"
+}
+document.getElementById(submenu).style.display = "block";
+document.getElementById(submenu).className += " active";
 }
 
 </script>
-     
+    
 </body>
