@@ -77,7 +77,7 @@ exports.getHorario = function (req, res, next) {
                         [op.ne]: null,
                     }
                 },
-                attributes: ['acronimo', 'curso', 'identificador', 'nombre', 'semestre', 'codigo'],
+                attributes: ['acronimo', 'codigo', 'curso', 'identificador', 'nombre', 'semestre', 'codigo'],
                 order: [
 
                     [Sequelize.literal('"curso"'), 'ASC'],
@@ -159,9 +159,10 @@ exports.getHorario = function (req, res, next) {
                     if (!asign) {
                         asign = {}
                         asign.acronimo = ej.acronimo;
-                        asign.nombre = ej.nombre
-                        asign.identificador = ej.identificador
-                        asign.semestre = ej['semestre']
+                        asign.nombre = ej.nombre;
+                        asign.codigo = ej.codigo;
+                        asign.identificador = ej.identificador;
+                        asign.semestre = ej['semestre'];
                         asign.curso = ej.curso;
                         let s1;
                         let s2;
@@ -213,6 +214,7 @@ exports.getHorario = function (req, res, next) {
                                     asignacion.asignaturaAcronimo = ej['acronimo'];
                                     asignacion.asignaturaNombre = ej['nombre'];
                                     asignacion.asignaturaIdentificador = ej['identificador'];
+                                    asignacion.asignaturaCodigo = ej['codigo'];
                                     g.asignaciones.push(asignacion);
                                 }
                             }

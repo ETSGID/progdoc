@@ -14,6 +14,7 @@ let gestionRoles = require('../controllers/gestion_controller')
 let estadoController = require("../controllers/estado_controller")
 let infopdfprogdocController = require('../controllers/infopdfprogdoc_controller')
 let historialController = require('../controllers/historial_controller')
+let acronimosController = require('../controllers/acronimos_controller')
 let estados = require('../estados');
 let enumsPD = require('../enumsPD');
 
@@ -314,7 +315,19 @@ router.get("/gestionRoles", function (req, res, next) {
 router.post("/gestionRoles/guardarRoles", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getPlanes, gestionRoles.guardarRoles, gestionRoles.redir);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionRoles.guardarRoles, gestionRoles.redir);
       //atento añadir la ruta del controlador para guardar 
 
+router.get("/gestion/acronimos", function (req, res, next) {
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next();
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, menuProgDocController.getAsignaturasProgDoc, menuProgDocController.getAllDepartamentos, acronimosController.getAcronimos);
+
+router.post('/gestionAcronimos/guardarAcronimosJE', function (req, res, next) {
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, acronimosController.actualizarAcronimos)
+
 module.exports = router;
+
+

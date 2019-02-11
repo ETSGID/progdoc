@@ -60,9 +60,9 @@
                                                         <%}%>
                                                         <span id='p_horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%m%>'> 
                                                         <%if(found[m].asignaturaAcronimo !== null){ %>
-                                                            <span title="<%=found[m].asignaturaNombre%>"><%=found[m].asignaturaAcronimo%></span>
+                                                            <span title="<%=found[m].asignaturaNombre%> (<%=found[m].asignaturaCodigo%>)"><%=found[m].asignaturaAcronimo%></span>
                                                         <%} else{%>
-                                                            <span title="<%=found[m].asignaturaNombre%>"><%=found[m].asignaturaNombre%></span>
+                                                            <span title="<%=found[m].asignaturaNombre%> (<%=found[m].asignaturaCodigo%>)"><%=found[m].asignaturaNombre%></span>
                                                         <% } %>
                                                         </span>
                                                     <% } %>
@@ -78,9 +78,9 @@
                                     for (let n=0; n< foundNotas.length; n++){ %>
                                         <p> 
                                         <% if (foundNotas[n].asignaturaAcronimo){ %>
-                                            <span title="<%=foundNotas[n].asignaturaNombre%>">(<%=foundNotas[n].asignaturaAcronimo%>)</span>
+                                            <span title="<%=foundNotas[n].asignaturaNombre%> (<%=foundNotas[n].asignaturaCodigo%>)">(<%=foundNotas[n].asignaturaAcronimo%>)</span>
                                         <%}else{%>
-                                            <span title="<%=foundNotas[n].asignaturaNombre%>">(<%=foundNotas[n].asignaturaNombre%>)</span>
+                                            <span title="<%=foundNotas[n].asignaturaNombre%> (<%=foundNotas[n].asignaturaCodigo%>)">(<%=foundNotas[n].asignaturaNombre%>)</span>
                                         <%}%>
                                         <%=foundNotas[n].nota%></p>
                                     <%}%>

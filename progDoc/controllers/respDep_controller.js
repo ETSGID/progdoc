@@ -198,7 +198,7 @@ function getAsignacion(ProgramacionDocenteIdentificador, DepartamentoResponsable
                 [op.ne]: null,
             }
         },
-        attributes: ['acronimo', 'curso', 'CoordinadorAsignatura', 'identificador', 'nombre', 'semestre'],
+        attributes: ['acronimo', 'curso', 'CoordinadorAsignatura', 'identificador', 'nombre', 'semestre', 'codigo'],
         order: [
 
             [Sequelize.literal('"Asignatura"."curso"'), 'ASC'],
@@ -226,10 +226,11 @@ function getAsignacion(ProgramacionDocenteIdentificador, DepartamentoResponsable
                     obj = "No hay coordinador"
                 }
                 asign.acronimo = ej.acronimo;
-                asign.nombre = ej.nombre
-                asign.identificador = ej.identificador
+                asign.nombre = ej.nombre;
+                asign.codigo = ej.codigo;
+                asign.identificador = ej.identificador;
                 asign.curso = ej.curso;
-                asign.coordinador = obj
+                asign.coordinador = obj;
                 asign.grupos = [];
                 let s1;
                 let s2;
@@ -594,7 +595,7 @@ exports.getTribunales = function (req, res, next) {
                         ProgramacionDocenteIdentificador: ProgramacionDocenteIdentificador,
                         DepartamentoResponsable: DepartamentoResponsable
                     },
-                    attributes: ['acronimo', 'nombre', 'curso', 'semestre', 'identificador', 'PresidenteTribunalAsignatura', 'VocalTribunalAsignatura', 'SecretarioTribunalAsignatura', 'SuplenteTribunalAsignatura'],
+                    attributes: ['acronimo', 'nombre', 'curso', 'codigo', 'semestre', 'identificador', 'PresidenteTribunalAsignatura', 'VocalTribunalAsignatura', 'SecretarioTribunalAsignatura', 'SuplenteTribunalAsignatura'],
                     order: [
 
                         [Sequelize.literal('"Asignatura"."curso"'), 'ASC'],

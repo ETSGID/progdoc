@@ -87,9 +87,9 @@
                                                         <%}%>
                                                         <span id='p_horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%m%>'> 
                                                         <%if(found[m].asignaturaAcronimo !== null){ %>
-                                                            <span title="<%=found[m].asignaturaNombre%>"><%=found[m].asignaturaAcronimo%></span>
+                                                            <span title="<%=found[m].asignaturaNombre%> (<%=found[m].asignaturaCodigo%>)"><%=found[m].asignaturaAcronimo%></span>
                                                         <%} else{%>
-                                                            <span title="<%=found[m].asignaturaNombre%>"><%=found[m].asignaturaNombre%></span>
+                                                            <span title="<%=found[m].asignaturaNombre%> (<%=found[m].asignaturaCodigo%>)"><%=found[m].asignaturaNombre%></span>
                                                         <% } %>
                                                         </span>
                                                         <input type='hidden' name='momentaneo' id='horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%=found[m].asignaturaIdentificador%>_<%=found[m].identificador%>' value='<%=found[m].identificador%>'>
@@ -113,9 +113,9 @@
                                             <input type='hidden' name='momentaneo' id='horario_<%=asignacionsHorario[i].curso%>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=foundNotas[n].asignaturaIdentificador%>_<%=foundNotas[n].identificador%>' value='<%=foundNotas[n].identificador%>'>
                                             <p id='nota_horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=foundNotas[n].asignaturaIdentificador%>_<%=foundNotas[n].identificador%>'> 
                                             <% if (foundNotas[n].asignaturaAcronimo){ %>
-                                                <span title="<%=foundNotas[n].asignaturaNombre%>">(<%=foundNotas[n].asignaturaAcronimo%>)</span>
+                                                <span title="<%=foundNotas[n].asignaturaNombre%> (<%=foundNotas[n].asignaturaCodigo%>)">(<%=foundNotas[n].asignaturaAcronimo%>)</span>
                                             <%}else{%>
-                                                <span title="<%=foundNotas[n].asignaturaNombre%>">(<%=foundNotas[n].asignaturaNombre%>)</span>
+                                                <span title="<%=foundNotas[n].asignaturaNombre%> (<%=foundNotas[n].asignaturaCodigo%>)">(<%=foundNotas[n].asignaturaNombre%>)</span>
                                             <%}%>
                                             <button type="button" class="btn btn-default" onclick = "eliminarNota('horario_<%=asignacionsHorario[i].curso%>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=foundNotas[n].asignaturaIdentificador%>_<%=foundNotas[n].identificador%>')">
                                             <span class="glyphicon glyphicon-trash"></span> 
@@ -227,7 +227,7 @@ function mostrar(id){
                     let asign = asignaturas.find(function (obj) { return (obj.nombre === selected[l] || obj.acronimo === selected[l]) })
                     let momentaneoAsign;
                     if (asign){
-                         div2.innerHTML = "<span title='"+asign.nombre+"'  id='p_horario_"+curso+"_"+grupo+"_"+dia+"_"+horaInicio+"_"+l+"'>"+selected[l]+"</span>"
+                         div2.innerHTML = "<span title='"+asign.nombre+"("+asign.codigo+")'  id='p_horario_"+curso+"_"+grupo+"_"+dia+"_"+horaInicio+"_"+l+"'>"+selected[l]+"</span>"
                     parent.appendChild(div2.firstChild);
                         momentaneoAsign = momentaneo.find(function(obj) {return obj.identificadorAsignatura === asign.identificador;});
                     }
@@ -372,8 +372,7 @@ function anadirNota(id){
      if(s1 || s2){
         let n = "";
         asignaturas[i].acronimo !== null ? n=asignaturas[i].acronimo : n=asignaturas[i].nombre;
-        console.log(n)
-        options+=`<option value="${n}" title="${asignaturas[i].nombre}">${n}</option>`    
+        options+=`<option value="${n}" title="${asignaturas[i].nombre} (${asignaturas[i].codigo})">${n}</option>`    
      }
     }
   div.innerHTML =`<p id="nota_horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}">
@@ -399,7 +398,6 @@ function guardarNota(id){
     let grupo = Number(id.split("_")[3]);
     let semestre = Number(id.split("_")[2]);
     let asignaturaNombreOAcronimo = document.getElementById("select_"+nuevaNota).value
-    console.log(asignaturaNombreOAcronimo)
     let cursoArray = asignacionsHorario.find(function (obj) { return obj.curso === curso});
     let semestreArray = cursoArray.semestres.find(function (obj) { return obj.semestre === semestre})
     let grupoArray = semestreArray.grupos.find(function (obj) { return obj.grupoCodigo === grupo})
@@ -412,7 +410,7 @@ function guardarNota(id){
         p.parentNode.removeChild(p)
         div.innerHTML = `<p id="nota_horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}">
         <input type="hidden" name="anadir" id="horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}" value="${asignatura.identificador}_${grupo}_${text}"> 
-        (${asignaturaNombreOAcronimo})
+        <span title="${asignatura.nombre} (${asignatura.codigo})">(${asignaturaNombreOAcronimo})</span>
         <button type="button" class="btn btn-default" onclick = "eliminarNota('horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}')">
         <span class="glyphicon glyphicon-trash"></span> 
         </button>

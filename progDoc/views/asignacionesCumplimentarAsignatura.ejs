@@ -3,9 +3,9 @@
 <form id="asignacionCumplimentarForm" autocomplete="off" action="<%= nuevopath %>" method="post" >
 <input type="hidden" name="asignaturaId" value="<%= asign.identificador %>">
 <% if (asign.acronimo !== null){ %>
-  <h1><span title="<%=asign.nombre%>"><%= asign.acronimo %></span></h1>
+  <h1><span title="<%=asign.nombre%> (<%=asign.codigo%>)"><%= asign.acronimo %></span></h1>
   <% }else{%>
-  <h1><span title="<%=asign.nombre%>"><%= asign.nombre %></span></h1>
+  <h1><span title="<%=asign.nombre%> (<%=asign.codigo%>)"><%= asign.nombre %></span></h1>
   <% }%>
 
 <ul style="list-style-type:none">

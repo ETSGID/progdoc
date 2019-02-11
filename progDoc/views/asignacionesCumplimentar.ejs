@@ -62,16 +62,16 @@
           <input type="hidden", name = 'acronimo', value='<%= asignacion[i].nombre %>'>
           <% } %>
           <% if (asignacion[i].acronimo !== null){ %>
-               <h3><span  title="<%=asignacion[i].nombre%>"> <%= asignacion[i].acronimo %></span> <input type="submit" value="Editar"></h3>
+               <h3><span  title="<%=asignacion[i].nombre%> (<%=asignacion[i].codigo%>)"> <%= asignacion[i].acronimo %></span> <input type="submit" value="Editar"></h3>
             <% }else{%>
-               <h3><span  title="<%=asignacion[i].nombre%>"> <%= asignacion[i].nombre %></span> <input type="submit" value="Editar"></h3>
+               <h3><span  title="<%=asignacion[i].nombre%> (<%=asignacion[i].codigo%>)"> <%= asignacion[i].nombre %></span> <input type="submit" value="Editar"></h3>
             <% } %>
           </form>
           <% } else{%>
             <% if (asignacion[i].acronimo !== null){ %>
-              <h3><span  title="<%=asignacion[i].nombre%>"><%= asignacion[i].acronimo %></span></h3>
+              <h3><span  title="<%=asignacion[i].nombre%> (<%=asignacion[i].codigo%>)"><%= asignacion[i].acronimo %></span></h3>
             <% }else{%>
-              <h3><span  title="<%=asignacion[i].nombre%>"><%= asignacion[i].nombre%></span></h3>
+              <h3><span  title="<%=asignacion[i].nombre%> (<%=asignacion[i].codigo%>)"><%= asignacion[i].nombre%></span></h3>
             <% }
            }%>
           <ul style="list-style-type:none">

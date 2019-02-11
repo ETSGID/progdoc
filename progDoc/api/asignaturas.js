@@ -63,7 +63,7 @@ exports.getGruposAsignatura = function (req, res, next) {
                     break;
             }
 
-            return models.sequelize.query(query = `SELECT distinct a.codigo, a.nombre as "nombreAsignatura", g.nombre, g."nombreItinerario", a."anoAcademico"
+            return models.sequelize.query(query = `SELECT distinct a.codigo, a.nombre as "nombreAsignatura", a.acronimo, g.nombre, g."nombreItinerario", g.aula, g.capacidad, a."anoAcademico"
   FROM public."Asignaturas" as a
   left join public."AsignacionProfesors" as s on a.identificador = s."AsignaturaId"
   inner join public."Grupos" as g on s."GrupoId" = g."grupoId"
@@ -82,8 +82,9 @@ exports.getGruposAsignatura = function (req, res, next) {
                 if (gr.anoAcademico === req.params.anoAcademico) {
                     asignatura.nombre = grupos[0][0].nombreAsignatura;
                     asignatura.codigo = grupos[0][0].codigo;
+                    asignatura.acronimo = grupos[0][0].acronimo;
                     if (gr.nombre.includes(semestreGrupo)) {
-                        asignatura.grupos.push({ nombre: gr.nombre })
+                        asignatura.grupos.push({ nombre: gr.nombre, aula: gr.aula, capacidad: gr.capacidad })
                     }
                 }
             })

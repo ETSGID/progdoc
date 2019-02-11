@@ -103,7 +103,7 @@
         <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
         <input type="hidden" id="ocultoanoAcademicoReabierto_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
         <input type="hidden" id="ocultosemestreReabierto_<%=pds[i].PlanEstudioId%>" name="semestre" value="<%=pds[i].semestre%>">        
-        <button type="button" class="btn" onclick="AbrirReabierto('plan_<%=pds[i].PlanEstudioId%>_reabierto', '<%=reabrirpath%>')" >
+        <button type="button" class="btn" title="Reabrirá la programación <%=pds[i].identificador%> " onclick="AbrirReabierto('plan_<%=pds[i].PlanEstudioId%>_reabierto', '<%=reabrirpath%>')" >
         Reabrir 2º Semestre
         </button>
         </form>
@@ -120,8 +120,8 @@
       <%}%>
     
   <% }  else if(pds[i].estadoProGDoc === estadosProgDoc.listo) { %>
+    <% let pdAnterior = pdsAnteriores.find(function (obj) { return obj.PlanEstudioId === pds[i].PlanEstudioId }) %>
     <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>"> 
-    
     <td><%=pds[i].anoAcademico%></td>
     <td><%=pds[i].semestre%></td>
     <td>
@@ -129,13 +129,16 @@
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
       <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
       <input type="hidden" id="ocultoanoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
-      <input type="hidden" id="ocultosemestre_<%=pds[i].PlanEstudioId%>" name="semestre" value="<%=pds[i].semestre%>"> 
+      <input type="hidden" id="ocultosemestre_<%=pds[i].PlanEstudioId%>" name="semestre" value="<%=pds[i].semestre%>">
+      <%if ( pdAnterior && pdAnterior.estadoProGDoc === estadosProgDoc.incidencia){%> 
+      <button type="button" class="btn"  title="Debe cerrar la incidencia primero" disabled>Cerrar</button>
+      <%}else{%>
       <button type="button" class="btn" onclick="Cerrar('plan_<%=pds[i].PlanEstudioId%>_gestionar', '<%=cerrarpath%>')" title="Cerrará la programación <%=pds[i].identificador%>">Cerrar</button>
+      <%}%>
       </form>
     </td>
     <td>
-      <% let pdAnterior = pdsAnteriores.find(function (obj) { return obj.PlanEstudioId === pds[i].PlanEstudioId })
-        if (pdAnterior){ %>
+        <% if (pdAnterior){ %>
           <form id="plan_<%=pdAnterior.PlanEstudioId%>_incidencia" action="/hola" method="post">
           <input type="hidden" name="plan" value="<%=pdAnterior.PlanEstudioId%>">
           <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pdAnterior.identificador%>">

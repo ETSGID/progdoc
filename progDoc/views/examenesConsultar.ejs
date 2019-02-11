@@ -26,9 +26,9 @@
                         <tr>
                             <th scope="row">
                                 <%if (asignacionsExamen[i].asignaturas[j].acronimo !== null){ %>
-                                    <span title="<%=asignacionsExamen[i].asignaturas[j].nombre%>"><%= asignacionsExamen[i].asignaturas[j].acronimo%></span>
+                                    <span title="<%=asignacionsExamen[i].asignaturas[j].nombre%> (<%=asignacionsExamen[i].asignaturas[j].codigo%>)"><%= asignacionsExamen[i].asignaturas[j].acronimo%></span>
                                 <% }else{%>
-                                <span  title="<%=asignacionsExamen[i].asignaturas[j].nombre%>"><%= asignacionsExamen[i].asignaturas[j].nombre%></span>
+                                <span  title="<%=asignacionsExamen[i].asignaturas[j].nombre%> (<%=asignacionsExamen[i].asignaturas[j].codigo%>)"><%= asignacionsExamen[i].asignaturas[j].nombre%></span>
                                 <% } %> 
                             </th>
                             <td>

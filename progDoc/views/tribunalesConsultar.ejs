@@ -18,9 +18,9 @@
     <tr>
       <th scope="row">
           <%if (tribunales[i].acronimo !== null){ %>
-            <span title="<%=tribunales[i].nombre%>"><%= tribunales[i].acronimo%></span>
+            <span title="<%=tribunales[i].nombre%> (<%=tribunales[i].codigo%>)"><%= tribunales[i].acronimo%></span>
           <% }else{%>
-          <span title="<%=tribunales[i].nombre%>"><%= tribunales[i].nombre%></span>
+          <span title="<%=tribunales[i].nombre%> (<%=tribunales[i].codigo%>)"><%= tribunales[i].nombre%></span>
           <% } %> 
       </th>
       <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Presidente'>

@@ -29,8 +29,8 @@
 <%}else{
   if(estadoTribunales[departamentoID] === estadosTribunal.abierto || estadoProgDoc === estadosProgDoc.incidencia) {%>
 <form id="formulario" autocomplete="off" action="<%= aprobarpath %>" method="post" onsubmit="return Enviar()" >
-<%if(estadoTribunales[departamentoID] === estadosTribunal.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
 <div class="myHeader2 sticky">
+<%if(estadoTribunales[departamentoID] === estadosTribunal.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
 <input type="submit" value='Guardar y Aprobar Asignación Tribunales'>
 <%}%>
 <button type="button" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
@@ -50,9 +50,9 @@
     <tr>
       <th scope="row">
         <% if (tribunales[i].acronimo !== null){ %>
-        <span title="<%=tribunales[i].nombre%>"><%= tribunales[i].acronimo%></span>
+        <span title="<%=tribunales[i].nombre%> (<%=tribunales[i].codigo%>)"><%= tribunales[i].acronimo%></span>
         <% }else{%>
-        <span title="<%=tribunales[i].nombre%>"><%= tribunales[i].nombre%></span>
+        <span title="<%=tribunales[i].nombre%> (<%=tribunales[i].codigo%>)"><%= tribunales[i].nombre%></span>
         <% } %> 
       </th>
       <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Presidente' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Presidente')">

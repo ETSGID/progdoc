@@ -8,7 +8,7 @@
 <%}else if(locals.permisoDenegado && locals.permisoDenegado!== null){%>
   <p><%=permisoDenegado%></p>
 <%}else{ %>
-<h3>Gestion Roles Aplicacion</h3>
+<h3>Gestión Roles Aplicacion</h3>
 <h3><em>Roles comunes a todas las titulaciones</em></h3>
 <div id='hermanoNuevoProfesorForm'>
     <div class="container">
@@ -324,10 +324,12 @@ function mostrar(id){
 }
 
 function Guardar(formID,nuevopath){
-    let form2 = document.getElementById(formID);
-    let pAcronimo = document.getElementById("selectCoordinador").value;
-    form2.setAttribute('action', nuevopath+"?planID="+pAcronimo);
-    form2.submit();
+    if(formID.split("_")[0] !== "JefeEstudios" || confirm("Seguro que quiere dejar su cargo de Jefe de Estudios, no podrá deshacer esta acción una vez aceptada")){
+        let form2 = document.getElementById(formID);
+        let pAcronimo = document.getElementById("selectCoordinador").value;
+        form2.setAttribute('action', nuevopath+"?planID="+pAcronimo);
+        form2.submit();
+    }
 }
 function cambiarPDCoordinador(){
     let pAcronimo = document.getElementById("selectCoordinador").value;

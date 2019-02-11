@@ -136,6 +136,7 @@ exports.getProgramacionDocente = function (req, res, next) {
 
 
 }
+
 //te da las ultimas pds existentes para el plan, tipoPD y ano
 //en caso de pasar la pdIDNoIncluir te obvia esa, se utiliza para el pdf 
 exports.getProgramacionDocentesAnteriores = function (plan, tipoPD, ano, pdIDNoIncluir) {
@@ -206,6 +207,54 @@ exports.getProgramacionDocentesAnteriores = function (plan, tipoPD, ano, pdIDNoI
             return pds;
         })
 }
+//debo pasarle en la sesión la progDoc
+//mw para recuperar las asignaturas de una progdoc 
+exports.getAsignaturasProgDoc = function (req, res, next) {
+    let pdID = req.session.pdID
+    if(pdID){
+        return models.Asignatura.findAll({
+            where: {
+                ProgramacionDocenteIdentificador: pdID,
+            },
+            attributes: ['identificador','codigo', 'nombre', 'acronimo', 'nombreIngles', 'creditos',
+                'acronimo', 'curso', 'semestre', 'tipo', 'DepartamentoResponsable'],
+            order: [
+                [Sequelize.literal('"Asignatura"."curso"'), 'ASC'],
+                [Sequelize.literal('"Asignatura"."codigo"'), 'ASC'],
+            ],
+            raw: true
+        }).then(function (asign) {
+            res.locals.asignaturas = asign;
+            next();
+        })
+            .catch(function (error) {
+                console.log('Error: ' + error);
+                next(error);
+            });
+    }else{
+        res.locals.asignaturas = null;
+        next();
+    }              
+}
+
+
+//te devuelve todos los departamentos que hay en el sistmea
+exports.getAllDepartamentos = function (req, res, next) {
+    
+    return models.Departamento.findAll({
+        attributes: ['codigo', 'nombre', 'acronimo'],
+        raw: true
+    }).then(function (deps) {
+        res.locals.departamentos = deps;
+        next();
+    })
+        .catch(function (error) {
+            console.log('Error: ' + error);
+            next(error);
+        });
+    
+}
+
 
 function getPeople(onlyProfesor) {
     let profesores = [];
