@@ -1,3 +1,4 @@
+<script src="<%=contextPath%>/js/funciones.js"></script>
 <%- include gestion.ejs %>
 <div class ="contenido2">
 <% if (locals.estado && locals.estado !== null) { %>
@@ -5,7 +6,7 @@
 <%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
   <p><%=permisoDenegado%></p>
 <%}else{%>
-        <form id="asignacionCumplimentarForm" autocomplete="off" action="<%= nuevopath %>" method="post" >
+        <form id="asignacionCumplimentarForm" autocomplete="off" action="<%= nuevopath %>" method="post" onsubmit="return Enviar()" >
             <div class="myHeader2 sticky">
                 <input type='submit' value='Guardar'>
             </div>
@@ -131,6 +132,8 @@
 //el multiselect del layout funciona con jquery
 let estado = <%-JSON.stringify(estado)%>
 let grupos = <%-JSON.stringify(grupos)%>;
+//se utiliza para disparar el evento de onbeforeunload
+let activado = true;
 
 function MostrarOcultar(id){
     let divSemestre = document.getElementById(id);
@@ -281,7 +284,22 @@ function MarcarChange(id){
     }else{
         inputElement.name = 'momentaneo'
     }
-   
+}
 
+function Enviar(){
+    activado = false;
+    if (confirm("Si crea/elimina grupos puede verse afectada la programación docente actual, ¿está seguro de guardar los cambios?")){
+        return true
+    }else{
+        activado = true
+        return false;
+    }
+}
+
+window.onbeforeunload = function(){
+  //primero debes mirar que activado sea true o false (en confirmarSalirSinGuarar y despues marcarlo como true) 
+  let confirma = confirmarSalirSinGuardar(["actualizar", "anadir", "eliminar"], activado)
+  activado = true
+  return confirma;
 }
 </script>

@@ -12,6 +12,6 @@ exports.rols = {
     ResponsableDocente: "ResponsableDocente",
     DirectorDepartamento: "DirectorDepartamento",
     CoordinadorTitulacion: "CoordinadorTitulacion",
-    SecretarioJefeEstudios: "SecretarioJefeEstudios",
+    SecretarioTitulacion: "SecretarioTitulacion",
     SubdirectorPosgrado: "SubdirectorPosgrado"
 }

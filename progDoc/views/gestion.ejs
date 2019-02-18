@@ -45,17 +45,6 @@ if (elementPlan){
 }else if (document.getElementById("plan").value){
     pAcronimo = document.getElementById("plan").value
 }
-let i, tabcontent, tablinks;
-tabcontent = document.getElementsByClassName("tabcontent");
-for (i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].style.display = "none";
-}
-tablinks = document.getElementsByClassName("tablinks");
-for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
-}
-document.getElementById(submenu).style.display = "block";
-evt.currentTarget.className += " active";
 if(submenu === 'AbrirCerrar'){
     let url = "<%=contextPath%>/AbrirCerrar"
     window.location.replace(url);

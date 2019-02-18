@@ -1,4 +1,5 @@
 <script src="<%=contextPath%>/js/autocomplete.js"></script>
+<script src="<%=contextPath%>/js/funciones.js"></script>
 <%- include cumplimentar.ejs %>
 <div id="hermanoNuevoProfesorForm" class="contenido2">
 <% if (locals.estado && locals.estado !== null) { %>
@@ -149,6 +150,8 @@ let form = document.getElementById("formulario");
 let estado = <%-JSON.stringify(estado)%>
 let profesores = <%-JSON.stringify(profesores)%>
 let profesores2 ="";
+//se utiliza para disparar el evento de onbeforeunload
+let activado = true;
 if(estado === null){
   
   
@@ -182,23 +185,42 @@ function mostrar(id){
   input.focus();
 }
 function Volver(cancelarpath){
+  activado = false;
   window.location.replace(cancelarpath);
 }
 function Guardar(nuevopath){
+  activado = false
   let form2 = document.getElementById("formulario");
   form2.setAttribute('action', nuevopath);
   form2.submit();
 }
 
 function Enviar(){
-  return confirm("Una vez aprobada la asignación de tribunales no podrá modificarla  ¿Seguro que quiere aprobarla?")
+  activado = false;
+  if (confirm("Una vez aprobada la asignación de tribunales no podrá modificarla  ¿Seguro que quiere aprobarla?")){
+    return true
+}else{
+    activado = true
+    return false;
+  }
 }
 
+
 function Decidir(decision){
+  activado = false;
   let dec = document.getElementById('decision');
   dec.setAttribute('value', decision)
   if(confirm("Esta acción no se podrá deshacer. ¿Está seguro de que quiere continuar?")){
     document.getElementById("formDecision").submit();
+  }else{
+    activado = true;
+    return false;
   }
+}
+window.onbeforeunload = function(){
+  //primero debes mirar que activado sea true o false (en confirmarSalirSinGuarar y despues marcarlo como true) 
+  let confirma = confirmarSalirSinGuardar(["actualizar"], activado)
+  activado = true
+  return confirma;
 }
 </script>

@@ -260,13 +260,22 @@ router.post('/coordiandor/aprobarExamenes', function (req, res, next) {
 router.get('/consultar/grupos', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, gruposController.getGrupos);
 
 router.get('/gestionGrupos/getGrupos',function (req, res, next) {
+  res.locals.rols.push({
+    rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+  });
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getProgramacionDocente, gruposController.getGrupos)
+
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente,permisosControllerProgDoc.comprobarRols, gruposController.getGrupos)
 
 
 router.post('/gestionGrupos/guardarGruposJE',function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
+  res.locals.rols.push({
+    rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+  });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gruposController.EliminarGruposJE, gruposController.ActualizarGruposJE, gruposController.AnadirGruposJE )
 

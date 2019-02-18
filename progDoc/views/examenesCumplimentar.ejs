@@ -1,5 +1,6 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+<script src="<%=contextPath%>/js/funciones.js"></script>
 <%- include cumplimentar.ejs %>
 <div class="contenido2">
 <% if (locals.estado && locals.estado !== null) { %>
@@ -104,6 +105,8 @@ let asignacionsExamen = <%-JSON.stringify(asignacionsExamen)%>;
 let anoInicial;
 let anoFinal;
 let fechasLimite;
+//se utiliza para disparar el evento de onbeforeunload
+let activado = true;
 if(pdID && periodos){
 anoInicial = 2000+ Number(pdID.split("_")[2][2]+""+pdID.split("_")[2][3])
 anoFinal = 2000+ Number(pdID.split("_")[2][4]+""+pdID.split("_")[2][5])
@@ -317,16 +320,24 @@ function mostrarCalendario(id){
 }
 
 function Volver(cancelarpath){
-  window.location.replace(cancelarpath);
+    activado = false;
+    window.location.replace(cancelarpath);
 }
 function Guardar(nuevopath){
-  let form2 = document.getElementById("formulario");
-  form2.setAttribute('action', nuevopath);
-  form2.submit();
+    activado = false;
+    let form2 = document.getElementById("formulario");
+    form2.setAttribute('action', nuevopath);
+    form2.submit();
 }
 
 function Enviar(){
-  return confirm("Una vez aprobados los exámenes no podrá modificarlos ¿Seguro que quiere aprobarlos?")
+    activado = false;
+      if (confirm("Una vez aprobados los exámenes no podrá modificarlos ¿Seguro que quiere aprobarlos?")){
+        return true
+    }else{
+        activado = true
+        return false;
+    }
 }
 
 //aumenta un dia a la fecha
@@ -356,7 +367,12 @@ function getDia(fecha) {
     weekday[5] = "V";
     weekday[6] = "S";
 
-    return weekday[d.getDay()];
-    
+    return weekday[d.getDay()];  
+}
+window.onbeforeunload = function(){
+  //primero debes mirar que activado sea true o false (en confirmarSalirSinGuarar y despues marcarlo como true) 
+  let confirma = confirmarSalirSinGuardar(["anadir","actualizar"], activado)
+  activado = true
+  return confirma;
 }
 </script>

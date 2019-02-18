@@ -33,7 +33,7 @@
     </form>
     <% } %>
     <% if(estadoProfesores[departamentoID] === estadosProfesor.aprobadoResponsable && estadoProgDoc === estadosProgDoc.abierto) { %>
-    <form id="formDecision" action="<%= aprobarpath %>" method="post">
+    <form id="formDecision" action="<%= aprobarpath %>" method="post" class="myHeader2 sticky">
     <input id="decision" type="hidden" name="decision" value='aceptar'>
     <button type="button" onclick="Decidir('aceptar')">Aceptar Asignación Profesores</button>
     <button type="button" onclick="Decidir('rechazar')">No aceptar Asignación Profesores</button>
