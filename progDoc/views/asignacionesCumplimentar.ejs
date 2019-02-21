@@ -39,8 +39,9 @@
     <button type="button" onclick="Decidir('rechazar')">No aceptar Asignación Profesores</button>
     </form>
     <% } if(estadosProgDoc === estadosProgDoc.incidencia){%>
-
-    <% }%>
+    <% } if(estadoProfesores[departamentoID] === estadosProfesor.aprobadoDirector && estadoProgDoc === estadosProgDoc.abierto){%>
+      <p class="myHeader2 sticky">La asignación de profesores ya ha sido aprobada por el director del departamento</p>
+    <%}%>
     <ul style="list-style-type:none">
     <% for(let i=0; i < asignacion.length; i++) { %> 
       <% if(i===0) { %>

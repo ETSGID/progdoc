@@ -3,7 +3,6 @@ let express = require('express');
 const normalize = require('normalize-path');
 let path = require('path');
 let cookieParser = require('cookie-parser');
-let logger = require('morgan');
 let partials = require('express-partials');
 let morgan = require('morgan');
 
@@ -52,7 +51,7 @@ app.use(morgan('combined', {
 }))
 app.use(partials());
 
-//app.use(logger('dev'));
+//app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

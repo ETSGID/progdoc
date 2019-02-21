@@ -1,6 +1,13 @@
 <script src="<%=contextPath%>/js/autocomplete.js"></script>
-<div id="hermanoNuevoProfesorForm">
+<%- include cumplimentar.ejs %>
+<div id="hermanoNuevoProfesorForm" class="contenido2">
 <form id="asignacionCumplimentarForm" autocomplete="off" action="<%= nuevopath %>" method="post" >
+<div class="myHeader2 sticky">
+  <input type='submit' value='Guardar'>
+  <button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+</div>
+<input  type="hidden" id="plan" value="<%=session.planID%>">
+<input type="hidden" id="selectPlan" value="<%=session.planID%>">
 <input type="hidden" name="asignaturaId" value="<%= asign.identificador %>">
 <% if (asign.acronimo !== null){ %>
   <h1><span title="<%=asign.nombre%> (<%=asign.codigo%>)"><%= asign.acronimo %></span></h1>
@@ -12,7 +19,8 @@
     <li>Coordinador:
     <div class="autocomplete" style="width:500px;">
     <input id="coordinador" type="text" name="coordinador" value="<%= asign.coordinador.nombreCorregido %>" placeholder="<%= asign.coordinador.nombreCorregido %>" onclick= 'LimpiaCoordinador()'>
-    </div> 
+    </div>
+    <span><button type="button" onclick="EliminarCoordinador()">Eliminar</button> 
     </li>
     <% for(var i=0; i< asign.grupos.length; i++){ %>
         <li>
@@ -33,8 +41,6 @@
         </li>
   <% } %> 
     </ul>
-    <input type='submit' value='Guardar'>
-    <button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
 </form> 
 </div>
 <%- include nuevoProfesor.ejs %>
@@ -60,6 +66,10 @@ function Eliminar2(id){
   input.parentNode.removeChild(input);
   liste.parentNode.removeChild(liste);
   
+}
+
+function EliminarCoordinador(){
+ document.getElementById('coordinador').setAttribute('value', "NO ASIGNADO");
 }
 
 function AnadirProfesor(id){

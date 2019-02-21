@@ -86,7 +86,6 @@
                                                         if(m>0){%>
                                                             <span> / </span>
                                                         <%}%>
-                                                        <span id='p_horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%m%>'> 
                                                         <%if(found[m].asignaturaAcronimo !== null){ %>
                                                             <span title="<%=found[m].asignaturaNombre%> (<%=found[m].asignaturaCodigo%>)"><%=found[m].asignaturaAcronimo%></span>
                                                         <%} else{%>
@@ -149,10 +148,12 @@ function mostrar(id){
     //solo dejo un select picker activo a la vez
     if( pulsado === 0 && document.getElementsByClassName("selectpicker").length === 0){ 
         pulsado =1;
+        //en asingacions se guardan las que quieras que aparezcan seleccionadas
         let asignacions = [];
         let parent = document.getElementById(id);
         let children = document.getElementById(id).children;
         let childrenToBorrar = [];
+        //Indica si había algún elemento en esa franja del horario
         let habiaP = false;
         let momentaneo = [];
         for(let i =0; i<children.length; i++){
@@ -203,14 +204,14 @@ function mostrar(id){
                 }
 
             }
-            div.innerHTML = '<select id="select_'+id.replace(".","-")+'" class="selectpicker" multiple>'+options+'</select>'
+            div.innerHTML = '<select name="selValue" id="select_'+id.replace(".","-")+'" class="selectpicker" title="Nada seleccionado" multiple>'+options+'</select>'
             let nuevo = div.firstChild;
             parent.appendChild(nuevo);
             //hago el replace pq el pto lo detecta como clase y no lo encuentra
             $("#select_" + id.replace(".","-")).selectpicker('render');
             $("#select_" + id.replace(".","-")).selectpicker('val', asignacions);
             //$("#select_" + id.replace(".","-")).selectpicker('toggle');
-        
+                    
             //evento cuando se cierra
            $("#select_" + id.replace(".","-")).on('hidden.bs.select', function (sel) {
               if(pulsado2){

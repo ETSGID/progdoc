@@ -1,14 +1,9 @@
-
-<!-- despliegue -->
-<script src="<%=contextPath%>/js/autocomplete.js"></script>
-<%- include gestion.ejs %>
+<%- include consultar.ejs %>
 <div class="contenido">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
-<%}else if(locals.permisoDenegado && locals.permisoDenegado!== null){%>
-  <p><%=permisoDenegado%></p>
 <%}else{ %>
-<h3>Gestión Roles Aplicación</h3>
+<h3>Gestión Roles Aplicacion</h3>
 <h3><em>Roles comunes a todas las titulaciones</em></h3>
 <div id='hermanoNuevoProfesorForm'>
     <div class="container">
@@ -25,23 +20,18 @@
                         prof.nombre="NO ASIGNADO";
                         prof.nombreCorregido = "NO ASIGNADO";
                     }%>
-        <form id="<%=roles[i].rol %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
+        <div id="<%=roles[i].rol %>">
         <div class="row col-sm space-above-below">
             <div class="col-sm-5" >Jefe De Estudios</div>
-             <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' 
-             onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
+             <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'>
                 <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
                 <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
                 placeholder="<%=prof.nombre %>"></input>
                 <input type="hidden" id="<%=roles[i].rol %>" name="rol" value="<%=roles[i].rol %>" />
                 <input type="hidden"  name="rol" placeholder="<%=roles[i].rol %>_<%=roles[i].PersonaId %>_<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>" />
             </div>
-            <div class="col-sm-2">
-                <button type="button" onclick="Guardar('<%=roles[i].rol %>', '<%= nuevopath %>')">Aprobar</button>
-                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-            </div>
         </div>
-        </form>
+        </div>
             <% } %>
         <% } %>
             <% for(var i=0; i < roles.length; i++){ %>
@@ -52,23 +42,18 @@
                         prof.nombre="NO ASIGNADO";
                         prof.nombreCorregido = "NO ASIGNADO";
                     }%>
-        <form id="<%=roles[i].rol %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
+        <div id="<%=roles[i].rol %>">
         <div class="row col-sm space-above-below">
             <div class="col-sm-5">Subdirector de Posgrado</div>
-            <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' 
-            onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
+            <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'>
                <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
                <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
                placeholder="<%=prof.nombre %>"></input>
                 <input type="hidden" id="<%=roles[i].rol %>" name="rol" value="<%=roles[i].rol %>" />
                 <input type="hidden"  name="rol" placeholder="<%=roles[i].rol %>_<%=roles[i].PersonaId %>_<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>" />
             </div>
-            <div class="col-sm-2">
-                <button type="button" onclick="Guardar('<%=roles[i].rol %>', '<%= nuevopath %>')">Aprobar</button>
-                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-            </div>
         </div>
-        </form>
+        </div>
             <% } %>
         <% } %>
             <% for(let i=0; i < roles.length; i++){ %>
@@ -79,23 +64,18 @@
                         prof.nombre="NO ASIGNADO";
                         prof.nombreCorregido = "NO ASIGNADO";
                     }%>
-                <form id="<%=roles[i].rol %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
+                <div id="<%=roles[i].rol %>">
                 <div class="row col-sm space-above-below">
                     <div class="col-sm-5">Secretaría Jefe De Estudios</div>
-                    <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'
-                        onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
+                    <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'>
                         <p id='p_<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
                         <input id='<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
                         placeholder="<%=prof.nombre %>"></input>
                         <input type="hidden" id="<%=roles[i].rol %>" name="rol" value="<%=roles[i].rol %>" />
                         <input type="hidden"  name="rol" value="<%=roles[i].rol %>_<%=roles[i].PersonaId %>_<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>" />
                     </div>
-                    <div class="col-sm-2">
-                        <button type="button"  onclick="Guardar('<%=roles[i].rol %>', '<%= nuevopath %>')">Aprobar</button>
-                        <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                    </div>
                 </div>
-                </form>
+                </div>
             <% }%>
         <% } %>
         
@@ -113,12 +93,11 @@
                                 prof.nombre="NO ASIGNADO";
                                 prof.nombreCorregido = "NO ASIGNADO";
                             }%>
-                <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
+                <div id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>">
                 <div class="row col-sm space-above-below">
                             
                     <div class="col-sm-5"><span title="<%=departamentos[j].nombre.toLowerCase()%>"><%=departamentos[j].nom%></span></div>
-                    <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'  
-                    onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
+                    <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'>
                         <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
                         <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
                         placeholder="<%=prof.nombre %>"></input>
@@ -127,12 +106,8 @@
                         <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
                         <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
                     </div>
-                    <div class="col-sm-2">
-                        <button type="button" onclick="Guardar('<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>', '<%= nuevopath %>')">Aprobar</button>
-                        <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                    </div>
                 </div>
-                </form>
+                </div>
                         <% } %>
                     <% } %>
                 <% } %>
@@ -170,11 +145,10 @@
                         prof.nombre="NO ASIGNADO";
                         prof.nombreCorregido = "NO ASIGNADO";
                     }%>
-                    <form id="<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
+                    <div id="<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo %>">
                         <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">       
                             <div class="col-sm-5" >Coordinador</div>    
-                            <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5" 
-                                onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
+                            <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5">
                                 <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
                                 <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
                                 placeholder="<%=prof.nombre %>"></input>
@@ -183,12 +157,8 @@
                                         <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
                                         <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
                             </div>
-                            <div class="col-sm-2">
-                                <button type="button" onclick="Guardar('<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo%>', '<%= nuevopath %>')">Aprobar</button>
-                                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                            </div>
                         </div>
-                    </form>          
+                    </div>          
                     </div>
                     <% }%>
                     <% if(roles[i].rol==="CoordinadorTitulacion" && roles[i].PlanEstudioCodigo === planEstudios[j].codigo&&(planEstudios[j].nombre ===null)){  %>
@@ -199,11 +169,10 @@
                         prof.nombre="NO ASIGNADO";
                         prof.nombreCorregido = "NO ASIGNADO";
                     }%>
-                    <form id="<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
+                    <div id="<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo %>" >
                         <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">
                             <div class="col-sm-5" >Coordinador <%=planEstudios[j].codigo %></div>
-                            <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5" 
-                            onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
+                            <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5">
                             <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
                             <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
                             placeholder="<%=prof.nombre %>"></input>
@@ -212,12 +181,8 @@
                                     <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
                                     <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
                             </div>
-                            <div class="col-sm-2">
-                                <button type="button" onclick="Guardar('<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo%>', '<%= nuevopath %>')">Aprobar</button>
-                                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                            </div>
                         </div>
-                    </form>          
+                    </div>          
                     </div>
 
                      <% } %>
@@ -237,7 +202,7 @@
                             prof.nombre="NO ASIGNADO";
                             prof.nombreCorregido = "NO ASIGNADO";
                         }%>
-                        <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
+                        <div id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre %>">
                             <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">
                                 <% for(let p=0; p < departamentos.length; p++){ 
                                     departamentos[p].nom = departamentos[p].acronimo !== null ? departamentos[p].acronimo : departamentos[p].codigo%>
@@ -245,8 +210,7 @@
                                         <div class="col-sm-5"><span title="<%=departamentos[p].nombre.toLowerCase()%>"><%=departamentos[p].nom%></span></div>
                                     <% }%> 
                                 <% }%>
-                                <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5" 
-                                    onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
+                                <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5">
                                     <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
                                     <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
                                     placeholder="<%=prof.nombre %>"></input>
@@ -255,12 +219,8 @@
                                             <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
                                             <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
                                 </div>
-                                <div class="col-sm-2">
-                                    <button type="button" onclick="Guardar('<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre%>', '<%= nuevopath %>')">Aprobar</button>
-                                    <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                                </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                     <% }%>
                     <% if(roles[i].rol==="ResponsableDocente"&&(roles[i].PlanEstudioCodigo === planEstudios[j].codigo)&&(planEstudios[j].nombre ===null)){  %>
@@ -271,7 +231,7 @@
                             prof.nombre="NO ASIGNADO";
                             prof.nombreCorregido = "NO ASIGNADO";
                         }%>
-                        <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
+                        <div id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre %>">
                             <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">
                                 <% for(var p=0; p < departamentos.length; p++){ 
                                     departamentos[p].nom = departamentos[p].acronimo !== null ? departamentos[p].acronimo : departamentos[p].codigo%>
@@ -279,8 +239,7 @@
                                         <div class="col-sm-5"><span title="<%=departamentos[p].nombre.toLowerCase()%>"><%=departamentos[p].nom%></span></div>
                                     <% }%> 
                                 <%}%>
-                                <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5" 
-                                    onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
+                                <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5">
                                     <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
                                     <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
                                     placeholder="<%=prof.nombre %>"></input>
@@ -289,13 +248,8 @@
                                             <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
                                             <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
                                 </div>
-
-                            <div class="col-sm-2">
-                                <button type="button" onclick="Guardar('<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre%>', '<%= nuevopath %>')">Aprobar</button>
-                                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
                             </div>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                     <% }%> 
                     <% } %>
@@ -318,8 +272,6 @@
     let profesores = <%-JSON.stringify(profesores)%>
     let planID = <%-JSON.stringify(planID)%>
     let planEstudios = <%-JSON.stringify(planEstudios)%>
-    let profesores2 ="";
-    profesores2 = quitAcents(profesores)
 function mostrar(id){
   let celda = document.getElementById("div_"+id);
   //debo hacer lo de p y p2 pq al aceptar en el buscador me vuelve a entrar aqui uso el id de p como flag 
@@ -347,14 +299,6 @@ function mostrar(id){
   input.focus();
 }
 
-function Guardar(formID,nuevopath){
-    if(formID.split("_")[0] !== "JefeEstudios" || confirm("Seguro que quiere dejar su cargo de Jefe de Estudios, no podrá deshacer esta acción una vez aceptada")){
-        let form2 = document.getElementById(formID);
-        let pAcronimo = document.getElementById("selectCoordinador").value;
-        form2.setAttribute('action', nuevopath+"?planID="+pAcronimo);
-        form2.submit();
-    }
-}
 function cambiarPDCoordinador(){
     let pAcronimo = document.getElementById("selectCoordinador").value;
     let search = parseQueryString();
@@ -365,9 +309,6 @@ function cambiarPDCoordinador(){
     
 }
 
-function Volver(cancelarpath){
-    window.location.replace(cancelarpath);
-}
 
 
 $(function() {

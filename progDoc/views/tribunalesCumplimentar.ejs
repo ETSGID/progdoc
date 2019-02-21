@@ -96,6 +96,8 @@
     <button type="button" onclick="Decidir('aceptar')">Aceptar Asignación Tribunales</button>
     <button type="button" onclick="Decidir('rechazar')">No aceptar Asignación Tribunales</button>
     </form>
+    <%} if(estadoTribunales[departamentoID] === estadosTribunal.aprobadoDirector && estadoProgDoc === estadosProgDoc.abierto){%>
+      <p class="myHeader2 sticky">La asignación de tribunales ya ha sido aprobada por el director del departamento</p>
     <%}%>
 <table class="table">
   <thead>

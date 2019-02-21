@@ -30,6 +30,7 @@
   </div>
     <div class="tab">
         <button id='Estado' class="tablinks" onclick="cambiarSubmenu(event, 'Estado')">Estado</button>
+        <button id='Roles' class="tablinks" onclick="cambiarSubmenu(event, 'Roles')">Roles</button>
         <button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>
         <button id='Profesores' class="tablinks" onclick="cambiarSubmenu(event, 'Profesores')">Profesores</button>
         <button id='Tribunales' class="tablinks" onclick="cambiarSubmenu(event, 'Tribunales')">Tribunales</button>
@@ -84,6 +85,10 @@ function cambiarSubmenu(evt, submenu) {
     }
         if (submenu === 'Estado'){
         let url = "<%=contextPath%>/consultar/estado?planID="+pAcronimo
+        window.location.replace(url);
+    }
+        if(submenu === 'Roles'){
+        let url = "<%=contextPath%>/consultar/roles?planID="+pAcronimo
         window.location.replace(url);
     }
         if (submenu === 'Grupos'){

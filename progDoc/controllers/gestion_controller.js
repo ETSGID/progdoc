@@ -106,11 +106,14 @@ exports.getRoles = function (req, res, next) {
                 //ahora ya tienes los departamentos que intervienen
                 //compruebas en la tabla de roles si estos estan o no, si no estan los creas
                 let nuevopath = "" + req.baseUrl + "/gestionRoles/guardarRoles";
-                res.render('gestionRoles', {
+                let cancelarpath = "" + req.baseUrl + "/gestionRoles";
+                let view = req.originalUrl.toLowerCase().includes("consultar") ? "rolesConsultar" : "gestionRoles"
+                res.render(view, {
                     contextPath: app.contextPath,
                     roles: cargos.sort(funciones.sortRolesporDepartamento),
                     profesores: profesores,
                     nuevopath: nuevopath,
+                    cancelarpath: cancelarpath,
                     submenu: req.session.submenu,
                     departamentos: departamentos.sort(funciones.sortDepartamentos),
                     planID: req.session.planID,
@@ -225,23 +228,15 @@ exports.redir = function (req, res, next) {
 }
 
 
-//ATENTO ESTA PENDIENTE DE MEJORAR PARA LAS LLAMADAS A LA API
-/*
-Tabla de ProgramacionesDocentes las columnas que interesan son las siguientes.
-	PlanEstudioId
-	identificador
-    fechaProgDoc
-    *te traes todo esto*
-    *guardas todo en un array y luego en un metodo aparte te guardas los identificadores de las mas antiguas*
-    *ahi ya tienes los identificadores de las PD de los que quieres los identificadores*
+exports.deleteRoles = function (req, res, next) {
+    return models.sequelize.query(query = `DELETE FROM public."Rols" r  WHERE r."rol" = 'DirectorDepartamento' and r."PlanEstudioCodigo" = '09AT'
+    and r."DepartamentoCodigo" = 'D550';`
+    ).then(() => {
+        next();
+    }).catch(function (err) {
+        next(err);
+    })
+}
 
-De la tabla de asignaturas te traes las tuplas con ese identificador y guardas todos los departamentos distintos en un array
-
-*Método que recibe el array de identificadores con el y haciendo bucle pasas como parámetro uno de los valores del array y sacas los departamentos que intervienen en cada titulacion*
-	Despues de la tabla de asignaturas las columnas de DepartamentoResponsable ProgramacionDocenteId
-
-Los vas creando si dichos roles no existen o haciendo update si estos ya existen
-
-*/
 
 

@@ -6,6 +6,7 @@
     <% } %>
     </p>
     <div class="row col-sm"  style="margin-left:0px">
+        <% if (locals.submenu !== "Profesores2") { %>
          <select id="selectPlan" onchange="cambiarPD()">
                 <% for(let i=0; i < planEstudios.length; i++) { 
                     if (planEstudios[i].nombre !== null){ %>
@@ -15,6 +16,7 @@
                     <%}
                 }%>
          </select>
+         <%}%>
     <% if (locals.departamentoID && locals.departamentosResponsables && (locals.submenu === "Profesores" || locals.submenu === "Tribunales")) { %>
      <input id='departamentoResponsable' type="hidden" value="<%=departamentoID%>">
          <select id="selectDepartamento"  onchange="cambiarDepart()">
@@ -35,6 +37,7 @@
         <button id='Tribunales' class="tablinks" onclick="cambiarSubmenu(event, 'Tribunales')">Tribunales</button>
         <button id='Horarios' class="tablinks" onclick="cambiarSubmenu(event, 'Horarios')">Horarios</button>
         <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Exámenes</button>
+        <button id='PDF' class="tablinks" onclick="cambiarSubmenu(event, 'PDF')">PDF</button>
     </div>
     <% if (locals.planID) { %>
      <input id='plan' type="hidden" value="<%=planID%>">
@@ -78,6 +81,10 @@ function cambiarSubmenu(evt, submenu) {
     }
     if (submenu === 'Estado'){
         let url = "<%=contextPath%>/estado?planID="+pAcronimo
+        window.location.replace(url);
+    }
+    if (submenu === 'PDF'){
+        let url = "<%=contextPath%>/consultar/PDF?planID="+pAcronimo
         window.location.replace(url);
     }
 
@@ -126,7 +133,7 @@ function actualizarSelectyBarra() {
     if(!selectValue) {
         selectValue= "09TT"
     }
-    document.getElementById('selectPlan').value = selectValue;
+    document.getElementById('selectPlan') ? document.getElementById('selectPlan').value = selectValue : null;
 
     let departamento = document.getElementById('departamento');
     let selectDepartamento = document.getElementById('selectDepartamento');
@@ -139,6 +146,10 @@ function actualizarSelectyBarra() {
     }
         
     let submenu = document.getElementById('submenu').value
+    //para pintar profesores cuando este en asignacionProfesoresCumplimentar
+    if(submenu ==="Profesores2"){
+        submenu="Profesores"
+    }
     if(!submenu) {
         submenu= "Estado"
     }

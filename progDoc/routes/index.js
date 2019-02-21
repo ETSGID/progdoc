@@ -313,29 +313,38 @@ router.post("/cerrarIncidenciaProgDoc", function (req, res, next) {
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarIncidenciaProgDoc, infopdfprogdocController.generarPDF, gestionController.cerrarProgDoc2);
 
-
+//consultarRoles
+router.get("/consultar/roles", menuProgDocController.getPlanes,gestionRoles.getRoles)
 //gestionRoles
 router.get("/gestionRoles", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
+  res.locals.rols.push({ rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols,  menuProgDocController.anadirUnaPersona, gestionRoles.getRoles,menuProgDocController.getProgramacionDocente, gruposController.getGrupos);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols,  menuProgDocController.anadirUnaPersona, gestionRoles.getRoles);
 //ruta para guardar
 
 router.post("/gestionRoles/guardarRoles", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
+  res.locals.rols.push({ rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionRoles.guardarRoles, gestionRoles.redir);
       //atento añadir la ruta del controlador para guardar 
 
 router.get("/gestion/acronimos", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  res.locals.rols.push({ rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next();
 }, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, menuProgDocController.getAsignaturasProgDoc, menuProgDocController.getAllDepartamentos, acronimosController.getAcronimos);
 
 router.post('/gestionAcronimos/guardarAcronimosJE', function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  res.locals.rols.push({ rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, acronimosController.actualizarAcronimos)
+
+router.get('/gestion/deleteeRoles', gestionRoles.deleteRoles, function (req, res, next) {
+  res.send("<h2>Hecho</h2")
+})
 
 module.exports = router;
 

@@ -139,7 +139,7 @@ exports.getAsignaciones = function (req, res, next) {
 
 // GET respDoc/editAsignacion:pdID/:departamentoID/:acronimo
 exports.editAsignacion = function (req, res, next) {
-    req.session.submenu = "Profesores"
+    req.session.submenu = "Profesores2"
     let pdID = req.session.pdID
     let departamentoID = req.session.departamentoID
     let asignacion = [];
@@ -309,6 +309,7 @@ exports.guardarAsignacion = function (req, res, next) {
         .then(function (profesors) {
             profesores = profesors;
             coordinador = profesores.find(function (obj) { return obj.nombre === req.body.coordinador; });
+            
             //la 
             return models.Asignatura.findAll(
                 {
@@ -332,9 +333,9 @@ exports.guardarAsignacion = function (req, res, next) {
                 res.locals.permisoDenegado = "No tiene permiso contacte con el Jefe de Estudios si debería tenerlo" //lo unico que hara será saltarse lo siguiente 
             }
             if (!res.locals.permisoDenegado) {
-                if (coordinador) {
+                if (coordinador || req.body.coordinador.toLowerCase().includes("no asignado")) {
                     models.Asignatura.update(
-                        { CoordinadorAsignatura: coordinador.identificador }, /* set attributes' value */
+                        { CoordinadorAsignatura: coordinador ? coordinador.identificador: null }, /* set attributes' value */
                         { where: { identificador: identificador } } /* where criteria */
                     ).then(() => {
                         paso2();
@@ -536,129 +537,156 @@ exports.getTribunales = function (req, res, next) {
     else {
 
         let pdID = req.session.pdID
+        let asignaturas = []
+        let asingaturasAntiguas = []
+        let whereAsignaturas = {}
+        whereAsignaturas['$or'] = [];
         let departamentoID = req.session.departamentoID;
-        let departamentoExisteEnElPlan = res.locals.departamentosResponsables.find(function (obj) { return obj.codigo === departamentoID; });
-        if (!departamentoExisteEnElPlan) {
-            let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
-            res.render(view, {
-                contextPath: app.contextPath,
-                estado: "El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior",
-                permisoDenegado: res.locals.permisoDenegado,
-                profesores: null,
-                menu: req.session.menu,
-                submenu: req.session.submenu,
-                planID: req.session.planID,
-                departamentoID: req.session.departamentoID,
-                departamentosResponsables: res.locals.departamentosResponsables,
-                estadosTribunal: estados.estadoTribunal,
-                estadosProgDoc: estados.estadoProgDoc,
-                estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
-                planEstudios: res.locals.planEstudios
-            })
-        } else {
-            if (res.locals.permisoDenegado) {
-                let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
-                res.render(view, {
-                    contextPath: app.contextPath,
-                    estado: null,
-                    permisoDenegado: res.locals.permisoDenegado,
-                    profesores: null,
-                    menu: req.session.menu,
-                    submenu: req.session.submenu,
-                    planID: req.session.planID,
-                    departamentoID: req.session.departamentoID,
-                    departamentosResponsables: res.locals.departamentosResponsables,
-                    estadosTribunal: estados.estadoTribunal,
-                    estadosProgDoc: estados.estadoProgDoc,
-                    estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
-                    planEstudios: res.locals.planEstudios
-                })
-            }
-            else {
-                let profesores = [];
-                return menuProgDocController.getProfesores()
-                    .then((profesors) => {
-                        profesores = profesors;
-                        getMiembrosTribunal(pdID, departamentoID, profesores);
+        return menuProgDocController.getProgramacionDocentesAnteriores(pdID.split("_")[1], pdID.split("_")[3], pdID.split("_")[2], pdID)
+            .then((pdis) => {
+                pdsAnteriores = pdis;
+            
+                whereAsignaturas['$or'].push(pdID);
+                //voy a obtener el identificador del plan y de paso preparo el where para asignaturas
+                for (let i = 0; i < pdsAnteriores.length; i++) {
+                    whereAsignaturas['$or'].push(pdsAnteriores[i].identificador)
+                }
+            }).then(() =>{
+                let departamentoExisteEnElPlan = res.locals.departamentosResponsables.find(function (obj) { return obj.codigo === departamentoID; });
+                if (!departamentoExisteEnElPlan) {
+                    let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
+                    res.render(view, {
+                        contextPath: app.contextPath,
+                        estado: "El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior",
+                        permisoDenegado: res.locals.permisoDenegado,
+                        profesores: null,
+                        menu: req.session.menu,
+                        submenu: req.session.submenu,
+                        planID: req.session.planID,
+                        departamentoID: req.session.departamentoID,
+                        departamentosResponsables: res.locals.departamentosResponsables,
+                        estadosTribunal: estados.estadoTribunal,
+                        estadosProgDoc: estados.estadoProgDoc,
+                        estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
+                        planEstudios: res.locals.planEstudios
                     })
-                    .catch(function (error) {
-                        console.log("Error:", error);
-                        next(error);
-                    });
-            }
-
-            function getMiembrosTribunal(ProgramacionDocenteIdentificador, DepartamentoResponsable, profesores) {
-                req.session.submenu = "Tribunales"
-                models.Asignatura.findAll({
-                    where: {
-                        //se obtendrá con req D510 1
-                        ProgramacionDocenteIdentificador: ProgramacionDocenteIdentificador,
-                        DepartamentoResponsable: DepartamentoResponsable
-                    },
-                    attributes: ['acronimo', 'nombre', 'curso', 'codigo', 'semestre', 'identificador', 'PresidenteTribunalAsignatura', 'VocalTribunalAsignatura', 'SecretarioTribunalAsignatura', 'SuplenteTribunalAsignatura'],
-                    order: [
-
-                        [Sequelize.literal('"Asignatura"."curso"'), 'ASC'],
-                        [Sequelize.literal('"Asignatura"."semestre"'), 'ASC'],
-                        [Sequelize.literal('"Asignatura"."acronimo"'), 'ASC'],
-                        [Sequelize.literal('"Asignatura"."nombre"'), 'ASC']
-
-                    ],
-                    raw: true,
-                })
-                    .each(function (ej) {
-                        let presidente = profesores.find(function (obj) { return obj.identificador === ej['PresidenteTribunalAsignatura']; });
-                        if (presidente) {
-                            ej.presidenteNombre = presidente.nombreCorregido
-                        }
-                        let vocal = profesores.find(function (obj) { return obj.identificador === ej['VocalTribunalAsignatura']; });
-                        if (vocal) {
-                            ej.vocalNombre = vocal.nombreCorregido
-                        }
-                        let secretario = profesores.find(function (obj) { return obj.identificador === ej['SecretarioTribunalAsignatura']; });
-                        if (secretario) {
-                            ej.secretarioNombre = secretario.nombreCorregido
-                        }
-                        let suplente = profesores.find(function (obj) { return obj.identificador === ej['SuplenteTribunalAsignatura']; });
-                        if (suplente) {
-                            ej.suplenteNombre = suplente.nombreCorregido
-                        }
-                        ej.tribunalId = ej['identificador'];
-
-
-                    })
-                    .then(function (e) {
+                } else {
+                    if (res.locals.permisoDenegado) {
                         let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
-                        let nuevopath = "" + req.baseUrl + "/respdoc/guardarTribunales"
-                        let cancelarpath = "" + req.baseUrl + "/respdoc/tribunales?planID=" + req.session.planID + "&departamentoID=" + DepartamentoResponsable
-                        res.render(view,
-                            {
-                                contextPath: app.contextPath,
-                                profesores: profesores,
-                                tribunales: e,
-                                nuevopath: nuevopath,
-                                aprobarpath: "" + req.baseUrl + "/respDoc/aprobarTribunales",
-                                cancelarpath: cancelarpath,
-                                planID: req.session.planID,
-                                estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
-                                estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
-                                pdID: pdID,
-                                submenu: req.session.submenu,
-                                menu: req.session.menu,
-                                estado: null,
-                                permisoDenegado: res.locals.permisoDenegado,
-                                departamentoID: req.session.departamentoID,
-                                departamentosResponsables: res.locals.departamentosResponsables,
-                                estadosTribunal: estados.estadoTribunal,
-                                estadosProgDoc: estados.estadoProgDoc,
-                                planEstudios: res.locals.planEstudios
+                        res.render(view, {
+                            contextPath: app.contextPath,
+                            estado: null,
+                            permisoDenegado: res.locals.permisoDenegado,
+                            profesores: null,
+                            menu: req.session.menu,
+                            submenu: req.session.submenu,
+                            planID: req.session.planID,
+                            departamentoID: req.session.departamentoID,
+                            departamentosResponsables: res.locals.departamentosResponsables,
+                            estadosTribunal: estados.estadoTribunal,
+                            estadosProgDoc: estados.estadoProgDoc,
+                            estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
+                            planEstudios: res.locals.planEstudios
+                        })
+                    }
+                    else {
+                        let profesores = [];
+                        return menuProgDocController.getProfesores()
+                            .then((profesors) => {
+                                profesores = profesors;
+                                getMiembrosTribunal(whereAsignaturas, departamentoID, profesores, pdID);
                             })
-                    }).catch(function (error) {
-                        console.log("Error:", error);
-                        next(error);
-                    });
-            }
-        }
+                            .catch(function (error) {
+                                console.log("Error:", error);
+                                next(error);
+                            });
+                    }
+
+                    function getMiembrosTribunal(ProgramacionDocentesIdentificador, DepartamentoResponsable, profesores, pdID) {
+                        req.session.submenu = "Tribunales"
+                        models.Asignatura.findAll({
+                            where: {
+                                //se obtendrá con req D510 1
+                                ProgramacionDocenteIdentificador: ProgramacionDocentesIdentificador,
+                                DepartamentoResponsable: DepartamentoResponsable
+                            },
+                            attributes: ['acronimo', 'nombre', 'curso', 'codigo', 'semestre', 'identificador', 'PresidenteTribunalAsignatura', 'VocalTribunalAsignatura', 'SecretarioTribunalAsignatura', 'SuplenteTribunalAsignatura', 'ProgramacionDocenteIdentificador'],
+                            order: [
+
+                                [Sequelize.literal('"Asignatura"."curso"'), 'ASC'],
+                                [Sequelize.literal('"Asignatura"."semestre"'), 'ASC'],
+                                [Sequelize.literal('"Asignatura"."acronimo"'), 'ASC'],
+                                [Sequelize.literal('"Asignatura"."nombre"'), 'ASC']
+
+                            ],
+                            raw: true,
+                        })
+                            .each(function (ej) {
+                                
+                                let presidente = profesores.find(function (obj) { return obj.identificador === ej['PresidenteTribunalAsignatura']; });
+                                    if (presidente) {
+                                        ej.presidenteNombre = presidente.nombreCorregido
+                                    }
+                                    let vocal = profesores.find(function (obj) { return obj.identificador === ej['VocalTribunalAsignatura']; });
+                                    if (vocal) {
+                                        ej.vocalNombre = vocal.nombreCorregido
+                                    }
+                                    let secretario = profesores.find(function (obj) { return obj.identificador === ej['SecretarioTribunalAsignatura']; });
+                                    if (secretario) {
+                                        ej.secretarioNombre = secretario.nombreCorregido
+                                    }
+                                    let suplente = profesores.find(function (obj) { return obj.identificador === ej['SuplenteTribunalAsignatura']; });
+                                    if (suplente) {
+                                        ej.suplenteNombre = suplente.nombreCorregido
+                                    }
+                                    ej.tribunalId = ej['identificador'];
+                                if (ej['ProgramacionDocenteIdentificador'] === pdID) {
+                                    asignaturas.push(ej)
+                                    
+                                }else{
+                                    let as = {}
+                                    as.codigo = ej['codigo']
+                                    as.presidente = ej['presidenteNombre']
+                                    as.vocal = ej['vocalNombre']
+                                    as.secretario = ej['secretarioNombre']
+                                    as.suplente = ej['suplenteNombre']
+                                    asingaturasAntiguas.push(as)
+                                }
+                            })
+                            .then(function (e) {
+                                let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
+                                let nuevopath = "" + req.baseUrl + "/respdoc/guardarTribunales"
+                                let cancelarpath = "" + req.baseUrl + "/respdoc/tribunales?planID=" + req.session.planID + "&departamentoID=" + DepartamentoResponsable
+                                res.render(view,
+                                    {
+                                        contextPath: app.contextPath,
+                                        profesores: profesores,
+                                        tribunales: asignaturas,
+                                        tribunalesAntiguos: asingaturasAntiguas,
+                                        nuevopath: nuevopath,
+                                        aprobarpath: "" + req.baseUrl + "/respDoc/aprobarTribunales",
+                                        cancelarpath: cancelarpath,
+                                        planID: req.session.planID,
+                                        estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
+                                        estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
+                                        pdID: pdID,
+                                        submenu: req.session.submenu,
+                                        menu: req.session.menu,
+                                        estado: null,
+                                        permisoDenegado: res.locals.permisoDenegado,
+                                        departamentoID: req.session.departamentoID,
+                                        departamentosResponsables: res.locals.departamentosResponsables,
+                                        estadosTribunal: estados.estadoTribunal,
+                                        estadosProgDoc: estados.estadoProgDoc,
+                                        planEstudios: res.locals.planEstudios
+                                    })
+                            }).catch(function (error) {
+                                console.log("Error:", error);
+                                next(error);
+                            });
+                    }
+                }
+            })
     }
 }
 
