@@ -32,6 +32,7 @@ let AsignacionProfesor = sequelize.import(path.join(__dirname, 'AsignacionProfes
 let ProgramacionDocente = sequelize.import(path.join(__dirname, 'ProgramacionDocente'));
 let Rol = sequelize.import(path.join(__dirname, 'Rol'));
 let Itinerario = sequelize.import(path.join(__dirname, 'Itinerario'));
+let FranjaExamen = sequelize.import(path.join(__dirname, 'FranjaExamen'));
 
 
 let Session = sequelizeSession.import(path.join(__dirname, 'Session'));
@@ -118,6 +119,12 @@ Asignatura.belongsTo(Profesor, { as: 'Secretario', foreignKey: 'SecretarioTribun
 Profesor.hasMany(Asignatura, { foreignKey: 'SuplenteTribunalAsignatura' });
 Asignatura.belongsTo(Profesor, { as: 'Suplente', foreignKey: 'SuplenteTribunalAsignatura' });
 
+//Relacion 1 a N entre ProgramacionDocente y FranjaExamen
+ProgramacionDocente.hasMany(FranjaExamen, { foreignKey: 'ProgramacionDocenteId' });
+FranjaExamen.belongsTo(ProgramacionDocente, {foreignKey: 'ProgramacionDocenteId'});
+
+
+
 
 
 
@@ -137,5 +144,6 @@ exports.Examen = Examen; // exportar definición de tabla Examen
 exports.Rol = Rol; //exportar definición de tabla Rol
 exports.Itinerario = Itinerario; //exportar definición de tabla Itinerario
 exports.Session = Session; //exportar definición de tabla Session
+exports.FranjaExamen = FranjaExamen; //exportar definición de tabla Franja Examen
 exports.sequelize = sequelize;
 exports.sequelizeSession = sequelizeSession;

@@ -205,8 +205,20 @@ router.get('/coordinador/examenes', menuProgDocController.getProgramacionDocente
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.getExamenes);
-router.get('/consultar/examenes', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, coordinadorController.getExamenes);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.getFranjas, coordinadorController.getExamenes);
+router.get('/consultar/examenes', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, coordinadorController.getFranjas, coordinadorController.getExamenes);
+
+router.get('/coordinador/franjasexamenes', menuProgDocController.getProgramacionDocente, function (req, res, next) {
+  res.locals.rols.push({
+    rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoExamenes', resultado: estados.estadoExamen.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+  });
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
+  });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.getFranjas, coordinadorController.getFranjasExamenes);
 
 router.get('/consultar/horarios', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, menuProgDocController.getGrupos, coordinadorController.getHorario);
 router.post('/coordinador/guardarHorarios', function (req, res, next) {
@@ -232,6 +244,18 @@ router.post('/coordinador/guardarExamenes', function (req, res, next) {
   });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.guardarExamenes, coordinadorController.reenviarExamenes);
+
+router.post('/coordinador/guardarFranjasExamenes', function (req, res, next) {
+  res.locals.rols.push({
+    rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoExamenes', resultado: estados.estadoExamen.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+  });
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
+  });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.guardarFranjasExamenes);
 
 router.post('/coordiandor/aprobarHorarios', function (req, res, next) {
   res.locals.rols.push({
@@ -342,9 +366,30 @@ router.post('/gestionAcronimos/guardarAcronimosJE', function (req, res, next) {
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, acronimosController.actualizarAcronimos)
 
-router.get('/gestion/deleteeRoles', gestionRoles.deleteRoles, function (req, res, next) {
-  res.send("<h2>Hecho</h2")
-})
+//Actividades
+router.get('/consultar/actividades', menuProgDocController.getPlanes, function(req,res,next){
+  req.session.submenu = "Actividades"
+  res.render('desarrolloConsultar', {
+    contextPath: app.contextPath,
+    menu: req.session.menu,
+    submenu: req.session.submenu,
+    planID: req.session.planID,
+    departamentoID: req.session.departamentoID,
+    planEstudios: res.locals.planEstudios,
+  })
+});
+
+router.get('/cumplimentar/actividades', menuProgDocController.getPlanes, function (req, res, next) {
+  req.session.submenu = "Actividades"
+  res.render('desarrolloCumplimentar', {
+    contextPath: app.contextPath,
+    menu: req.session.menu,
+    submenu: req.session.submenu,
+    planID: req.session.planID,
+    departamentoID: req.session.departamentoID,
+    planEstudios: res.locals.planEstudios,
+  })
+});
 
 module.exports = router;
 

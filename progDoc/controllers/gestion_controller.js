@@ -228,15 +228,6 @@ exports.redir = function (req, res, next) {
 }
 
 
-exports.deleteRoles = function (req, res, next) {
-    return models.sequelize.query(query = `DELETE FROM public."Rols" r  WHERE r."rol" = 'DirectorDepartamento' and r."PlanEstudioCodigo" = '09AT'
-    and r."DepartamentoCodigo" = 'D550';`
-    ).then(() => {
-        next();
-    }).catch(function (err) {
-        next(err);
-    })
-}
 
 
 

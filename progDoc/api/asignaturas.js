@@ -3,6 +3,7 @@ let Sequelize = require('sequelize');
 let menuProgDocController = require('../controllers/menuProgDoc_controller')
 
 // GET /progdoc/api/asignaturas/:progDocID
+//donde progDocID es el identificador de la progDoc en la bbdd
 exports.getAsignaturasPD = function (req, res, next) {
     return models.Asignatura.findAll({
         where: {
@@ -28,6 +29,10 @@ exports.getAsignaturasPD = function (req, res, next) {
 
 
 // GET /asignaturas/:plan/:anoAcademico(\\d+)/:semestre/:codigoAsignatura
+// plan es codigo del plan
+//anoAcademico 201819
+//semestre 1S 2S I
+//codigoAsignatura es codigo de la asignatura
 exports.getGruposAsignatura = function (req, res, next) {
     let semestreGrupo = '%%'
     let pdID1 = null;

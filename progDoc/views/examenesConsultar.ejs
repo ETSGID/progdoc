@@ -13,6 +13,38 @@
                 Calendario
                 </button></h2>
                 <div class="hidden" id="div_<%=asignacionsExamen[i].periodo%>">
+                    <div id="div_<%=franjasExamen[i].periodo%>">
+                        <% 
+                        let franja = franjasExamen.find(function (obj) { return obj.periodo === asignacionsExamen[i].periodo; });
+                        if (franja.franjas.length>0){%>
+                            <table class="table" id="tableFranjas_<%=franja.periodo%>">
+                                <tr>
+                                <th>Franja</th>
+                                <th>Hora Inicio</th>
+                                <th>Duración (Minutos)</th>
+                                </tr>
+                            <%for (let j=0 ; j<franja.franjas.length; j++){%>
+                                <tr id="fila_<%=franja.franjas[j].identificador%>">
+                                    <%
+                                    let hora= +franja.franjas[j].horaInicio.split(':')[0]
+                                    let minutos = +franja.franjas[j].horaInicio.split(':')[1]
+                                    let duracion = franja.franjas[j].duracion
+                                    if(!hora)hora=8;
+                                    if(!minutos)minutos=0;
+                                    if(!duracion)duracion=0;
+                                    if(parseInt(hora,10)<10)hora='0'+hora;
+                                    if(parseInt(minutos,10)<10)minutos='0'+minutos;
+                                        %>
+                                    <td><%=j+1%></td>
+                                    <td><%=hora%>:<%=minutos%></td>
+                                    <td><%=duracion%></td>
+                                </tr>
+                            <%}%>
+                        </table>
+                        <%}else{%>
+                        <p>No hay franjas de exámenes definidas</p>
+                        <%}%>
+                    </div>
                     <table class="table" id="table_<%=asignacionsExamen[i].periodo%>">
                         <thead>
                             <tr>

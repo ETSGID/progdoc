@@ -1,15 +1,18 @@
 let app = require('../app');
 let models = require('../models');
 let funciones = require('../funciones');
+let estados = require('../estados');
 //en res.locals.asignaturas tendre todas las asignaturas de la pd
 exports.getAcronimos = function (req, res, next) {
     let nuevopath = "" + req.baseUrl + "/gestionAcronimos/guardarAcronimosJE"
     let asignaturasPorCursos = {};
     req.session.submenu = "Acronimos"
-    if (!res.locals.progDoc) {
+    if (!res.locals.progDoc || !res.locals.departamentosResponsables ||
+        (estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) 
+        && estados.estadoProgDoc.incidencia !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) {
         res.render("acronimosJE", {
             contextPath: app.contextPath,
-            estado: "Programación docente no abierta",
+            estado: "Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,

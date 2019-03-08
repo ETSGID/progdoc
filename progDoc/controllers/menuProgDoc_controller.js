@@ -52,6 +52,7 @@ exports.getProgramacionDocente = function (req, res, next) {
     wherePD['$or'] = [];
     //solo puede haber una abierta y una en incidencia como maximo en un plan
     wherePD['$or'].push({ estadoProGDoc: estados.estadoProgDoc.abierto });
+    wherePD['$or'].push({ estadoProGDoc: estados.estadoProgDoc.listo });
     wherePD['$or'].push({ estadoProGDoc: estados.estadoProgDoc.incidencia });
     //el planID si no existe acronimo sera el código, por eso el or
 
@@ -77,6 +78,9 @@ exports.getProgramacionDocente = function (req, res, next) {
                 res.locals.pdSemestre = param['ProgramacionDocentes.semestre']
                 switch (param['ProgramacionDocentes.estadoProGDoc']) {
                     case estados.estadoProgDoc.abierto:
+                        progDocAbierta = param;
+                        break;
+                    case estados.estadoProgDoc.listo:
                         progDocAbierta = param;
                         break;
                     case estados.estadoProgDoc.incidencia:
@@ -296,13 +300,18 @@ function getPersonCorreo(onlyProfesor, correo) {
         raw: true,
     })
         .then(function (pers) {
-            let nombre = pers['apellido'] + " " + pers['nombre']
-            let nombreCorregido = pers['apellido'] + ", " + pers['nombre']
-            nombreCorregido = funciones.primerasMayusc(nombreCorregido)
-            let correo = pers['email']
-            let identificador = pers['identificador']
-            let persona = { nombre: nombre, correo: correo, nombreCorregido: nombreCorregido, identificador: identificador }
-            return persona;
+            if(pers){
+                let nombre = pers['apellido'] + " " + pers['nombre']
+                let nombreCorregido = pers['apellido'] + ", " + pers['nombre']
+                nombreCorregido = funciones.primerasMayusc(nombreCorregido)
+                let correo = pers['email']
+                let identificador = pers['identificador']
+                let persona = { nombre: nombre, correo: correo, nombreCorregido: nombreCorregido, identificador: identificador }
+                return persona;
+            }else{
+                return null;
+            }
+
         })
 }
 
@@ -443,7 +452,53 @@ exports.anadirUnaPersona = function (req, res, next){
             })           
     }
     next();
-   
+}
+
+//te da las ultimas programaciones docentes de los planes pasados como array
+//planes el codigo del plan
+//tipoPD: 1S,2S no acepta I
+//ano: 201819
+exports.getAllProgramacionDocentes = function (planes, tipoPD, ano){
+    let programacionDocentesPlan = {}
+    planes.forEach(function (p, index) {
+        programacionDocentesPlan[p]=[]
+    })
+    return models.ProgramacionDocente.findAll({
+        attributes: ["identificador", "semestre", 'PlanEstudioId'],
+        where: {
+            PlanEstudioId: {
+                [op.or]: planes,
+            },
+            anoAcademico: ano
+        },
+        order: [
+            [Sequelize.literal('identificador'), 'DESC'],
+        ],
+        raw: true
+    })
+        .then(function (pd) {
+            for (let i = 0; i < pd.length; i++) {
+                let pdsPlanes = programacionDocentesPlan[pd[i]['PlanEstudioId']]
+                if(pdsPlanes.length>0){
+                    continue;
+                }
+                //el segundo elemento del if es para que me coja la pd anterior o igual por si quiero modificar una cuando ya abri otra mas nueva
+                if (tipoPD === '1S' && ano >= pd[i]["identificador"].split("_")[2]) {
+                    if (pd[i].semestre === '1S' || pd[i].semestre === 'I') {
+                        pdsPlanes.push(pd[i]);
+                        continue;
+                    }
+                }
+                if (tipoPD === '2S' && ano >= pd[i]["identificador"].split("_")[2]) {
+                    if (pd[i].semestre === '2S' || pd[i].semestre === 'I') {
+                        pdsPlanes.push(pd[i]);
+                        continue;
+                    }
+                }
+            }
+            //caso raro que haya varias I y s1 por ejemplo si tengo s1 I s2 se va a dar. En ese caso me quedo con la anual
+            return programacionDocentesPlan;
+        })
 
 }
 

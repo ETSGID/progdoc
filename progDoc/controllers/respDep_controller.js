@@ -33,10 +33,11 @@ exports.getAsignaciones = function (req, res, next) {
     //hay que comprobar que no sea una url de consultar.
     else if (!comprobarEstadoCumpleUno(estados.estadoProfesor.abierto, res.locals.progDoc['ProgramacionDocentes.estadoProfesores'])
         && !comprobarEstadoCumpleUno(estados.estadoProfesor.aprobadoResponsable, res.locals.progDoc['ProgramacionDocentes.estadoProfesores'])
-        && res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto && !req.originalUrl.toLowerCase().includes("consultar")) {
+        && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
+        && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("asignacionesCumplimentar", {
             contextPath: app.contextPath,
-            estado: "Asignación de profesores ya se realizó",
+            estado: "Asignación de profesores ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe",
             permisoDenegado: res.locals.permisoDenegado,
             profesores: null,
             menu: req.session.menu,
@@ -517,10 +518,11 @@ exports.getTribunales = function (req, res, next) {
     //hay que comprobar que no sea una url de consultar.
     else if (!comprobarEstadoCumpleUno(estados.estadoTribunal.abierto, res.locals.progDoc['ProgramacionDocentes.estadoTribunales'])
         && !comprobarEstadoCumpleUno(estados.estadoTribunal.aprobadoResponsable, res.locals.progDoc['ProgramacionDocentes.estadoTribunales'])
-        && res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto && !req.originalUrl.toLowerCase().includes("consultar")) {
+        && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo) 
+        && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("tribunalesCumplimentar", {
             contextPath: app.contextPath,
-            estado: "Asignación de tribunales ya se realizó",
+            estado: "Asignación de tribunales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe",
             permisoDenegado: res.locals.permisoDenegado,
             profesores: null,
             menu: req.session.menu,

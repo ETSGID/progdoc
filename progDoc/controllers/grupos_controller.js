@@ -23,11 +23,12 @@ exports.getGrupos = function (req, res, next) {
         })
     }
     //hay que comprobar que no sea una url de consultar.
-    else if (estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] && estados.estadoProgDoc.incidencia !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] && estados.estadoProgDoc.listo !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']
+    else if (estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] 
+        && estados.estadoProgDoc.incidencia !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']
         && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("gruposJE", {
             contextPath: app.contextPath,
-            estado: "Programación docente no abierta",
+            estado: "Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,

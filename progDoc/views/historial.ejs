@@ -1,12 +1,18 @@
 <body>
+<script src="<%=contextPath%>/js/funciones.js"></script>
 <div class="contenido3">
     <p>Historial</p>
     <% let ano = null;
         let codig = null;
     %>
+        <% if (locals.planID) { %>
+     <input id='plan' type="hidden" value="<%=planID%>">
+  <%} else {%>
+    <input id='plan' type="hidden">
+  <%}%>
     <div class="row col-sm space-above-below">
-         <select id="selectPlan" onchange="cambiar()">
-                <% for(let i=0; i < planEstudios.length; i++) {
+         <select id="selectPlan" onchange="cambiarPD()">
+            <% for(let i=0; i < planEstudios.length; i++) {
                     if (planEstudios[i].nombre !== null && pdSeleccionada && pdSeleccionada.includes(planEstudios[i].codigo)){ 
                         codig = planEstudios[i].codigo%>
                         <option selected value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%>"><%=planEstudios[i].nombre%></option> 
@@ -20,7 +26,7 @@
                     <%}
                 }%>
          </select>
-          <select id="selectAno" onchange="cambiar()">
+          <select id="selectAno" onchange="cambiarPD()">
                 <% for(let i=0; i < anosExistentes.length; i++) { 
                     if(pdSeleccionada && pdSeleccionada.includes(anosExistentes[i])){
                         ano = anosExistentes[i]%>
@@ -60,7 +66,7 @@
 </body>
 
 <script>
-function cambiar(){
+function cambiarPD(){
     let planID = document.getElementById("selectPlan").value;
     let year =  document.getElementById("selectAno").value;
     let pdSelect = document.getElementById("selectPd")
@@ -74,12 +80,32 @@ function cambiar(){
     }
 }
 function buscar(){
+    let pAcronimo = document.getElementById("selectPlan").value;
     let pdSelect =  document.getElementById("selectPd")
     let pdSeleccionada = document.getElementById("selectPd").value;
+    let search = parseQueryString();
+    delete search.pdID;
+    delete search.pdSeleccionada;
+    search.planID = pAcronimo;
     if(pdSeleccionada !== pdSelect.options[0].value){
-        let url = window.location.protocol + '//' + window.location.host + window.location.pathname
-        url = url+"?pdSeleccionada="+pdSeleccionada
-        window.location.replace(url);
+        search.pdSeleccionada = pdSeleccionada
+    }
+    let url = parseStringQuery(search);
+    window.location.replace(url);
+   
+}
+
+document.getElementsByTagName('body')[0].onload = actualizarSelectyBarra();
+function actualizarSelectyBarra() {
+    let selectPlanValue = document.getElementById('plan').value
+    if(!selectPlanValue) {
+        selectPlanValue= "09TT"
+    }
+    document.getElementById('selectPlan').value = selectPlanValue;
+    let pdSelect =  document.getElementById("selectPd")
+    let pdSeleccionada = document.getElementById("selectPd").value;
+    if(!pdSeleccionada.includes(selectPlanValue)){
+        cambiarPD();
     }
 }
 </script>

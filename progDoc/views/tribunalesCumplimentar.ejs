@@ -223,6 +223,9 @@ window.onbeforeunload = function(){
   //primero debes mirar que activado sea true o false (en confirmarSalirSinGuarar y despues marcarlo como true) 
   let confirma = confirmarSalirSinGuardar(["actualizar"], activado)
   activado = true
+   //debo reinicializar esto por si le da a seguir en la página
+  document.getElementById('selectPlan') ? document.getElementById('selectPlan').value = selectPlanValue : null;
+  document.getElementById('selectDepartamento') ? document.getElementById('selectDepartamento').value = selectDepartamentoValue : null;
   return confirma;
 }
 </script>

@@ -8,6 +8,7 @@ let funciones = require('../funciones');
 let menuProgDocController = require('../controllers/menuProgDoc_controller')
 
 
+
 exports.abrirNuevaProgDoc = function (req, res, next) {
     let tipoPD = req.body.semestre;
     let plan = req.body.plan;
@@ -27,9 +28,13 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
     let asignacions = [];
 
     let gruposToAnadir = [];
+    let franjasToAnadir = [];
     let relacionGrupos = [];
     let apiAsignaturas = [];
-    let whereAsignaturas;
+    let wherePdsAnteriores;
+    //las dos programaciones anteriores que se toman como referencia
+    let pdId1 = "no programacion"
+    let pdId2 = "no programacion"
 
     res.locals.departamentosResponsables = [];
     let promisesRoles = [];
@@ -60,12 +65,12 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
         })
         .then((pdis) => {
             pds = pdis;
-            whereAsignaturas = {};
-            whereAsignaturas['$or'] = [];
-
+            wherePdsAnteriores = {};
+            wherePdsAnteriores['$or'] = [];
             //voy a obtener el identificador del plan y de paso preparo el where para asignaturas
             for (let i = 0; i < pds.length; i++) {
-                whereAsignaturas['$or'].push({ ProgramacionDocenteIdentificador: pds[i].identificador })
+                wherePdsAnteriores['$or'].push({ ProgramacionDocenteIdentificador: pds[i].identificador })
+
                 let ident = pds[i].identificador.split("_");
                 if (ident[0] === 'PD' && ident[1] === plan && ident[2] === ano && ident[3] === tipoPD) {
                     let vers = Number(ident[4].split("v")[1]) + 1;
@@ -92,8 +97,6 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
         })
         .then(() => { // Notice: There are no arguments here, as of right now you'll have to...
             //se supone que los grupos terminan en .1 o .2 aunque sean para optativas. Si tal definir un grupo de optativas con un flag.
-            let pdId1 = "no programacion"
-            let pdId2 = "no programacion"
             let cursoGrupo = '%%';
             pds[0] ? pdId1 = pds[0].identificador : pdId1 = pdId1;
             pds[1] ? pdId2 = pds[1].identificador : pdId2 = pdId2;
@@ -156,7 +159,7 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
         .then(() => {
             cont = 0;
             return models.Asignatura.findAll({
-                where: whereAsignaturas,
+                where: wherePdsAnteriores,
                 include: [{
                     //incluye las asignaciones de profesores y los horarios.
                     model: models.AsignacionProfesor,
@@ -467,6 +470,39 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                 asignacions
             )
 
+        }).then(() => {
+            let periodo = '';
+            switch (tipoPD) {
+                case "1S":
+                    periodo = '1S%'
+                    break;
+                case "2S":
+                    periodo = '2S%'
+                    break;
+                case "I":
+                    periodo = '%%'
+                    break;
+                default:
+                    break;
+            }
+            //debo catear a text el enum para usar like
+            return models.sequelize.query(query = 'SELECT  f."horaInicio", f."duracion", f."curso", f."periodo" FROM public."FranjaExamens" f WHERE (f."ProgramacionDocenteId" = :pdId1 or f."ProgramacionDocenteId" = :pdId2) and f."periodo"::text LIKE :periodo',
+                { replacements: { pdId1: pdId1, pdId2: pdId2, periodo: periodo } },
+            )
+            .then(function (franjas) {
+               franjas[0].forEach(function (franja) {
+               let franjaExamen = {}
+               franjaExamen.horaInicio = franja.horaInicio
+               franjaExamen.duracion = franja.duracion
+               franjaExamen.curso = franja.curso
+               franjaExamen.periodo = franja.periodo
+               franjaExamen.ProgramacionDocenteId = res.locals.identificador
+               franjasToAnadir.push(franjaExamen)
+               })
+                return models.FranjaExamen.bulkCreate(
+                    franjasToAnadir
+                )
+            })
         })
         .then(() => {
             let pd = res.locals.identificador.split("_")[1];
@@ -491,7 +527,8 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
             DELETE FROM public."Grupos" g WHERE g."ProgramacionDocenteId" is null; 
             DELETE FROM public."Asignaturas" asign WHERE asign."ProgramacionDocenteIdentificador" is null; 
             DELETE FROM public."AsignacionProfesors" a WHERE a."GrupoId" is null;
-            DELETE FROM public."Examens" e WHERE e."AsignaturaIdentificador" is null;`,
+            DELETE FROM public."Examens" e WHERE e."AsignaturaIdentificador" is null;
+            DELETE FROM public."FranjaExamens" f WHERE f."ProgramacionDocenteId" is null;`,
                 { replacements: { pdId1: res.locals.identificador } },
             ).then(() => {
                 next(error);
@@ -555,7 +592,7 @@ exports.abrirCopiaProgDoc = function (req, res, next) {
     let examens = [];
     let gruposToAnadir = [];
     let relacionGrupos = [];
-    let whereAsignaturas;
+    let franjasToAnadir = [];
     res.locals.departamentosResponsables = [];
 
     return models.ProgramacionDocente.findOne({
@@ -566,10 +603,6 @@ exports.abrirCopiaProgDoc = function (req, res, next) {
         raw: true
     })
         .then(function (pd) {
-
-            whereAsignaturas = {};
-            whereAsignaturas['$or'] = [];
-
             //voy a obtener el identificador del plan y de paso preparo el where para asignaturas
             nuevaPd.identificador = res.locals.identificador;
             nuevaPd.version = Number(res.locals.identificador.split("_")[4].split("v")[1]);
@@ -786,6 +819,30 @@ exports.abrirCopiaProgDoc = function (req, res, next) {
             )
         })
         .then(() => {
+            return models.FranjaExamen.findAll({
+                where: {
+                    ProgramacionDocenteId: pdIDanterior
+                },
+                raw: true
+
+            })
+                .each(function (franja) {
+                    let franjaExamen = {}
+                    franjaExamen.horaInicio = franja.horaInicio
+                    franjaExamen.duracion = franja.duracion
+                    franjaExamen.curso = franja.curso
+                    franjaExamen.periodo = franja.periodo
+                    franjaExamen.ProgramacionDocenteId = res.locals.identificador
+                    franjasToAnadir.push(franjaExamen)
+                })
+                .then(function () {
+                    return models.FranjaExamen.bulkCreate(
+                        franjasToAnadir
+                    )
+                })
+
+        })
+        .then(() => {
             next();
         }).then(() => {
         })
@@ -795,7 +852,8 @@ exports.abrirCopiaProgDoc = function (req, res, next) {
             DELETE FROM public."Grupos" g WHERE g."ProgramacionDocenteId" is null; 
             DELETE FROM public."Asignaturas" asign WHERE asign."ProgramacionDocenteIdentificador" is null; 
             DELETE FROM public."AsignacionProfesors" a WHERE a."GrupoId" is null;
-            DELETE FROM public."Examens" e WHERE e."AsignaturaIdentificador" is null;`,
+            DELETE FROM public."Examens" e WHERE e."AsignaturaIdentificador" is null;
+            DELETE FROM public."FranjaExamens" f WHERE f."ProgramacionDocenteId" is null;`,
                 { replacements: { pdId1: res.locals.identificador } },
             ).then(() => {
                 next(error);
@@ -834,4 +892,6 @@ WHERE "ProgramacionDocenteIdentificador" is null;
 WHERE "GrupoId" is null;
     delete FROM public."Examens" e 
     WHERE e."AsignaturaIdentificador" is null;
+     delete FROM public."FranjaExamens" f
+    WHERE f."ProgramacionDocenteId" is null
     */

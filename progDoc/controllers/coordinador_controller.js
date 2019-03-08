@@ -30,10 +30,11 @@ exports.getHorario = function (req, res, next) {
     }
     //hay que comprobar que no sea una url de consultar.
     else if (estados.estadoHorario.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoHorarios']
-        && res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto && !req.originalUrl.toLowerCase().includes("consultar")) {
+        && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
+        && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("horariosCumplimentar", {
             contextPath: app.contextPath,
-            estado: "Asignación de horarios ya se realizó",
+            estado: "Asignación de horarios ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -447,11 +448,58 @@ exports.aprobarHorarios = function (req, res, next) {
 
 
 
+//funcion que devuelve las franjas de examenes pasandole la pdID
+exports.getFranjas = function (req, res, next) {
+    let franjasExamen = [];
+    if (req.session.pdID) {
+        let tipo = req.session.pdID.split("_")[3]
+        switch (tipo) {
+            case '1S':
+                franjasExamen.push({periodo: enumsPD.periodoPD.S1_O, periodoNombre:"Periodo Ordinario 1º Semestre", franjas: [] })
+                franjasExamen.push({ periodo: enumsPD.periodoPD.S1_E, periodoNombre: "Periodo Extraordinario 1º Semestre", franjas: [] })
+                break;
+            case '2S':
+                franjasExamen.push({ periodo: enumsPD.periodoPD.S2_O, periodoNombre: "Periodo Ordinario 2º Semestre", franjas: [] })
+                franjasExamen.push({ periodo: enumsPD.periodoPD.S2_E, periodoNombre: "Periodo Extraordinario 2º Semestre", franjas: [] })
+                break;
+            case 'I':
+                franjasExamen.push({ periodo: enumsPD.periodoPD.S1_O, periodoNombre:"Periodo Ordinario 1º Semestre", franjas: [] })
+                franjasExamen.push({ periodo: enumsPD.periodoPD.S1_E, periodoNombre:"Periodo Extraordinario 1º Semestre", franjas: [] })
+                franjasExamen.push({ periodo: enumsPD.periodoPD.S2_O, periodoNombre:"Periodo Ordinario 2º Semestre", franjas: [] })
+                franjasExamen.push({ periodo: enumsPD.periodoPD.S2_E, periodoNombre:"Periodo Extraordinario 2º Semestre", franjas: [] })
+                break;
+        }
+        return models.FranjaExamen.findAll({
+            where: {
+                ProgramacionDocenteId: req.session.pdID,
+            },
+            order: [
+                [Sequelize.literal('"FranjaExamen"."periodo"'), 'ASC'],
+                [Sequelize.literal('"FranjaExamen"."horaInicio"'), 'ASC'],
+            ],
+        }).each(function (franja) {
+            let f = franjasExamen.find(function (obj) { return obj.periodo === franja['periodo']; });
+            //si la franja no está la añado
+            if (f) {
+                f["franjas"].push(franja)
+            }
+        }).then(() => {
+            res.locals.franjasExamen = franjasExamen
+            next();
+        }).catch(function (error) {
+            console.log("Error:", error);
+            next(error);
+        });
+    } else {
+        next()
+    }
+
+}
+
 // GET /respDoc/:pdID/Examenes
 exports.getExamenes = function (req, res, next) {
 
     req.session.submenu = "Examenes"
-
     //si no hay progDoc o no hay departamentosResponsables de dicha progDoc. Ojo también comprueba que no esté en incidencia para el JE
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         let view = req.originalUrl.toLowerCase().includes("consultar") ? "examenesConsultar" : "examenesCumplimentar"
@@ -465,6 +513,7 @@ exports.getExamenes = function (req, res, next) {
             departamentoID: req.session.departamentoID,
             planEstudios: res.locals.planEstudios,
             asignacionsExamen: null,
+            franjasExamen: null,
             periodosExamen: null,
             cursos: null,
             pdID: null,
@@ -472,10 +521,11 @@ exports.getExamenes = function (req, res, next) {
     }
     //hay que comprobar que no sea una url de consultar.
     else if (estados.estadoExamen.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoExamenes']
-        && res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto && !req.originalUrl.toLowerCase().includes("consultar")) {
+        && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
+        && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("examenesCumplimentar", {
             contextPath: app.contextPath,
-            estado: "Asignación de exámenes ya se realizó",
+            estado: "Asignación de exámenes ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -484,6 +534,7 @@ exports.getExamenes = function (req, res, next) {
             planEstudios: res.locals.planEstudios,
             estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
             asignacionsExamen: null,
+            franjasExamen: null,
             periodosExamen: null,
             cursos: null,
             pdID: null
@@ -526,9 +577,7 @@ exports.getExamenes = function (req, res, next) {
         //si no estaba inicializada la inicializo.
         req.session.departamentoID = departamentoID;
 
-
         getAsignacionExamen(pdID);
-
 
         function getAsignacionExamen(ProgramacionDocenteIdentificador) {
             //busco las asignaturas con departamento responsable ya que son las que entran en los exámenes
@@ -631,17 +680,20 @@ exports.getExamenes = function (req, res, next) {
 
                     }
                 })
-                .then(function (e) {
+                .then(() => {
                     let cancelarpath = "" + req.baseUrl + "/coordinador/examenes?planID=" + req.session.planID
+                    let selectExamenespath = "" + req.baseUrl + "/coordinador/franjasexamenes?planID=" + req.session.planID
                     let nuevopath = "" + req.baseUrl + "/coordinador/guardarExamenes"
                     let view = req.originalUrl.toLowerCase().includes("consultar") ? "examenesConsultar" : "examenesCumplimentar"
                     res.render(view,
                         {
                             contextPath: app.contextPath,
                             asignacionsExamen: asignacionsExamen,
+                            franjasExamen: res.locals.franjasExamen,
                             periodosExamen: enumsPD.periodoPD,
                             nuevopath: nuevopath,
                             aprobarpath: "" + req.baseUrl + "/coordiandor/aprobarExamenes",
+                            selectExamenespath: selectExamenespath,
                             cancelarpath: cancelarpath,
                             planID: req.session.planID,
                             pdID: pdID,
@@ -659,16 +711,86 @@ exports.getExamenes = function (req, res, next) {
                         })
 
 
-                })
-                .catch(function (error) {
-                    console.log("Error:", error);
-                    next(error);
-                });
-
+            })
+            .catch(function (error) {
+                console.log("Error:", error);
+                next(error);
+            });
         }
+
     }
 
 }
+
+
+// GET /respDoc/:pdID/Examenes
+exports.getFranjasExamenes = function (req, res, next) {
+    req.session.submenu = "Examenes"
+    let view = "franjasExamenesCumplimentar"
+    //si no hay progDoc o no hay departamentosResponsables de dicha progDoc. Ojo también comprueba que no esté en incidencia para el JE
+    if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
+        
+        res.render(view, {
+            contextPath: app.contextPath,
+            estado: "Programación docente no abierta",
+            permisoDenegado: res.locals.permisoDenegado,
+            menu: req.session.menu,
+            submenu: req.session.submenu,
+            planID: req.session.planID,
+            departamentoID: req.session.departamentoID,
+            planEstudios: res.locals.planEstudios,
+            franjasExamen: null,
+            periodosExamen: null,
+            pdID: null,
+        })
+    }
+    //hay que comprobar que no sea una url de consultar.
+    else if (estados.estadoExamen.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoExamenes']
+        && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
+        && !req.originalUrl.toLowerCase().includes("consultar")) {
+        res.render(view, {
+            contextPath: app.contextPath,
+            estado: "Asignación de exámenes ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe",
+            permisoDenegado: res.locals.permisoDenegado,
+            menu: req.session.menu,
+            submenu: req.session.submenu,
+            planID: req.session.planID,
+            departamentoID: req.session.departamentoID,
+            planEstudios: res.locals.planEstudios,
+            estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
+            franjasExamen: null,
+            periodosExamen: null,
+            pdID: null
+        })
+    } else {
+        let cancelarpath = "" + req.baseUrl + "/coordinador/franjasexamenes?planID=" + req.session.planID
+        let nuevopath = "" + req.baseUrl + "/coordinador/guardarFranjasExamenes"
+        let selectExamenespath = "" + req.baseUrl + "/coordinador/examenes?planID=" + req.session.planID
+        res.render(view,
+            {
+                contextPath: app.contextPath,
+                franjasExamen: res.locals.franjasExamen,
+                periodosExamen: enumsPD.periodoPD,
+                nuevopath: nuevopath,
+                selectExamenespath: selectExamenespath, 
+                cancelarpath: cancelarpath,
+                planID: req.session.planID,
+                pdID: req.session.pdID,
+                menu: req.session.menu,
+                submenu: req.session.submenu,
+                estado: null,
+                permisoDenegado: res.locals.permisoDenegado,
+                estadosExamen: estados.estadoExamen,
+                estadosProgDoc: estados.estadoProgDoc,
+                estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
+                estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
+                departamentoID: req.session.departamentoID,
+                planEstudios: res.locals.planEstudios
+            })
+    }
+}
+
+
 
 exports.guardarExamenes = function (req, res, next) {
     req.session.submenu = "Examenes"
@@ -680,6 +802,7 @@ exports.guardarExamenes = function (req, res, next) {
     if (!res.locals.permisoDenegado) {
         let toAnadir = req.body.anadir;
         let toActualizar = req.body.actualizar;
+        let toEliminar = req.body.eliminar;
         let queryToAnadir = []
         return models.Asignatura.findAll(
             {
@@ -698,9 +821,14 @@ exports.guardarExamenes = function (req, res, next) {
                 if (toAnadir) {
                     if (!Array.isArray(toAnadir)) {
                         let nuevaEntrada = {};
-                        nuevaEntrada.AsignaturaIdentificador = Number(toAnadir.split("_")[1]);
-                        nuevaEntrada.periodo = toAnadir.split("_")[3];
-                        nuevaEntrada.fecha = moment(toAnadir.split("_")[4], "DD/MM/YYYY");
+                        let hora = req.body["hora_"+ toAnadir];
+                        let minutos = req.body["minutos_" + toAnadir];
+                        nuevaEntrada.AsignaturaIdentificador = Number(toAnadir.split("_")[0]);
+                        nuevaEntrada.periodo = toAnadir.split("_")[2];
+                        nuevaEntrada.fecha = moment(req.body["date_"+toAnadir], "DD/MM/YYYY");
+                        nuevaEntrada.horaInicio = hora + ":" + minutos;
+                        nuevaEntrada.duracion = Number(req.body["duracion_"+ toAnadir]);
+
                         let asig = as.find(function (obj) { return (nuevaEntrada.AsignaturaIdentificador && obj.identificador === nuevaEntrada.AsignaturaIdentificador) })
                         if (!asig) {
                             console.log("Quiere añadir un examen que no es suyo")
@@ -710,9 +838,13 @@ exports.guardarExamenes = function (req, res, next) {
                     } else {
                         toAnadir.forEach(function (element, index) {
                             let nuevaEntrada = {};
-                            nuevaEntrada.AsignaturaIdentificador = Number(element.split("_")[1]);
-                            nuevaEntrada.periodo = element.split("_")[3];
-                            nuevaEntrada.fecha = moment(element.split("_")[4], "DD/MM/YYYY");
+                            let hora = req.body["hora_" + element];
+                            let minutos = req.body["minutos_" + element];
+                            nuevaEntrada.AsignaturaIdentificador = Number(element.split("_")[0]);
+                            nuevaEntrada.periodo = element.split("_")[2];
+                            nuevaEntrada.fecha = moment(req.body["date_" +element], "DD/MM/YYYY");
+                            nuevaEntrada.horaInicio = hora + ":" + minutos;
+                            nuevaEntrada.duracion = Number(req.body["duracion_" + element]);
                             let asig = as.find(function (obj) { return (nuevaEntrada.AsignaturaIdentificador && obj.identificador === nuevaEntrada.AsignaturaIdentificador) })
                             if (!asig) {
                                 console.log("Quiere añadir un examen que no es suyo")
@@ -729,11 +861,15 @@ exports.guardarExamenes = function (req, res, next) {
                 if (toActualizar) {
                     if (!Array.isArray(toActualizar)) {
                         let nuevaEntrada = {};
-                        let identificador = Number(toActualizar.split("_")[2])
-                        nuevaEntrada.fecha = moment(toActualizar.split("_")[4], "DD/MM/YYYY");
+                        let hora = req.body["hora_" + toActualizar];
+                        let minutos = req.body["minutos_" + toActualizar];
+                        let identificador = Number(toActualizar.split("_")[1])
+                        nuevaEntrada.fecha = moment(req.body["date_" +toActualizar], "DD/MM/YYYY");
+                        nuevaEntrada.horaInicio = hora + ":" + minutos;
+                        nuevaEntrada.duracion = Number(req.body["duracion_" + toActualizar]);
                         let asig = as.find(function (obj) { return (identificador && obj['Examens.identificador'] === identificador) })
                         if (!asig) {
-                            next();
+                            console.log("Quiere actualizar un examen que no es suyo")
                         } else {
                             promises.push(models.Examen.update(
                                 nuevaEntrada, /* set attributes' value */
@@ -744,11 +880,15 @@ exports.guardarExamenes = function (req, res, next) {
                         let examensToActualizar = [];
                         toActualizar.forEach(function (element, index) {
                             let nuevaEntrada = {};
-                            let identificador = Number(element.split("_")[2])
-                            nuevaEntrada.fecha = moment(element.split("_")[4], "DD/MM/YYYY");
+                            let hora = req.body["hora_" + element];
+                            let minutos = req.body["minutos_" + element];
+                            let identificador = Number(element.split("_")[1])
+                            nuevaEntrada.fecha = moment(req.body["date_" +element], "DD/MM/YYYY");
+                            nuevaEntrada.horaInicio = hora + ":" + minutos;
+                            nuevaEntrada.duracion = Number(req.body["duracion_" + element]);
                             let asig = as.find(function (obj) { return (identificador && obj['Examens.identificador'] === identificador) })
                             if (!asig) {
-                                next();
+                                console.log("Quiere actulaizar un examen que no es suyo")
                             } else {
                                 promises.push(models.Examen.update(
                                     nuevaEntrada, /* set attributes' value */
@@ -757,6 +897,24 @@ exports.guardarExamenes = function (req, res, next) {
                             }
                         });
                     }
+                }
+                if (toEliminar) {
+                    if (!Array.isArray(toEliminar)) {
+                        let identificador = Number(toEliminar.split("_")[1])
+                        whereEliminar.identificador = Number(identificador);
+                    } else {
+                        whereEliminar.identificador = [];
+                        toEliminar.forEach(function (element, index) {
+                            let identificador = Number(element.split("_")[1]);
+                            whereEliminar.identificador.push(identificador);
+
+                        });
+                    }
+                    funciones.isEmpty(whereEliminar) === true ? whereEliminar.identificador = "Identificador erróneo" : whereEliminar = whereEliminar;
+                    let promise1 = models.Examen.destroy({
+                        where: whereEliminar
+                    })
+                    promises.push(promise1)
                 }
                 Promise.all(promises).then(() => {
                     next();
@@ -768,6 +926,121 @@ exports.guardarExamenes = function (req, res, next) {
             })
     } else {
         next();
+    }
+
+}
+
+exports.guardarFranjasExamenes = function (req, res, next) {
+    req.session.submenu = "Examenes"
+    let whereEliminar = {};
+    let pdID = req.session.pdID
+    let planID = req.session.planID
+    let departamentoID = req.session.departamentoID
+    let promises = [];
+    if (!res.locals.permisoDenegado) {
+        let toAnadir = req.body.anadir;
+        let toActualizar = req.body.actualizar;
+        let toEliminar = req.body.eliminar;
+        let queryToAnadir = []
+        return models.FranjaExamen.findAll(
+            {
+                where: {
+                    ProgramacionDocenteId: pdID
+                },
+                attributes: ["identificador"],
+                raw: true
+            })
+            .then(function (franjas) {
+                if (toAnadir) {
+                    if (!Array.isArray(toAnadir)) {
+                        let nuevaEntrada = {};
+                        let identificador = toAnadir.split("_")[0];
+                        let hora = req.body[identificador+"_hora"];
+                        let minutos = req.body[identificador + "_minutos"];
+                        nuevaEntrada.ProgramacionDocenteId = pdID;
+                        nuevaEntrada.periodo = toAnadir.split("_")[1];
+                        nuevaEntrada.horaInicio = hora + ":" + minutos;
+                        nuevaEntrada.duracion = Number(req.body[identificador + "_duracion"]);
+                        queryToAnadir.push(nuevaEntrada);
+                        
+                    } else {
+                        toAnadir.forEach(function (element, index) {
+                            let nuevaEntrada = {};
+                            let identificador = element.split("_")[0];
+                            let hora = req.body[identificador + "_hora"];
+                            let minutos = req.body[identificador + "_minutos"];
+                            nuevaEntrada.ProgramacionDocenteId = pdID;
+                            nuevaEntrada.periodo = element.split("_")[1];
+                            nuevaEntrada.horaInicio = hora + ":" + minutos;
+                            nuevaEntrada.duracion = Number(req.body[identificador + "_duracion"]);
+                            queryToAnadir.push(nuevaEntrada);
+                        });
+                    }
+                    let promise1 = models.FranjaExamen.bulkCreate(
+                        queryToAnadir
+                    )
+                    promises.push(promise1)
+                }
+                if (toActualizar) {
+                    if (!Array.isArray(toActualizar)) {
+                        let nuevaEntrada = {};
+                        let identificador = toActualizar.split("_")[0];
+                        let hora = req.body[identificador + "_hora"];
+                        let minutos = req.body[identificador + "_minutos"];
+                        nuevaEntrada.ProgramacionDocenteId = pdID;
+                        nuevaEntrada.periodo = toActualizar.split("_")[1];
+                        nuevaEntrada.horaInicio = hora + ":" + minutos;
+                        nuevaEntrada.duracion = Number(req.body[identificador + "_duracion"]);
+                        promises.push(models.FranjaExamen.update(
+                            nuevaEntrada, /* set attributes' value */
+                            { where: { identificador: identificador } } /* where criteria */
+                        ))
+                        
+                    } else {
+                        toActualizar.forEach(function (element, index) {
+                            let nuevaEntrada = {};
+                            let identificador = element.split("_")[0];
+                            let hora = req.body[identificador + "_hora"];
+                            let minutos = req.body[identificador + "_minutos"];
+                            nuevaEntrada.ProgramacionDocenteId = pdID;
+                            nuevaEntrada.periodo = element.split("_")[1];
+                            nuevaEntrada.horaInicio = hora + ":" + minutos;
+                            nuevaEntrada.duracion = Number(req.body[identificador + "_duracion"]);
+                            promises.push(models.FranjaExamen.update(
+                                nuevaEntrada, /* set attributes' value */
+                                { where: { identificador: identificador } } /* where criteria */
+                            ))
+                        });
+                    }
+                }
+                if (toEliminar) {
+                    if (!Array.isArray(toEliminar)) {
+                        let identificador = Number(toEliminar.split("_")[0])
+                        whereEliminar.identificador = Number(identificador);
+                    } else {
+                        whereEliminar.identificador = [];
+                        toEliminar.forEach(function (element, index) {
+                            let identificador = Number(element.split("_")[0]);
+                            whereEliminar.identificador.push(identificador);
+
+                        });
+                    }
+                    funciones.isEmpty(whereEliminar) === true ? whereEliminar.identificador = "Identificador erróneo" : whereEliminar = whereEliminar;
+                    let promise1 = models.FranjaExamen.destroy({
+                        where: whereEliminar
+                    })
+                    promises.push(promise1)
+                }
+                Promise.all(promises).then(() => {
+                    res.redirect("" + req.baseUrl + "/coordinador/franjasExamenes")
+                })
+                    .catch(function (error) {
+                        console.log("Error:", error);
+                        next(error);
+                    });
+            })
+    } else {
+        res.redirect("" + req.baseUrl + "/coordinador/franjasExamenes")
     }
 
 }

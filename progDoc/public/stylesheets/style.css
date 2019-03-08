@@ -108,6 +108,7 @@ html {
     padding: 15px 15px;
     height: 100%;
   }
+
   
   
   /* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
@@ -173,6 +174,14 @@ html {
   .space-above-below{
       padding: 20px 10px;
   }
+
+  .noBorde {
+      border:0 !important;
+  }
+
+  .noBordeInferior {
+    border-bottom:0 !important;
+  }
   
   .autocomplete {
     /*the container must be positioned relative:*/
@@ -194,6 +203,10 @@ html {
     color: #fff;
     cursor: pointer;
   }
+
+  input:disabled {
+  background: #ccc;
+}
   .autocomplete-items {
     position: absolute;
     border: 1px solid #d4d4d4;
@@ -244,3 +257,7 @@ html {
       color:  rgb(186, 82, 82);
    }
   
+
+   .solapa input{
+       border-color: rgb(186, 82, 82);
+   }

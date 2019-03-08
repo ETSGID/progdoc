@@ -1,4 +1,5 @@
 <body>
+<script src="<%=contextPath%>/js/funciones.js"></script>
 <div class="myHeader sticky">
     <p>Consultar Programación
         <% if ( session && session.pdID){ %>
@@ -35,6 +36,7 @@
         <button id='Profesores' class="tablinks" onclick="cambiarSubmenu(event, 'Profesores')">Profesores</button>
         <button id='Tribunales' class="tablinks" onclick="cambiarSubmenu(event, 'Tribunales')">Tribunales</button>
         <button id='Horarios' class="tablinks" onclick="cambiarSubmenu(event, 'Horarios')">Horarios</button>
+        <button id='Actividades' class="tablinks" onclick="cambiarSubmenu(event, 'Actividades')">Actividades</button>
         <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Exámenes</button>
         <button id='PDF' class="tablinks" onclick="cambiarSubmenu(event, 'PDF')">PDF</button>
     </div>
@@ -75,7 +77,11 @@ function cambiarSubmenu(evt, submenu) {
         let url = "<%=contextPath%>/consultar/horarios?planID="+pAcronimo
         window.location.replace(url);
     }
-        if (submenu === 'PDF'){
+    if (submenu === 'Actividades'){
+        let url = "<%=contextPath%>/consultar/actividades"
+        window.location.replace(url);
+    }
+    if (submenu === 'PDF'){
         let url = "<%=contextPath%>/consultar/PDF?planID="+pAcronimo
         window.location.replace(url);
     }
@@ -115,32 +121,17 @@ function cambiarDepart(){
     window.location.replace(url);
 }
 
-let parseQueryString = function() {
 
-    let str = window.location.search;
-    let objURL = {};
 
-    str.replace(
-        new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
-        function( $0, $1, $2, $3 ){
-            objURL[ $1 ] = $3;
-        }
-    );
-    return objURL;
-};
-
-let parseStringQuery = function ( obj ) {
-  return '?'+Object.keys(obj).reduce(function(a,k){a.push(k+'='+encodeURIComponent(obj[k]));return a},[]).join('&')
-}
 
 
 document.getElementsByTagName('body')[0].onload = actualizarSelectyBarra();
 function actualizarSelectyBarra() {
-    let selectValue = document.getElementById('plan').value
-    if(!selectValue) {
-        selectValue= "09TT"
+    let selectPlanValue = document.getElementById('plan').value
+    if(!selectPlanValue) {
+        selectPlanValue= "09TT"
     }
-    document.getElementById('selectPlan').value = selectValue;
+    document.getElementById('selectPlan').value = selectPlanValue;
 
     let departamento = document.getElementById('departamento');
     let selectDepartamento = document.getElementById('selectDepartamento');
