@@ -22,6 +22,7 @@
     "git": "^0.1.5",
     "html-pdf": "^2.2.0",
     "http-errors": "~1.6.2",
+    "json2csv": "^4.3.5",
     "method-override": "^2.3.10",
     "moment": "^2.22.2",
     "morgan": "~1.9.0",
@@ -29,6 +30,8 @@
     "normalize-path": "^3.0.0",
     "pg": "^6",
     "pg-hstore": "^2.3.2",
+    "rich-filemanager": "^2.7.6",
+    "rich-filemanager-node": "^0.1.5",
     "sequelize": "^4.37.6",
     "sequelize-cli": "^4.0.0",
     "serve-favicon": "^2.5.0"

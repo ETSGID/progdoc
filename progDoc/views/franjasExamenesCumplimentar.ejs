@@ -53,10 +53,10 @@
                                     if(parseInt(hora,10)<10)hora='0'+hora;
                                     if(parseInt(minutos,10)<10)minutos='0'+minutos;
                                         %>
-                                    <td><input type="number" min='0' max='23'   name='<%=franjasExamen[i].franjas[j].identificador%>_hora' placeholder="<%=hora%>" value="<%=hora%>" onblur="formatHora(this); MarcarChangeAsignatura('<%=franjasExamen[i].franjas[j].identificador%>','<%=franjasExamen[i].periodo%>')"><b>:</b>
-                                    <input type="number"  min='0' max='59' id='' name='<%=franjasExamen[i].franjas[j].identificador%>_minutos' placeholder="<%=minutos%>" value="<%=minutos%>" onblur="formatHora(this); MarcarChangeAsignatura('<%=franjasExamen[i].franjas[j].identificador%>','<%=franjasExamen[i].periodo%>')">
+                                    <td><input type="number" min='0' max='23'   name='<%=franjasExamen[i].franjas[j].identificador%>_hora' placeholder="<%=hora%>" value="<%=hora%>" onChange="formatHora(this); MarcarChangeAsignatura('<%=franjasExamen[i].franjas[j].identificador%>','<%=franjasExamen[i].periodo%>')"><b>:</b>
+                                    <input type="number"  min='0' max='59' id='' name='<%=franjasExamen[i].franjas[j].identificador%>_minutos' placeholder="<%=minutos%>" value="<%=minutos%>" onChange="formatHora(this); MarcarChangeAsignatura('<%=franjasExamen[i].franjas[j].identificador%>','<%=franjasExamen[i].periodo%>')">
                                     </td>
-                                    <td><input type="number" min='1' max='500' id='' name='<%=franjasExamen[i].franjas[j].identificador%>_duracion' placeholder="<%=duracion%>" value="<%=duracion%>" onblur="MarcarChangeAsignatura('<%=franjasExamen[i].franjas[j].identificador%>','<%=franjasExamen[i].periodo%>')"></td>
+                                    <td><input type="number" min='1' max='500' id='' name='<%=franjasExamen[i].franjas[j].identificador%>_duracion' placeholder="<%=duracion%>" value="<%=duracion%>" onChange="MarcarChangeAsignatura('<%=franjasExamen[i].franjas[j].identificador%>','<%=franjasExamen[i].periodo%>')"></td>
                                     <td><button type="button" onclick="Eliminar('<%=franjasExamen[i].franjas[j].identificador%>', '<%=franjasExamen[i].periodo%>' )">Eliminar</button></td>
                                 </tr>
                                 <%}%>
@@ -99,9 +99,9 @@ function Anadir(franjaPeriodo){
     let cell0 = row.insertCell(0);
     let cell1 = row.insertCell(1);
     let cell2 = row.insertCell(2);
-    cell0.innerHTML=`<input type ="number" min='0' max='23' name='nuevo${numeroIncrementable}_hora' placehoder='08' value='08'  onblur="formatHora(this); solapaFranjas('${franjaPeriodo}')"><b>:</b>
-                        <input type="number"  min='0' max='59' name='nuevo${numeroIncrementable}_minutos' placeholder="00" value="00"  onblur="formatHora(this); solapaFranjas('${franjaPeriodo}')">`
-    cell1.innerHTML=`<input type="number" min='1' max='500' name='nuevo${numeroIncrementable}_duracion' placeholder="120" value="120" onblur="solapaFranjas('${franjaPeriodo}')">`
+    cell0.innerHTML=`<input type ="number" min='0' max='23' name='nuevo${numeroIncrementable}_hora' placehoder='08' value='08'  onChange="formatHora(this); solapaFranjas('${franjaPeriodo}')"><b>:</b>
+                        <input type="number"  min='0' max='59' name='nuevo${numeroIncrementable}_minutos' placeholder="00" value="00"  onChange="formatHora(this); solapaFranjas('${franjaPeriodo}')">`
+    cell1.innerHTML=`<input type="number" min='1' max='500' name='nuevo${numeroIncrementable}_duracion' placeholder="120" value="120" onChange="solapaFranjas('${franjaPeriodo}')">`
     cell2.innerHTML=`<button type="button" onclick="Eliminar2('nuevo${numeroIncrementable}', '${franjaPeriodo}')">Eliminar</button>
                         <input type ="hidden"  name='anadir' id='nuevo${numeroIncrementable}' value='nuevo${numeroIncrementable}_${franjaPeriodo}'>`
     numeroIncrementable++;

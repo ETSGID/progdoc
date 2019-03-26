@@ -8,15 +8,17 @@ let permisosControllerProgDoc = require('../controllers/permisos_controllerProgD
 let jefeController = require('../controllers/abrirprogdoc_controller');
 let gestionController = require('../controllers/JE_controller')
 let menuProgDocController = require('../controllers/menuProgDoc_controller')
-let coordinadorController = require('../controllers/coordinador_controller')
+let horarioController = require('../controllers/horario_controller')
 let gruposController = require('../controllers/grupos_controller')
 let gestionRoles = require('../controllers/gestion_controller')
 let estadoController = require("../controllers/estado_controller")
 let infopdfprogdocController = require('../controllers/infopdfprogdoc_controller')
 let historialController = require('../controllers/historial_controller')
 let acronimosController = require('../controllers/acronimos_controller')
+let examenController = require('../controllers/examen_controller')
 let estados = require('../estados');
 let enumsPD = require('../enumsPD');
+
 
 
 
@@ -61,7 +63,7 @@ router.get('/Historial', function (req, res, next) {
   req.session.menu.push("drop_ProgDoc")
   req.session.menu.push("element_ProgDocHistorial")
   next()
-}, menuProgDocController.getPlanes, historialController.getPDsWithPdf, menuProgDocController.getHistorial);
+}, menuProgDocController.getPlanes, menuProgDocController.getHistorial);
 //ruta para comprobar permisos para Asignar profesores(responsableDocente es principal)
 router.get('/Gestion',   function (req, res, next) {
   req.session.menu = [];
@@ -192,7 +194,7 @@ router.get('/coordinador/horarios', menuProgDocController.getProgramacionDocente
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, coordinadorController.getHorario);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, horarioController.getHorario);
 
 
 router.get('/coordinador/examenes', menuProgDocController.getProgramacionDocente, function (req, res, next) {
@@ -205,8 +207,8 @@ router.get('/coordinador/examenes', menuProgDocController.getProgramacionDocente
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.getFranjas, coordinadorController.getExamenes);
-router.get('/consultar/examenes', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, coordinadorController.getFranjas, coordinadorController.getExamenes);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, examenController.getFranjas, examenController.getExamenes, examenController.getExamenesView);
+router.get('/consultar/examenes', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, examenController.getFranjas, examenController.getExamenes, examenController.getExamenesView);
 
 router.get('/coordinador/franjasexamenes', menuProgDocController.getProgramacionDocente, function (req, res, next) {
   res.locals.rols.push({
@@ -218,9 +220,10 @@ router.get('/coordinador/franjasexamenes', menuProgDocController.getProgramacion
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.getFranjas, coordinadorController.getFranjasExamenes);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, examenController.getFranjas, examenController.getFranjasView);
 
-router.get('/consultar/horarios', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, menuProgDocController.getGrupos, coordinadorController.getHorario);
+
+router.get('/consultar/horarios', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, menuProgDocController.getGrupos, horarioController.getHorario);
 router.post('/coordinador/guardarHorarios', function (req, res, next) {
   res.locals.rols.push({
     rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
@@ -231,7 +234,7 @@ router.post('/coordinador/guardarHorarios', function (req, res, next) {
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.guardarHorarios, coordinadorController.reenviar);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, horarioController.guardarHorarios, horarioController.reenviar);
 
 router.post('/coordinador/guardarExamenes', function (req, res, next) {
   res.locals.rols.push({
@@ -243,7 +246,7 @@ router.post('/coordinador/guardarExamenes', function (req, res, next) {
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.guardarExamenes, coordinadorController.reenviarExamenes);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, examenController.guardarExamenes, examenController.getExamenes, examenController.generateCsvExamens, examenController.reenviarExamenes);
 
 router.post('/coordinador/guardarFranjasExamenes', function (req, res, next) {
   res.locals.rols.push({
@@ -255,7 +258,7 @@ router.post('/coordinador/guardarFranjasExamenes', function (req, res, next) {
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.guardarFranjasExamenes);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, examenController.guardarFranjasExamenes);
 
 router.post('/coordiandor/aprobarHorarios', function (req, res, next) {
   res.locals.rols.push({
@@ -267,7 +270,7 @@ router.post('/coordiandor/aprobarHorarios', function (req, res, next) {
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.guardarHorarios, coordinadorController.aprobarHorarios);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, horarioController.guardarHorarios, horarioController.aprobarHorarios);
 
 router.post('/coordiandor/aprobarExamenes', function (req, res, next) {
   res.locals.rols.push({
@@ -279,7 +282,7 @@ router.post('/coordiandor/aprobarExamenes', function (req, res, next) {
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, coordinadorController.guardarExamenes, coordinadorController.aprobarExamenes);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, examenController.guardarExamenes, examenController.aprobarExamenes, examenController.getExamenes,examenController.generateCsvExamens, examenController.reenviarExamenes);
 
 router.get('/consultar/grupos', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, gruposController.getGrupos);
 

@@ -23,6 +23,7 @@
         <button id='Roles' class="tablinks" onclick="cambiarSubmenu(event, 'Roles')">Roles</button>
         <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')" title="Próximamente" disabled>Calendario</button>
         <button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>
+        <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Exámenes</button>
         <button id='Acronimos' class="tablinks" onclick="cambiarSubmenu(event, 'Acronimos')">Acrónimos</button>
     </div>
 
@@ -58,6 +59,10 @@ window.location.replace(url);
 } 
 if (submenu === 'Roles'){
 let url = "<%=contextPath%>/gestionRoles"
+window.location.replace(url);
+}
+if (submenu === 'Examenes'){
+let url = "<%=contextPath%>/csvExamenes"
 window.location.replace(url);
 }
 if (submenu === 'Acronimos'){

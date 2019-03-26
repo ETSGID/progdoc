@@ -136,10 +136,10 @@
                                     if(parseInt(hora,10)<10)hora='0'+hora;
                                     if(parseInt(minutos,10)<10)minutos='0'+minutos;
                                         %>
-                                     <td><input type="number" min='0' max='23' id='hora_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>'   name='hora_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="<%=hora%>" value="<%=hora%>" onblur="formatHora(this);Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>><b>:</b>
-                                    <input type="number"  min='0' max='59' id='minutos_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' name='minutos_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="<%=minutos%>" value="<%=minutos%>" onblur="formatHora(this);Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>>
+                                     <td><input type="number" min='0' max='23' id='hora_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>'   name='hora_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="<%=hora%>" value="<%=hora%>" onChange="formatHora(this);Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>><b>:</b>
+                                    <input type="number"  min='0' max='59' id='minutos_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' name='minutos_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="<%=minutos%>" value="<%=minutos%>" onChange="formatHora(this);Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>>
                                     </td>
-                                    <td><input type="number" min='0' max='500' id='duracion_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' name='duracion_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="<%=duracion%>" value="<%=duracion%>" onblur="Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>></td>
+                                    <td><input type="number" min='0' max='500' id='duracion_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' name='duracion_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="<%=duracion%>" value="<%=duracion%>" onChange="Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>></td>
                                 </tr>
                                 <%}%>
                                 </tbody>
@@ -285,7 +285,10 @@ function Change(id){
         hora.disabled = true;
         minutos.disabled = true;
         duracion.disabled = true;
+        franja.value="-"
         franja.disabled = true;
+
+
         if (id.split("_")[1] === ""){
             elementHidden.setAttribute('name', "momentaneo2");
             document.getElementById(id).classList.remove("solapa");
@@ -308,6 +311,7 @@ function Change(id){
         elementHidden.setAttribute('name', "actualizar");
         isExamenInFranjas(id)
     }
+
 }
 
 //cuando cambia la hora los minutos o la duracion
@@ -396,7 +400,6 @@ function mostrarCalendario(id){
     let fechaLimiteInicio = fechasLimite[periodoKey][0]
     let fechaLimiteFinal = fechasLimite[periodoKey][1]
     if(text === 'Calendario'){
-        let body = document.getElementById("body_table_"+id)
         //borro lo que había en el body para repintarlo
         while (tableBody.firstChild) {
             tableBody.removeChild(tableBody.firstChild);
@@ -430,7 +433,7 @@ function mostrarCalendario(id){
                     }                    
                     for(let l=0; l<cursos.length; l++){
                         let cell = row.insertCell();
-                        cell.innerHTML =""
+                        cell.innerHTML ="&nbsp"
                         let condicionFranja = sinFranjas === 1 ? "-" : ""+(+k+1)
                         let coincidencias = estadoExamenes.filter(
                         //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
@@ -454,6 +457,11 @@ function mostrarCalendario(id){
         }
         //borro las últimas filas que no hay
         if(ultimoEncontrado !== -1){
+            if(period.franjas.length > 0){
+                if((ultimoEncontrado+1)%period.franjas.length > 0){
+                    ultimoEncontrado += period.franjas.length-(ultimoEncontrado+1)%period.franjas.length
+                }
+            }
             for (let n=tableBody.rows.length -1; n>ultimoEncontrado; n--){
                 tableBody.deleteRow(n);
             }
@@ -515,6 +523,7 @@ function cambiarFranjaExamen(id){
    
     //debo comprobar que no solape si elige -
     isExamenInFranjas(id)
+    Change2(id)
 
 }
 

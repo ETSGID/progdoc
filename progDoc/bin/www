@@ -7,13 +7,21 @@
 require('dotenv').config({ path: './file.env' })
 
 let app = require('../app');
+const normalize = require('normalize-path');
+let path = require('path');
+let menuProgDocController = require('../controllers/menuProgDoc_controller')
 let debug = require('debug')('portalalumno:server');
 let http = require('http');
 let local = app.local;
 
+
+
+let ruta = path.join(normalize(process.env.PATH_PDF), 'pdfs', 'files')
+menuProgDocController.ensureDirectoryExistence(ruta)
 /**
  * Get port from environment and store in Express.
  */
+
 
 let port = normalizePort(process.env.PORT);
 app.set('port', port);

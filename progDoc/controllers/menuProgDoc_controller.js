@@ -4,6 +4,43 @@ let Sequelize = require('sequelize');
 const op = Sequelize.Op;
 let estados = require('../estados');
 let funciones = require('../funciones');
+const fs = require('fs')
+const path = require('path')
+
+
+
+exports.ensureDirectoryExistence = function probar(filePath) {
+    let dirname = path.dirname(filePath);
+    if (fs.existsSync(dirname)) {
+        return true;
+    }
+    probar(dirname);
+    fs.mkdirSync(dirname);
+}
+
+
+//devuelve el tipo de la PD a partir del id
+//PD_09TT_201819_I_v1
+exports.getPlanPd = function (pdID) {
+    return pdID ? pdID.split("_")[1] : null;
+}
+//devuelve el ano de la PD a partir del id
+//PD_09TT_201819_I_v1
+exports.getAnoPd = function(pdID){
+ return  pdID ? pdID.split("_")[2] : null;
+}
+
+//devuelve el tipo de la PD a partir del id
+//PD_09TT_201819_I_v1
+exports.getTipoPd = function (pdID) {
+    return pdID ?  pdID.split("_")[3] : null;
+}
+
+//devuelve el version de la PD a partir del id
+//PD_09TT_201819_I_v1
+exports.getVersionPd = function (pdID) {
+    return  pdID ? pdID.split("_")[4] : null;
+}
 
 exports.getPlanes = function (req, res, next) {
     let planID = req.query.planID;

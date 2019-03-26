@@ -5,6 +5,10 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let partials = require('express-partials');
 let morgan = require('morgan');
+const filemanager = require('rich-filemanager-node'); 
+
+
+
 
 //context path para la aplicacion en el servidor
 let session = require('express-session');
@@ -15,6 +19,8 @@ const local = process.env.DEV;
 exports.local = local;
 const pathPDF = normalize(process.env.PATH_PDF);
 exports.pathPDF = pathPDF;
+//fichero de configuracion del gestor de archivos
+const config = __dirname + "/public/config/filemanager.config.json";
 //cas autentication
 let CASAuthentication = require('cas-authentication');
 // Create a new instance of CASAuthentication.
@@ -51,12 +57,16 @@ app.use(morgan('combined', {
 }))
 app.use(partials());
 
+
 //app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(path.join(contextPath, 'pdfs'), express.static(path.join(pathPDF, 'pdfs')));
+app.use(path.join(contextPath, 'archivos'), express.static(path.join(__dirname, 'public')));
 app.use(contextPath, express.static(path.join(__dirname, 'public')));
+
+
 
 
 
@@ -82,6 +92,8 @@ app.use(session({
   //exit del cas el primero para que no entre en bucle. El cas es el encargado de eliminar la sesión
   app.get(path.join(contextPath, 'logout'), cas.logout);
   
+
+
 
   // Helper dinamico:
   app.use(cas.bounce, function (req, res, next) {
@@ -138,7 +150,10 @@ app.use(session({
       next();
     }
   });
-  
+  //gestor de archivos, puede acceder todo el mundo que esté en progdoc o sea profesor
+  //debe existir esa carpeta sino dara error
+app.use(path.join(contextPath, 'archivos/filemanager'), filemanager((path.join(pathPDF, 'pdfs')), config));
+  app.use(path.join(contextPath, 'archivos'), express.static('node_modules/rich-filemanager'));
   //router para contexto
   app.use(contextPath, router);
 

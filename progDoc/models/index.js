@@ -6,7 +6,7 @@ let app = require('../app')
 let Sequelize = require('sequelize');
 
 //    DATABASE_URL = postgres://user:passwd@host:port/database
-let logs = process.env.DEV === 'true' ? true : false
+let logs = process.env.DEV === 'true' ? false : false
 let sequelize;
 let sequelizeSession;
 if (process.env.DOCKER === 'true'){
