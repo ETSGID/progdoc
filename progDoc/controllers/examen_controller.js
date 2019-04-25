@@ -479,7 +479,7 @@ exports.guardarExamenes = function (req, res, next) {
                         whereEliminar.identificador = [];
                         toEliminar.forEach(function (element, index) {
                             let identificador = Number(element.split("_")[1]);
-                            whereEliminar.identificador.pspush(identificador);
+                            whereEliminar.identificador.push(identificador);
 
                         });
                     }
