@@ -142,7 +142,7 @@ router.get("/respDoc/editAsignacion/cambioModo", menuProgDocController.getProgra
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, respController.changeModeAsignacion, respController.getAsignaciones);
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, respController.changeModeAsignacion);
 
 router.post("/respDoc/aprobarAsignacion", function (req, res, next) {
   res.locals.rols.push({

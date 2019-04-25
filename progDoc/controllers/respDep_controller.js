@@ -253,7 +253,7 @@ exports.changeModeAsignacion = function (req,res,next){
                     { where: { identificador: asign.identificador } } /* where criteria */
                 )}).then(() => { 
                 req.session.save(function () {
-                    next();
+                    res.redirect("" + req.baseUrl + "/respDoc/profesores")
                 })
             })
             .catch(function (error) {
@@ -262,7 +262,7 @@ exports.changeModeAsignacion = function (req,res,next){
             });
     } else {
         req.session.save(function () {
-            next();
+            res.redirect("" + req.baseUrl + "/respDoc/profesores")
         })
     }
 }
