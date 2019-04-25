@@ -4,328 +4,240 @@
   <p><%=estado%></p>
 <%}else{ %>
 <h3>Gestión Roles Aplicacion</h3>
-<h3><em>Roles comunes a todas las titulaciones</em></h3>
-<div id='hermanoNuevoProfesorForm'>
-    <div class="container">
-        <div class="row col-sm space-above-below">
-            <span class="col-sm-4"></span>
-            <span class="col-sm-4"></span> 
-            <span class="col-sm-4"></span>
-        </div>
-        <% for(var i=0; i < roles.length; i++){ %>
-            <% if(roles[i].rol==="JefeEstudios"){  %>
-                <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                    <% if(!prof){
-                        prof={}
-                        prof.nombre="NO ASIGNADO";
-                        prof.nombreCorregido = "NO ASIGNADO";
-                    }%>
-        <div id="<%=roles[i].rol %>">
-        <div class="row col-sm space-above-below">
-            <div class="col-sm-5" >Jefe De Estudios</div>
-             <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'>
-                <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                placeholder="<%=prof.nombre %>"></input>
-                <input type="hidden" id="<%=roles[i].rol %>" name="rol" value="<%=roles[i].rol %>" />
-                <input type="hidden"  name="rol" placeholder="<%=roles[i].rol %>_<%=roles[i].PersonaId %>_<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>" />
-            </div>
-        </div>
-        </div>
-            <% } %>
-        <% } %>
-            <% for(var i=0; i < roles.length; i++){ %>
-            <%  if(roles[i].rol==="SubdirectorPosgrado"){ %>
-                <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                    <% if(!prof){
-                        prof={}
-                        prof.nombre="NO ASIGNADO";
-                        prof.nombreCorregido = "NO ASIGNADO";
-                    }%>
-        <div id="<%=roles[i].rol %>">
-        <div class="row col-sm space-above-below">
-            <div class="col-sm-5">Subdirector de Posgrado</div>
-            <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'>
-               <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-               <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-               placeholder="<%=prof.nombre %>"></input>
-                <input type="hidden" id="<%=roles[i].rol %>" name="rol" value="<%=roles[i].rol %>" />
-                <input type="hidden"  name="rol" placeholder="<%=roles[i].rol %>_<%=roles[i].PersonaId %>_<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>" />
-            </div>
-        </div>
-        </div>
-            <% } %>
-        <% } %>
-            <% for(let i=0; i < roles.length; i++){ %>
-            <% if(roles[i].rol==="SecretarioTitulacion"){ %>
-                <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                    <% if(!prof){
-                        prof={}
-                        prof.nombre="NO ASIGNADO";
-                        prof.nombreCorregido = "NO ASIGNADO";
-                    }%>
-                <div id="<%=roles[i].rol %>">
-                <div class="row col-sm space-above-below">
-                    <div class="col-sm-5">Secretaría Jefe De Estudios</div>
-                    <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'>
-                        <p id='p_<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                        <input id='<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                        placeholder="<%=prof.nombre %>"></input>
-                        <input type="hidden" id="<%=roles[i].rol %>" name="rol" value="<%=roles[i].rol %>" />
-                        <input type="hidden"  name="rol" value="<%=roles[i].rol %>_<%=roles[i].PersonaId %>_<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>" />
-                    </div>
-                </div>
-                </div>
-            <% }%>
-        <% } %>
-        
-        <div class="row col-sm space-above-below">
-                <div class="row col-sm space-above-below">
-                    <span class="col-sm-4"><u>Directores Departamentos</u>
-                </div>
-                <% for(var i=0; i < roles.length; i++) { %>
-                    <% for(var j=0; j < departamentos.length; j++) {
-                        departamentos[j].nom = departamentos[j].acronimo !== null ? departamentos[j].acronimo : departamentos[j].codigo %>
-                        <% if(roles[i].DepartamentoCodigo===departamentos[j].codigo&&roles[i].rol==='DirectorDepartamento'){ %>
-                            <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                            <% if(!prof){
-                                prof={}
-                                prof.nombre="NO ASIGNADO";
-                                prof.nombreCorregido = "NO ASIGNADO";
-                            }%>
-                <div id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>">
-                <div class="row col-sm space-above-below">
-                            
-                    <div class="col-sm-5"><span title="<%=departamentos[j].nombre.toLowerCase()%>"><%=departamentos[j].nom%></span></div>
-                    <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'>
-                        <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                        <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                        placeholder="<%=prof.nombre %>"></input>
-                        <input type="hidden"  name="rol" value="<%=roles[i].rol %>" />
-                        <input type="hidden"  name="PersonaId" value="<%=roles[i].PersonaId %>" />
-                        <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
-                        <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
-                    </div>
-                </div>
-                </div>
-                        <% } %>
-                    <% } %>
-                <% } %>
-                    
-        </div>
-        <div class="row col-sm-12 space-above-below dropdown">
-                <div class="row col-sm space-above-below">
-                    <h3><em><span class="col-sm-4">Roles específicos de titulación</span></em></h3>
-                        <span clas="col-sm-3">
-                    </span>
-                    <span>
-                        <Select id="selectCoordinador" >
-                            <% for(let i=0; i < planEstudios.length; i++) { 
-                                if (planEstudios[i].nombre !== null && (planID !== planEstudios[i].codigo)){ %>
-                            <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option>
-                                <% }else if (planEstudios[i].nombre !== null && (planID === planEstudios[i].codigo)){ %>
-                            <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)" selected><%=planEstudios[i].nombre%></option>  
-                                <%}else if (planEstudios[i].nombre === null && (planID !== planEstudios[i].codigo)) {%>
-                            <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].codigo%></option>
-                            <%}else{%>
-                            <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>"  title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"selected><%=planEstudios[i].codigo%></option>
-                                <%}
-                            }%>
-                        </Select>
-                    </span>
-                </div>
-                <div class="row col-sm space-above-below">
-                <% for(var i=0; i < roles.length; i++){ %>
-                    <% for(var j=0; j < planEstudios.length; j++){ %>
-                        <% if(roles[i].rol==="CoordinadorTitulacion"&&(roles[i].PlanEstudioCodigo === planEstudios[j].codigo)&&(planEstudios[j].nombre !==null)){  %>
-                    <div style="display:none" class="Coordinador"  id="Coordinador_<%=planEstudios[j].codigo%>">
-                    <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                    <% if(!prof){
-                        prof={}
-                        prof.nombre="NO ASIGNADO";
-                        prof.nombreCorregido = "NO ASIGNADO";
-                    }%>
-                    <div id="<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo %>">
-                        <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">       
-                            <div class="col-sm-5" >Coordinador</div>    
-                            <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5">
-                                <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                                <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                                placeholder="<%=prof.nombre %>"></input>
-                                        <input type="hidden"  name="rol" value="<%=roles[i].rol %>" />
-                                        <input type="hidden"  name="PersonaId" value="<%=roles[i].PersonaId %>>" />
-                                        <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
-                                        <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
-                            </div>
-                        </div>
-                    </div>          
-                    </div>
-                    <% }%>
-                    <% if(roles[i].rol==="CoordinadorTitulacion" && roles[i].PlanEstudioCodigo === planEstudios[j].codigo&&(planEstudios[j].nombre ===null)){  %>
-                    <div style="display:none" class="Coordinador"  id="Coordinador_<%=planEstudios[j].codigo%>">
-                    <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                    <% if(!prof){
-                        prof={}
-                        prof.nombre="NO ASIGNADO";
-                        prof.nombreCorregido = "NO ASIGNADO";
-                    }%>
-                    <div id="<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo %>" >
-                        <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">
-                            <div class="col-sm-5" >Coordinador <%=planEstudios[j].codigo %></div>
-                            <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5">
-                            <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                            <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                            placeholder="<%=prof.nombre %>"></input>
-                                    <input type="hidden"  name="rol" value="<%=roles[i].rol %>" />
-                                    <input type="hidden"  name="PersonaId" value="<%=roles[i].PersonaId %>>" />
-                                    <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
-                                    <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
-                            </div>
-                        </div>
-                    </div>          
-                    </div>
-
-                     <% } %>
-                    
-                    <% } %>
-                <% } %>
-                  
-            <div><u>Responsables Docentes</u></div>
-                          
-            <% for(var i=0; i < roles.length; i++){ %>
-                <% for(var j=0; j < planEstudios.length; j++){ %> 
-                    <% if(roles[i].rol==="ResponsableDocente"&&(roles[i].PlanEstudioCodigo === planEstudios[j].codigo)&&(planEstudios[j].nombre !==null)){  %>
-                        <div style="display:none" class="ResponsableDocente"  id="ResponsableDocente_<%=planEstudios[j].codigo%>">
-                        <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                        <% if(!prof){
-                            prof={}
-                            prof.nombre="NO ASIGNADO";
-                            prof.nombreCorregido = "NO ASIGNADO";
-                        }%>
-                        <div id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre %>">
-                            <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">
-                                <% for(let p=0; p < departamentos.length; p++){ 
-                                    departamentos[p].nom = departamentos[p].acronimo !== null ? departamentos[p].acronimo : departamentos[p].codigo%>
-                                    <% if(roles[i].DepartamentoCodigo === departamentos[p].codigo){ %>
-                                        <div class="col-sm-5"><span title="<%=departamentos[p].nombre.toLowerCase()%>"><%=departamentos[p].nom%></span></div>
-                                    <% }%> 
-                                <% }%>
-                                <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5">
-                                    <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                                    <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                                    placeholder="<%=prof.nombre %>"></input>
-                                            <input type="hidden"  name="rol" value="<%=roles[i].rol %>" />
-                                            <input type="hidden"  name="PersonaId" value="<%=roles[i].PersonaId %>>" />
-                                            <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
-                                            <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <% }%>
-                    <% if(roles[i].rol==="ResponsableDocente"&&(roles[i].PlanEstudioCodigo === planEstudios[j].codigo)&&(planEstudios[j].nombre ===null)){  %>
-                        <div style="display:none" class="ResponsableDocente"  id="ResponsableDocente_<%=planEstudios[j].codigo%>">
-                        <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                        <% if(!prof){
-                            prof={}
-                            prof.nombre="NO ASIGNADO";
-                            prof.nombreCorregido = "NO ASIGNADO";
-                        }%>
-                        <div id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre %>">
-                            <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">
-                                <% for(var p=0; p < departamentos.length; p++){ 
-                                    departamentos[p].nom = departamentos[p].acronimo !== null ? departamentos[p].acronimo : departamentos[p].codigo%>
-                                    <% if(roles[i].DepartamentoCodigo === departamentos[p].codigo){ %>
-                                        <div class="col-sm-5"><span title="<%=departamentos[p].nombre.toLowerCase()%>"><%=departamentos[p].nom%></span></div>
-                                    <% }%> 
-                                <%}%>
-                                <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5">
-                                    <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                                    <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                                    placeholder="<%=prof.nombre %>"></input>
-                                            <input type="hidden"  name="rol" value="<%=roles[i].rol %>" />
-                                            <input type="hidden"  name="PersonaId" value="<%=roles[i].PersonaId %>>" />
-                                            <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
-                                            <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <% }%> 
-                    <% } %>
-                <% } %>
-            </div>
-        </div>
-    </div> 
-    <div class="container">
-        <div class="row col-sm space-above-below">
-            <span class="col-sm-4"></span>
-            <span class="col-sm-4"></span> 
-            <span class="col-sm-4"></span>
-        </div>
-    </div>
-</div> 
-<%- include nuevoProfesor.ejs %>
-<%}%>
-</div>
-<script>
-    let profesores = <%-JSON.stringify(profesores)%>
-    let planID = <%-JSON.stringify(planID)%>
-    let planEstudios = <%-JSON.stringify(planEstudios)%>
-function mostrar(id){
-  let celda = document.getElementById("div_"+id);
-  //debo hacer lo de p y p2 pq al aceptar en el buscador me vuelve a entrar aqui uso el id de p como flag 
-  let p = document.getElementById("p_"+id);
-  let p2 = document.getElementById("p_"+id+"_provisional")
-  let input = document.getElementById(id)
-  let nameInput = input.getAttribute('name');
-  if (p){
-    //creo el div para encapsular la busqueda
-    let div = document.createElement('div');
-    div.innerHTML = '<div class="autocomplete col-sm-12"></div>'
-    let nuevo = div.firstChild;
-    celda.appendChild(nuevo)
-    nuevo.appendChild(input)
-    celda.removeChild(p);
-    let nuevoValor = input.getAttribute('placeholder')
-    if (input.getAttribute('value')){
-      input.setAttribute('value', '' )
-    }
-    input.setAttribute('type', 'text')
-    autocomplete(input, profesores, profesores2, 'tribunales');
-  }else if(p2){
-    p2.setAttribute('id', "p_"+id);
-  }
-  input.focus();
+<% let filterByRol = function (roles, rol, plan, departamento){
+    let filtro
+    if (departamento) filtro = r => ((r.rol === rol && r.PlanEstudioCodigo === plan && r.DepartamentoCodigo === departamento))
+    else filtro = r => ((r.rol === rol && r.PlanEstudioCodigo === plan))
+    let found = roles.filter(
+        filtro
+    );
+    return found;
+}%>
+<% let buscaPers = function (profesores, id){
+let prof = profesores.find(function (obj) { return obj.identificador === id; });
+if(!prof){
+    prof={}
+    prof.nombre="No asignado";
+    prof.nombreCorregido = "No asignado";
 }
+return prof
+}%>
+<% let buscaDep = function (departamentos, id){
+let dep = departamentos.find(function (obj) { return obj.codigo=== id; });
+if(!dep.acronimo){
+    dep.nom = dep.codigo
+}else{
+    dep.nom= dep.acronimo
+}
+return dep
+}%>
+    <h3><em>Roles comunes a todas las titulaciones</em></h3>
+     <table class="table">          
+        <tbody id='body_tb_departamentos'>
+            <% 
+            let rol = rolesEnum.JefeEstudios
+            let departamento = null
+            let plan = null
+            let rols = filterByRol(roles, rol, plan, departamento)
+            rols.forEach(function(r,index){ %>
+                <tr>
+                <td>
+                Jefe de Estudios
+                </td>
+                <td>
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                </td>
+                <td>&nbsp</td>
+                </tr>
+            <%})%>
+             <% 
+            rol = rolesEnum.SecretarioTitulacion
+            departamento = null
+            plan = null
+            rols = filterByRol(roles, rol, plan, departamento)
+            rols.forEach(function(r,index){ %>
+                <tr>
+                <td>
+                Secretaría Jefe de Estudios
+                </td>
+                <td>
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                </td>
+                <td>&nbsp</td>
+                </tr>
+            <%})%>
+           
+            <% 
+            rol = rolesEnum.SubdirectorPosgrado
+            departamento = null
+            plan = null
+            rols = filterByRol(roles, rol, plan, departamento)
+            rols.forEach(function(r,index){ %>
+                <tr>
+                <td>
+                SubdirectorPosgrado
+                </td>
+                <td>
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                </td>
+                <td>&nbsp</td>
+                </tr>
+            <%})%>
+            <tr>
+            <td><u>Directores departamentos</u></td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            </tr>
+            <%
+            rol = rolesEnum.DirectorDepartamento 
+            departamento = null
+            plan = null
+            let directores = filterByRol(roles, rol, plan, departamento)
+            directores.forEach(function(r,index){ %>
+                <% departamento = r.DepartamentoCodigo%>
+                <tr>
+                <td title="<%=buscaDep(departamentos,departamento).nombre.toLowerCase()%> (<%=departamento%>)">
+                <%=buscaDep(departamentos,departamento).nom%>
+                </td>
+                <td>
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                </td>
+                <td>&nbsp</td>
+                </tr>
+            <%let rol2 = rolesEnum.DirectorDepartamentoX2 
+            let delegado = filterByRol(roles, rol2, plan, departamento)
+            if (delegado.length === 0) prof = buscaPers(profesores, null)
+            else prof = buscaPers(profesores, delegado[0].PersonaId);
+            %>
+            <tr>
+            <td style="border: 0; padding-left:5em">
+            <em>Delegado en<em>
+            </td>
+            <td>
+            <p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
+            </td>
+            <td>&nbsp</td>
+            </tr>
+            <%})%>
+            <tr id="foco">
+            <td></td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3 style="display:inline;"><em>Roles específicos de titulación</em></h3>
+    <select id="selectCoordinador" onChange="cambiarPDCoordinador()" >
+        <% for(let i=0; i < planEstudios.length; i++) { 
+            if (planEstudios[i].nombre !== null && (planID !== planEstudios[i].codigo)){ %>
+        <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option>
+            <% }else if (planEstudios[i].nombre !== null && (planID === planEstudios[i].codigo)){ %>
+        <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)" selected><%=planEstudios[i].nombre%></option>  
+            <%}else if (planEstudios[i].nombre === null && (planID !== planEstudios[i].codigo)) {%>
+        <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].codigo%></option>
+        <%}else{%>
+        <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>"  title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"selected><%=planEstudios[i].codigo%></option>
+            <%}
+        }%>
+    </select>
+    <table class="table">          
+        <tbody id='body_tb_departamentos'>
+            <% 
+            rol = rolesEnum.CoordinadorTitulacion
+            departamento = null
+            plan = planID
+            rols = filterByRol(roles, rol, plan, departamento)
+            rols.forEach(function(r,index){ %>
+                <tr>
+                <td>
+                Coordinador Titulación
+                </td>
+                <td>
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                </td>
+                <td>&nbsp</td>
+                </tr>
+            <%let rol2 = rolesEnum.CoordinadorTitulacionX2 
+            delegado = filterByRol(roles, rol2, plan, departamento)
+            if (delegado.length === 0) prof = buscaPers(profesores, null)
+            else prof = buscaPers(profesores, delegado[0].PersonaId);
+            %>
+            <tr>
+            <td style="border: 0; padding-left:5em">
+            <em>Delegado en<em>
+            </td>
+            <td>
+            <p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
+            </td>
+            <td>&nbsp</td>
+            </tr>
+            <%})%>         
+            <tr>
+            <td><u>Responsables Docentes</u></td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            </tr>
+            <%
+            rol = rolesEnum.ResponsableDocente
+            departamento = null
+            plan = planID
+            responsables = filterByRol(roles, rol, plan, departamento) 
+            responsables.forEach(function(r,index){ %>
+                <% departamento = r.DepartamentoCodigo%>
+                <tr>
+                <td title="<%=buscaDep(departamentos,departamento).nombre.toLowerCase()%> (<%=departamento%>)">
+                <%=buscaDep(departamentos,departamento).nom%>
+                </td>
+                <td>
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                </td>
+                <td>&nbsp</td>
+                </tr>
+            <%let rol2 = rolesEnum.ResponsableDocenteX2 
+            delegado = filterByRol(roles, rol2, plan, departamento)
+            if (delegado.length === 0) prof = buscaPers(profesores, null)
+            else prof = buscaPers(profesores, delegado[0].PersonaId);
+            %>
+            <tr>
+            <td style="border: 0; padding-left:5em">
+            <em>Delegado en<em>
+            </td>
+            <td>
+            <p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
+            </td>
+            <td>&nbsp</td>
+            </tr>
+            <%})%>
+        </tbody>
+    </table>
+</div>
+<%}%> 
+<script>
+
+//se utiliza para que al cambiar plan el foco vaya a donde estabas
+let foco = <%- JSON.stringify(foco) %>
 
 function cambiarPDCoordinador(){
     let pAcronimo = document.getElementById("selectCoordinador").value;
     let search = parseQueryString();
     delete search.pdID;
     search.planID = pAcronimo;
+    search.foco = true;
     let url = parseStringQuery(search);
     window.location.replace(url);
     
 }
 
-
-
 $(function() {
 
-    let form = $(this)
-        $('#selectCoordinador').change(function(){
-            $('.Coordinador').hide();
-            $('.ResponsableDocente').hide();
-            $('*#' +'Coordinador_'+ $(this).val()).show();
-            $('*#' +'ResponsableDocente_'+ $(this).val()).show();
-        });
-    $('.Coordinador').hide();
-    $('.ResponsableDocente').hide();
-    let planID =  $('#selectCoordinador').val();
-    $('*#' +'Coordinador_'+ planID).show();
-    $('*#' +'ResponsableDocente_'+ planID).show();
-    
+    if (foco)window.scrollTo(0, document.getElementById('foco').offsetTop + 20);
 });
     
 </script>

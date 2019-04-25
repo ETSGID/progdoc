@@ -109,7 +109,7 @@ exports.getExamenes = function(req,res,next){
                         [op.ne]: null,
                     }
                 },
-                attributes: ['acronimo', 'curso', 'identificador', 'nombre', 'semestre', 'codigo'],
+                attributes: ['acronimo', 'curso', 'identificador', 'nombre', 'semestre', 'codigo','DepartamentoResponsable'],
                 order: [
 
                     [Sequelize.literal('"Asignatura"."curso"'), 'ASC'],
@@ -174,6 +174,7 @@ exports.getExamenes = function(req,res,next){
                                 a.identificador = asignatura.identificador;
                                 a.curso = asignatura.curso;
                                 a.nombre = asignatura.nombre;
+                                a.departamentoResponsable = asignatura.DepartamentoResponsable
                                 a.semestre = asignatura.semestre;
                                 a.codigo = asignatura.codigo;
                                 a.examen = {};
@@ -671,7 +672,7 @@ exports.generateCsvExamens = function (req, res, next){
             let planID = req.session.planID
             let acronimoOIdPlan = menuProgDocController.getPlanPd(req.session.pdID);
             try {
-                const fields = ['titulacion', 'curso', 'dia', 'hora de comienzo', 'hora finalizacion', 'asignatura', 'codigo'];
+                const fields = ['codigo', 'titulacion', 'curso', 'dia', 'hora de comienzo', 'hora finalizacion','asignatura','departamento responsable'];
                 const opts = { fields };
                 let data = [];
                 let ano = menuProgDocController.getAnoPd(req.session.pdID)
@@ -689,13 +690,10 @@ exports.generateCsvExamens = function (req, res, next){
                                 ex['hora de comienzo'] = moment(ex.examen.horaInicio, 'HH:mm:ss').format("HH:mm")
                             }
                             if (moment(ex.examen.horaInicio, 'HH:mm:ss').add(ex.examen.duracion).isValid()) {
-                                ex['hora finalizacion'] = moment(ex.examen.horaInicio, 'HH:mm:ss').add(ex.examen.duracion).format("HH:mm")
+                                ex['hora finalizacion'] = moment(ex.examen.horaInicio, 'HH:mm:ss').add(ex.examen.duracion,"m").format("HH:mm")
                             }
-
                             ex['asignatura'] = ex.nombre;
-                            if (ex.examen.aulas) {
-                                ex['aulas'] = ex.examen.aulas.join(' ')
-                            }
+                            ex['departamento responsable'] = ex.departamentoResponsable
                             data.push(ex)
 
                         })

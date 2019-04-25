@@ -33,3 +33,9 @@ thead{
 .nuevaAsignatura {
     background-color: rgb(129, 186, 82); 
 }
+.portada {
+    text-align : center; 
+    position:absolute;
+    margin-top: 40%;
+    width:100%
+}

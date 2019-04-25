@@ -39,6 +39,7 @@
         <button id='Actividades' class="tablinks" onclick="cambiarSubmenu(event, 'Actividades')">Actividades</button>
         <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Exámenes</button>
         <button id='PDF' class="tablinks" onclick="cambiarSubmenu(event, 'PDF')">PDF</button>
+        <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')">Calendario</button>
     </div>
     <% if (locals.planID) { %>
      <input id='plan' type="hidden" value="<%=planID%>">
@@ -99,6 +100,10 @@ function cambiarSubmenu(evt, submenu) {
     }
         if (submenu === 'Grupos'){
         let url = "<%=contextPath%>/consultar/grupos?planID="+pAcronimo
+        window.location.replace(url);
+    }
+    if (submenu === 'Calendario'){
+        let url = "<%=contextPath%>/consultar/calendario?planID="+pAcronimo
         window.location.replace(url);
     }
 

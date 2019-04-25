@@ -1,3 +1,8 @@
+<div class ="portada">
+<h1>PROGRAMACIÓN DOCENTE DE <%=progDoc.nombreCompleto%><h1>
+<h2>Curso <%=progDoc['anoAcademico']%></h2>
+<h3>Semestre <%let sem = progDoc['semestre'] === "I" ? 'Anual' : progDoc['semestre']%><%=sem%> versión <%=progDoc['version']%></h3>
+</div>
 <div style="page-break-after:always;"></div>
 <div>
 <% let getAsignaturas = function (curso,semestre){
@@ -19,8 +24,8 @@ return found;
       return "-"
     }
 }%>
-
-<h2>1.Asignaturas</h2>
+<%- include ./pdfCalendario.ejs %>
+<h2>1.Asignaturas</h2> 
 <% for(let i=0; i < cursosConGrupos.length; i++) { %>
   <p>Curso <%=cursosConGrupos[i].curso%></p>
   <% for(let j=0; j < cursosConGrupos[i].semestres.length; j++) { %>

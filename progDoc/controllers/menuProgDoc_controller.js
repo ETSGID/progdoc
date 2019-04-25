@@ -42,6 +42,8 @@ exports.getVersionPd = function (pdID) {
     return  pdID ? pdID.split("_")[4] : null;
 }
 
+
+
 exports.getPlanes = function (req, res, next) {
     let planID = req.query.planID;
     if (!planID) {
@@ -95,7 +97,7 @@ exports.getProgramacionDocente = function (req, res, next) {
 
 
     models.PlanEstudio.findAll({
-        attributes: ['nombre', 'codigo'],
+        attributes: ['nombre', 'codigo' ,'nombreCompleto'],
         where: Sequelize.or(
             { nombre: planID },
             { codigo: planID }
@@ -159,7 +161,6 @@ exports.getProgramacionDocente = function (req, res, next) {
                     }
 
                     next();
-
                 })
                     .catch(function (error) {
                         console.log("Error:", error);
@@ -179,20 +180,23 @@ exports.getProgramacionDocente = function (req, res, next) {
 }
 
 //te da las ultimas pds existentes para el plan, tipoPD y ano
-//en caso de pasar la pdIDNoIncluir te obvia esa, se utiliza para el pdf 
-exports.getProgramacionDocentesAnteriores = function (plan, tipoPD, ano, pdIDNoIncluir) {
+//en caso de pasar la pdIDNoIncluir te obvia esa, se utiliza para el pdf
+//estadoPD en caso de que se quiera el estado de la programación docente, sino a null 
+exports.getProgramacionDocentesAnteriores = function (plan, tipoPD, ano, pdIDNoIncluir,estadoPD) {
     let s1 = false;
     let s2 = false;
     let I = false;
     let pds = [];
+    let filtro = {
+        PlanEstudioId: plan,
+        identificador: {
+            [op.ne]: pdIDNoIncluir,
+        }
+    }
+    if (estadoPD) filtro.estadoProGDoc = estadoPD;
     return models.ProgramacionDocente.findAll({
         attributes: ["identificador", "semestre", "estadoProfesores", "reabierto"],
-        where: {
-            PlanEstudioId: plan,
-            identificador: {
-                [op.ne]: pdIDNoIncluir,
-            }
-        },
+        where: filtro,
         order: [
             [Sequelize.literal('identificador'), 'DESC'],
         ],
@@ -280,22 +284,35 @@ exports.getAsignaturasProgDoc = function (req, res, next) {
 
 
 //te devuelve todos los departamentos que hay en el sistmea
-exports.getAllDepartamentos = function (req, res, next) {
-    
+exports.getAllDepartamentos = function () {
     return models.Departamento.findAll({
         attributes: ['codigo', 'nombre', 'acronimo'],
         raw: true
     }).then(function (deps) {
-        res.locals.departamentos = deps;
-        next();
+        return deps;
     })
-        .catch(function (error) {
-            console.log('Error: ' + error);
-            next(error);
-        });
     
 }
-
+//se pasa el tipoPD (1S, 2S o I) y el semestre de asignatura (1S, 1S-2S, A ...)
+//devuelve si para semestre1 debaría estar en la PD (true) y lo mismo con semestre2
+exports.getSemestresAsignaturainPD = function(tipoPD,semestre){
+    let s1, s2
+    switch (tipoPD) {
+        case '1S':
+            s1 = (semestre === '1S' || semestre === '1S-2S' || semestre === 'A' || semestre === 'I')
+            s2 = false;
+            break;
+        case '2S':
+            s1 = false;
+            s2 = (semestre === '2S' || semestre === '1S-2S' || semestre === 'A' || semestre === 'I')
+            break;
+        default:
+            s1 = (semestre === '1S' || semestre === '1S-2S' || semestre === 'A' || semestre === 'I')
+            s2 = (semestre === '2S' || semestre === '1S-2S' || semestre === 'A' || semestre === 'I')
+            break;
+    }
+    return [s1, s2]
+}
 
 function getPeople(onlyProfesor) {
     let profesores = [];
@@ -375,7 +392,7 @@ exports.getGrupos = function (req, res, next) {
     if (res.locals.progDoc) {
         let pdID = req.query.pdID ? req.query.pdID : res.locals.progDoc['ProgramacionDocentes.identificador']
         models.Grupo.findAll({
-            attributes: ["nombre", "curso", "grupoId", "nombreItinerario"],
+            attributes: ["nombre", "curso", "grupoId", "nombreItinerario", "aula"],
             where: { ProgramacionDocenteId: pdID },
             order: [
 

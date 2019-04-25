@@ -114,7 +114,7 @@
             "readerHeight": "600"
         },
         "opendoc": {
-            "enabled": true,
+            "enabled": false,
             "extensions": [
                 "pdf",
                 "odt",

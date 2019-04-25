@@ -1,3 +1,4 @@
+const moment = require ('moment')
 exports.primerasMayusc = function (texto) {
     const re = /(^|[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ])(?:([a-záéíóúüñ])|([A-ZÁÉÍÓÚÜÑ]))|([A-ZÁÉÍÓÚÜÑ]+)/gu;
     return texto.replace(re,
@@ -108,5 +109,49 @@ exports.isEmpty = function (obj) {
     }
 
     return true;
+}
+
+//convierte de formato 4,5 a 4.5 el separador de decimales en números
+exports.convertCommaToPointDecimal = function(n) {
+    n = n.replace(/\./g, '').replace(',', '.');
+    return n;
+}
+
+//convierte de YYYY-MM-DD a DD/MM/YYYY
+formatFecha = function (fecha){
+    try{
+        return (fecha.split("-")[2] + "/" + fecha.split("-")[1] + "/" + fecha.split("-")[0])
+    }catch(error){
+        return null
+    }
+        
+}
+
+exports.formatFecha
+
+
+//le pasas una fecha y te devuelve el dia más proximo de dentro de un año que caiga
+//el mismo dia de la semana
+exports.addYear = function (fechaActual) {
+    fechaActual = formatFecha(fechaActual)
+    try{
+        let actual = moment(fechaActual, 'DD/MM/YYYY');
+        let siguiente = actual.clone().add(1, 'year');
+        let a = actual.day() - siguiente.day()
+        temp = [a, a - 7, 7 - a]
+        let index = 0;
+        let value = temp[0];
+        for (var i = 1; i < temp.length; i++) {
+            if (Math.abs(temp[i]) < Math.abs(value)) {
+                value = temp[i];
+                index = i;
+            }
+        }
+        siguiente = siguiente.add(temp[index], 'day')
+        return siguiente
+    }catch(error){
+        return null;
+    }
+       
 }
 

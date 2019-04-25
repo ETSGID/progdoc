@@ -91,17 +91,22 @@ exports.generarPDF = function (req, res, next) {
         let semestre;
         switch (view) {
             case "pdfDraftGenerado":
+                //console.log(2);
                 pdID = res.locals.progDoc['ProgramacionDocentes.identificador']
                 anoFinal = 2000 + Number(res.locals.progDoc['ProgramacionDocentes.anoAcademico'][4] + "" + res.locals.progDoc['ProgramacionDocentes.anoAcademico'][5])
                 semestre = res.locals.progDoc['ProgramacionDocentes.semestre']
+                res.locals.progDoc.semestre = res.locals.progDoc['ProgramacionDocentes.semestre']
+                res.locals.progDoc.version = res.locals.progDoc['ProgramacionDocentes.version']
+                res.locals.progDoc.anoAcademico = res.locals.progDoc['ProgramacionDocentes.anoAcademico']
                 break;
             case "pdfCerrado":
                 pdID = res.locals.progDoc['identificador']
                 anoFinal = 2000 + Number(res.locals.progDoc['anoAcademico'][4] + "" + res.locals.progDoc['anoAcademico'][5])
                 semestre = res.locals.progDoc['semestre']
+                res.locals.progDoc.nombreCompleto = res.locals.progDoc['PlanEstudio.nombreCompleto']
                 break;
         }
-        return menuProgDocController.getProgramacionDocentesAnteriores(pdID.split("_")[1], pdID.split("_")[3], pdID.split("_")[2], pdID)
+        return menuProgDocController.getProgramacionDocentesAnteriores(pdID.split("_")[1], pdID.split("_")[3], pdID.split("_")[2], pdID, null)
             .then((pdis) => {
                 pdsAnteriores = pdis;
                 let whereAsignaturas = {};
@@ -174,6 +179,7 @@ exports.generarPDF = function (req, res, next) {
                                     newGrupo.capacidad = g.capacidad;
                                     newGrupo.curso = g.curso;
                                     newGrupo.aula = g.aula;
+                                    newGrupo.nombreItinerario = g.nombreItinerario;
                                     newGrupo.idioma = g.idioma;
                                     newGrupo.horarios = [];
                                     newGrupo.asignaturas = [];
@@ -242,6 +248,7 @@ exports.generarPDF = function (req, res, next) {
                                 //debo convertir la fecha a formato dd/mm/yyyy
                                 nuevoExamen.fecha = ej['Examens.fecha'].split("-")[2] + "/" + ej['Examens.fecha'].split("-")[1] + "/" + ej['Examens.fecha'].split("-")[0];
                                 p.examenes.push(nuevoExamen)
+
                             }
                         } else {
                             let as = asignaturasViejas.find(function (x) { return (x.identificador === ej.identificador && x.curso === ej.curso && x.creditos === ej.creditos && x.semestre === ej.semestre) })
@@ -283,12 +290,19 @@ exports.generarPDF = function (req, res, next) {
                     .then(() => {
                         promises2.push(
                             new Promise(function (resolve, reject) {
-                                ejs.renderFile("./views/pdfs/pdfAsignaturas.ejs",
+                                //console.log("11");
+                                if(req.calendario.estado === 0){
+                                    ejs.renderFile("./views/pdfs/pdfAsignaturas.ejs",
                                     {
                                         asignaturas: asignaturas,
                                         asignaturasViejas: asignaturasViejas,
                                         cursosConGrupos: cursosConGrupos,
-                                        profesores: profesores
+                                        profesores: profesores,
+                                        calendario: [],
+                                        array_dias: [],
+                                        anoSeleccionado: req.ano,
+                                        estadoCalendario: 0,
+                                        progDoc: res.locals.progDoc
                                     },
                                     function (err, str) {
                                         if (err) {
@@ -298,10 +312,34 @@ exports.generarPDF = function (req, res, next) {
                                         }
                                     }
                                 )
+                                }else{
+                                    ejs.renderFile("./views/pdfs/pdfAsignaturas.ejs",
+                                    {
+                                        asignaturas: asignaturas,
+                                        asignaturasViejas: asignaturasViejas,
+                                        cursosConGrupos: cursosConGrupos,
+                                        profesores: profesores,
+                                        calendario: req.calendario.calendario,
+                                        array_dias: req.calendario.array_dias,
+                                        anoSeleccionado: req.ano,
+                                        estadoCalendario: 1,
+                                        progDoc: res.locals.progDoc
+                                    },
+                                    function (err, str) {
+                                        if (err) {
+                                            reject(err);
+                                        } else {
+                                            resolve(str);
+                                        }
+                                    }
+                                )
+                                }
+                                
                             })
                         )
                         promises2.push(
                             new Promise(function (resolve, reject) {
+                                //console.log("22");
                                 ejs.renderFile("./views/pdfs/pdfGruposyHorarios.ejs",
                                     {
                                         asignaturas: asignaturas,
@@ -321,6 +359,7 @@ exports.generarPDF = function (req, res, next) {
                         )
                         promises2.push(
                             new Promise(function (resolve, reject) {
+                                //console.log("33");
                                 ejs.renderFile("./views/pdfs/pdfExamenes.ejs",
                                     {
                                         asignacionsExamen: asignacionsExamen,
@@ -330,8 +369,10 @@ exports.generarPDF = function (req, res, next) {
                                     },
                                     function (err, str) {
                                         if (err) {
+                                            console.log("error");
                                             reject(err);
                                         } else {
+                                            //console.log("éxito!");
                                             resolve(str);
                                         }
                                     }
@@ -379,16 +420,22 @@ exports.generarPDF = function (req, res, next) {
                                 let elements = pdID.split("_")
                                 let borrador = req.originalUrl.toLowerCase().includes("consultar") ? 'borrador/' : ''
                                 file = elements[1] + "/" + elements[2] + "/" + elements[3] + "/" + borrador + file
+                                //console.log("the fileç: ", file);
                                 let ruta = app.pathPDF+'/pdfs/' + file
                                 let options = {
                                     'text': 'draft',
                                     'dstPath': ruta
                                 }
                                 let configPdfOptions = req.originalUrl.toLowerCase().includes("consultar") ? configPdfDraft : configPdfCerrado
+                                //console.log(html);
+                                //console.log(configPdfOptions);
+                                //console.log(ruta);
                                 pdf.create(html, configPdfOptions).toFile(ruta, function (err, resp) {
                                     if (err) return console.log(err);
+                                    //console.log("eeee" ,view);
                                     switch (view) {
                                         case "pdfDraftGenerado":
+                                            //console.log("not next");
                                             res.render(view,
                                                 {
                                                     contextPath: app.contextPath,
@@ -403,6 +450,7 @@ exports.generarPDF = function (req, res, next) {
                                             break;
 
                                         case "pdfCerrado":
+                                            
                                             next();
                                             break;
                                     }

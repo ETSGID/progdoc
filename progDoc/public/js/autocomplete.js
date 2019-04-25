@@ -1,6 +1,7 @@
-function autocomplete(inp, obj, obj2, opcion) {
     /*the autocomplete function takes two arguments,
-    the text field element and an array of possible autocompleted values:*/
+    the text field element and an array of possible autocompleted values
+    ademas tiene un campo opcion para algunos menus especificos*/
+function autocomplete(inp, obj, obj2, opcion) {
     var currentFocus;
     /*execute a function when someone writes in the text field:*/
     inp.addEventListener("input", function (e) {

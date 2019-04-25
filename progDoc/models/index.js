@@ -34,6 +34,9 @@ let Rol = sequelize.import(path.join(__dirname, 'Rol'));
 let Itinerario = sequelize.import(path.join(__dirname, 'Itinerario'));
 let FranjaExamen = sequelize.import(path.join(__dirname, 'FranjaExamen'));
 
+let EventoGeneral = sequelize.import(path.join(__dirname, 'EventoGeneral'));
+let EventoPlan = sequelize.import(path.join(__dirname, 'EventoPlan'));
+let Calendario = sequelize.import(path.join(__dirname, 'Calendario'));
 
 let Session = sequelizeSession.import(path.join(__dirname, 'Session'));
 
@@ -123,9 +126,16 @@ Asignatura.belongsTo(Profesor, { as: 'Suplente', foreignKey: 'SuplenteTribunalAs
 ProgramacionDocente.hasMany(FranjaExamen, { foreignKey: 'ProgramacionDocenteId' });
 FranjaExamen.belongsTo(ProgramacionDocente, {foreignKey: 'ProgramacionDocenteId'});
 
+//Relacion 1 a N entre PlanEstudio y EventoPlan
+PlanEstudio.hasMany(EventoPlan, { foreignKey: 'PlanEstudioId' });
+EventoPlan.belongsTo(PlanEstudio, { foreignKey: 'PlanEstudioId' });
+
+//Relacion 1 a N entre EventoGeneral y EventoPlan
+EventoGeneral.hasMany(EventoPlan, { foreignKey: 'EventoGeneralId' });
+EventoPlan.belongsTo(EventoGeneral, { foreignKey: 'EventoGeneralId' });
 
 
-
+ 
 
 
 sequelize.sync();
@@ -145,5 +155,8 @@ exports.Rol = Rol; //exportar definición de tabla Rol
 exports.Itinerario = Itinerario; //exportar definición de tabla Itinerario
 exports.Session = Session; //exportar definición de tabla Session
 exports.FranjaExamen = FranjaExamen; //exportar definición de tabla Franja Examen
+exports.EventoGeneral = EventoGeneral; //exportar definición de tabla EventoGeneral
+exports.EventoPlan = EventoPlan; //exportar definición de tabla EventoPlan
+exports.Calendario = Calendario; //exportar definición de tabla Calendario
 exports.sequelize = sequelize;
 exports.sequelizeSession = sequelizeSession;

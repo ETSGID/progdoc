@@ -158,7 +158,6 @@ app.use(path.join(contextPath, 'archivos/filemanager'), filemanager((path.join(p
   app.use(contextPath, router);
 
 
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
 

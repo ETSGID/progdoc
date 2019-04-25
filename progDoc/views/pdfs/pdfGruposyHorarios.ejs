@@ -99,7 +99,7 @@ let getNumeroGruposNoOptativas = function (grupos){
                                     return found;
                             }%>
                             <table>
-                              <caption style="text-align: left;">Grupo <%= cursosConGrupos[i].semestres[j].grupos[k].nombre %></caption>
+                              <caption style="text-align: left;">Grupo <%=cursosConGrupos[i].semestres[j].grupos[k].nombre%> <%=cursosConGrupos[i].semestres[j].grupos[k].nombreItinerario%> <%=cursosConGrupos[i].semestres[j].grupos[k].aula%></caption>
                                 <thead>
                                     <tr>
                                     <th scope="col" width="10%">Hora</th>

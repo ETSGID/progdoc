@@ -3,7 +3,7 @@
 <div class ="contenido2">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
-<%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+<%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%> 
   <p><%=permisoDenegado%></p>
 <%}else{%>
         <form id="asignacionCumplimentarForm" autocomplete="off" action="<%= nuevopath %>" method="post" onsubmit="return Enviar()" >

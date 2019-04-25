@@ -53,10 +53,22 @@ exports.gestionProgDoc = function (req, res, next) {
             console.log("Error:", error);
             next(error);
         });
+        //borra todos las programaciones docentes con errores que no deberia haberlas y lo vacio que no deberia estar
+    let promise2 = models.sequelize.query(query = `DELETE FROM public."ProgramacionDocentes" p  WHERE p."estadoProGDoc" = -1; 
+            DELETE FROM public."Grupos" g WHERE g."ProgramacionDocenteId" is null; 
+            DELETE FROM public."Asignaturas" asign WHERE asign."ProgramacionDocenteIdentificador" is null; 
+            DELETE FROM public."AsignacionProfesors" a WHERE a."GrupoId" is null;
+            DELETE FROM public."Examens" e WHERE e."AsignaturaIdentificador" is null;
+            DELETE FROM public."FranjaExamens" f WHERE f."ProgramacionDocenteId" is null;`)
+        .then(() => {
+        }).catch(function (err) {
+            console.log("Error:", error);
+            next(err);
+        })
     //veo si hay algún 
     //compruebo que no hay ningún plan nuevo
     //los planes viejos no desaparecen se debería hacer manualmente pq el año actual igual si que se necesita
-    let promise2 = axios.get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json/9/planes/PSC")
+    let promise3 = axios.get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json/9/planes/PSC")
         .then(function (response) {
             //obtengo las pd abiertas o con incidencias
             apiPlanes = response.data;
@@ -145,6 +157,7 @@ exports.gestionProgDoc = function (req, res, next) {
 
     promises.push(promise1);
     promises.push(promise2);
+    promises.push(promise3);
     return Promise.all(promises).then(() => {
         return Promise.all(promises2)
     })
@@ -268,7 +281,13 @@ exports.cerrarProgDoc = function (req, res, next) {
     if (!res.locals.permisoDenegado) {
         let pdID = req.body.pdIdentificador.split("-")[1];
         models.ProgramacionDocente.findOne(
-            { where: { identificador: pdID } } /* where criteria */
+            { where: { identificador: pdID },
+                include: [{
+                    model: models.PlanEstudio,
+                    attributes: ['nombre','nombreCompleto'],
+                }],
+                raw: true
+         } 
         ).then((pd) => {
             res.locals.progDoc = pd
             next()
@@ -329,7 +348,12 @@ exports.cerrarIncidenciaProgDoc = function (req, res, next) {
     if (!res.locals.permisoDenegado) {
         let pdID = req.body.pdIdentificador.split("-")[1];
         models.ProgramacionDocente.findOne(
-            { where: { identificador: pdID } } /* where criteria */
+            { where: { identificador: pdID },
+                include: [{
+                    model: models.PlanEstudio,
+                    attributes: ['nombre', 'nombreCompleto'],
+                }],
+                raw: true} 
         ).then((pd) => {
             res.locals.progDoc = pd
             next()

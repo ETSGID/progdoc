@@ -39,7 +39,7 @@
         <button id='Horarios' class="tablinks" onclick="cambiarSubmenu(event, 'Horarios')">Horarios</button>
         <button id='Actividades' class="tablinks" onclick="cambiarSubmenu(event, 'Actividades')">Actividades</button>
         <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Exámenes</button>
-        <button id='PDF' class="tablinks" onclick="cambiarSubmenu(event, 'PDF')">PDF</button>
+        <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')">Calendario</button>
     </div>
     <% if (locals.planID) { %>
      <input id='plan' type="hidden" value="<%=planID%>">
@@ -91,10 +91,15 @@ function cambiarSubmenu(evt, submenu) {
         let url = "<%=contextPath%>/estado?planID="+pAcronimo
         window.location.replace(url);
     }
-    if (submenu === 'PDF'){
-        let url = "<%=contextPath%>/consultar/PDF?planID="+pAcronimo
+    if (submenu === 'Calendario'){
+        let url = "<%=contextPath%>/cumplimentar/calendario?planID="+pAcronimo
         window.location.replace(url);
     }
+    if (submenu === 'PDF'){
+        let url = "<%=contextPath%>/cumplimentar/PDF?planID="+pAcronimo
+        window.location.replace(url);
+    }
+
 
 
 }

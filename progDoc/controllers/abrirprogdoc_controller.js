@@ -6,6 +6,7 @@ const axios = require('axios');
 let estados = require('../estados');
 let funciones = require('../funciones');
 let menuProgDocController = require('../controllers/menuProgDoc_controller')
+let enumsPD = require('../enumsPD');
 
 
 
@@ -26,6 +27,7 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
     let cambioAsignaturas = [];
     let desapareceAsignaturas = [];
     let asignacions = [];
+    let examens = [];
 
     let gruposToAnadir = [];
     let franjasToAnadir = [];
@@ -38,6 +40,7 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
 
     res.locals.departamentosResponsables = [];
     let promisesRoles = [];
+    let planBBDD = res.locals.planEstudios.find(function (obj) { return obj.codigo === plan; });
 
     axios.get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/plan.json/" + plan + "/asignaturas?anio=" + ano)
         .then(function (response) {
@@ -61,7 +64,7 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
             También es importante la forma de la clave ppal de la pd ya que ordenamos en funcion de ello.
             */
 
-            return menuProgDocController.getProgramacionDocentesAnteriores(plan, tipoPD, ano, null)
+            return menuProgDocController.getProgramacionDocentesAnteriores(plan, tipoPD, ano, null, null)
         })
         .then((pdis) => {
             pds = pdis;
@@ -165,7 +168,8 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                     model: models.AsignacionProfesor,
                     //left join
                     required: false
-                }],
+                }
+            ],
                 raw: true
 
             })
@@ -174,26 +178,23 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                         cont = 1;
                     }
                     let cursoCambio = false;
-                    //cambio de tipo es de optativa a otro tipo o al revés
+                    //cambio de tipo es de optativa a otro tipo o al revés de momento no se utiliza
                     let tipoCambio = false;
                     //cambio de semestre
                     let semestreCambio = false;
                     let hasCurso = true;
                     let hasDepartamento = true;
                     let hasSemestre = true;
-
                     let nuevaAsignatura = nuevasAsignaturas.find(function (obj) { return obj.codigo === asignBBDD.codigo; });
                     let viejaAsignatura = viejasAsignaturas.find(function (obj) { return obj.codigo === asignBBDD.codigo; });
                     let cambioAsignatura = cambioAsignaturas.find(function (obj) { return obj.codigo === asignBBDD.codigo; });
-
-
                     //asignatura que está en la api pero es la primera vez que la metemos con su primera asignación
                     if (apiAsignaturas[asignBBDD.codigo] && !nuevaAsignatura && !viejaAsignatura && !cambioAsignatura) {
                         apiAsignatura = apiAsignaturas[asignBBDD.codigo]
                         asignBBDD.anoAcademico = ano;
                         asignBBDD.nombre = apiAsignatura["nombre"]
                         apiAsignatura["nombre_ingles"] === "" ? asignBBDD.nombreIngles = asignBBDD.nombreIngles : asignBBDD.nombreIngles = apiAsignatura["nombre_ingles"];
-                        asignBBDD.creditos = apiAsignatura['credects'];
+                        asignBBDD.creditos = funciones.convertCommaToPointDecimal(apiAsignatura['credects']);
                         let tipo = asignBBDD.tipo;
                         switch (apiAsignatura["codigo_tipo_asignatura"]) {
                             case "T":
@@ -218,8 +219,15 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                         }
                         let apiDepartamentos = apiAsignatura['departamentos']
                         if (apiDepartamentos.length === 0) {
-                            asignBBDD.DepartamentoResponsable = null;
-                            hasDepartamento = false; //no lo uso pq tft si que la quiero y no tiene departamento
+                            if (apiAsignatura["codigo_tipo_asignatura"] === "P" && (planBBDD["nombreCompleto"].toUpperCase().includes("MASTER") || planBBDD["nombreCompleto"].toUpperCase().includes("MÁSTER"))){
+                                asignBBDD.DepartamentoResponsable = "TFM"
+                            }
+                            else if(apiAsignatura["codigo_tipo_asignatura"] === "P" && planBBDD["nombreCompleto"].toUpperCase().includes("GRADO")){
+                                asignBBDD.DepartamentoResponsable = "TFG"
+                            }else{
+                                asignBBDD.DepartamentoResponsable = null;
+                                hasDepartamento = false; //no lo uso pq tft si que la quiero y no tiene departamento
+                            }
                         }
                         apiDepartamentos.forEach(function (element, index) {
                             if (element["responsable"] === "S" || element["responsable"] === "") {
@@ -262,7 +270,6 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                         As.acronimo = asignBBDD.acronimo;
                         As.curso = asignBBDD.curso;
                         As.semestre = asignBBDD.semestre;
-                        As.estado = asignBBDD.estado;
                         As.tipo = asignBBDD.tipo;
                         As.creditos = asignBBDD.creditos;
                         As.cupo = asignBBDD.cupo;
@@ -276,8 +283,9 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                         As.VocalTribunalAsignatura = asignBBDD.VocalTribunalAsignatura;
                         As.SecretarioTribunalAsignatura = asignBBDD.SecretarioTribunalAsignatura;
                         As.SuplenteTribunalAsignatura = asignBBDD.SuplenteTribunalAsignatura;
-
-                        if (!cursoCambio && !semestreCambio && !tipoCambio && hasCurso && hasSemestre) {
+                        //si  cambio el curso o el semestre se pone el estado S: los profesores se asignan por grupo, no comun
+                        As.estado = (!cursoCambio && !semestreCambio) ? asignBBDD.estado : 'S';
+                        if (!cursoCambio && !semestreCambio  && hasCurso && hasSemestre) {
                             //no puedo meter asignaturas del primer semestre en el segundo cuando consulto una I para rellenar una 1S
                             if (tipoPD === "I" || (tipoPD === '1S' && asignBBDD.semestre !== '2S') || (tipoPD === '2S' && asignBBDD.semestre !== '1S')) {
                                 //las asignaciones con profesor y horario a null las creo abajo no aqui
@@ -297,22 +305,18 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                                     }
 
                                 }
-
                                 viejasAsignaturas.push(As)
                             }
 
                         } else if (!hasCurso || !hasSemestre) {
                             desapareceAsignaturas.push(As);
-                        } else if (cursoCambio || semestreCambio || tipoCambio) {
+                        } else if (cursoCambio || semestreCambio) {
                             if (tipoPD === "I" || (tipoPD === '1S' && asignBBDD.semestre !== '2S') || (tipoPD === '2S' && asignBBDD.semestre !== '1S')) {
-                                // Ahora mismo si una asignatura cambia en algo lo unico que sigue es el tribunal el horario y los profesores no siguen
-
+                                // Ahora mismo si una asignatura cambia en algo lo unico que sigue es el tribunal, el horario y los profesores no siguen
                                 cambioAsignaturas.push(As);
                             }
 
                         }
-
-
                     }//asignación nueva en una asignatura que ya meti
                     else if (apiAsignaturas[asignBBDD.codigo] && viejaAsignatura) {
                         if (asignBBDD["AsignacionProfesors.ProfesorId"] || asignBBDD["AsignacionProfesors.Dia"] || asignBBDD["AsignacionProfesors.Nota"]) {
@@ -332,6 +336,7 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                             }
 
                         }
+                        
                     } //asignatura que cambia de cuatrimestre o curso o tipo solo meto los profesores en el primer grupo y sin repetirh y no meto horarios
                     else if (apiAsignaturas[asignBBDD.codigo] && cambioAsignatura) {
                         if (asignBBDD["AsignacionProfesors.ProfesorId"]) {
@@ -365,7 +370,6 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
 
         .then(function (asignaturasBBDD) {
             cont = 0
-
             for (let apiCodigo in apiAsignaturas) {
                 let apiAsignEncontrada = apiAsignaturas[apiCodigo];
                 let asignExisteBBDD = asignaturasBBDD.find(function (obj) { return obj.codigo === apiAsignEncontrada.codigo; });
@@ -386,8 +390,15 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                 }
                 let apiDepartamentos = apiAsignEncontrada['departamentos']
                 let depResponsable = null
-                if (apiDepartamentos.lenth === 0) {
-                    depResponsable = null;
+                if (apiDepartamentos.length === 0) {
+                    if (apiAsignEncontrada["codigo_tipo_asignatura"] === "P" && (planBBDD["nombreCompleto"].toUpperCase().includes("MASTER") || planBBDD["nombreCompleto"].toUpperCase().includes("MÁSTER"))) {
+                        depResponsable = "TFM"
+                    }
+                    else if (apiAsignEncontrada["codigo_tipo_asignatura"] === "P" && planBBDD["nombreCompleto"].toUpperCase().includes("GRADO")) {
+                        depResponsable = "TFG"
+                    } else {
+                        depResponsable = null;
+                    }
                 }
                 apiDepartamentos.forEach(function (element, index) {
                     if (element["responsable"] === "S" || element["responsable"] === "") {
@@ -404,8 +415,9 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                     nuevaAsign.curso = apiAsignEncontrada['curso'];
                     nuevaAsign.semestre = semestre;
                     nuevaAsign.DepartamentoResponsable = depResponsable;
+                    //por defecto los profesores se asignan por grupo
                     nuevaAsign.estado = "S";
-                    nuevaAsign.creditos = apiAsignEncontrada['credects'];
+                    nuevaAsign.creditos = funciones.convertCommaToPointDecimal(apiAsignEncontrada['credects']);
                     nuevaAsign.ProgramacionDocenteIdentificador = res.locals.identificador;
                     switch (apiAsignEncontrada["codigo_tipo_asignatura"]) {
                         case "T":
@@ -437,6 +449,49 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
             )
         })
         .then(() => {
+            //copio los examenes de asignaturas que no han cambiado en el año siguiente al mismo dia de la semana
+            return models.Asignatura.findAll({
+                where: wherePdsAnteriores,
+                include: [{
+                    model: models.Examen,
+                    //left join
+                    required: true
+                }
+                ],
+                raw: true
+
+            })
+                .each(function (ex) {
+                    let viejaAsignatura = viejasAsignaturas.find(function (obj) { return obj.codigo === ex.codigo; });
+                    if (viejaAsignatura) {
+                        let nuevoExamen = {};
+                        if (funciones.addYear(ex['Examens.fecha'])) {
+
+                            //pongo el _a pq sino en el while de abajo podría quedarseme hasta el infinito
+                            nuevoExamen.AsignaturaIdentificador = ex.codigo + "_a"; //este es el viejo después deberé de sustituirlo por el id nuevo no por el codigo el codigo para identificar
+                            nuevoExamen.fecha = funciones.addYear(ex['Examens.fecha'])
+                            nuevoExamen.periodo = ex['Examens.periodo'];
+                            nuevoExamen.horaInicio = ex['Examens.horaInicio']
+                            nuevoExamen.duracion = ex['Examens.duracion']
+                            let cuadraExamen = false;
+                            switch (tipoPD) {
+                                case "1S":
+                                    if (nuevoExamen.periodo === enumsPD.periodoPD.S1_E || nuevoExamen.periodo === enumsPD.periodoPD.S1_O) cuadraExamen = true;
+                                    break;
+                                case "2S":
+                                    if (nuevoExamen.periodo === enumsPD.periodoPD.S2_E || nuevoExamen.periodo === enumsPD.periodoPD.S2_O) cuadraExamen = true;
+                                    break;
+                                case "I":
+                                    cuadraExamen = true;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (cuadraExamen) examens.push(nuevoExamen)
+                        }
+                    }
+                })
+            }).then(() => {
 
             return models.Asignatura.findAll({
                 attributes: ["identificador", "codigo", "DepartamentoResponsable"],
@@ -461,6 +516,10 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                         let asignacionToActualizar = asignacions.find(function (obj) { return obj.AsignaturaId === asignaturaNueva.codigo + "_a"; })
                         asignacionToActualizar.AsignaturaId = asignaturaNueva.identificador;
                     }
+                    while (examens.find(function (obj) { return obj.AsignaturaIdentificador === asignaturaNueva.codigo + "_a"; })) {
+                        let examenToActualizar = examens.find(function (obj) { return obj.AsignaturaIdentificador === asignaturaNueva.codigo + "_a"; })
+                        examenToActualizar.AsignaturaIdentificador = asignaturaNueva.identificador;
+                    }
                 })
         })
 
@@ -471,6 +530,13 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
             )
 
         }).then(() => {
+            cont = 0;
+            return models.Examen.bulkCreate(
+                examens
+            )
+
+        })
+        .then(() => {
             let periodo = '';
             switch (tipoPD) {
                 case "1S":
@@ -485,7 +551,7 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                 default:
                     break;
             }
-            //debo catear a text el enum para usar like
+            //debo castear a text el enum para usar like
             return models.sequelize.query(query = 'SELECT  f."horaInicio", f."duracion", f."curso", f."periodo" FROM public."FranjaExamens" f WHERE (f."ProgramacionDocenteId" = :pdId1 or f."ProgramacionDocenteId" = :pdId2) and f."periodo"::text LIKE :periodo',
                 { replacements: { pdId1: pdId1, pdId2: pdId2, periodo: periodo } },
             )
@@ -519,7 +585,15 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
             return Promise.all(promisesRoles);
         })
         .then(() => {
-            next();
+            if ((viejasAsignaturas.length === 0 && nuevasAsignaturas.length === 0 && cambioAsignaturas.length === 0)) {
+                let err = new Error('Error en la información de Universitas XXI, ahora mismo no puede abrir esta programación docente');
+                throw err
+            }
+            else if ((res.locals.departamentosResponsables.length === 0)) {
+                let err = new Error('Error, no hay departamentos responsables asignados a esta titulación. Puede deberse a un error en API UPM o que este plan no necesite planificación');
+                throw err
+            }
+            else { next() }
         })
         .catch(function (error) {
             console.log("Error:", error);
@@ -767,6 +841,8 @@ exports.abrirCopiaProgDoc = function (req, res, next) {
                     let nuevoExamen = {};
                     nuevoExamen.fecha = ex['Examens.fecha'];
                     nuevoExamen.periodo = ex['Examens.periodo'];
+                    nuevoExamen.horaInicio = ex['Examens.horaInicio']
+                    nuevoExamen.duracion = ex['Examens.duracion']
                     //hago el truco de antes
                     nuevoExamen.AsignaturaIdentificador = ex['codigo'] + "_a"
                     examens.push(nuevoExamen)

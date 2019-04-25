@@ -1,0 +1,378 @@
+<%- include gestion.ejs %>
+
+<div class="contenido" style="padding-top: 120px;">
+
+    <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+        <p><%=permisoDenegado%></p>
+    <%}else{%>
+        <input type="hidden" value="<%=anoSeleccionado%>" id="anoSeleccionado">
+        <div class="">       
+            <h2>Calendario por titulación
+                
+                <button type="button" class="btn btn-default" data-toggle="popover" title="Leyenda de colores" data-content="">Leyenda de colores</button>
+                
+               
+                <small>En esta interfaz puedes definir eventos editables por titulación.</small>
+                
+            </h2>
+
+            
+        </div>
+        
+        <div id="myPopoverContent" style="display: none;">
+            <table border="1" style="width:100%;  font-size: 17px;">
+                <tr>
+                    <th style="text-align: center">Evento</th>
+                    <th style="text-align: center">Color</th>
+                </tr>
+                <tr>
+                    <td>Días no lectivos o de ajuste</td>
+                    <td style="background-color: SpringGreen"></td>
+                </tr>
+                <tr>
+                    <td>Días especiales</td>
+                    <td style="background-color: red"></td>
+                </tr>
+                <tr>
+                    <td>Exámenes</td>
+                    <td style="background-color: yellow"></td>
+                </tr>
+                <tr>
+                    <td>Defensas de TFTs</td>
+                    <td style="background-color: LightSkyBlue"></td>
+                </tr>
+                <tr>
+                    <td>Días festivos o no lectivos oficiales UPM</td>
+                    <td style="background-color: grey"></td>
+                </tr>
+                <tr>
+                    <td>Fechas importantes</td>
+                    <td style="background-color: Orange"></td>
+                </tr>
+                    
+                    
+                    
+                    
+               
+            </table>
+        </div>
+        <script>
+            $('[data-toggle=popover]').popover({
+
+                content: $('#myPopoverContent').html(),
+                html: true
+
+            }).click(function() {
+                $(this).popover('show');
+            });
+        </script>
+        <div  id="calendario_comun" style=" margin-top: 35px;">
+            
+            <table style="font-size: 17px; border-color: black" border="2">
+                <tr >
+                    <th style="text-align: center;padding-right: 1em;padding-left: 1em;border: 0px;">
+                        Semana
+                    </th>
+                    <th style="text-align: center;padding-right: 1em;padding-left: 1em;border: 0px;">
+                        Mes
+                    </th>
+                    <th style="text-align: center;">
+                        L
+                    </th>
+                    <th style="text-align: center;">
+                        M
+                    </th>
+                    <th style="text-align: center;">
+                        X
+                    </th>
+                    <th style="text-align: center;">
+                        J
+                    </th>
+                    <th style="text-align: center;">
+                        V
+                    </th>
+                    <th style="text-align: center;">
+                        S
+                    </th>
+                    <th style="text-align: center;">
+                        D
+                    </th>
+                    <th style="text-align: center;padding-right: 1em;padding-left: 1em;border: 0px;">
+                        Eventos
+                    </th>
+                </tr>
+
+                <% meses = ["Septiembre", "Octubre", "Noviembre", "Diciembre","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto"] %>
+                <% contador_de_meses = 0; contador_de_semanas = 0 %>
+                <% array_eventos = [] %>
+                <% for(var i = 0 ; i<(calendario.length/7); i++){ %>
+
+                    <% array_eventos = [] %>
+                    <tr>
+                        <td style="text-align: center; margin-right:1px; border: 0px">
+                            
+                                <span style="margin-right: 1em;margin-left: 1em;">
+                                    <%=contador_de_semanas %>
+                                </span>
+                                <% contador_de_semanas += 1 %>   
+                            
+                        </td>
+                        <td style="border: 0px;text-align: center; margin-right:1px; margin-left:1px;">
+                            <% if(calendario.slice(i*7, i*7+7).includes(1)){ %>
+                                <span style="margin-right: 1em;margin-left: 1em;">
+                                    <%= meses[contador_de_meses] %>
+                                </span>
+                                <% contador_de_meses += 1 %>   
+                            <% } %>
+                        </td>
+
+                        <% for(var j = 0 ; j<(7); j++){ %>
+                                    
+                            <% if(calendario[i*7 + (j)] === undefined) { %>
+                                <td></td>
+
+                            <%}else{ %>
+                                <% array_eventos.push.apply(array_eventos, array_dias[i*7 + (j)].eventos);%>
+                                
+                                    <%if(j== 6) {%>
+                                        <td  style="border: 1;background-color: white; color: red; text-align: center; padding: 5px;"  >   <%= calendario[i*7 + (j)] %>
+                                        </td>
+                                        
+                                    <% }else{ %>
+                                        <td border="1" style="border: 1;background-color: <%= array_dias[i*7 + (j)].color %>; text-align: center; padding: 5px;"  >   <%= calendario[i*7 + (j)] %>
+                                        </td>
+                                    <% } %>
+                                                                        
+                            <% } %>
+
+                        <% } %>
+                                
+                        <td style="border: 0px;">
+                            <span style="margin-left: 1em;margin-right: 1em;">
+                                
+                                <% for( var j=0 ; j < array_eventos.length ; j++){ %>
+                                    <% var json_stringify = JSON.stringify(array_eventos[j]) %>
+                                    <input type="hidden" value="<%= json_stringify%>" id="data-<%= array_eventos[j].mensaje %>">
+                                    <button  id="button-<%= array_eventos[j].mensaje %>" onclick="eventoAntiguoBoton(<%=json_stringify%>)"><%= array_eventos[j].mensaje %></button>
+                                <% }%>
+                            </span>
+                        </td>
+
+                    </tr>
+
+                <% } %>
+                
+            </table>
+        </div>
+        <div class="modal fade" id="eventoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"></span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                            <input type="hidden" id="fechaInicio">
+                            <input type="hidden" id="eventoAntiguo">
+                            
+                            <div style="display: none;" id="formularioEventoPersonalizado">
+                                <input type="hidden" id="tipoDeEvento">
+                                
+                                <b><span id="text-formularioEvento"></span></b>
+                                
+                                
+                                
+                                <div id="div-editableCheck">
+                                    <input type="checkbox" class="form-check-input" id="editableCheck">
+                                    <label class="form-check-label" for="editableCheck" style="font-weight: normal;">Evento editable</label>
+                                </div>
+                                
+                                
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <span style="display: none; color: red; text-align: left;" id="mensajeErrorEvento">Debe escoger la opción de evento diario o poner una fecha final.</span>
+                      
+                      <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cerrar</button>
+                      <button type="button" class="btn btn-primary" onclick="guardarEvento()">Guardar</button>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+</div>
+
+
+
+        
+    <%}%>
+
+</div>
+<style>
+        .calendario-boton{
+            border-color: black;
+            height: 3em;
+            width: 3em;
+            border-radius: 0px;
+        }    
+    </style>
+<script>
+
+        //el multiselect del layout funciona con jquery
+        $('#eventoModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var dia = button.data('dia'); // Extract info from data-* attributes
+            var tipo = button.data('tipo');
+            var modal = $(this);
+            if(dia !== undefined){
+                
+                let eventos = document.getElementById("eventos" + dia).value;
+                modal.find('.modal-title').text('Día: ' + dia);
+                document.getElementById("fechaInicio").value = dia;
+                document.getElementById("text-fechaInicio").innerHTML = "Fecha de comienzo: " + dia;
+                if(eventos === ""){
+                    document.getElementById("option-text-eventos").style.display = "none";
+                }else{
+                    document.getElementById("option-text-eventos").style.display = "block";
+                }
+                document.getElementById("div-selectEvento").style.display = "block";
+                document.getElementById("botonEliminarEvento").style.display = "none";
+                                
+                document.getElementById("eventoAntiguo").value = 0;
+            }else{
+                var evento = JSON.parse(document.getElementById("eventoAntiguo").value)
+               // console.log(evento, evento.evento)
+                //modal.find('.modal-title').text(evento.evento);
+            }
+            
+
+            
+        });
+        
+                                        
+                                        
+                                        
+        
+        function cerrarModal(){
+            $('#eventoModal').modal('hide');
+            document.getElementById("eventoTipo").selectedIndex = "0";
+            document.getElementById("formularioEventoPersonalizado").style.display = "none";
+            
+
+        }
+
+        function guardarEvento(){
+            
+            let editableCheck = document.getElementById("editableCheck");
+       
+            let eventoAntiguo = JSON.parse(document.getElementById("eventoAntiguo").value);
+           // console.log(eventoAntiguo);
+            let identificador = eventoAntiguo.identificador;
+            
+            let url = "<%= contextPath %>/cumplimentar/calendario/eventoEditablePlan"
+            url += "?editable=" + editableCheck.checked + "&identificador=" + identificador;
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: url,
+                success: function(json) {
+                    //console.log(JSON.stringify(json.estado));
+                    location.reload();
+                },
+                error: function(e){
+                    //console.log("F");
+                }
+            });
+            
+            $('#eventoModal').modal('hide');
+            
+        }
+        
+        function eventoAntiguoBoton(evento){
+//console.log(evento);
+            var modal = $('#eventoModal');
+            document.getElementById("eventoAntiguo").value = JSON.stringify(evento);
+
+            modal.find('.modal-title').text("Modificar la propiedad de editabilidad para <%-planID%>");
+            
+
+            
+            if(evento.editable === 0){
+                document.getElementById("editableCheck").checked = false;
+                
+            }else{
+                document.getElementById("editableCheck").checked = true;
+            }
+            document.getElementById("div-editableCheck").style.display = "block";
+            
+
+            
+            
+            document.getElementById("text-formularioEvento").innerHTML = evento.nombre;
+            document.getElementById("formularioEventoPersonalizado").style.display = "block";
+            //console.log("EE")
+            $('#eventoModal').modal('show');
+            
+            //console.log("E")
+        }
+
+        function cambiarano(){
+            let ano = document.getElementById("selectano").value;
+            let search = parseQueryString();
+            delete search.ano;
+            search.ano = ano;
+            let url = parseStringQuery(search);
+            window.location.replace(url);
+        }
+        
+        function Enviar(){
+            return confirm("Una vez aprobado el calendario, los coordinadores de las titulaciones podrán comenzar a adaptarlo. ¿Estás seguro de querer aprobarlo?");
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            let element3 = document.getElementById('selectano');
+            //console.log("sep");
+            if (element3){
+                //console.log(document.getElementById("anoSeleccionado").value);
+                document.getElementById('selectano').value = document.getElementById("anoSeleccionado").value;
+            } 
+        });
+        
+        document.getElementsByTagName('body')[0].onload = actualizarCalendarioBarra();
+        function actualizarCalendarioBarra() {
+        
+
+            if("<%-general%>" === "true"){
+                document.getElementById('selectPlanCalendario').value = "General";
+            }else{
+                let selectValue = document.getElementById('plan').value
+                if(!selectValue) {
+                    selectValue= "09TT"
+                }
+                let element2 = document.getElementById('selectPlanCalendario')
+                if (element2){
+                    document.getElementById('selectPlanCalendario').value = selectValue;
+                } 
+            }
+                
+            let submenu = document.getElementById('submenu').value
+            if(!submenu) {
+                submenu= "AbrirCerrar"
+            }
+            document.getElementById(submenu).style.display = "block";
+            document.getElementById(submenu).className += " active";    
+        }
+        
+        function cambiarano(){
+            let ano = document.getElementById("selectano").value;
+            let search = parseQueryString();
+            delete search.ano;
+            search.ano = ano;
+            let url = parseStringQuery(search);
+            window.location.replace(url);
+        }
+
+
+        </script>

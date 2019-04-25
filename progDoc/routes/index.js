@@ -16,6 +16,7 @@ let infopdfprogdocController = require('../controllers/infopdfprogdoc_controller
 let historialController = require('../controllers/historial_controller')
 let acronimosController = require('../controllers/acronimos_controller')
 let examenController = require('../controllers/examen_controller')
+let calendarioController = require('../controllers/calendario_controller')
 let estados = require('../estados');
 let enumsPD = require('../enumsPD');
 
@@ -85,6 +86,16 @@ router.get("/respDoc/tribunales", menuProgDocController.getProgramacionDocente, 
   res.locals.rols.push({ rol: enumsPD.rols.DirectorDepartamento, PlanEstudioCodigo: null, DepartamentoCodigo: req.session.departamentoID, condiciones:
     [{ condicion: 'estadoTribunales[' + req.session.departamentoID, resultado: estados.estadoTribunal.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
    });
+  if (req.session.departamentoID === "TFG" || req.session.departamentoID === "TFM") {
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoTribunales[' + req.session.departamentoID, resultado: estados.estadoTribunal.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoTribunales[' + req.session.departamentoID, resultado: estados.estadoTribunal.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+  }
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
     [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }] 
   });
@@ -92,19 +103,46 @@ router.get("/respDoc/tribunales", menuProgDocController.getProgramacionDocente, 
 }, menuProgDocController.getPlanes,permisosControllerProgDoc.comprobarRols, respController.getTribunales);
 
 router.get("/consultar/tribunales", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, respController.getTribunales);
-router.get("/consultar/PDF", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, infopdfprogdocController.generarPDF);
- 
+router.get("/consultar/PDF", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, calendarioController.anoDeTrabajoPDF, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF);
+router.get("/cumplimentar/PDF", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, calendarioController.anoDeTrabajoPDF, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF); 
 router.get("/respDoc/editAsignacion", menuProgDocController.getProgramacionDocente, function (req, res, next) {
   res.locals.rols.push({
     rol: enumsPD.rols.ResponsableDocente, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: req.session.departamentoID, condiciones:
       [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoProfesor.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
   });
+  if (req.session.departamentoID === "TFG" || req.session.departamentoID === "TFM") {
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoTribunal.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+  }
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProfesores', resultado: estados.estadoProgDoc.incidencia }]
+  });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, respController.editAsignacion);
+router.get("/respDoc/editAsignacion/cambioModo", menuProgDocController.getProgramacionDocente, function (req, res, next) {
+  res.locals.rols.push({
+    rol: enumsPD.rols.ResponsableDocente, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: req.session.departamentoID, condiciones:
+      [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoProfesor.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+  });
+  if (req.session.departamentoID === "TFG" || req.session.departamentoID === "TFM") {
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoTribunal.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoTribunal.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+  }
   res.locals.rols.push({
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, respController.editAsignacion);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, respController.changeModeAsignacion, respController.getAsignaciones);
 
 router.post("/respDoc/aprobarAsignacion", function (req, res, next) {
   res.locals.rols.push({
@@ -115,6 +153,16 @@ router.post("/respDoc/aprobarAsignacion", function (req, res, next) {
     rol: enumsPD.rols.DirectorDepartamento, PlanEstudioCodigo: null, DepartamentoCodigo: req.session.departamentoID, condiciones:
       [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoProfesor.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
   });
+  if (req.session.departamentoID === "TFG" || req.session.departamentoID === "TFM") {
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoTribunal.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoTribunal.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+  }
   res.locals.rols.push({
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
@@ -122,17 +170,27 @@ router.post("/respDoc/aprobarAsignacion", function (req, res, next) {
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols,respController.aprobarAsignacion);
 
-router.post("/respDoc/guardarAsignacion", function (req, res, next) {
+router.post("/respDoc/guardarAsignacion", menuProgDocController.getProgramacionDocente, function (req, res, next) {
   res.locals.rols.push({
     rol: enumsPD.rols.ResponsableDocente, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: req.session.departamentoID, condiciones:
       [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoProfesor.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
   });
+  if (req.session.departamentoID === "TFG" || req.session.departamentoID === "TFM") {
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoTribunal.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoTribunal.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+  }
   res.locals.rols.push({
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.anadirProfesor,respController.guardarAsignacion);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, menuProgDocController.anadirProfesor,respController.guardarAsignacion);
 
 router.post("/respDoc/aprobarTribunales", function (req, res, next) {
   res.locals.rols.push({
@@ -143,6 +201,16 @@ router.post("/respDoc/aprobarTribunales", function (req, res, next) {
     rol: enumsPD.rols.DirectorDepartamento, PlanEstudioCodigo: null, DepartamentoCodigo: req.session.departamentoID, condiciones:
       [{ condicion: 'estadoTribunales[' + req.session.departamentoID, resultado: estados.estadoTribunal.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
   });
+  if (req.session.departamentoID === "TFG" || req.session.departamentoID === "TFM") {
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoTribunales[' + req.session.departamentoID, resultado: estados.estadoTribunal.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoTribunales[' + req.session.departamentoID, resultado: estados.estadoTribunal.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+  }
   res.locals.rols.push({
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
@@ -159,6 +227,16 @@ router.post("/respDoc/guardarTribunales", function (req, res, next) {
     rol: enumsPD.rols.DirectorDepartamento, PlanEstudioCodigo: null, DepartamentoCodigo: req.session.departamentoID, condiciones:
       [{ condicion: 'estadoTribunales[' + req.session.departamentoID, resultado: estados.estadoTribunal.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
   });
+  if (req.session.departamentoID === "TFG" || req.session.departamentoID === "TFM") {
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoTribunales[' + req.session.departamentoID, resultado: estados.estadoTribunal.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoTribunales[' + req.session.departamentoID, resultado: estados.estadoTribunal.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+  }
   res.locals.rols.push({
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
@@ -175,6 +253,16 @@ router.get("/respDoc/profesores", menuProgDocController.getProgramacionDocente, 
     rol: enumsPD.rols.DirectorDepartamento, PlanEstudioCodigo: null, DepartamentoCodigo: req.session.departamentoID, condiciones:
       [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoProfesor.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
   });
+  if (req.session.departamentoID === "TFG" || req.session.departamentoID === "TFM") {
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoTribunal.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+    res.locals.rols.push({
+      rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+        [{ condicion: 'estadoProfesores[' + req.session.departamentoID, resultado: estados.estadoTribunal.aprobadoResponsable }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+    });
+  }
   res.locals.rols.push({
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
@@ -287,10 +375,6 @@ router.post('/coordiandor/aprobarExamenes', function (req, res, next) {
 router.get('/consultar/grupos', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, gruposController.getGrupos);
 
 router.get('/gestionGrupos/getGrupos',function (req, res, next) {
-  res.locals.rols.push({
-    rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
-      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
-  });
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
   next();
 
@@ -299,10 +383,6 @@ router.get('/gestionGrupos/getGrupos',function (req, res, next) {
 
 router.post('/gestionGrupos/guardarGruposJE',function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
-  res.locals.rols.push({
-    rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
-      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
-  });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gruposController.EliminarGruposJE, gruposController.ActualizarGruposJE, gruposController.AnadirGruposJE )
 
@@ -319,7 +399,7 @@ router.post("/abrirProgDoc", function (req, res, next) {
 router.post("/cerrarProgDoc", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarProgDoc, infopdfprogdocController.generarPDF, gestionController.cerrarProgDoc2);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarProgDoc, calendarioController.anoDeTrabajoPDF, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF, gestionController.cerrarProgDoc2);
 
 router.post("/abrirIncidenciaProgDoc", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null });
@@ -338,34 +418,30 @@ router.post("/reabrirProgDoc", function (req, res, next) {
 router.post("/cerrarIncidenciaProgDoc", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarIncidenciaProgDoc, infopdfprogdocController.generarPDF, gestionController.cerrarProgDoc2);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarIncidenciaProgDoc,calendarioController.anoDeTrabajoPDF, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF, gestionController.cerrarProgDoc2);
 
 //consultarRoles
 router.get("/consultar/roles", menuProgDocController.getPlanes,gestionRoles.getRoles)
 //gestionRoles
 router.get("/gestionRoles", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
-  res.locals.rols.push({ rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols,  menuProgDocController.anadirUnaPersona, gestionRoles.getRoles);
 //ruta para guardar
 
 router.post("/gestionRoles/guardarRoles", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
-  res.locals.rols.push({ rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionRoles.guardarRoles, gestionRoles.redir);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.anadirProfesor, gestionRoles.guardarRoles, gestionRoles.redir);
       //atento añadir la ruta del controlador para guardar 
 
 router.get("/gestion/acronimos", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
-  res.locals.rols.push({ rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next();
-}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, menuProgDocController.getAsignaturasProgDoc, menuProgDocController.getAllDepartamentos, acronimosController.getAcronimos);
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, menuProgDocController.getAsignaturasProgDoc, acronimosController.getAcronimos);
 
 router.post('/gestionAcronimos/guardarAcronimosJE', function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
-  res.locals.rols.push({ rol: enumsPD.rols.SecretarioTitulacion, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, acronimosController.actualizarAcronimos)
 
@@ -393,6 +469,58 @@ router.get('/cumplimentar/actividades', menuProgDocController.getPlanes, functio
     planEstudios: res.locals.planEstudios,
   })
 });
+
+router.get('/gestion/calendario', function (req, res, next) {
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.anoDeTrabajo, calendarioController.eventosPlanDiccionario, calendarioController.eventosDiccionario, calendarioController.getCalendario)
+
+router.post('/gestion/calendario/eventoGeneral', function (req, res, next){
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.postEventoGeneral)
+
+router.delete('/gestion/calendario/eventoGeneral', function (req, res, next){
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.deleteEventoGeneral);
+
+router.post('/gestion/calendario/aprobarGeneral', function (req, res, next){
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next(); 
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.aprobarGeneral);
+
+router.get('/cumplimentar/calendario', function (req, res, next) {
+  res.locals.rols.push({
+    rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+      []
+  });
+  
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.anoDeTrabajo, calendarioController.eventosPlanDiccionario, calendarioController.eventosDiccionario, calendarioController.getCalendarioPlan)
+
+router.delete('/cumplimentar/calendario/eventoGeneral', function (req, res, next){
+  res.locals.rols.push({
+    rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+      []
+  });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.deleteEventoPlan);
+
+router.post('/cumplimentar/calendario/eventoGeneral', function (req, res, next){
+  res.locals.rols.push({
+    rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
+      []
+  });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.postEventoPlan);
+
+router.get('/consultar/calendario', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, calendarioController.anoDeTrabajo, calendarioController.eventosPlanDiccionario, calendarioController.eventosDiccionario, calendarioController.getCalendarioPlanConsultar);
+
+router.post('/cumplimentar/calendario/eventoEditablePlan', function (req, res, next){
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next(); 
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.editablePlan);
 
 module.exports = router;
 

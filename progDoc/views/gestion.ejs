@@ -16,21 +16,42 @@
             </select>
         </div>
     </div>
-    <%}%>
+    <%}else if(locals.submenu === "Calendario"){%>
+        
+        <select id="selectano" onchange="cambiarano()">
+
+                <option value="<%=ano3%>"><%=ano3.substring(2,5)%>/<%= parseInt(ano3.substring(2,5)) + 1%></option>
+            
+                <option value="<%=ano2%>"><%=ano2.substring(2,5)%>/<%= parseInt(ano2.substring(2,5)) + 1%></option> 
+                
+                <option value="<%=ano1%>"><%=ano1.substring(2,5)%>/<%= parseInt(ano1.substring(2,5)) + 1%></option> 
+                
+            
+        </select>
+        <select id="selectPlanCalendario" onchange="cambiarPlanCalendario()">
+            <option value="General" title="General">General</option>
+            <% for(let i=0; i < planEstudios.length; i++) { 
+                if (planEstudios[i].nombre !== null){ %>
+                    <option value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option> 
+                <%}else {%>
+                    <option value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].codigo%></option> 
+                <%}
+            }%>
+        </select>
+    <% }%>
 
     <div class="tab">
         <button id='AbrirCerrar' class="tablinks" onclick="cambiarSubmenu(event, 'AbrirCerrar')">Abrir/Cerrar</button>
         <button id='Roles' class="tablinks" onclick="cambiarSubmenu(event, 'Roles')">Roles</button>
-        <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')" title="Próximamente" disabled>Calendario</button>
+        <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')">Calendario</button>
         <button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>
-        <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Exámenes</button>
         <button id='Acronimos' class="tablinks" onclick="cambiarSubmenu(event, 'Acronimos')">Acrónimos</button>
     </div>
 
     <% if (locals.planID) { %>
         <input id='plan' type="hidden" value="<%=planID%>">
     <%} else {%>
-    <input id='plan' type="hidden">
+        <input id='plan' type="hidden">
     <%}%>
     <% if (locals.submenu) { %>
         <input id='submenu' type="hidden" value="<%=submenu%>">
@@ -61,12 +82,13 @@ if (submenu === 'Roles'){
 let url = "<%=contextPath%>/gestionRoles"
 window.location.replace(url);
 }
-if (submenu === 'Examenes'){
-let url = "<%=contextPath%>/csvExamenes"
-window.location.replace(url);
-}
+
 if (submenu === 'Acronimos'){
 let url = "<%=contextPath%>/gestion/acronimos"
+window.location.replace(url);
+}
+if (submenu === 'Calendario'){
+let url = "<%=contextPath%>/gestion/calendario"
 window.location.replace(url);
 }
 
@@ -99,6 +121,25 @@ if(!submenu) {
 }
 document.getElementById(submenu).style.display = "block";
 document.getElementById(submenu).className += " active";
+}
+
+
+
+
+function cambiarPlanCalendario(){
+    let pAcronimo = document.getElementById("selectPlanCalendario").value;
+    
+    let search = parseQueryString();
+    delete search.planID;
+    if(pAcronimo !== "General"){
+
+        search.planID = pAcronimo;
+    }else{
+        
+    }
+    
+    let url = parseStringQuery(search);
+    window.location.replace(url);
 }
 
 </script>

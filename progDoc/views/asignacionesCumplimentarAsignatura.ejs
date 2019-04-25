@@ -20,26 +20,45 @@
     <div class="autocomplete" style="width:500px;">
     <input id="coordinador" type="text" name="coordinador" value="<%= asign.coordinador.nombreCorregido %>" placeholder="<%= asign.coordinador.nombreCorregido %>" onclick= 'LimpiaCoordinador()'>
     </div>
-    <span><button type="button" onclick="EliminarCoordinador()">Eliminar</button> 
+    <span><button type="button" onclick="EliminarCoordinador()">Eliminar</button></span>
     </li>
-    <% for(var i=0; i< asign.grupos.length; i++){ %>
-        <li>
-      <% if (asign.grupos[i].grupoPerteneciente === true){%>
-        <h2> <span> Grupo <%= asign.grupos[i].GrupoNombre %>  <%= asign.grupos[i].nombreItinerario %>: </span></h2>
-      <%} else{%>
-         <h2> <span class="cuidado"> Grupo <%= asign.grupos[i].GrupoNombre %>  <%= asign.grupos[i].nombreItinerario %>: </span></h2>
-      <%}%>
-      <ul style="list-style-type:none">
-      <%for(var j=0; j< asign.grupos[i].profesors.length; j++){ %>
-      <li id="asignacion_<%= asign.grupos[i].profesors[j].asignacion %>">
-      <%= asign.grupos[i].profesors[j].nombreCorregido %> <button type="button" onclick="Eliminar('asignacion_<%= asign.grupos[i].profesors[j].asignacion %>')">Eliminar</button>
-      </li>
-    <% } %>
-    <div id = 'anadir_profesor_<%= asign.grupos[i].GrupoId %>'></div>
-    <button type="button" onclick="AnadirProfesor('anadir_profesor_<%= asign.grupos[i].GrupoId %>')">Añadir Profesor</button>
-        </ul>
+    <!-- Si el estado es N la asignacion se hace por grupo comun -->
+    <%if(asign.estado === "N") {
+        if(asign.grupos.length > 1){ %>
+          <li>
+          <h2> <span> Grupo Común: </span></h2>
+        <ul style="list-style-type:none">
+        <%for(let j=0; j< asign.grupos[0].profesors.length; j++){ %>
+        <li id="asignacion_<%= asign.grupos[0].profesors[j].asignacion %>">
+        <%= asign.grupos[0].profesors[j].nombreCorregido %> <button type="button" onclick="Eliminar('asignacion_<%= asign.grupos[0].profesors[j].asignacion %>')">Eliminar</button>
         </li>
-  <% } %> 
+      <% } %>
+      <div id = 'anadir_profesor_<%= asign.grupos[0].GrupoId %>'></div>
+      <button type="button" onclick="AnadirProfesor('anadir_profesor_<%= asign.grupos[0].GrupoId %>')">Añadir Profesor</button>
+          </ul>
+          </li>
+        <%}%>
+    <%} else {%>
+      <% for(let i=0; i< asign.grupos.length; i++){ %>
+          <li>
+        <% if (asign.grupos[i].grupoPerteneciente === true){%>
+          <h2> <span> Grupo <%= asign.grupos[i].GrupoNombre %>  <%= asign.grupos[i].nombreItinerario %>: </span></h2>
+        <%} else{%>
+            <h2> <span class="cuidado"> Grupo <%= asign.grupos[i].GrupoNombre %>  <%= asign.grupos[i].nombreItinerario %>: </span></h2>
+        <%}%>
+        <ul style="list-style-type:none">
+        <%for(let j=0; j< asign.grupos[i].profesors.length; j++){ %>
+        <li id="asignacion_<%= asign.grupos[i].profesors[j].asignacion %>">
+        <%= asign.grupos[i].profesors[j].nombreCorregido %> <button type="button" onclick="Eliminar('asignacion_<%= asign.grupos[i].profesors[j].asignacion %>')">Eliminar</button>
+        </li>
+      <% } %>
+      <div id = 'anadir_profesor_<%= asign.grupos[i].GrupoId %>'></div>
+      <button type="button" onclick="AnadirProfesor('anadir_profesor_<%= asign.grupos[i].GrupoId %>')">Añadir Profesor</button>
+          </ul>
+          </li>
+    <% }
+  } %>
+
     </ul>
 </form> 
 </div>

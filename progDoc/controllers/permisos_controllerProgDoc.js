@@ -1,8 +1,9 @@
 let models = require('../models');
 let Sequelize = require('sequelize');
 let app = require('../app');
+let enumsPD = require('../enumsPD');
 
-
+//comprueba el rol o si es delegado de dicho rol en función del estado de la PD pasada
 exports.comprobarRols = function (req, res, next) {
     let rols = req.session.user.rols;
     let rolsCoincidentes = [];
@@ -13,9 +14,15 @@ exports.comprobarRols = function (req, res, next) {
             pd['reabierto'] === null ? pd['reabierto'] = 0 : pd['reabierto'] = pd['reabierto']
         }
         res.locals.rols.forEach(function (r, index) {
-            let rolExistente = rols.find(function (obj) { return (obj.rol === r.rol && obj.PlanEstudioCodigo === r.PlanEstudioCodigo && obj.DepartamentoCodigo === r.DepartamentoCodigo) });
+            let rolExistente = rols.find(function (obj) { return ((obj.rol === r.rol || enumsPD.delegacion[r.rol] && enumsPD.delegacion[r.rol].includes(obj.rol))   
+                && obj.PlanEstudioCodigo === r.PlanEstudioCodigo && obj.DepartamentoCodigo === r.DepartamentoCodigo) });
             if (rolExistente) {
                 let cumple = true;
+                if(rolExistente.rol === "JefeEstudios"){
+                    req.isJefeDeEstudios = true;
+                }else{
+                    req.isJefeDeEstudios = false;
+                }
                 if (Array.isArray(r.condiciones)) {
                     for (let i = 0; i < r.condiciones.length; i++) {
                         let condic = r.condiciones[i].condicion.trim().split('[')

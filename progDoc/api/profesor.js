@@ -13,7 +13,8 @@ exports.getProfesorAsignaturas = function (req, res, next) {
     let planesCompletos = []
     let profesor = null;
     let pds=[]
-    let respuesta = {};
+    let resp = {};
+    let respError 
     let semestreAsignatura=["I","A","1S-2S"];
     switch (req.params.semestre) {
         case "1S":
@@ -23,16 +24,16 @@ exports.getProfesorAsignaturas = function (req, res, next) {
             semestreAsignatura.push("2S");
             break;
         default:
-            respuesta = { error: "Semestre incorrecto" }
+            respError = { error: "Semestre incorrecto" }
             break;
     }
     return menuProgDocController.getProfesorCorreo(req.params.profesorCorreo)
         .then((prof) => {
             profesor = prof
             if(!profesor){
-                respuesta = { error: "Profesor no encontrado"}
+                respError = { error: "Profesor no encontrado"}
             }
-            if (!('error' in respuesta)){
+            if (!respError){
                 return models.PlanEstudio.findAll({
                     attributes: ["codigo",'nombreCompleto','nombre'],
                     raw: true
@@ -76,27 +77,26 @@ exports.getProfesorAsignaturas = function (req, res, next) {
                     }).then((asignaciones) => {
                         asignaciones.forEach(function(asign,index){
                             let planId=asign['ProgramacionDocenteIdentificador'].split("_")[1]
-                            console.log(asign)
-                            if (!respuesta[planId]){
-                                respuesta[planId]={}
+                            if (!resp[planId]){
+                                resp[planId]={}
                                 let infoPlan = planesCompletos.find(function(obj){ return obj.codigo === planId})
-                                respuesta[planId]['codigo'] = infoPlan['codigo']
-                                respuesta[planId]['nombre'] = infoPlan['nombreCompleto']
-                                respuesta[planId]['acronimo'] = infoPlan['nombre']
-                                respuesta[planId]['asignaturas'] = []
+                                resp[planId]['codigo'] = infoPlan['codigo']
+                                resp[planId]['nombre'] = infoPlan['nombreCompleto']
+                                resp[planId]['acronimo'] = infoPlan['nombre']
+                                resp[planId]['asignaturas'] = []
                             }
-                            let asignatura= respuesta[planId]['asignaturas'].find(function(obj){return obj.codigo === asign.codigo})
+                            let asignatura= resp[planId]['asignaturas'].find(function(obj){return obj.codigo === asign.codigo})
                             if(!asignatura){
                                 delete asign['ProgramacionDocenteIdentificador']
-                                respuesta[planId]['asignaturas'].push(asign)
+                                resp[planId]['asignaturas'].push(asign)
                                 
                             }
                         })
-                        res.json(respuesta)
+                        res.json(resp)
                     })
                     
             }else{
-                res.json(respuesta);
+                res.json(respError);
             }
 
         })

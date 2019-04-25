@@ -104,6 +104,8 @@ exports.getAsignaciones = function (req, res, next) {
                     .then(function (asignacions) {
                         asignacion = asignacions
                         let nuevopath = "" + req.baseUrl + "/respdoc/editAsignacion"
+                        //se usa cambiopath para cambiar a la asignacion de profesores por grupo o comun
+                        let cambiopath = "" + req.baseUrl + "/respdoc/editAsignacion/cambioModo"
                         let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignacionesCumplimentar"
                         res.render(view,
                             {
@@ -111,6 +113,7 @@ exports.getAsignaciones = function (req, res, next) {
                                 profesores: profesores,
                                 asignacion: asignacion,
                                 nuevopath: nuevopath,
+                                cambiopath: cambiopath,
                                 aprobarpath: "" + req.baseUrl + "/respDoc/aprobarAsignacion",
                                 planID: req.session.planID,
                                 estadoProfesores: res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
@@ -138,15 +141,15 @@ exports.getAsignaciones = function (req, res, next) {
 
 }
 
-// GET respDoc/editAsignacion:pdID/:departamentoID/:acronimo
+// GET respDoc/editAsignacion/:pdID/:departamentoID/:acronimo
 exports.editAsignacion = function (req, res, next) {
     req.session.submenu = "Profesores2"
     let pdID = req.session.pdID
     let departamentoID = req.session.departamentoID
     let asignacion = [];
     let gruposBBDD = res.locals.grupos;
-    //por defecto es acronimo pero si no hay debe ser el nombre
-    let acronimo = req.query.acronimo
+    //por defecto es acronimo pero si no hay debe ser el nombre TODO: cambiar a codigo
+    let asignaturaIdentificador = Number(req.query.asignatura)
     if (!res.locals.permisoDenegado) {
         let profesores = [];
         return menuProgDocController.getProfesores()
@@ -156,7 +159,7 @@ exports.editAsignacion = function (req, res, next) {
             })
             .then(function (asignacions) {
                 asignacion = asignacions
-                let asign = asignacion.find(function (obj) { return (obj.acronimo === acronimo || obj.nombre === acronimo); });
+                let asign = asignacion.find(function (obj) { return (obj.identificador === asignaturaIdentificador); });
                 res.render('asignacionesCumplimentarAsignatura',
                     {
                         contextPath: app.contextPath,
@@ -181,11 +184,87 @@ exports.editAsignacion = function (req, res, next) {
             });
     } else {
         req.session.save(function () {
-        res.redirect("" + req.baseUrl + "/respDoc/profesores?pdID=" + pdID + "&departamentoID=" + departamentoID + "&planID=" + planID)
+        res.redirect("" + req.baseUrl + "/respDoc/profesores?pdID=" + pdID + "&departamentoID=" + departamentoID)
         })
     }
+}
+// GET respDoc/editAsignacion/cambioModo
+/*
+cuando quieres cambiar de asignacion indivudal a comun
+el cambiar a grupo comun copia todos los profesores de forma no repetida (dentro del mismo grupo), en todos los grupos
+curso y mismo semestre sin diferenciar si en ellos se imparte o no, eso se asigna en el horario
+tambien cambia el estado a asignatura a "N" para indicar este modo
+----
+cuando quieres cambiar de grupo comun a individual solo cambia el parametro estado a "S" deja todos los
+profesores en todos los grupos.
+*/
+exports.changeModeAsignacion = function (req,res,next){
+    let pdID = req.session.pdID
+    let departamentoID = req.session.departamentoID
+    let gruposBBDD = res.locals.grupos;
+    let queryToAnadir = []
+    let profesoresIdNoRepetidos = [];
+    //por defecto es acronimo pero si no hay debe ser el nombre TODO: cambiar a codigo
+    let asignaturaIdentificador = Number(req.query.asignatura)
+    let modo = req.query.modo
+    let asign;
+    if (!res.locals.permisoDenegado) {
+        let profesores = [];
+        return menuProgDocController.getProfesores()
+            .then(function (profesors) {
+                profesores = profesors;
+                return getAsignacion(pdID, departamentoID, profesores, pdID, gruposBBDD);
+            })
+            .then(function (asignacion) {
+                asign = asignacion.find(function (obj) { return (obj.identificador === asignaturaIdentificador); });
+                if(modo === "N"){
+                    //se rellena el array con los profesores no repetidos
+                    asign.grupos.forEach(function (g, index) {
+                        g.profesors.forEach(function (p, index2) {
+                            if (!profesoresIdNoRepetidos.includes(p.identificador)) profesoresIdNoRepetidos.push(p.identificador)
+                        })
+                    })
+                    //se añaden los profesores que no estaban en los grupos en los que puede existir la asignatura
+                    asign.grupos.forEach(function (g, index) {
+                        profesoresIdNoRepetidos.forEach(function (p, index2) {
+                            let coincide = g.profesors.find(function (obj) { return obj.identificador === p; });
+                            if (!coincide) {
+                                let nuevaEntrada = {};
+                                nuevaEntrada.AsignaturaId = asign.identificador;
+                                nuevaEntrada.ProfesorId = p;
+                                nuevaEntrada.GrupoId = g.GrupoId;
+                                queryToAnadir.push(nuevaEntrada);
+                            }
+                        })
+                    })
+                    return models.AsignacionProfesor.bulkCreate(
+                        queryToAnadir
+                    )
+                }else{
+                    return null;
+                }
 
-
+            }).then(() => {
+                return models.Asignatura.update(
+                    {
+                        estado: modo,
+                        
+                    },
+                    { where: { identificador: asign.identificador } } /* where criteria */
+                )}).then(() => { 
+                req.session.save(function () {
+                    next();
+                })
+            })
+            .catch(function (error) {
+                console.log("Error:", error);
+                next(error);
+            });
+    } else {
+        req.session.save(function () {
+            next();
+        })
+    }
 }
 
 function getAsignacion(ProgramacionDocenteIdentificador, DepartamentoResponsable, profesores, pdID, gruposBBDD, asignatura) {
@@ -199,7 +278,7 @@ function getAsignacion(ProgramacionDocenteIdentificador, DepartamentoResponsable
                 [op.ne]: null,
             }
         },
-        attributes: ['acronimo', 'curso', 'CoordinadorAsignatura', 'identificador', 'nombre', 'semestre', 'codigo'],
+        attributes: ['acronimo', 'curso', 'CoordinadorAsignatura', 'identificador', 'nombre', 'semestre', 'codigo', 'estado'],
         order: [
 
             [Sequelize.literal('"Asignatura"."curso"'), 'ASC'],
@@ -229,26 +308,13 @@ function getAsignacion(ProgramacionDocenteIdentificador, DepartamentoResponsable
                 asign.acronimo = ej.acronimo;
                 asign.nombre = ej.nombre;
                 asign.codigo = ej.codigo;
+                asign.estado = ej.estado;
                 asign.identificador = ej.identificador;
                 asign.curso = ej.curso;
                 asign.coordinador = obj;
                 asign.grupos = [];
-                let s1;
-                let s2;
-                switch (pdID.split("_")[3]) {
-                    case '1S':
-                        s1 = (ej.semestre === '1S' || ej.semestre === '1S-2S' || ej.semestre === 'A' || ej.semestre === 'I')
-                        s2 = false;
-                        break;
-                    case '2S':
-                        s1 = false;
-                        s2 = (ej.semestre === '2S' || ej.semestre === '1S-2S' || ej.semestre === 'A' || ej.semestre === 'I')
-                        break;
-                    default:
-                        s1 = (ej.semestre === '1S' || ej.semestre === '1S-2S' || ej.semestre === 'A' || ej.semestre === 'I')
-                        s2 = (ej.semestre === '2S' || ej.semestre === '1S-2S' || ej.semestre === 'A' || ej.semestre === 'I')
-                        break;
-                }
+                let s1 = menuProgDocController.getSemestresAsignaturainPD(menuProgDocController.getTipoPd(pdID), ej.semestre)[0];
+                let s2 = menuProgDocController.getSemestresAsignaturainPD(menuProgDocController.getTipoPd(pdID), ej.semestre)[1];
                 let coincidenciasGrupos = [];
                 if (s1) {
                     coincidenciasGrupos = gruposBBDD.filter(
@@ -259,7 +325,6 @@ function getAsignacion(ProgramacionDocenteIdentificador, DepartamentoResponsable
                     coincidenciasGrupos = coincidenciasGrupos.concat(gruposBBDD.filter(
                         gr => (Number(gr.curso) === Number(ej['curso']) && Number(gr.nombre.split(".")[1]) === 2)
                     ));
-
                 }
                 for (let i = 0; i < coincidenciasGrupos.length; i++) {
                     let grupo = {};
@@ -304,6 +369,7 @@ exports.guardarAsignacion = function (req, res, next) {
     let identificador = Number(req.body.asignaturaId)
     let pdID = req.session.pdID
     let planID = req.session.planID
+    let gruposBBDD = res.locals.grupos
     let departamentoID = req.session.departamentoID
     let profesoresAnadidos = res.profesoresAnadidos
     return menuProgDocController.getProfesores()
@@ -318,7 +384,7 @@ exports.guardarAsignacion = function (req, res, next) {
                         identificador: identificador,
                         ProgramacionDocenteIdentificador: pdID
                     },
-                    attributes: ["identificador", "DepartamentoResponsable"],
+                    attributes: ["identificador", "DepartamentoResponsable", "estado", "semestre", "curso"],
                     include: [{
                         //incluye las asignaciones de profesores y los horarios.
                         model: models.AsignacionProfesor,
@@ -358,7 +424,15 @@ exports.guardarAsignacion = function (req, res, next) {
                             if (!asig || !asig['AsignacionProfesors.ProfesorId']) {
                                 console.log("Intenta cambiar una nota o un horario")
                             } else {
-                                whereEliminar.identificador = asignacion;
+                                //si esta la opcion de grupo comun
+                                if(asig.estado === "N"){
+                                    whereEliminar.identificador = [];
+                                    //se deben coger tosas las asignaciones de profesor
+                                    let coincidencias = as.filter(a => (a['AsignacionProfesors.ProfesorId'] === asig['AsignacionProfesors.ProfesorId']));
+                                    coincidencias.forEach(function (c, index) { whereEliminar.identificador.push(c['AsignacionProfesors.identificador'])})
+                                }else{
+                                    whereEliminar.identificador = asignacion;
+                                }
                             }
                         } else {
                             whereEliminar.identificador = [];
@@ -368,7 +442,14 @@ exports.guardarAsignacion = function (req, res, next) {
                                 if (!asig || !asig['AsignacionProfesors.ProfesorId']) {
                                     console.log("Intenta cambiar una nota o un horario")
                                 } else {
-                                    whereEliminar.identificador.push(asignacion);
+                                    //si esta la opcion de grupo comun
+                                    if (asig.estado === "N") {
+                                        //se deben coger todas las asignaciones de profesor de dicha asignatura
+                                        let coincidencias = as.filter(a => (a['AsignacionProfesors.ProfesorId'] === asig['AsignacionProfesors.ProfesorId']));
+                                        coincidencias.forEach(function (c, index) { whereEliminar.identificador.push(c['AsignacionProfesors.identificador']) })
+                                    } else {
+                                        whereEliminar.identificador.push(asignacion);
+                                    }
                                 }
                             });
                         }
@@ -387,9 +468,24 @@ exports.guardarAsignacion = function (req, res, next) {
                     }
 
                     function paso3() {
-
                         let toAnadir = req.body.anadir;
                         let queryToAnadir = []
+                        let asig = as.find(function (obj) { return (obj['identificador'] === identificador) })
+                        let s1 = menuProgDocController.getSemestresAsignaturainPD(menuProgDocController.getTipoPd(pdID), asig.semestre)[0];
+                        let s2 = menuProgDocController.getSemestresAsignaturainPD(menuProgDocController.getTipoPd(pdID), asig.semestre)[1];
+                        //coincidencias de grupos a los que podria pertenecer la asignatura
+                        let coincidencias = []
+                        if (s1) {
+                            coincidencias = gruposBBDD.filter(
+                                gr => (Number(gr.curso) === Number(asig['curso']) && Number(gr.nombre.split(".")[1]) === 1)
+                            );
+                        }
+                        if (s2) {
+                            coincidencias = coincidencias.concat(gruposBBDD.filter(
+                                gr => (Number(gr.curso) === Number(asig['curso']) && Number(gr.nombre.split(".")[1]) === 2)
+                            ));
+
+                        }
                         if (toAnadir) {
                             if (!Array.isArray(toAnadir)) {
                                 let profesor = toAnadir.split("_")[3]
@@ -400,13 +496,25 @@ exports.guardarAsignacion = function (req, res, next) {
                                         profesor = p.ProfesorId;
                                     }
                                 }
-                                let nuevaEntrada = {};
-                                nuevaEntrada.AsignaturaId = identificador;
-                                nuevaEntrada.ProfesorId = profesor;
-                                if (!isNaN(toAnadir.split("_")[2])) {
-                                    nuevaEntrada.GrupoId = Number(toAnadir.split("_")[2]);
+                                let grupoId = toAnadir.split("_")[2]
+                                if (!isNaN(grupoId)) {
+                                    grupoId = Number(grupoId)
+                                    //si esta la opcion de grupo comun
+                                    if (asig.estado === "N") {
+                                        coincidencias.forEach(function (c, index) { 
+                                            let nuevaEntrada = {};
+                                            nuevaEntrada.AsignaturaId = identificador;
+                                            nuevaEntrada.ProfesorId = profesor;
+                                            nuevaEntrada.GrupoId = c.grupoId;
+                                            queryToAnadir.push(nuevaEntrada); })
+                                    } else {
+                                        let nuevaEntrada = {};
+                                        nuevaEntrada.AsignaturaId = identificador;
+                                        nuevaEntrada.ProfesorId = profesor;
+                                        nuevaEntrada.GrupoId = grupoId;
+                                        queryToAnadir.push(nuevaEntrada);
+                                    }
                                 }
-                                queryToAnadir.push(nuevaEntrada);
                             } else {
                                 toAnadir.forEach(function (element, index) {
                                     let profesor = element.split("_")[3]
@@ -417,13 +525,25 @@ exports.guardarAsignacion = function (req, res, next) {
                                             profesor = p.ProfesorId;
                                         }
                                     }
-                                    let nuevaEntrada = {};
-                                    nuevaEntrada.AsignaturaId = identificador;
-                                    if (!isNaN(element.split("_")[2])) {
-                                        nuevaEntrada.GrupoId = Number(element.split("_")[2]);
+                                    let grupoId = element.split("_")[2]
+                                    if (!isNaN(grupoId)) {
+                                        grupoId = Number(grupoId)
+                                        //si esta la opcion de grupo comun
+                                        if (asig.estado === "N") {
+                                            coincidencias.forEach(function (c, index) {
+                                                let nuevaEntrada = {};
+                                                nuevaEntrada.AsignaturaId = identificador;
+                                                nuevaEntrada.ProfesorId = profesor; 
+                                                nuevaEntrada.GrupoId = c.grupoId; 
+                                                queryToAnadir.push(nuevaEntrada); })
+                                        } else {
+                                            let nuevaEntrada = {};
+                                            nuevaEntrada.AsignaturaId = identificador;
+                                            nuevaEntrada.ProfesorId = profesor;
+                                            nuevaEntrada.GrupoId = grupoId;
+                                            queryToAnadir.push(nuevaEntrada);
+                                        }
                                     }
-                                    nuevaEntrada.ProfesorId = profesor;
-                                    queryToAnadir.push(nuevaEntrada);
                                 });
                             }
                         }
@@ -453,6 +573,8 @@ exports.guardarAsignacion = function (req, res, next) {
         });
 
 }
+
+
 // post respDoc/aprobarAsignacion:pdID
 exports.aprobarAsignacion = function (req, res, next) {
     let pdID = req.session.pdID;
@@ -544,7 +666,7 @@ exports.getTribunales = function (req, res, next) {
         let whereAsignaturas = {}
         whereAsignaturas['$or'] = [];
         let departamentoID = req.session.departamentoID;
-        return menuProgDocController.getProgramacionDocentesAnteriores(pdID.split("_")[1], pdID.split("_")[3], pdID.split("_")[2], pdID)
+        return menuProgDocController.getProgramacionDocentesAnteriores(menuProgDocController.getPlanPd(pdID), menuProgDocController.getTipoPd(pdID), menuProgDocController.getAnoPd(pdID), pdID,null)
             .then((pdis) => {
                 pdsAnteriores = pdis;
             

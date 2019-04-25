@@ -9,7 +9,7 @@
                     <% for (let j=0 ; j<asignacionsHorario[i].semestres.length; j++){%>
                         <h3>Semestre <%= asignacionsHorario[i].semestres[j].semestre %></h3>
                         <% for (let k=0 ; k<asignacionsHorario[i].semestres[j].grupos.length; k++){%>
-                            <h4><%= asignacionsHorario[i].semestres[j].grupos[k].grupoNombre %> <%=asignacionsHorario[i].semestres[j].grupos[k].nombreItinerario%>
+                            <h4><%= asignacionsHorario[i].semestres[j].grupos[k].grupoNombre %>  <%=asignacionsHorario[i].semestres[j].grupos[k].nombreItinerario%>  <%=asignacionsHorario[i].semestres[j].grupos[k].aula%>
                             <button type="button" class="btn btn-default" onclick = "MostrarOcultar('div_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
                             <span id ='button_div_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>'  class="glyphicon glyphicon-plus"></span> 
                             </button>

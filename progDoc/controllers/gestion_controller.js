@@ -3,15 +3,14 @@ let models = require('../models');
 let funciones = require('../funciones');
 let Sequelize = require('sequelize');
 let menuProgDocController = require('../controllers/menuProgDoc_controller')
-
-
+let enumsPD = require('../enumsPD');
 
 //funcion de getRoles para directores de departamentos jefe de estudios y subdirector de posgrado
 exports.getRoles = function (req, res, next) {
     req.session.submenu = "Roles"
     let responsablesDocentes = [];
     let profesores = [];
-    let departamentosList = [];
+    let cargos = []
     let programacionesDocentes = [];
     //responsables docentes
     return models.Rol.findAll({
@@ -33,10 +32,33 @@ exports.getRoles = function (req, res, next) {
             responsablesDocentes.push(cargos);
 
         })
-        .then(function (cargos) {
+        .then(function (cargs) {
+            cargos = cargs
+            return menuProgDocController.getPersonas()
+        }).then(function (profesors) {
+            profesores = profesors;
+            return menuProgDocController.getAllDepartamentos()
+        }).then(function(departs){
             //aqui llamar a la funcion de sacar los nombres de cada id
-            getDirectoresDepartamentos(cargos);
-
+            let nuevopath = "" + req.baseUrl + "/gestionRoles/guardarRoles";
+            let cancelarpath = "" + req.baseUrl + "/gestionRoles";
+            let view = req.originalUrl.toLowerCase().includes("consultar") ? "rolesConsultar" : "gestionRoles"
+            //foco al cambiar de plan desde la view para que vuelva a ese punto
+            let foco = req.query.foco ? true : false
+            res.render(view, {
+                contextPath: app.contextPath,
+                roles: cargos.sort(funciones.sortRolesporDepartamento),
+                rolesEnum: enumsPD.rols,
+                profesores: profesores,
+                nuevopath: nuevopath,
+                cancelarpath: cancelarpath,
+                submenu: req.session.submenu,
+                foco:foco,
+                departamentos: departs.sort(funciones.sortDepartamentos),
+                planID: req.session.planID,
+                planEstudios: res.locals.planEstudios,
+                menu: req.session.menu
+            });
         })
         .catch(function (error) {
             console.log("Error:", error);
@@ -44,189 +66,86 @@ exports.getRoles = function (req, res, next) {
         });
 
 
-    //funcion para sacar los nombres de los responsable de los roles
-    function getDirectoresDepartamentos(cargos) {
-
-        return menuProgDocController.getPersonas()
-            .then(function (profesors) {
-                profesores = profesors;
-            })
-            .then(function (prof) {
-                //de esta manera puedes sacar los string al anidar los includes de las tablas
-                //getResponsablesDocentes(cargos);
-                getDepartmentos(cargos);
-
-            })
-            .catch(function (error) {
-                console.log("Error:", error);
-                next(error);
-            });
-    }
-    //query donde sacar la lista de departamentos 
-    function getDepartmentos(cargos) {
-        return models.Departamento.findAll({
-            attributes: ['codigo', 'nombre', 'acronimo'],
-
-            raw: true
-        })
-            .each(function (departamentos) {
-                let codigoDepartamento = departamentos['codigo'];
-                let nombreDepartamento = departamentos['nombre'];
-                let acronimoDepartamento = departamentos['acronimo'];
-                let departamento = { codigo: codigoDepartamento, nombre: nombreDepartamento, acronimo: acronimoDepartamento }
-                departamentosList.push(departamento);
-
-            })
-            .then(function (departamentos) {
-                getResponsablesDocentes(cargos, departamentos)
-            })
-            .catch(function (error) {
-                console.log("Error:", error);
-                next(error);
-            });
-    }
-    function getResponsablesDocentes(cargos, departamentos) {
-
-        return models.ProgramacionDocente.findAll({
-            attributes: ['identificador', 'fechaProgDoc', 'PlanEstudioId'],
-
-            raw: true
-        })
-            .each(function (programacionesDoc) {
-                let indentificador = programacionesDoc['identificador'];
-                let fechaProgDoc = programacionesDoc['fechaProgDoc'];
-                let PlanEstudioId = programacionesDoc['PlanEstudioId'];
-                let pd = { indentificador: indentificador, fechaProgDoc: fechaProgDoc, PlanEstudioId: PlanEstudioId }
-                programacionesDocentes.push(pd);
-
-            })
-            .then(function (programacionesDoc) {
-                //hacer un metodo  que le pasas programaciones y te guarda en un array las + nuevas
-                //despues otro metodo que llama a tabla de asignaturas de cada indentificador de PD y guarda en un array con los departamentos de cada indentificador de PD
-                //ahora ya tienes los departamentos que intervienen
-                //compruebas en la tabla de roles si estos estan o no, si no estan los creas
-                let nuevopath = "" + req.baseUrl + "/gestionRoles/guardarRoles";
-                let cancelarpath = "" + req.baseUrl + "/gestionRoles";
-                let view = req.originalUrl.toLowerCase().includes("consultar") ? "rolesConsultar" : "gestionRoles"
-                res.render(view, {
-                    contextPath: app.contextPath,
-                    roles: cargos.sort(funciones.sortRolesporDepartamento),
-                    profesores: profesores,
-                    nuevopath: nuevopath,
-                    cancelarpath: cancelarpath,
-                    submenu: req.session.submenu,
-                    departamentos: departamentos.sort(funciones.sortDepartamentos),
-                    planID: req.session.planID,
-                    planEstudios: res.locals.planEstudios,
-                    programacionesDocentes: programacionesDocentes,
-                    menu: req.session.menu
-                });
-            })
-            .catch(function (error) {
-                console.log("Error:", error);
-                next(error);
-            });
-
-    }
-
+    
 }
+
+
+
 
 //query para guardar los cambios del sistema
 exports.guardarRoles = function (req, res, next) {
-    if (!res.locals.permisoDenegado) {
+    //si no tiene permiso o no hay rol
+    if (!res.locals.permisoDenegado || !req.body.rol || !req.body.rol.split("_")[0]) {
         req.session.submenu = "Roles"
+        let profesoresAnadidos = res.profesoresAnadidos;
         delete req.session.user.rols; //para asi luego obligarle a volver a buscarlos por los cambios que hayan
         //sacar name del rol  guardar
-        //id del rol a actualizar
+        let personaId;
+        //si hay que eliminarlo sigue existiendo el rol pero no asignado a nadie.
         let toActualizar = req.body.actualizar;
+        if (!toActualizar){
+            toActualizar = req.body.eliminar
+            personaId = null;
+        }else{
+            personaId = toActualizar.split("_")[1];
+            if (isNaN(personaId)) {
+                //le paso el correo en el caso que sea un profesor que se acaba de añadir.
+                let p = profesoresAnadidos.find(function (obj) { return obj.correo === toActualizar.split("_")[3] });
+                if (p) {
+                    personaId = p.ProfesorId;
+                }
+            }
+        } 
+        
 
-        let profesorId = toActualizar.split("_")[1];
-
-        //id y cargo del rol anterior => atento cuando undefined
-        let rolToActualizar = req.body.rol;
-        let idRolAntiguo = req.body.PersonaId;
-        let PlanEstudioCodigo = req.body.PlanEstudioCodigo;
-        let DepartamentoCodigo = req.body.DepartamentoCodigo;
-        if (PlanEstudioCodigo !== null && PlanEstudioCodigo !== undefined){
+        //rol 
+        let rolToActualizar = req.body.rol.split("_")[0];
+        let PlanEstudioCodigo = req.body.rol.split("_")[1];
+        let DepartamentoCodigo = req.body.rol.split("_")[2];
+        if (rolToActualizar.trim() === "" ) rolToActualizar = null
+        if (PlanEstudioCodigo.trim() === "") PlanEstudioCodigo = null
+        if (DepartamentoCodigo.trim() === "") DepartamentoCodigo = null
+        if (PlanEstudioCodigo !== null){
             req.session.planID = PlanEstudioCodigo
         }
-    
-
-        //actualizar el id de PersonaId si se ha escrito algo
-        //actualizamos subposgrado jefeestudios secretario
-        if (PlanEstudioCodigo === undefined && DepartamentoCodigo === undefined && !isNaN(profesorId)) {
-            return models.Rol.update(
-                { PersonaId: profesorId }, /* set attributes' value */
-                { where: { rol: rolToActualizar } } /* where criteria */
-            ).then(() => {
-                next();
+        let filtro = {}
+        filtro.rol = rolToActualizar;
+        filtro.DepartamentoCodigo = DepartamentoCodigo;
+        filtro.PlanEstudioCodigo = PlanEstudioCodigo;
+        return models.Rol
+            .findOne({ where: filtro })
+            .then(function (obj) {
+                if (obj) {
+                    return obj.update({ PersonaId: personaId });
+                }
+                else {
+                    if (Object.values(enumsPD.rols).includes(rolToActualizar) === true){
+                        return models.Rol.create({ rol: rolToActualizar, DepartamentoCodigo: DepartamentoCodigo, PlanEstudioCodigo: PlanEstudioCodigo, PersonaId: personaId })
+                    }
+                    else {
+                        return null
+                    }
+                }
+            })
+            .then(() => {
+                next()
+            })
+            .catch(function (error) {
+                console.log("Error:", error);
+                next(error);
             });
-        }
-        //actualizar cargos de coordinadores de titulacion
-        else if (PlanEstudioCodigo !== undefined && DepartamentoCodigo !== undefined && !isNaN(profesorId)) {
-            if (PlanEstudioCodigo !== null && DepartamentoCodigo.length === 0) {
-                return models.Rol.update(
-                    { PersonaId: profesorId }, /* valor a cambiar */
-                    { where: { DepartamentoCodigo: null, PlanEstudioCodigo: PlanEstudioCodigo } } /* criterio dentro de la tabla */
-                ).then(() => {
-                    next();
-                })
-                    .catch(function (error) {
-                        console.log("Error:", error);
-                        next(error);
-                    });
-            }
-            // actualizamos directores de departamento
-            else if (PlanEstudioCodigo.length === 0 && DepartamentoCodigo !== null && profesorId) {
-                return models.Rol.update(
-                    { PersonaId: profesorId }, /*valor a cambiar */
-                    { where: { DepartamentoCodigo: DepartamentoCodigo, PlanEstudioCodigo: null } } /* criterio dentro de la tabla */
-                ).then(() => {
-                    next(); 
-                })
-                .catch(function (error) {
-                    console.log("Error:", error);
-                    next(error);
-                });
-            }
-            // actualizamos Responsables Docentes
-            else if (PlanEstudioCodigo.length > 0 && DepartamentoCodigo.length > 0 && profesorId){
-                return models.Rol.update(
-                    { PersonaId: profesorId }, /*valor a cambiar */
-                    { where: { DepartamentoCodigo: DepartamentoCodigo, PlanEstudioCodigo: PlanEstudioCodigo } } /* criterio dentro de la tabla */
-                ).then(() => {
-                    next();
-                })
-                    .catch(function (error) {
-                        console.log("Error:", error);
-                        next(error);
-                    });
-            }
-        }
-        else {
-
-            next();
-            //si no se ha escrito nada en la celda
-        }
     }else{
-        req.session.save(function () {
-            res.redirect("" + req.baseUrl)
-        })
+        next()
     }
-    //atento al hacer el insert al sistema, buscar como hacerlo
-
-    //metodo en el caso de un solo, pensar ademas en como hacer la query para responsables docentes de cada titulacion y departamento
-
-    //volver a cargar la pagina de gestionRoles, volver a hacer la carga de la pagina de roles, volver  a hcer la llamada
 }
 
+
 exports.redir = function (req, res, next) {
-    req.session.save(function(){
+    req.session.save(function () {
         res.redirect("" + req.baseUrl + "/gestionRoles")
     })
 
 }
-
 
 
 

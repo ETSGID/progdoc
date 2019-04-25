@@ -1,0 +1,184 @@
+
+
+<div class="contenido" style="position: relative;">
+
+        <%if(estadoCalendario === 0){%>
+            <p><b>Calendario pendiente de validar</b></p>
+        <%}else{%>
+            
+            <div class="">       
+                <h2>Calendario común
+                    
+                </h2>
+    
+                
+            </div>
+            
+ 
+    
+            
+            <div  id="calendario_comun" style="font-size: 9px;">
+                <style>
+                    #calendario_comun td{
+                        padding: 1px;
+                        
+                    }
+                    #calendario_comun th{
+                        padding: 1px;
+                       
+                    }
+                </style>
+                
+                <table style="font-size: 9px;">
+                    <tr >
+                        <th style="text-align: center; ">
+                            Semana
+                        </th>
+                        <th style="text-align: center; ">
+                            Mes
+                        </th>
+                        <th style="text-align: center; ">
+                            L
+                        </th>
+                        <th style="text-align: center; ">
+                            M
+                        </th>
+                        <th style="text-align: center;">
+                            X
+                        </th>
+                        <th style="text-align: center;">
+                            J
+                        </th>
+                        <th style="text-align: center;">
+                            V
+                        </th>
+                        <th style="text-align: center;">
+                            S
+                        </th> 
+                        <th style="text-align: center;">
+                            D
+                        </th>
+                        <th style="text-align: center;">
+                            Eventos
+                        </th>
+                    </tr>
+    
+                    <% meses = ["SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE","ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO"] %>
+                    <% contador_de_meses = 0; contador_de_semanas = 0 %>
+                    <% array_eventos = [] %>
+                    <% for(var i = 0 ; i<(calendario.length/7); i++){ %>
+    
+                        <% array_eventos = [] %>
+                        <tr>
+                            <td style="text-align: center; margin-right:1px;">
+                                
+                                    
+                                        <%=contador_de_semanas %>
+                                    
+                                    <% contador_de_semanas += 1 %>   
+                                
+                            </td>
+                            <td style="text-align: center; margin-right:1px; border: 0px">
+                                <% if(calendario.slice(i*7, i*7+7).includes(1)){ %>
+                                    
+                                        <%= meses[contador_de_meses] %>
+                                    
+                                    <% contador_de_meses += 1 %>   
+                                <% } %>
+                            </td>
+    
+                            <% for(var j = 0 ; j<(7); j++){ %>
+                                
+                                <% if(calendario[i*7 + (j)] === undefined) { %>
+                                    <td></td>
+    
+                                <%}else{ %>
+                                    <% array_eventos.push.apply(array_eventos, array_dias[i*7 + (j)].eventos);%>
+                                    
+                                        <%if(j== 6) {%>
+                                            <td style="background-color: white; color: red; text-align: center;"  >   <%= calendario[i*7 + (j)] %>
+                                            </td>
+                                            
+                                        <% }else{ %>
+                                            <td style="background-color: <%= array_dias[i*7 + (j)].color %>; text-align: center;"  >   <%= calendario[i*7 + (j)] %>
+                                            </td>
+                                        <% } %>
+                                                                            
+                                <% } %>
+    
+                            <% } %>
+                            <td style="border: 0px">
+                            
+                                <span style="margin-left: 1em; font-size: 9px">
+                                    
+                                    <% for( var j=0 ; j < array_eventos.length ; j++){ %>
+                                        <% var json_stringify = JSON.stringify(array_eventos[j]) %>
+                                        <%= array_eventos[j].mensaje %>
+                                    <% }%>
+                                </span>
+                                
+                            </td>
+    
+                        </tr>
+    
+                    <% } %>
+                    
+                </table>
+            </div>
+            </div>
+    
+            <br>
+            <table border="1" style="font-size: 9px; width: 50%;">
+                    <tr style="text-align: center; width: 100%">
+                        <td><b>LEYENDA</b></td>
+                    </tr>
+                    <tr>
+                        <th style="text-align: center">Evento</th>
+                        <th style="text-align: center">Color</th>
+                    </tr>
+                    <tr>
+                        <td>Días no lectivos o de ajuste</td>
+                        <td style="background-color: SpringGreen"></td>
+                    </tr>
+                    <tr>
+                        <td>Días especiales</td>
+                        <td style="background-color: red"></td>
+                    </tr>
+                    <tr>
+                        <td>Exámenes</td>
+                        <td style="background-color: yellow"></td>
+                    </tr>
+                    <tr>
+                        <td>Defensas de TFTs</td>
+                        <td style="background-color: LightSkyBlue"></td>
+                    </tr>
+                    <tr>
+                        <td>Días festivos o no lectivos oficiales UPM</td>
+                        <td style="background-color: grey"></td>
+                    </tr>
+                    <tr>
+                        <td>Fechas importantes</td>
+                        <td style="background-color: Orange"></td>
+                    </tr>
+                        
+                        
+                        
+                        
+                   
+                </table>
+            
+                  
+        <%}%>
+               
+
+    </div>
+
+    <div style="page-break-after:always;"></div>
+<style>
+        .calendario-boton{
+            border-color: black;
+            height: 3em;
+            width: 3em;
+            border-radius: 0px;
+        }    
+    </style>

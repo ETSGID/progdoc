@@ -8,346 +8,381 @@
 <%}else if(locals.permisoDenegado && locals.permisoDenegado!== null){%>
   <p><%=permisoDenegado%></p>
 <%}else{ %>
+<% let filterByRol = function (roles, rol, plan, departamento){
+    let filtro
+    if (departamento) filtro = r => ((r.rol === rol && r.PlanEstudioCodigo === plan && r.DepartamentoCodigo === departamento))
+    else filtro = r => ((r.rol === rol && r.PlanEstudioCodigo === plan))
+    let found = roles.filter(
+        filtro
+    );
+    return found;
+}%>
+<% let buscaPers = function (profesores, id){
+let prof = profesores.find(function (obj) { return obj.identificador === id; });
+if(!prof){
+    prof={}
+    prof.nombre="No asignado";
+    prof.nombreCorregido = "No asignado";
+}
+return prof
+}%>
+<% let buscaDep = function (departamentos, id){
+let dep = departamentos.find(function (obj) { return obj.codigo=== id; });
+if(!dep.acronimo){
+    dep.nom = dep.codigo
+}else{
+    dep.nom= dep.acronimo
+}
+return dep
+}%>
 <h3>Gestión Roles Aplicación</h3>
-<h3><em>Roles comunes a todas las titulaciones</em></h3>
 <div id='hermanoNuevoProfesorForm'>
-    <div class="container">
-        <div class="row col-sm space-above-below">
-            <span class="col-sm-4"></span>
-            <span class="col-sm-4"></span> 
-            <span class="col-sm-4"></span>
-        </div>
-        <% for(var i=0; i < roles.length; i++){ %>
-            <% if(roles[i].rol==="JefeEstudios"){  %>
-                <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                    <% if(!prof){
-                        prof={}
-                        prof.nombre="NO ASIGNADO";
-                        prof.nombreCorregido = "NO ASIGNADO";
-                    }%>
-        <form id="<%=roles[i].rol %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
-        <div class="row col-sm space-above-below">
-            <div class="col-sm-5" >Jefe De Estudios</div>
-             <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' 
-             onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
-                <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                placeholder="<%=prof.nombre %>"></input>
-                <input type="hidden" id="<%=roles[i].rol %>" name="rol" value="<%=roles[i].rol %>" />
-                <input type="hidden"  name="rol" placeholder="<%=roles[i].rol %>_<%=roles[i].PersonaId %>_<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>" />
-            </div>
-            <div class="col-sm-2">
-                <button type="button" onclick="Guardar('<%=roles[i].rol %>', '<%= nuevopath %>')">Aprobar</button>
-                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-            </div>
-        </div>
-        </form>
-            <% } %>
-        <% } %>
-            <% for(var i=0; i < roles.length; i++){ %>
-            <%  if(roles[i].rol==="SubdirectorPosgrado"){ %>
-                <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                    <% if(!prof){
-                        prof={}
-                        prof.nombre="NO ASIGNADO";
-                        prof.nombreCorregido = "NO ASIGNADO";
-                    }%>
-        <form id="<%=roles[i].rol %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
-        <div class="row col-sm space-above-below">
-            <div class="col-sm-5">Subdirector de Posgrado</div>
-            <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' 
-            onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
-               <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-               <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-               placeholder="<%=prof.nombre %>"></input>
-                <input type="hidden" id="<%=roles[i].rol %>" name="rol" value="<%=roles[i].rol %>" />
-                <input type="hidden"  name="rol" placeholder="<%=roles[i].rol %>_<%=roles[i].PersonaId %>_<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>" />
-            </div>
-            <div class="col-sm-2">
-                <button type="button" onclick="Guardar('<%=roles[i].rol %>', '<%= nuevopath %>')">Aprobar</button>
-                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-            </div>
-        </div>
-        </form>
-            <% } %>
-        <% } %>
-            <% for(let i=0; i < roles.length; i++){ %>
-            <% if(roles[i].rol==="SecretarioTitulacion"){ %>
-                <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                    <% if(!prof){
-                        prof={}
-                        prof.nombre="NO ASIGNADO";
-                        prof.nombreCorregido = "NO ASIGNADO";
-                    }%>
-                <form id="<%=roles[i].rol %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
-                <div class="row col-sm space-above-below">
-                    <div class="col-sm-5">Secretaría Jefe De Estudios</div>
-                    <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'
-                        onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
-                        <p id='p_<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                        <input id='<%=roles[i].rol %>_<%=prof.nombre.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                        placeholder="<%=prof.nombre %>"></input>
-                        <input type="hidden" id="<%=roles[i].rol %>" name="rol" value="<%=roles[i].rol %>" />
-                        <input type="hidden"  name="rol" value="<%=roles[i].rol %>_<%=roles[i].PersonaId %>_<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>" />
-                    </div>
-                    <div class="col-sm-2">
-                        <button type="button"  onclick="Guardar('<%=roles[i].rol %>', '<%= nuevopath %>')">Aprobar</button>
-                        <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                    </div>
-                </div>
+    <h3><em>Roles comunes a todas las titulaciones</em></h3>
+     <table class="table">          
+        <tbody id='body_tb_departamentos'>
+            <% 
+            let rol = rolesEnum.JefeEstudios
+            let departamento = null
+            let plan = null
+            let rols = filterByRol(roles, rol, plan, departamento)
+            rols.forEach(function(r,index){ %>
+                <tr>
+                <td>
+                Jefe de Estudios
+                </td>
+                <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
+                <form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post" >
+                <input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                <input id="<%=rol%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
                 </form>
-            <% }%>
-        <% } %>
-        
-        <div class="row col-sm space-above-below">
-                <div class="row col-sm space-above-below">
-                    <span class="col-sm-4"><u>Directores Departamentos</u>
-                </div>
-                <% for(var i=0; i < roles.length; i++) { %>
-                    <% for(var j=0; j < departamentos.length; j++) {
-                        departamentos[j].nom = departamentos[j].acronimo !== null ? departamentos[j].acronimo : departamentos[j].codigo %>
-                        <% if(roles[i].DepartamentoCodigo===departamentos[j].codigo&&roles[i].rol==='DirectorDepartamento'){ %>
-                            <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                            <% if(!prof){
-                                prof={}
-                                prof.nombre="NO ASIGNADO";
-                                prof.nombreCorregido = "NO ASIGNADO";
-                            }%>
-                <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
-                <div class="row col-sm space-above-below">
-                            
-                    <div class="col-sm-5"><span title="<%=departamentos[j].nombre.toLowerCase()%>"><%=departamentos[j].nom%></span></div>
-                    <div class="col-sm-5" id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'  
-                    onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
-                        <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                        <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                        placeholder="<%=prof.nombre %>"></input>
-                        <input type="hidden"  name="rol" value="<%=roles[i].rol %>" />
-                        <input type="hidden"  name="PersonaId" value="<%=roles[i].PersonaId %>" />
-                        <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
-                        <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
-                    </div>
-                    <div class="col-sm-2">
-                        <button type="button" onclick="Guardar('<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>', '<%= nuevopath %>')">Aprobar</button>
-                        <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                    </div>
-                </div>
+                </td>
+                <td>
+                <div id="buttons_<%=rol%>_<%=index%>" style="visibility:hidden">
+                <button type="button" onclick="Guardar('<%=rol%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
+                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
+                <button type="button" onclick="Eliminar('<%=rol%>_<%=index%>')">Eliminar</button>
+                <div>
+                </td>
+                </tr>
+            <%})%>
+             <% 
+            rol = rolesEnum.SecretarioTitulacion
+            departamento = null
+            plan = null
+            rols = filterByRol(roles, rol, plan, departamento)
+            rols.forEach(function(r,index){ %>
+                <tr>
+                <td>
+                Secretaría Jefe de Estudios
+                </td>
+                <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
+                <form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+                <input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                <input id="<%=rol%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
                 </form>
-                        <% } %>
-                    <% } %>
-                <% } %>
-                    
-        </div>
-        <div class="row col-sm-12 space-above-below dropdown">
-                <div class="row col-sm space-above-below">
-                    <h3><em><span class="col-sm-4">Roles específicos de titulación</span></em></h3>
-                        <span clas="col-sm-3">
-                    </span>
-                    <span>
-                        <Select id="selectCoordinador" >
-                            <% for(let i=0; i < planEstudios.length; i++) { 
-                                if (planEstudios[i].nombre !== null && (planID !== planEstudios[i].codigo)){ %>
-                            <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option>
-                                <% }else if (planEstudios[i].nombre !== null && (planID === planEstudios[i].codigo)){ %>
-                            <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)" selected><%=planEstudios[i].nombre%></option>  
-                                <%}else if (planEstudios[i].nombre === null && (planID !== planEstudios[i].codigo)) {%>
-                            <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].codigo%></option>
-                            <%}else{%>
-                            <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>"  title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"selected><%=planEstudios[i].codigo%></option>
-                                <%}
-                            }%>
-                        </Select>
-                    </span>
-                </div>
-                <div class="row col-sm space-above-below">
-                <% for(var i=0; i < roles.length; i++){ %>
-                    <% for(var j=0; j < planEstudios.length; j++){ %>
-                        <% if(roles[i].rol==="CoordinadorTitulacion"&&(roles[i].PlanEstudioCodigo === planEstudios[j].codigo)&&(planEstudios[j].nombre !==null)){  %>
-                    <div style="display:none" class="Coordinador"  id="Coordinador_<%=planEstudios[j].codigo%>">
-                    <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                    <% if(!prof){
-                        prof={}
-                        prof.nombre="NO ASIGNADO";
-                        prof.nombreCorregido = "NO ASIGNADO";
-                    }%>
-                    <form id="<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
-                        <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">       
-                            <div class="col-sm-5" >Coordinador</div>    
-                            <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5" 
-                                onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
-                                <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                                <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                                placeholder="<%=prof.nombre %>"></input>
-                                        <input type="hidden"  name="rol" value="<%=roles[i].rol %>" />
-                                        <input type="hidden"  name="PersonaId" value="<%=roles[i].PersonaId %>>" />
-                                        <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
-                                        <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
-                            </div>
-                            <div class="col-sm-2">
-                                <button type="button" onclick="Guardar('<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo%>', '<%= nuevopath %>')">Aprobar</button>
-                                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                            </div>
-                        </div>
-                    </form>          
-                    </div>
-                    <% }%>
-                    <% if(roles[i].rol==="CoordinadorTitulacion" && roles[i].PlanEstudioCodigo === planEstudios[j].codigo&&(planEstudios[j].nombre ===null)){  %>
-                    <div style="display:none" class="Coordinador"  id="Coordinador_<%=planEstudios[j].codigo%>">
-                    <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                    <% if(!prof){
-                        prof={}
-                        prof.nombre="NO ASIGNADO";
-                        prof.nombreCorregido = "NO ASIGNADO";
-                    }%>
-                    <form id="<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
-                        <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">
-                            <div class="col-sm-5" >Coordinador <%=planEstudios[j].codigo %></div>
-                            <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5" 
-                            onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
-                            <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                            <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                            placeholder="<%=prof.nombre %>"></input>
-                                    <input type="hidden"  name="rol" value="<%=roles[i].rol %>" />
-                                    <input type="hidden"  name="PersonaId" value="<%=roles[i].PersonaId %>>" />
-                                    <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
-                                    <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
-                            </div>
-                            <div class="col-sm-2">
-                                <button type="button" onclick="Guardar('<%=roles[i].rol %>_<%= roles[i].PlanEstudioCodigo%>', '<%= nuevopath %>')">Aprobar</button>
-                                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                            </div>
-                        </div>
-                    </form>          
-                    </div>
-
-                     <% } %>
-                    
-                    <% } %>
-                <% } %>
-                  
-            <div><u>Responsables Docentes</u></div>
-                          
-            <% for(var i=0; i < roles.length; i++){ %>
-                <% for(var j=0; j < planEstudios.length; j++){ %> 
-                    <% if(roles[i].rol==="ResponsableDocente"&&(roles[i].PlanEstudioCodigo === planEstudios[j].codigo)&&(planEstudios[j].nombre !==null)){  %>
-                        <div style="display:none" class="ResponsableDocente"  id="ResponsableDocente_<%=planEstudios[j].codigo%>">
-                        <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                        <% if(!prof){
-                            prof={}
-                            prof.nombre="NO ASIGNADO";
-                            prof.nombreCorregido = "NO ASIGNADO";
-                        }%>
-                        <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
-                            <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">
-                                <% for(let p=0; p < departamentos.length; p++){ 
-                                    departamentos[p].nom = departamentos[p].acronimo !== null ? departamentos[p].acronimo : departamentos[p].codigo%>
-                                    <% if(roles[i].DepartamentoCodigo === departamentos[p].codigo){ %>
-                                        <div class="col-sm-5"><span title="<%=departamentos[p].nombre.toLowerCase()%>"><%=departamentos[p].nom%></span></div>
-                                    <% }%> 
-                                <% }%>
-                                <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5" 
-                                    onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
-                                    <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                                    <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                                    placeholder="<%=prof.nombre %>"></input>
-                                            <input type="hidden"  name="rol" value="<%=roles[i].rol %>" />
-                                            <input type="hidden"  name="PersonaId" value="<%=roles[i].PersonaId %>>" />
-                                            <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
-                                            <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
-                                </div>
-                                <div class="col-sm-2">
-                                    <button type="button" onclick="Guardar('<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre%>', '<%= nuevopath %>')">Aprobar</button>
-                                    <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <% }%>
-                    <% if(roles[i].rol==="ResponsableDocente"&&(roles[i].PlanEstudioCodigo === planEstudios[j].codigo)&&(planEstudios[j].nombre ===null)){  %>
-                        <div style="display:none" class="ResponsableDocente"  id="ResponsableDocente_<%=planEstudios[j].codigo%>">
-                        <% let prof = profesores.find(function (obj) { return obj.identificador === roles[i].PersonaId; }); %>
-                        <% if(!prof){
-                            prof={}
-                            prof.nombre="NO ASIGNADO";
-                            prof.nombreCorregido = "NO ASIGNADO";
-                        }%>
-                        <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre %>" autocomplete="off" action="<%= nuevopath %>"  method="post" >
-                            <div id="related_<%=roles[i].PlanEstudioCodigo %>"class="row col-sm space-above-below">
-                                <% for(var p=0; p < departamentos.length; p++){ 
-                                    departamentos[p].nom = departamentos[p].acronimo !== null ? departamentos[p].acronimo : departamentos[p].codigo%>
-                                    <% if(roles[i].DepartamentoCodigo === departamentos[p].codigo){ %>
-                                        <div class="col-sm-5"><span title="<%=departamentos[p].nombre.toLowerCase()%>"><%=departamentos[p].nom%></span></div>
-                                    <% }%> 
-                                <%}%>
-                                <div id='div_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' class="col-sm-5" 
-                                    onclick="mostrar('<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>')">
-                                    <p id='p_<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>'><%=prof.nombreCorregido %></p>
-                                    <input id='<%=roles[i].rol %>_<%=prof.nombre %>__<%=roles[i].PlanEstudioCodigo %>_<%=roles[i].DepartamentoCodigo %>' type="hidden" name="actualizar" value="<%=roles[i].rol %>_<%=prof.nombre %>"
-                                    placeholder="<%=prof.nombre %>"></input>
-                                            <input type="hidden"  name="rol" value="<%=roles[i].rol %>" />
-                                            <input type="hidden"  name="PersonaId" value="<%=roles[i].PersonaId %>>" />
-                                            <input type="hidden"  name="PlanEstudioCodigo" value="<%=roles[i].PlanEstudioCodigo %>" />
-                                            <input type="hidden"  name="DepartamentoCodigo" value="<%=roles[i].DepartamentoCodigo %>" />
-                                </div>
-
-                            <div class="col-sm-2">
-                                <button type="button" onclick="Guardar('<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>_<%=planEstudios[j].nombre%>', '<%= nuevopath %>')">Aprobar</button>
-                                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                            </div>
-                            </div>
-                        </form>
-                    </div>
-                    <% }%> 
-                    <% } %>
-                <% } %>
-            </div>
-        </div>
-    </div> 
-    <div class="container">
-        <div class="row col-sm space-above-below">
-            <span class="col-sm-4"></span>
-            <span class="col-sm-4"></span> 
-            <span class="col-sm-4"></span>
-        </div>
-    </div>
+                </td>
+                <td>
+                <div id="buttons_<%=rol%>_<%=index%>" style="visibility:hidden">
+                <button type="button" onclick="Guardar('<%=rol%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
+                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
+                <button type="button" onclick="Eliminar('<%=rol%>_<%=index%>')">Eliminar</button>
+                <div>
+                </td>
+                </tr>
+            <%})%>
+           
+            <% 
+            rol = rolesEnum.SubdirectorPosgrado
+            departamento = null
+            plan = null
+            rols = filterByRol(roles, rol, plan, departamento)
+            rols.forEach(function(r,index){ %>
+                <tr>
+                <td>
+                SubdirectorPosgrado
+                </td>
+                <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
+                <form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+                <input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                <input id="<%=rol%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
+                </form>
+                </td>
+                <td>
+                <div id="buttons_<%=rol%>_<%=index%>" style="visibility:hidden">
+                <button type="button" onclick="Guardar('<%=rol%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
+                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
+                <button type="button" onclick="Eliminar('<%=rol%>_<%=index%>')">Eliminar</button>
+                <div>
+                </td>
+                </tr>
+            <%})%>
+            <tr>
+            <td><u>Directores departamentos</u></td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            </tr>
+            <%
+            rol = rolesEnum.DirectorDepartamento 
+            departamento = null
+            plan = null
+            let directores = filterByRol(roles, rol, plan, departamento)
+            directores.forEach(function(r,index){ %>
+                <% departamento = r.DepartamentoCodigo%>
+                <tr>
+                <td title="<%=buscaDep(departamentos,departamento).nombre.toLowerCase()%> (<%=departamento%>)">
+                <%=buscaDep(departamentos,departamento).nom%>
+                </td>
+                <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
+                <form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+                <input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                <input id="<%=rol%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
+                </form>
+                </td>
+                <td>
+                <div id="buttons_<%=rol%>_<%=index%>" style="visibility:hidden">
+                <button type="button" onclick="Guardar('<%=rol%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
+                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
+                <button type="button" onclick="Eliminar('<%=rol%>_<%=index%>')">Eliminar</button>
+                <div>
+                </td>
+                </tr>
+            <%let rol2 = rolesEnum.DirectorDepartamentoX2 
+            let delegado = filterByRol(roles, rol2, plan, departamento)
+            if (delegado.length === 0) prof = buscaPers(profesores, null)
+            else prof = buscaPers(profesores, delegado[0].PersonaId);
+            %>
+            <tr>
+            <td style="border: 0; padding-left:5em">
+            <em>Delegado en<em>
+            </td>
+            <td id="td_<%=rol2%>_<%=index%>" onclick="mostrar('<%=rol2%>_<%=index%>')" >
+            <form id="<%=rol2%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+            <input type="hidden" name="rol" value="<%=rol2%>_<%=plan%>_<%=departamento%>">
+            <p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
+            <input id="<%=rol2%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
+            </form>
+            </td>
+            <td>
+            <div id="buttons_<%=rol2%>_<%=index%>" style="visibility:hidden">
+            <button type="button" onclick="Guardar('<%=rol2%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
+            <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
+            <button type="button" onclick="Eliminar('<%=rol2%>_<%=index%>')">Eliminar</button>
+            <div>
+            </td>
+            </tr>
+            <%})%>
+            <tr id="foco">
+            <td></td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3 style="display:inline;"><em>Roles específicos de titulación</em></h3>
+    <select id="selectCoordinador" onChange="cambiarPDCoordinador()" >
+        <% for(let i=0; i < planEstudios.length; i++) { 
+            if (planEstudios[i].nombre !== null && (planID !== planEstudios[i].codigo)){ %>
+        <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option>
+            <% }else if (planEstudios[i].nombre !== null && (planID === planEstudios[i].codigo)){ %>
+        <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)" selected><%=planEstudios[i].nombre%></option>  
+            <%}else if (planEstudios[i].nombre === null && (planID !== planEstudios[i].codigo)) {%>
+        <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].codigo%></option>
+        <%}else{%>
+        <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>"  title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"selected><%=planEstudios[i].codigo%></option>
+            <%}
+        }%>
+    </select>
+    <table class="table">          
+        <tbody id='body_tb_departamentos'>
+            <% 
+            rol = rolesEnum.CoordinadorTitulacion
+            departamento = null
+            plan = planID
+            rols = filterByRol(roles, rol, plan, departamento)
+            rols.forEach(function(r,index){ %>
+                <tr>
+                <td>
+                Coordinador Titulación
+                </td>
+                <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
+                <form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+                <input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                <input id="<%=rol%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
+                </form>
+                </td>
+                <td>
+                <div id="buttons_<%=rol%>_<%=index%>" style="visibility:hidden">
+                <button type="button" onclick="Guardar('<%=rol%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
+                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
+                <button type="button" onclick="Eliminar('<%=rol%>_<%=index%>')">Eliminar</button>
+                <div>
+                </td>
+                </tr>
+            <%let rol2 = rolesEnum.CoordinadorTitulacionX2 
+            delegado = filterByRol(roles, rol2, plan, departamento)
+            if (delegado.length === 0) prof = buscaPers(profesores, null)
+            else prof = buscaPers(profesores, delegado[0].PersonaId);
+            %>
+            <tr>
+            <td style="border: 0; padding-left:5em">
+            <em>Delegado en<em>
+            </td>
+            <td id="td_<%=rol2%>_<%=index%>" onclick="mostrar('<%=rol2%>_<%=index%>')" >
+            <form id="<%=rol2%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+            <input type="hidden" name="rol" value="<%=rol2%>_<%=plan%>_<%=departamento%>">
+            <p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
+            <input id="<%=rol2%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
+            </form>
+            </td>
+            <td>
+            <div id="buttons_<%=rol2%>_<%=index%>" style="visibility:hidden">
+            <button type="button" onclick="Guardar('<%=rol2%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
+            <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
+            <button type="button" onclick="Eliminar('<%=rol2%>_<%=index%>')">Eliminar</button>
+            <div>
+            </td>
+            </tr>
+            <%})%>         
+            <tr>
+            <td><u>Responsables Docentes</u></td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            </tr>
+            <%
+            rol = rolesEnum.ResponsableDocente
+            departamento = null
+            plan = planID
+            responsables = filterByRol(roles, rol, plan, departamento) 
+            responsables.forEach(function(r,index){ %>
+                <% departamento = r.DepartamentoCodigo%>
+                <tr>
+                <td title="<%=buscaDep(departamentos,departamento).nombre.toLowerCase()%> (<%=departamento%>)">
+                <%=buscaDep(departamentos,departamento).nom%>
+                </td>
+                <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
+                <form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+                <input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                <input id="<%=rol%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
+                </form>
+                </td>
+                <td>
+                <div id="buttons_<%=rol%>_<%=index%>" style="visibility:hidden">
+                <button type="button" onclick="Guardar('<%=rol%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
+                <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
+                <button type="button" onclick="Eliminar('<%=rol%>_<%=index%>')">Eliminar</button>
+                <div>
+                </td>
+                </tr>
+            <%let rol2 = rolesEnum.ResponsableDocenteX2 
+            delegado = filterByRol(roles, rol2, plan, departamento)
+            if (delegado.length === 0) prof = buscaPers(profesores, null)
+            else prof = buscaPers(profesores, delegado[0].PersonaId);
+            %>
+            <tr>
+            <td style="border: 0; padding-left:5em">
+            <em>Delegado en<em>
+            </td>
+            <td id="td_<%=rol2%>_<%=index%>" onclick="mostrar('<%=rol2%>_<%=index%>')" >
+            <form id="<%=rol2%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+            <input type="hidden" name="rol" value="<%=rol2%>_<%=plan%>_<%=departamento%>">
+            <p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
+            <input id="<%=rol2%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
+            </form>
+            </td>
+            <td>
+            <div id="buttons_<%=rol2%>_<%=index%>" style="visibility:hidden">
+            <button type="button" onclick="Guardar('<%=rol2%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
+            <button type="button" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
+            <button type="button" onclick="Eliminar('<%=rol2%>_<%=index%>')">Eliminar</button>
+            <div>
+            </td>
+            </tr>
+            <%})%>
+        </tbody>
+    </table>
 </div> 
 <%- include nuevoProfesor.ejs %>
 <%}%>
 </div>
 <script>
-    let profesores = <%-JSON.stringify(profesores)%>
-    let planID = <%-JSON.stringify(planID)%>
-    let planEstudios = <%-JSON.stringify(planEstudios)%>
-    let profesores2 ="";
-    profesores2 = quitAcents(profesores)
+
+
+//solo deja cambiar un rol por cada petición por eso selected
+let selected = false;
+let profesores = <%- JSON.stringify(profesores) %>
+let profesores2 = quitAcents(profesores)
+//se utiliza para que al cambiar plan el foco vaya a donde estabas
+let foco = <%- JSON.stringify(foco) %>
+//este form se usa cuando anades un profesor al sistema
+let form
 function mostrar(id){
-  let celda = document.getElementById("div_"+id);
-  //debo hacer lo de p y p2 pq al aceptar en el buscador me vuelve a entrar aqui uso el id de p como flag 
-  let p = document.getElementById("p_"+id);
-  let p2 = document.getElementById("p_"+id+"_provisional")
+  let celda = document.getElementById("td_"+id);
+  form = celda.children[0]
   let input = document.getElementById(id)
-  let nameInput = input.getAttribute('name');
-  if (p){
-    //creo el div para encapsular la busqueda
-    let div = document.createElement('div');
-    div.innerHTML = '<div class="autocomplete col-sm-12"></div>'
-    let nuevo = div.firstChild;
-    celda.appendChild(nuevo)
-    nuevo.appendChild(input)
-    celda.removeChild(p);
-    let nuevoValor = input.getAttribute('placeholder')
-    if (input.getAttribute('value')){
-      input.setAttribute('value', '' )
+  let p = document.getElementById("p_"+id);
+    if(!selected){
+        //muestro los botones
+        document.getElementById("buttons_"+id).style.visibility= "visible"
+        //creo el div para encapsular la busqueda
+        let div = document.createElement('div');
+        div.innerHTML = '<div class="autocomplete col-sm-12"></div>'
+        let nuevo = div.firstChild;
+        form.appendChild(nuevo)
+        nuevo.appendChild(input)
+        form.removeChild(p);
+        let nuevoValor = input.getAttribute('placeholder')
+        if (input.getAttribute('value')){
+        input.setAttribute('value', '' )
+        }
+        input.setAttribute('type', 'text')
+        autocomplete(input, profesores, profesores2, 'tribunales');
+        input.focus();
     }
-    input.setAttribute('type', 'text')
-    autocomplete(input, profesores, profesores2, 'tribunales');
-  }else if(p2){
-    p2.setAttribute('id', "p_"+id);
-  }
-  input.focus();
+    selected = true;
 }
 
-function Guardar(formID,nuevopath){
+
+function Eliminar(id){
+    document.getElementById(id).style.display = "none";
+    document.getElementById(id).name = "eliminar";
+    let celda = document.getElementById("td_"+id);
+    let div = document.createElement('div');
+    div.innerHTML = `<p id="p_${id}">No asignado</p>`
+    let nuevo = div.firstChild;
+    celda.appendChild(nuevo)
+    //se habilita el boton de aceptar y el de cancelar y se deshabilita el de eliminar
+    document.getElementById("buttons_"+id).children[0].disabled = false;
+    document.getElementById("buttons_"+id).children[1].disabled = false;
+    document.getElementById("buttons_"+id).children[2].disabled = true;
+}
+
+function cambioRol(input){
+    let id = input.id
+    if(input.value !== "otro"){
+        //se habilita el boton de aceptar y el de cancelar y se deshabilita el de eliminar
+        document.getElementById("buttons_"+id).children[0].disabled = false;
+        document.getElementById("buttons_"+id).children[1].disabled = false;
+        document.getElementById("buttons_"+id).children[2].disabled = true;
+        let persona = input.value.split("_")[1]
+        let rol = input.id.split("_")[0]
+        input.value = persona
+    }
+}
+
+function Guardar(formID, nuevopath){
     if(formID.split("_")[0] !== "JefeEstudios" || confirm("Seguro que quiere dejar su cargo de Jefe de Estudios, no podrá deshacer esta acción una vez aceptada")){
         let form2 = document.getElementById(formID);
         let pAcronimo = document.getElementById("selectCoordinador").value;
@@ -360,6 +395,7 @@ function cambiarPDCoordinador(){
     let search = parseQueryString();
     delete search.pdID;
     search.planID = pAcronimo;
+    search.foco = true;
     let url = parseStringQuery(search);
     window.location.replace(url);
     
@@ -369,22 +405,9 @@ function Volver(cancelarpath){
     window.location.replace(cancelarpath);
 }
 
-
 $(function() {
 
-    let form = $(this)
-        $('#selectCoordinador').change(function(){
-            $('.Coordinador').hide();
-            $('.ResponsableDocente').hide();
-            $('*#' +'Coordinador_'+ $(this).val()).show();
-            $('*#' +'ResponsableDocente_'+ $(this).val()).show();
-        });
-    $('.Coordinador').hide();
-    $('.ResponsableDocente').hide();
-    let planID =  $('#selectCoordinador').val();
-    $('*#' +'Coordinador_'+ planID).show();
-    $('*#' +'ResponsableDocente_'+ planID).show();
-    
+    if (foco)window.scrollTo(0, document.getElementById('foco').offsetTop + 20);
 });
     
 </script>

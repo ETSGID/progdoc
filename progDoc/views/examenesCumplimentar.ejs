@@ -106,7 +106,7 @@
                                         <%if (asignacionsExamen[i].asignaturas[j].acronimo !== null){ %>
                                             <span title="<%=asignacionsExamen[i].asignaturas[j].nombre%> (<%=asignacionsExamen[i].asignaturas[j].codigo%>)"><%= asignacionsExamen[i].asignaturas[j].acronimo%></span>
                                         <% }else{%>
-                                        <span  title="<%=asignacionsExamen[i].asignaturas[j].nombre%> (<%=asignacionsExamen[i].asignaturas[j].codigo%>)"><%= asignacionsExamen[i].asignaturas[j].nombre%></span>
+                                        <span  title="<%=asignacionsExamen[i].asignaturas[j].nombre%> (<%=asignacionsExamen[i].asignaturas[j].codigo%>)"><%= asignacionsExamen[i].asignaturas[j].codigo%></span>
                                         <% } %> 
                                     </th>
                                     <td>
@@ -130,16 +130,16 @@
                                     <%}%>
                                     </td>
                                      <%
-                                    let hora= asignacionsExamen[i].asignaturas[j].examen.horaInicio ? +asignacionsExamen[i].asignaturas[j].examen.horaInicio.split(':')[0] : 8
-                                    let minutos = asignacionsExamen[i].asignaturas[j].examen.horaInicio ? +asignacionsExamen[i].asignaturas[j].examen.horaInicio.split(':')[1]:0
-                                    let duracion = asignacionsExamen[i].asignaturas[j].examen.duracion ? asignacionsExamen[i].asignaturas[j].examen.duracion : 0
+                                    let hora= asignacionsExamen[i].asignaturas[j].examen.horaInicio ? +asignacionsExamen[i].asignaturas[j].examen.horaInicio.split(':')[0] : null
+                                    let minutos = asignacionsExamen[i].asignaturas[j].examen.horaInicio ? +asignacionsExamen[i].asignaturas[j].examen.horaInicio.split(':')[1]:null
+                                    let duracion = asignacionsExamen[i].asignaturas[j].examen.duracion ? asignacionsExamen[i].asignaturas[j].examen.duracion : null
                                     if(parseInt(hora,10)<10)hora='0'+hora;
                                     if(parseInt(minutos,10)<10)minutos='0'+minutos;
                                         %>
-                                     <td><input type="number" min='0' max='23' id='hora_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>'   name='hora_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="<%=hora%>" value="<%=hora%>" onChange="formatHora(this);Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>><b>:</b>
-                                    <input type="number"  min='0' max='59' id='minutos_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' name='minutos_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="<%=minutos%>" value="<%=minutos%>" onChange="formatHora(this);Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>>
+                                     <td><input type="number" min='0' max='23' id='hora_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>'   name='hora_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="hh" value="<%=hora%>" onChange="formatHora(this);Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>><b>:</b>
+                                    <input type="number"  min='0' max='59' id='minutos_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' name='minutos_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="mm" value="<%=minutos%>" onChange="formatHora(this);Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>>
                                     </td>
-                                    <td><input type="number" min='0' max='500' id='duracion_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' name='duracion_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="<%=duracion%>" value="<%=duracion%>" onChange="Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>></td>
+                                    <td><input type="number" min='0' max='500' id='duracion_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' name='duracion_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="mm" value="<%=duracion%>" onChange="Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>></td>
                                 </tr>
                                 <%}%>
                                 </tbody>
@@ -243,19 +243,22 @@ $(function() {
 
 
 function isExamenInFranjas(examenId){
-    let horaInicial;
-    let horaFinal;
     let rowsSolapa = false;
     let period = franjas.find(function (obj) { return obj.periodo === examenId.split("_")[2]; });
-    if(period.franjas.length === 0){
-        //en este caso return true porque no hay franjas
-        return true;
-    }
-    let hora = document.getElementsByName("hora_"+examenId)[0].value;
-    let minutos = document.getElementsByName("minutos_"+examenId)[0].value;
+    let hora = +document.getElementsByName("hora_"+examenId)[0].value;
+    let minutos = +document.getElementsByName("minutos_"+examenId)[0].value;
     let duracion = +document.getElementsByName("duracion_"+examenId)[0].value;
-    horaInicial = moment.duration(hora+":"+minutos)
-    horaFinal = (moment.duration(hora+":"+minutos).add(duracion,"m"));
+    let horaInicial = moment.duration(hora+":"+minutos)
+    let horaFinal = (moment.duration(hora+":"+minutos).add(duracion,"m"));
+    if(period.franjas.length === 0){
+        //en este caso no hay franjas
+       if(!isNaN(hora) && hora !== 0 && !isNaN(minutos) && !isNaN(duracion) && horaInicial.isValid() && horaFinal.isValid()){
+        document.getElementById(examenId).classList.remove("solapa");
+        return true;
+       }    
+        document.getElementById(examenId).classList.add("solapa");
+        return false;
+    }
     document.getElementById(examenId).classList.add("solapa");
     for (let i=0; i<period.franjas.length; i++){    
             //encaja con un examen si la horaInicial es posterior o igual a la hora inicial de la period
@@ -484,7 +487,7 @@ function Guardar(nuevopath){
     activado = false;
     let rowsSolapan = document.getElementsByClassName('solapa').length;
     if (rowsSolapan > 0){
-        alert("Hay exámenes que no encajan con ninguna de las franjas definidas, no puede guardar los exámenes hasta solucionarlo");
+        alert("Hay exámenes que no encajan con ninguna de las franjas definidas o no tienen hora asignada, no puede guardar los exámenes hasta solucionarlo");
     }else{
     let form2 = document.getElementById("formulario");
     form2.setAttribute('action', nuevopath);
@@ -496,7 +499,7 @@ function Enviar(){
     activado = false;
     let rowsSolapan = document.getElementsByClassName('solapa').length;
     if (rowsSolapan > 0){
-        alert("Hay exámenes que no encajan con ninguna de las franjas definidas, no puede aprobar los exámenes hasta solucionarlo");
+        alert("Hay exámenes que no encajan con ninguna de las franjas definidas o no tienen hora asignada, no puede aprobar los exámenes hasta solucionarlo");
         return false;
     }else{
         if (confirm("Una vez aprobados los exámenes no podrá modificarlos ¿Seguro que quiere aprobarlos?")){

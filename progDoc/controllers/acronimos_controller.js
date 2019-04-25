@@ -2,51 +2,57 @@ let app = require('../app');
 let models = require('../models');
 let funciones = require('../funciones');
 let estados = require('../estados');
+let menuProgDocController = require('./menuProgDoc_controller')
 //en res.locals.asignaturas tendre todas las asignaturas de la pd
 exports.getAcronimos = function (req, res, next) {
-    let nuevopath = "" + req.baseUrl + "/gestionAcronimos/guardarAcronimosJE"
-    let asignaturasPorCursos = {};
-    req.session.submenu = "Acronimos"
-    if (!res.locals.progDoc || !res.locals.departamentosResponsables ||
-        (estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) 
-        && estados.estadoProgDoc.incidencia !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) {
-        res.render("acronimosJE", {
-            contextPath: app.contextPath,
-            estado: "Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada",
-            permisoDenegado: res.locals.permisoDenegado,
-            menu: req.session.menu,
-            submenu: req.session.submenu,
-            planID: req.session.planID,
-            planEstudios: res.locals.planEstudios,
-            nuevopath: nuevopath,
-            departamentos: res.locals.departamentos.sort(funciones.sortDepartamentos),
-            asignaturasPorCursos: null,
-        })
-    }else{
-        let pdID = res.locals.progDoc['ProgramacionDocentes.identificador']
-        if (res.locals.asignaturas) {
-            res.locals.asignaturas.forEach(function (as) {
-                if (asignaturasPorCursos[as.curso] == null) {
-                    asignaturasPorCursos[as.curso] = [];
-                }
-                asignaturasPorCursos[as.curso].push(as);
-            });
+    return menuProgDocController.getAllDepartamentos()
+    .then(function (departs) {
+        let nuevopath = "" + req.baseUrl + "/gestionAcronimos/guardarAcronimosJE"
+        let asignaturasPorCursos = {}; 
+        req.session.submenu = "Acronimos"
+        if (!res.locals.progDoc || !res.locals.departamentosResponsables ||
+            (estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) 
+            && estados.estadoProgDoc.incidencia !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) {
+            res.render("acronimosJE", {
+                contextPath: app.contextPath,
+                estado: "Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada",
+                permisoDenegado: res.locals.permisoDenegado,
+                menu: req.session.menu,
+                submenu: req.session.submenu,
+                planID: req.session.planID,
+                planEstudios: res.locals.planEstudios,
+                nuevopath: nuevopath,
+                departamentos: departs.sort(funciones.sortDepartamentos),
+                asignaturasPorCursos: null,
+            })
+        }else{
+            let pdID = res.locals.progDoc['ProgramacionDocentes.identificador']
+            if (res.locals.asignaturas) {
+                res.locals.asignaturas.forEach(function (as) {
+                    if (asignaturasPorCursos[as.curso] == null) {
+                        asignaturasPorCursos[as.curso] = [];
+                    }
+                    asignaturasPorCursos[as.curso].push(as);
+                });
+            }
+            res.render("acronimosJE", {
+                contextPath: app.contextPath,
+                estado: null,
+                permisoDenegado: res.locals.permisoDenegado,
+                menu: req.session.menu,
+                submenu: req.session.submenu,
+                planID: req.session.planID,
+                planEstudios: res.locals.planEstudios,
+                nuevopath: nuevopath,
+                asignaturas: asignaturasPorCursos,
+                departamentos: departs.sort(funciones.sortDepartamentos),
+                pdID: pdID
+            })
         }
-        res.render("acronimosJE", {
-            contextPath: app.contextPath,
-            estado: null,
-            permisoDenegado: res.locals.permisoDenegado,
-            menu: req.session.menu,
-            submenu: req.session.submenu,
-            planID: req.session.planID,
-            planEstudios: res.locals.planEstudios,
-            nuevopath: nuevopath,
-            asignaturas: asignaturasPorCursos,
-            departamentos: res.locals.departamentos,
-            pdID: pdID
-        })
-
-    }
+        }).catch(function (error) {
+            console.log("Error:", error);
+            next(error);
+        });
 }
 
 //guardar acrónimos departamento

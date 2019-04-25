@@ -28,23 +28,38 @@
           <li>
             <span> Coordinador: <%= asignacion[i].coordinador.nombreCorregido %> </span>
           </li>
-        <% for(var j=0; j< asignacion[i].grupos.length; j++){ %>
-        
-            <li>
-          <% if (asignacion[i].grupos[j].grupoPerteneciente === true){%>
-              <span> Grupo <%= asignacion[i].grupos[j].GrupoNombre %> <%= asignacion[i].grupos[j].nombreItinerario %>: </span>
-            <%} else{%>
-              <span class="cuidado"> Grupo <%= asignacion[i].grupos[j].GrupoNombre %> <%= asignacion[i].grupos[j].nombreItinerario %>: </span>
-            <%}%>
-          <%for(var k=0; k< asignacion[i].grupos[j].profesors.length; k++){ 
-            if(k === asignacion[i].grupos[j].profesors.length -1 ){%>
-              <span><%= asignacion[i].grupos[j].profesors[k].nombreCorregido %></span>
-            <%}else{%>     
-              <span><%= asignacion[i].grupos[j].profesors[k].nombreCorregido %>;</span>
-            <%}
-          } %>
+           <!-- Si el estado es N la asignacion se hace por grupo comun -->
+           <%if(asignacion[i].estado === "N") {
+              if(asignacion[i].grupos.length > 1){ %>
+                <li>
+                  <span> Grupo Común: </span>             
+              <%for(var k=0; k< asignacion[i].grupos[0].profesors.length; k++){
+                if(k === asignacion[i].grupos[0].profesors.length -1 ){%>
+                  <span><%= asignacion[i].grupos[0].profesors[k].nombreCorregido %></span>
+                <%}else{%>     
+                  <span><%= asignacion[i].grupos[0].profesors[k].nombreCorregido %>; </span>
+                <%}
+              } %>
             </li>
-      <% } %> 
+              <%}%>
+          <%} else { %>
+          <% for(var j=0; j< asignacion[i].grupos.length; j++){ %>
+              <li>
+            <% if (asignacion[i].grupos[j].grupoPerteneciente === true){%>
+                <span> Grupo <%= asignacion[i].grupos[j].GrupoNombre %> <%= asignacion[i].grupos[j].nombreItinerario %>: </span>
+              <%} else{%>
+                <span class="cuidado"> Grupo <%= asignacion[i].grupos[j].GrupoNombre %> <%= asignacion[i].grupos[j].nombreItinerario %>: </span>
+              <%}%>
+            <%for(var k=0; k< asignacion[i].grupos[j].profesors.length; k++){ 
+              if(k === asignacion[i].grupos[j].profesors.length -1 ){%>
+                <span><%= asignacion[i].grupos[j].profesors[k].nombreCorregido %></span>
+              <%}else{%>     
+                <span><%= asignacion[i].grupos[j].profesors[k].nombreCorregido %>;</span>
+              <%}
+            } %>
+              </li>
+        <% } 
+      } %> 
         </ul>
         </li>
     </ul>  
