@@ -171,6 +171,8 @@ let cursos = <%-JSON.stringify(cursos)%>
 //el multiselect del layout funciona con jquery
 let estado = <%-JSON.stringify(estado)%>
 let asignacionsExamen = <%-JSON.stringify(asignacionsExamen)%>;
+let estadoProgDoc = <%-JSON.stringify(estadoProgDoc)%>
+let estadosProgDoc = <%-JSON.stringify(estadosProgDoc)%>
 let anoInicial;
 let anoFinal;
 let fechasLimite;
@@ -486,7 +488,7 @@ function Volver(cancelarpath){
 function Guardar(nuevopath){
     activado = false;
     let rowsSolapan = document.getElementsByClassName('solapa').length;
-    if (rowsSolapan > 0){
+    if (rowsSolapan > 0 && estadoProgDoc === estadosProgDoc.incidencia){
         alert("Hay exámenes que no encajan con ninguna de las franjas definidas o no tienen hora asignada, no puede guardar los exámenes hasta solucionarlo");
     }else{
     let form2 = document.getElementById("formulario");

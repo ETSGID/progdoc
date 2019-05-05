@@ -39,3 +39,10 @@ thead{
     margin-top: 40%;
     width:100%
 }
+.noBorde {
+    border:0 !important;
+}
+
+.noBordeInferior {
+    border-bottom:0 !important;
+}

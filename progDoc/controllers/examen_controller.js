@@ -17,7 +17,23 @@ const path = require('path')
 exports.getFranjas = function (req, res, next) {
     let franjasExamen = [];
     if (req.session.pdID) {
-        let tipo = req.session.pdID.split("_")[3]
+        return getFranjasExamenes(req.session.pdID)
+        .then((franjasExamen) => {
+            res.locals.franjasExamen = franjasExamen
+            next();
+        }).catch(function (error) {
+            console.log("Error:", error);
+            next(error);
+        });
+    } else {
+        next()
+    }
+
+}
+
+function getFranjasExamenes (pdID){
+    let franjasExamen = [];
+        let tipo = menuProgDocController.getTipoPd(pdID)
         switch (tipo) {
             case '1S':
                 franjasExamen.push({ periodo: enumsPD.periodoPD.S1_O, periodoNombre: "Periodo Ordinario 1º Semestre", franjas: [] })
@@ -36,7 +52,7 @@ exports.getFranjas = function (req, res, next) {
         }
         return models.FranjaExamen.findAll({
             where: {
-                ProgramacionDocenteId: req.session.pdID,
+                ProgramacionDocenteId: pdID,
             },
             order: [
                 [Sequelize.literal('"FranjaExamen"."periodo"'), 'ASC'],
@@ -49,17 +65,10 @@ exports.getFranjas = function (req, res, next) {
                 f["franjas"].push(franja)
             }
         }).then(() => {
-            res.locals.franjasExamen = franjasExamen
-            next();
-        }).catch(function (error) {
-            console.log("Error:", error);
-            next(error);
-        });
-    } else {
-        next()
-    }
-
+            return franjasExamen
+        })
 }
+exports.getFranjasExamenes = getFranjasExamenes;
 
 exports.getExamenes = function(req,res,next){
     let asignacionsExamen = []; //asignaciones existentes
@@ -238,6 +247,8 @@ exports.getExamenesView = function (req, res, next) {
             periodosExamen: null,
             cursos: null,
             pdID: null,
+            estadosProgDoc: null,
+            estadoProgDoc: null
         })
     }
     //hay que comprobar que no sea una url de consultar.
@@ -255,6 +266,8 @@ exports.getExamenesView = function (req, res, next) {
             planEstudios: res.locals.planEstudios,
             estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
             asignacionsExamen: null,
+            estadosProgDoc: estados.estadoProgDoc,
+            estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
             franjasExamen: null,
             periodosExamen: null,
             cursos: null,
@@ -396,10 +409,13 @@ exports.guardarExamenes = function (req, res, next) {
                         let nuevaEntrada = {};
                         let hora = req.body["hora_" + toAnadir];
                         let minutos = req.body["minutos_" + toAnadir];
+                        if(!minutos) minutos = '00';
                         nuevaEntrada.AsignaturaIdentificador = Number(toAnadir.split("_")[0]);
                         nuevaEntrada.periodo = toAnadir.split("_")[2];
                         nuevaEntrada.fecha = moment(req.body["date_" + toAnadir], "DD/MM/YYYY");
+                        if (hora && minutos) {
                         nuevaEntrada.horaInicio = hora + ":" + minutos;
+                        }
                         nuevaEntrada.duracion = Number(req.body["duracion_" + toAnadir]);
 
                         let asig = as.find(function (obj) { return (nuevaEntrada.AsignaturaIdentificador && obj.identificador === nuevaEntrada.AsignaturaIdentificador) })
@@ -413,10 +429,13 @@ exports.guardarExamenes = function (req, res, next) {
                             let nuevaEntrada = {};
                             let hora = req.body["hora_" + element];
                             let minutos = req.body["minutos_" + element];
+                            if (!minutos) minutos = '00';
                             nuevaEntrada.AsignaturaIdentificador = Number(element.split("_")[0]);
                             nuevaEntrada.periodo = element.split("_")[2];
                             nuevaEntrada.fecha = moment(req.body["date_" + element], "DD/MM/YYYY");
-                            nuevaEntrada.horaInicio = hora + ":" + minutos;
+                            if(hora && minutos){
+                                nuevaEntrada.horaInicio = hora + ":" + minutos;
+                            }
                             nuevaEntrada.duracion = Number(req.body["duracion_" + element]);
                             let asig = as.find(function (obj) { return (nuevaEntrada.AsignaturaIdentificador && obj.identificador === nuevaEntrada.AsignaturaIdentificador) })
                             if (!asig) {
@@ -436,9 +455,12 @@ exports.guardarExamenes = function (req, res, next) {
                         let nuevaEntrada = {};
                         let hora = req.body["hora_" + toActualizar];
                         let minutos = req.body["minutos_" + toActualizar];
+                        if (!minutos) minutos = '00';
                         let identificador = Number(toActualizar.split("_")[1])
                         nuevaEntrada.fecha = moment(req.body["date_" + toActualizar], "DD/MM/YYYY");
+                        if (hora && minutos) {
                         nuevaEntrada.horaInicio = hora + ":" + minutos;
+                        }
                         nuevaEntrada.duracion = Number(req.body["duracion_" + toActualizar]);
                         let asig = as.find(function (obj) { return (identificador && obj['Examens.identificador'] === identificador) })
                         if (!asig) {
@@ -455,9 +477,12 @@ exports.guardarExamenes = function (req, res, next) {
                             let nuevaEntrada = {};
                             let hora = req.body["hora_" + element];
                             let minutos = req.body["minutos_" + element];
+                            if (!minutos) minutos = '00';
                             let identificador = Number(element.split("_")[1])
                             nuevaEntrada.fecha = moment(req.body["date_" + element], "DD/MM/YYYY");
+                            if (hora && minutos) {
                             nuevaEntrada.horaInicio = hora + ":" + minutos;
+                            }
                             nuevaEntrada.duracion = Number(req.body["duracion_" + element]);
                             let asig = as.find(function (obj) { return (identificador && obj['Examens.identificador'] === identificador) })
                             if (!asig) {
@@ -530,9 +555,12 @@ exports.guardarFranjasExamenes = function (req, res, next) {
                         let identificador = toAnadir.split("_")[0];
                         let hora = req.body[identificador + "_hora"];
                         let minutos = req.body[identificador + "_minutos"];
+                        if (!minutos) minutos = '00';
                         nuevaEntrada.ProgramacionDocenteId = pdID;
                         nuevaEntrada.periodo = toAnadir.split("_")[1];
+                        if (hora && minutos) {
                         nuevaEntrada.horaInicio = hora + ":" + minutos;
+                        }
                         nuevaEntrada.duracion = Number(req.body[identificador + "_duracion"]);
                         queryToAnadir.push(nuevaEntrada);
 
@@ -542,9 +570,12 @@ exports.guardarFranjasExamenes = function (req, res, next) {
                             let identificador = element.split("_")[0];
                             let hora = req.body[identificador + "_hora"];
                             let minutos = req.body[identificador + "_minutos"];
+                            if (!minutos) minutos = '00';
                             nuevaEntrada.ProgramacionDocenteId = pdID;
                             nuevaEntrada.periodo = element.split("_")[1];
+                            if (hora && minutos) {
                             nuevaEntrada.horaInicio = hora + ":" + minutos;
+                            }
                             nuevaEntrada.duracion = Number(req.body[identificador + "_duracion"]);
                             queryToAnadir.push(nuevaEntrada);
                         });
@@ -560,9 +591,12 @@ exports.guardarFranjasExamenes = function (req, res, next) {
                         let identificador = toActualizar.split("_")[0];
                         let hora = req.body[identificador + "_hora"];
                         let minutos = req.body[identificador + "_minutos"];
+                        if (!minutos) minutos = '00';
                         nuevaEntrada.ProgramacionDocenteId = pdID;
                         nuevaEntrada.periodo = toActualizar.split("_")[1];
+                        if (hora && minutos) {
                         nuevaEntrada.horaInicio = hora + ":" + minutos;
+                        }
                         nuevaEntrada.duracion = Number(req.body[identificador + "_duracion"]);
                         promises.push(models.FranjaExamen.update(
                             nuevaEntrada, /* set attributes' value */
@@ -575,9 +609,12 @@ exports.guardarFranjasExamenes = function (req, res, next) {
                             let identificador = element.split("_")[0];
                             let hora = req.body[identificador + "_hora"];
                             let minutos = req.body[identificador + "_minutos"];
+                            if (!minutos) minutos = '00';
                             nuevaEntrada.ProgramacionDocenteId = pdID;
                             nuevaEntrada.periodo = element.split("_")[1];
+                            if (hora && minutos) {
                             nuevaEntrada.horaInicio = hora + ":" + minutos;
+                            }
                             nuevaEntrada.duracion = Number(req.body[identificador + "_duracion"]);
                             promises.push(models.FranjaExamen.update(
                                 nuevaEntrada, /* set attributes' value */

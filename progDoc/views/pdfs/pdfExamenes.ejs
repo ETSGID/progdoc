@@ -35,6 +35,7 @@ function aumentarDia(fecha){
    return(("0" + nextDay.getDate()).slice(-2)+"/"+("0" + (nextDay.getMonth() + 1)).slice(-2)+"/"+nextDay.getFullYear())
 }
 
+
 let anoInicial;
 let anoFinal;
 let fechasLimite;
@@ -46,12 +47,43 @@ fechasLimite ={S1_O:["01/01/"+anoFinal, "28/02/"+anoFinal], S1_E:["01/06/"+anoFi
 S2_O:["01/05/"+anoFinal,"31/06/"+anoFinal], S2_E:["01/06/"+anoFinal,"31/07/"+anoFinal]}
 }%>
 
-<h2>4.Exámenes</h2>
+<h2>4.Exámenes</h2>                    
     <% for (let i=0 ; i<asignacionsExamen.length; i++){%>
     <%if(i>0){%>
                 <div style="page-break-after:always;"></div>
             <%}%>
         <h3><%= asignacionsExamen[i].periodoNombre %></h3>
+            <% 
+            let period = franjasExamen.find(function (obj) { return obj.periodo === asignacionsExamen[i].periodo; });
+            if (period.franjas.length>0){%>
+                <table class="table" id="tableFranjas_<%=period.periodo%>">
+                    <tr>
+                    <th>Franja</th>
+                    <th>Hora Inicio</th>
+                    <th>Duración (Minutos)</th>
+                    </tr>
+                <%for (let j=0 ; j<period.franjas.length; j++){%>
+                    <tr id="fila_<%=period.franjas[j].identificador%>">
+                        <%
+                        let hora= +period.franjas[j].horaInicio.split(':')[0]
+                        let minutos = +period.franjas[j].horaInicio.split(':')[1]
+                        let duracion = period.franjas[j].duracion
+                        if(!hora)hora=8;
+                        if(!minutos)minutos=0;
+                        if(!duracion)duracion=0;
+                        if(parseInt(hora,10)<10)hora='0'+hora;
+                        if(parseInt(minutos,10)<10)minutos='0'+minutos;
+                            %>
+                        <td><%=j+1%></td>
+                        <td><%=hora%>:<%=minutos%></td>
+                        <td><%=duracion%></td>
+                    </tr>
+                <%}%>
+            </table>
+            <br>
+            <%}else{%>
+            <p>No hay franjas de exámenes definidas</p>
+            <%}%>
             <table class="table" id="table_calendario_<%=asignacionsExamen[i].periodo%>">
                 <thead>
                     <tr>
@@ -61,40 +93,63 @@ S2_O:["01/05/"+anoFinal,"31/06/"+anoFinal], S2_E:["01/06/"+anoFinal,"31/07/"+ano
                     <%}%> 
                     </tr>
                 </thead>
-                <tbody id="body_table_calendario_<%=asignacionsExamen[i].periodoNombre%>">
+                <tbody id="body_table_calendario_<%=asignacionsExamen[i].periodo%>">
                     <%let p = getPeriodoKey(asignacionsExamen[i].periodo)
                     let fechaLimiteInicial = fechasLimite[p][0]
                     let fechaLimiteFinal = fechasLimite[p][1]
                     let fechaFila = fechaLimiteInicial
                     let primeroEncontrado = false;
                     let ultimoEncontrado = 0;
-                    while (fechaFila !== aumentarDia(fechaLimiteFinal) && ultimoEncontrado !== asignacionsExamen[i].examenes.length ){
+                    let exs=[];
+                    for(let z = 0; z<asignacionsExamen[i].examenes.length; z++){
+                        if(period.franjas.length === 0){
+                            exs.push(asignacionsExamen[i].examenes[z])
+                        } 
+                        else{
+                            if(asignacionsExamen[i].examenes[z].franja) exs.push(asignacionsExamen[i].examenes[z])
+                        }
+                    }
+                    while (fechaFila !== aumentarDia(fechaLimiteFinal) &&  ultimoEncontrado !== exs.length ){
                         if(!primeroEncontrado){
-                            let coincidenciasFecha = asignacionsExamen[i].examenes.filter(
+                            let coincidenciasFecha = exs.filter(
                             //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
                             ex => (ex.fecha === fechaFila)
                             );
                             coincidenciasFecha.length === 0 ? primeroEncontrado = false : primeroEncontrado = true;
                         }
-                        if(primeroEncontrado){%>
+                        if(primeroEncontrado){
+                           //compruebo sinFranjas porque cuando no hay franjas period.franjas.length seria 0 y no entraria en el bucle
+                            let sinFranjas = period.franjas.length === 0 ? 1 : 0;
+                            for(let k=0; k<(period.franjas.length || sinFranjas); k++){ %>
                             <tr>
-                                <td width="10%"><%=getDia(fechaFila)+ " " +fechaFila.split("/")[0];%></td>
-                                <%for (let k=0 ; k<cursosConGrupos.length; k++){
-                                    let coincidencias = asignacionsExamen[i].examenes.filter(
+                                <%if(k===0){%>
+                                <td width="10%" class="noBordeInferior">
+                                <%}else{%>
+                                <td width="10%" class="noBorde">
+                                <%}%>
+                                <%if(Math.trunc(period.franjas.length/2)===k){%>
+                                <%=getDia(fechaFila)+ " " +fechaFila.split("/")[0];%>
+                                <%}else{%>
+                                &nbsp
+                                <%}%>
+                                </td>
+                                <%for (let l=0 ; l<cursosConGrupos.length; l++){
+                                    let condicionFranja = sinFranjas === 1 ? "-" : ""+(+k+1)
+                                    let coincidencias = exs.filter(
                                     //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
-                                    ex => (ex.fecha === fechaFila && Number(ex.curso)===Number(cursosConGrupos[k].curso))
+                                    ex => (ex.fecha === fechaFila && Number(ex.curso)===Number(cursosConGrupos[l].curso) && ""+ex.franja === condicionFranja)
                                     );
                                     if (coincidencias.length === 0){%>
                                         <td width="90/<%=cursosConGrupos.length%>%">-</td>
                                     <%}else{%>
                                         <td width="90/<%=cursosConGrupos.length%>%">
-                                            <%for (let l=0; l<coincidencias.length; l++){
-                                                if(l>0){
+                                            <%for (let m=0; m<coincidencias.length; m++){
+                                                if(m>0){
                                                     ultimoEncontrado++%>
-                                                    / <%=coincidencias[l].asignatura%>
+                                                    / <%=coincidencias[m].asignatura%>
                                                 <%}else{
                                                     ultimoEncontrado++%>
-                                                    <%=coincidencias[l].asignatura%>
+                                                    <%=coincidencias[m].asignatura%>
                                                 <%}
                                             }%>
                                        </td>
@@ -102,6 +157,7 @@ S2_O:["01/05/"+anoFinal,"31/06/"+anoFinal], S2_E:["01/06/"+anoFinal,"31/07/"+ano
                                 }%>
                             </tr>                            
                         <%}
+                        }
                         fechaFila = aumentarDia(fechaFila)
                     }%>
                 </tbody>

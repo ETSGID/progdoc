@@ -2,6 +2,7 @@ let app = require('../app');
 let path = require('path')
 let models = require('../models');
 let Sequelize = require('sequelize');
+let moment = require('moment')
 const op = Sequelize.Op;
 let estados = require('../estados');
 let enumsPD = require('../enumsPD');
@@ -10,6 +11,7 @@ let pdf = require('html-pdf');
 let fs = require('fs');
 let ejs = require('ejs')
 let menuProgDocController = require('../controllers/menuProgDoc_controller')
+let examenController = require('../controllers/examen_controller')
 //local
 const base = path.resolve('public'); //  just relative path to absolute path 
 //despliegue¿?
@@ -85,6 +87,7 @@ exports.generarPDF = function (req, res, next) {
         let asignaturas = [];
         let asignaturasViejas = [];
         let asignacionsExamen = [];
+        let franjasExamen = [];
         let pdsAnteriores = [];
         let pdID;
         let anoFinal;
@@ -247,8 +250,9 @@ exports.generarPDF = function (req, res, next) {
                                 nuevoExamen.curso = ej['curso'];
                                 //debo convertir la fecha a formato dd/mm/yyyy
                                 nuevoExamen.fecha = ej['Examens.fecha'].split("-")[2] + "/" + ej['Examens.fecha'].split("-")[1] + "/" + ej['Examens.fecha'].split("-")[0];
+                                nuevoExamen.horaInicio = ej['Examens.horaInicio']
+                                nuevoExamen.duracion = ej['Examens.duracion']
                                 p.examenes.push(nuevoExamen)
-
                             }
                         } else {
                             let as = asignaturasViejas.find(function (x) { return (x.identificador === ej.identificador && x.curso === ej.curso && x.creditos === ej.creditos && x.semestre === ej.semestre) })
@@ -283,9 +287,15 @@ exports.generarPDF = function (req, res, next) {
 
 
                     })
+
+                let promise4 = examenController.getFranjasExamenes(pdID)
+                    .then((franjas) => {
+                        franjasExamen = franjas
+                    })
                 promises.push(promise1);
                 promises.push(promise2);
                 promises.push(promise3);
+                promises.push(promise4);
                 Promise.all(promises)
                     .then(() => {
                         promises2.push(
@@ -359,12 +369,25 @@ exports.generarPDF = function (req, res, next) {
                         )
                         promises2.push(
                             new Promise(function (resolve, reject) {
-                                //console.log("33");
+                                //console.log("33");      
+                                asignacionsExamen.forEach(function (as, index) {
+                                    let fr = franjasExamen.find(function (obj) { return obj.periodo === as.periodo; });
+                                    as.franjas = fr.franjas
+                                    as.examenes.forEach(function (ex,index){
+                                        if(fr.franjas.length === 0){
+                                            ex.franja = '-'
+                                        }else{
+                                            ex.franja = isExamenInFranjas(ex,fr.franjas)
+                                        }
+                                    })
+                                })
                                 ejs.renderFile("./views/pdfs/pdfExamenes.ejs",
                                     {
                                         asignacionsExamen: asignacionsExamen,
+                                        franjasExamen : franjasExamen,
                                         cursosConGrupos: cursosConGrupos,
                                         pdID: pdID,
+                                        contextPath: app.contextPath,
                                         periodos: enumsPD.periodoPD,
                                     },
                                     function (err, str) {
@@ -477,4 +500,23 @@ exports.generarPDF = function (req, res, next) {
             });
 
     }
+}
+
+function isExamenInFranjas(examen, franjas) {    
+    let duracion = +examen.duracion;
+    let horaInicial = moment.duration(examen.horaInicio)
+    let horaFinal = (moment.duration(horaInicial).add(duracion, "m"));
+    if (franjas.length === 0) {
+        //en este caso no hay franjas
+        return false;
+    }
+    for (let i = 0; i < franjas.length; i++) {
+        //encaja con un examen si la horaInicial es posterior o igual a la hora inicial de la period
+        //y la hora final es anterior o igual a la hora de la period
+        if ((horaInicial - moment.duration(franjas[i].horaInicio) >= 0) &&
+            (horaFinal - moment.duration(franjas[i].horaInicio).add(franjas[i].duracion, "m") <= 0)) {
+            return i + 1;
+        }
+    }
+    return false;
 }
