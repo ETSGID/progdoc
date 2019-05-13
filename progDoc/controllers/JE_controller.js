@@ -347,6 +347,8 @@ exports.abrirIncidenciaProgDoc = function (req, res, next) {
 exports.cerrarIncidenciaProgDoc = function (req, res, next) {
     if (!res.locals.permisoDenegado) {
         let pdID = req.body.pdIdentificador.split("-")[1];
+        //debo guardarla para generar los csv de los examenes
+        req.session.pdID = pdID
         models.ProgramacionDocente.findOne(
             { where: { identificador: pdID },
                 include: [{

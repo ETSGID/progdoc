@@ -440,9 +440,8 @@ exports.generarPDF = function (req, res, next) {
 
                                 html += `</body></html>`
                                 let file = req.originalUrl.toLowerCase().includes("consultar") ? pdID + '_borrador.pdf' : pdID + '.pdf'
-                                let elements = pdID.split("_")
                                 let borrador = req.originalUrl.toLowerCase().includes("consultar") ? 'borrador/' : ''
-                                file = elements[1] + "/" + elements[2] + "/" + elements[3] + "/" + borrador + file
+                                file = menuProgDocController.getAnoPd(pdID) + "/" + menuProgDocController.getTipoPd(pdID) + "/" + menuProgDocController.getPlanPd(pdID) + "/" + menuProgDocController.getVersionPd(pdID) + "/"  + borrador + file
                                 //console.log("the fileç: ", file);
                                 let ruta = app.pathPDF+'/pdfs/' + file
                                 let options = {

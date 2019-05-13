@@ -734,7 +734,7 @@ exports.generateCsvExamens = function (req, res, next){
                             data.push(ex)
 
                         })
-                        let dir = app.pathPDF + '/pdfs/'+ menuProgDocController.getPlanPd(req.session.pdID) + "/" + menuProgDocController.getAnoPd(req.session.pdID) + "/" + menuProgDocController.getTipoPd(req.session.pdID) + "/examenes/"
+                        let dir = app.pathPDF + '/pdfs/' + menuProgDocController.getAnoPd(req.session.pdID) + "/" + menuProgDocController.getTipoPd(req.session.pdID) + "/" + menuProgDocController.getPlanPd(req.session.pdID) + '/' + menuProgDocController.getVersionPd(req.session.pdID) + "/examenes/"
                         let ruta = dir + acronimoOIdPlan + "_" + ano + "_" + asignacions.periodo + "_" + menuProgDocController.getVersionPd(req.session.pdID) + ".csv"
                         menuProgDocController.ensureDirectoryExistence(ruta)
                         const csv = json2csv(data, opts);

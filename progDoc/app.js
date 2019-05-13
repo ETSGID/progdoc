@@ -19,6 +19,10 @@ const local = process.env.DEV;
 exports.local = local;
 const pathPDF = normalize(process.env.PATH_PDF);
 exports.pathPDF = pathPDF;
+
+//TODO repetida en bin www solo en un sitio
+const filePthPDF = path.join(pathPDF, 'pdfs', 'files')
+
 //fichero de configuracion del gestor de archivos
 const config = __dirname + "/public/config/filemanager.config.json";
 //cas autentication
@@ -46,6 +50,7 @@ let routerApi = require('./routes/api')
 let models = require('./models');
 let Sequelize = require('sequelize');
 let permisosControllerProgDoc = require('./controllers/permisos_controllerProgDoc');
+let menuProgDocController = require('./controllers/menuProgDoc_controller')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -152,6 +157,11 @@ app.use(session({
   });
   //gestor de archivos, puede acceder todo el mundo que esté en progdoc o sea profesor
   //debe existir esa carpeta sino dara error
+
+app.use(path.join(contextPath, 'archivos/filemanager'), function(req,res,next){
+  menuProgDocController.ensureDirectoryExistence(filePthPDF)
+  next()
+});
 app.use(path.join(contextPath, 'archivos/filemanager'), filemanager((path.join(pathPDF, 'pdfs')), config));
   app.use(path.join(contextPath, 'archivos'), express.static('node_modules/rich-filemanager'));
   //router para contexto

@@ -418,7 +418,7 @@ router.post("/reabrirProgDoc", function (req, res, next) {
 router.post("/cerrarIncidenciaProgDoc", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarIncidenciaProgDoc,calendarioController.anoDeTrabajoPDF, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF, gestionController.cerrarProgDoc2);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarIncidenciaProgDoc, calendarioController.anoDeTrabajoPDF, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF, examenController.getExamenes, examenController.generateCsvExamens, gestionController.cerrarProgDoc2);
 
 //consultarRoles
 router.get("/consultar/roles", menuProgDocController.getPlanes,gestionRoles.getRoles)
