@@ -5,13 +5,13 @@ let enumsPD = require('../enumsPD');
 
 
 function comprobarColor(buffer_eventos, eventos, dia){
-    var code = 0;
+    var code = -1;
     var nuevo_buffer = [];
     var dia_objetoFecha = new Date(dia);
     for(var i in buffer_eventos){
         if(new Date(buffer_eventos[i].fechaFin) >= dia_objetoFecha){
             nuevo_buffer.push(buffer_eventos[i]);
-            if(enumsPD.eventosTipo[buffer_eventos[i].tipo] > code){
+            if(enumsPD.eventosTipo[buffer_eventos[i].tipo]%6 > code%6){
                 code = enumsPD.eventosTipo[buffer_eventos[i].tipo];
             }
         }
@@ -20,7 +20,7 @@ function comprobarColor(buffer_eventos, eventos, dia){
         if(eventos[i].fechaFin !== "Evento de dia"){
             nuevo_buffer.push(eventos[i]);
         }
-        if(enumsPD.eventosTipo[eventos[i].tipo] > code){
+        if(enumsPD.eventosTipo[eventos[i].tipo]%6 > code%6){
             code = enumsPD.eventosTipo[eventos[i].tipo];
         }
     }
@@ -60,7 +60,8 @@ function generarArrayDias(dic_eventos, ano){
     meses_31 = ["1","3","4","6","8","10","11"]
     febrero = []
 
-    if(bisiesto(parseInt(ano))){
+    if(bisiesto(parseInt(ano) + 1)){
+        console.log("BISIESTO");
         febrero = Array.from(new Array(29),(val,index)=>index+1);
     }else{
         febrero = Array.from(new Array(28),(val,index)=>index+1);
@@ -156,11 +157,13 @@ function generarArrayDias(dic_eventos, ano){
                     contar = false;
                     noContar = true;
                     in_periodo_lectivo = false;
+                    dic_dias[dia] += 1
                     break;
                 }
                 if(evento.nombre === "Final del primer cuatrimestre"){
                     contar = false;
                     noContar = true;
+                    dic_dias[dia] += 1
                     dic_dias_1 = dic_dias;
                     contador_semanas = 1;
                     dic_dias = {
@@ -173,16 +176,18 @@ function generarArrayDias(dic_eventos, ano){
                         6: 0
                     };
                     in_periodo_lectivo = false;
+
                     break;
                 }
                 if(evento.tipo === "festivo"){
                     noContar = true;
+                    contar = false;
                     if(evento.fechaFin !== "Evento de dia"){
                         if(evento.nombre === "Periodo festivo de navidades"){
                             contar = false;
                         }else{
                             //console.log((Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio))/86400000)
-                            vacaciones_offset = 1 + (Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio))/86400000;
+                            vacaciones_offset = (Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio))/86400000;
                         }
                         
                         
@@ -249,7 +254,11 @@ function generarArrayDias(dic_eventos, ano){
         dia = (dia + 1)%7;
         let comprobarColorArray = comprobarColor(buffer_eventos, eventos, codigo);
         //console.log(comprobarColorArray);
-        let color = enumsPD.coloresEvento[comprobarColorArray[0]];
+        let color = "white"
+        if(comprobarColorArray[0] !== -1){
+            color = enumsPD.coloresEvento[comprobarColorArray[0]];
+        }
+        
         buffer_eventos = comprobarColorArray[1];
         objeto = {
             numero: numero,
@@ -292,6 +301,7 @@ exports.getCalendario = function (req, res, next) {
 
     //console.log(req.dic_eventos);
     let ano = req.ano;
+    req.session.ano = req.ano;
     //console.log(ano);
     array_datos = generarArrayDias(req.dic_eventos, ano);
 
@@ -428,6 +438,7 @@ exports.getCalendarioPlanConsultar = function(req, res, next){
     req.calendario = {};
     //console.log(req.dic_eventos);
     let ano = req.ano;
+    req.session.ano = ano;
     //console.log(ano);
     array_datos = generarArrayDias(req.dic_eventos, ano);
 
@@ -816,10 +827,15 @@ exports.anoDeTrabajo = function (req, res, next){
     //console.log(ano);
     if(ano === undefined){
         //En caso negativo, se obtiene el año actual (el de comienzo del curso, ej:19/20 --> 2019)
-        ano = (new Date()).toString().split(" ")[3];
-        if((new Date()).getMonth() < 8){
-            ano = String(parseInt(ano) - 1);
+        if(req.session.ano === undefined){
+            ano = (new Date()).toString().split(" ")[3];
+            if((new Date()).getMonth() < 8){
+                ano = String(parseInt(ano) - 1);
+            }
+        }else{
+            ano = req.session.ano;
         }
+        
     }
     req.ano = ano;
     next();

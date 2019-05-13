@@ -58,6 +58,11 @@
     <%} else {%>
     <input id='submenu' type="hidden">
     <%}%>
+    <% if (locals.ano) { %>
+        <input id='ano' type="hidden" value="<%=ano%>">
+    <%} else {%>
+        <input id='ano' type="hidden">
+    <%}%>
 </div>
 <script>
 let selectPlanValue;
@@ -122,8 +127,6 @@ if(!submenu) {
 document.getElementById(submenu).style.display = "block";
 document.getElementById(submenu).className += " active";
 }
-
-
 
 
 function cambiarPlanCalendario(){
