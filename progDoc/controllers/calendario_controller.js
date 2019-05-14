@@ -5,7 +5,7 @@ let enumsPD = require('../enumsPD');
 
 
 function comprobarColor(buffer_eventos, eventos, dia){
-    var code = -1;
+    var code = -1; 
     var nuevo_buffer = [];
     var dia_objetoFecha = new Date(dia);
     for(var i in buffer_eventos){
@@ -61,7 +61,7 @@ function generarArrayDias(dic_eventos, ano){
     febrero = []
 
     if(bisiesto(parseInt(ano) + 1)){
-        console.log("BISIESTO");
+        //console.log("BISIESTO");
         febrero = Array.from(new Array(29),(val,index)=>index+1);
     }else{
         febrero = Array.from(new Array(28),(val,index)=>index+1);
@@ -181,10 +181,11 @@ function generarArrayDias(dic_eventos, ano){
                 }
                 if(evento.tipo === "festivo"){
                     noContar = true;
-                    contar = false;
+                    
                     if(evento.fechaFin !== "Evento de dia"){
+                        contar = false;
                         if(evento.nombre === "Periodo festivo de navidades"){
-                            contar = false;
+                            
                         }else{
                             //console.log((Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio))/86400000)
                             vacaciones_offset = (Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio))/86400000;
@@ -305,13 +306,13 @@ exports.getCalendario = function (req, res, next) {
     //console.log(ano);
     array_datos = generarArrayDias(req.dic_eventos, ano);
 
-    let ano_actual = (new Date()).toString().split(" ")[3];
+   
     //onsole.log(ano_actual)
     let general = "false"
     if(req.query.planID === undefined){
         general = "true"
     }
-
+    let ano_actual = (new Date()).toString().split(" ")[3];
     if((new Date()).getMonth() < 8){
         ano_actual = String(parseInt(ano_actual) - 1);
     }
@@ -536,7 +537,6 @@ exports.getCalendarioPDF = function(req, res, next){
     req.calendario = {};
     //console.log(req.dic_eventos);
     let ano = req.ano;
-    //console.log(ano);
     array_datos = generarArrayDias(req.dic_eventos, ano);
 
     let ano_actual = (new Date()).toString().split(" ")[3];
@@ -855,7 +855,12 @@ exports.anoDeTrabajoPDF = function (req, res, next){
     console.log(planID)
     let ano = planID.split("_")[2].substring(0,4);
     req.ano = ano*/
-    req.ano = "2018";
+    try{
+        req.ano = 2000 + Number(res.locals.progDoc['ProgramacionDocentes.anoAcademico'][4] + "" + res.locals.progDoc['ProgramacionDocentes.anoAcademico'][5]) - 1;
+    }
+    catch(err){
+        req.ano = 2000 + Number(res.locals.progDoc['anoAcademico'][4] + "" + res.locals.progDoc['anoAcademico'][5]) -1;
+    }
     //console.log("LEEEL", req.session.pdID);
     next();
     

@@ -3,20 +3,20 @@
 
 <div class="contenido" style="padding-top: 120px;">
         <script src="<%=contextPath%>/js/datepicker.js"></script>
-
+        <input type="hidden" value="<%=anoSeleccionado%>" id="anoSeleccionado">
     <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
         <p style="margin-top: 30px"><%=permisoDenegado%></p>
     <%}else if(estado === 0){ %>
         <p style="margin-top: 30px">El calendario general de este año no ha sido todavía aprobado por el jefe de estudios.</p>
     <%}else{%>
-        <input type="hidden" value="<%=anoSeleccionado%>" id="anoSeleccionado">
+        
         <div class="">       
             <h2>Calendario común
                 
                 <button type="button" class="btn btn-default" data-toggle="popover" title="Leyenda de colores" data-content="">Leyenda de colores</button>
                 
                 
-            </h2>
+            </h2> 
 
             
         </div>

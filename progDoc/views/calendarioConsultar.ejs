@@ -3,7 +3,7 @@
 
 <div class="contenido" style="padding-top: 120px;">
         <script src="<%=contextPath%>/js/datepicker.js"></script>
-
+        <input type="hidden" value="<%=anoSeleccionado%>" id="anoSeleccionado">
     <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
         <p><%=permisoDenegado%></p>
     <%}else if(estado === 0){ %>
