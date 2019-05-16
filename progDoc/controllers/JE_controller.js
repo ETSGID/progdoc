@@ -97,11 +97,18 @@ exports.gestionProgDoc = function (req, res, next) {
         })
         .then(() => {
             //la incidencia se marca sobre la pd anterior (no la versión anterior)
-            return models.sequelize.query(query = 'SELECT  * FROM public."ProgramacionDocentes" p   ORDER BY p."identificador" DESC ',
-            )
+            return models.ProgramacionDocente.findAll({
+                order: [
+                    [Sequelize.literal('"PlanEstudioId"'), 'DESC'],
+                    [Sequelize.literal('"anoAcademico"'), 'DESC'],
+                    [Sequelize.literal('semestre'), 'DESC'],
+                    [Sequelize.literal('version'), 'DESC']
+                ],
+                raw: true
+            })
         })
         .then(pdsBBDD => {
-            pdsBBDD[0].forEach(function (pdBBDD) {
+            pdsBBDD.forEach(function (pdBBDD) {
                 let existentePD = pds.find(function (obj) { return obj.PlanEstudioId === pdBBDD.PlanEstudioId });
                 if (!existentePD) {
                     pds.push({

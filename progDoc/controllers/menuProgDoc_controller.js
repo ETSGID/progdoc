@@ -9,10 +9,13 @@ const path = require('path')
 
 
 
-exports.ensureDirectoryExistence = function probar(filePath) {
+exports.ensureDirectoryExistence = function probar(filePath,notCreate) {
     let dirname = path.dirname(filePath);
     if (fs.existsSync(dirname)) {
         return true;
+    }
+    if(notCreate){
+        return false;
     }
     probar(dirname);
     fs.mkdirSync(dirname);
@@ -36,10 +39,15 @@ exports.getTipoPd = function (pdID) {
     return pdID ?  pdID.split("_")[3] : null;
 }
 
-//devuelve el version de la PD a partir del id
+//devuelve el version de la PD a partir del id v1
 //PD_09TT_201819_I_v1
 exports.getVersionPd = function (pdID) {
     return  pdID ? pdID.split("_")[4] : null;
+}
+//devuelve el numero version de la PD a partir del id 1
+//PD_09TT_201819_I_v1
+exports.getVersionPdNumber = function (pdID){
+    return pdID ? Number(pdID.split("_")[4].split("v")[1]) : null
 }
 
 
@@ -195,10 +203,12 @@ exports.getProgramacionDocentesAnteriores = function (plan, tipoPD, ano, pdIDNoI
     }
     if (estadoPD) filtro.estadoProGDoc = estadoPD;
     return models.ProgramacionDocente.findAll({
-        attributes: ["identificador", "semestre", "estadoProfesores", "reabierto"],
+        attributes: ["identificador", "semestre", 'anoAcademico',"estadoProfesores", "reabierto", "version"],
         where: filtro,
         order: [
-            [Sequelize.literal('identificador'), 'DESC'],
+            [Sequelize.literal('"anoAcademico"'), 'DESC'],
+            [Sequelize.literal('semestre'), 'DESC'],
+            [Sequelize.literal('version'), 'DESC']
         ],
         raw: true
     })
@@ -518,7 +528,7 @@ exports.getAllProgramacionDocentes = function (planes, tipoPD, ano){
         programacionDocentesPlan[p]=[]
     })
     return models.ProgramacionDocente.findAll({
-        attributes: ["identificador", "semestre", 'PlanEstudioId'],
+        attributes: ["identificador", "semestre", 'PlanEstudioId', 'anoAcademico', 'version'],
         where: {
             PlanEstudioId: {
                 [op.or]: planes,
@@ -526,7 +536,10 @@ exports.getAllProgramacionDocentes = function (planes, tipoPD, ano){
             anoAcademico: ano
         },
         order: [
-            [Sequelize.literal('identificador'), 'DESC'],
+            [Sequelize.literal('"PlanEstudioId"'), 'DESC'],
+            [Sequelize.literal('"anoAcademico"'), 'DESC'],
+            [Sequelize.literal('semestre'), 'DESC'],
+            [Sequelize.literal('version'), 'DESC']
         ],
         raw: true
     })
