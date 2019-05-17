@@ -62,13 +62,21 @@ exports.comprobarRols = function (req, res, next) {
 exports.comprobarRolYPersona = function (req, res, next) {
     let role = req.session.user.employeetype;
     let id = req.session.user.PersonaId;
+    if (role && typeof role === "string" && (role.includes("F") || role.includes("L"))) {
+        req.session.portal = 'pas'
+    }
+    else if (role && typeof role === "string" && role.includes("D")){
+        req.session.portal = 'pdi'
+    }else{
+        req.session.portal = 'pdi'
+    }
     //comprobamos en la tabla de persona si esta o no esta
         if (id !== null) {
             next();
         }
         if (id === null) {
             //profesor que no está en el sistema pero puede ver las cosas
-            if (req.session.user.employeetype && typeof req.session.user.employeetype === "string" && req.session.user.employeetype.includes("D")) {
+            if (role && typeof role === "string" && (role.includes("D") || role.includes("F") || role.includes("L"))) {
                 next();
             }
             else{
