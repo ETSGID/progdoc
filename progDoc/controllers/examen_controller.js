@@ -703,9 +703,8 @@ exports.generateCsvExamens = function (req, res, next){
     return models.ProgramacionDocente.findOne({ where: { identificador: req.session.pdID }, attributes: ["estadoProGDoc","estadoExamenes"] }).then(function (pd) {
         let estadoExamenes = pd['estadoExamenes']
         let estadoProgDoc = pd['estadoProGDoc']
-        //solo se genera el pdf si es por incidencia o al aprobar los examenes
-        if (!res.locals.permisoDenegado && (estadoProgDoc === estados.estadoProgDoc.incidencia ||
-             ((estadoProgDoc === estados.estadoProgDoc.abierto || estadoProgDoc === estados.estadoProgDoc.listo) && estadoExamenes === estados.estadoExamen.aprobadoCoordinador))) {
+        //solo se genera el pdf si se tiene permiso
+        if (!res.locals.permisoDenegado) {
             let planID = req.session.planID
             let acronimoOIdPlan = menuProgDocController.getPlanPd(req.session.pdID);
             try {
@@ -734,8 +733,16 @@ exports.generateCsvExamens = function (req, res, next){
                             data.push(ex)
 
                         })
-                        let dir = app.pathPDF + '/pdfs/' + menuProgDocController.getAnoPd(req.session.pdID) + "/" + menuProgDocController.getTipoPd(req.session.pdID) + "/" + menuProgDocController.getPlanPd(req.session.pdID) + '/' + menuProgDocController.getVersionPd(req.session.pdID) + "/examenes/"
-                        let ruta = dir + acronimoOIdPlan + "_" + ano + "_" + asignacions.periodo + "_" + menuProgDocController.getVersionPd(req.session.pdID) + ".csv"
+                         
+                        //si esta abierto se guarda en borrador
+                        let folder = "/examenes/"
+                        let folder2 =""
+                       if(estadoExamenes === estados.estadoExamen.abierto){
+                            folder = "/borrador/"
+                            folder2 = "_borrador"
+                        }
+                        let dir = app.pathPDF + '/pdfs/' + menuProgDocController.getAnoPd(req.session.pdID) + "/" + menuProgDocController.getTipoPd(req.session.pdID) + "/" + menuProgDocController.getPlanPd(req.session.pdID) + '/' + menuProgDocController.getVersionPd(req.session.pdID) + folder
+                        let ruta = dir + acronimoOIdPlan + "_" + ano + "_" + asignacions.periodo + "_" + menuProgDocController.getVersionPd(req.session.pdID) + folder2 + ".csv"
                         menuProgDocController.ensureDirectoryExistence(ruta)
                         const csv = json2csv(data, opts);
                         fs.writeFile(ruta, csv, function (err) {

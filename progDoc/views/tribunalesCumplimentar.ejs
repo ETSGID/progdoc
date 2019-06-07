@@ -44,6 +44,7 @@
       <th scope="col">Presidente</th>
       <th scope="col">Vocal</th>
       <th scope="col">Secretario</th>
+      <th scope="col">Suplente</th>
     </tr>
   </thead>
   <tbody>
@@ -83,6 +84,15 @@
       <input id="tribunal_<%=tribunales[i].tribunalId%>_Secretario" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
       <% } %>
       </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Suplente' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Suplente')">
+      <% if(tribunales[i].suplenteNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Suplente'><%= tribunales[i].suplenteNombre%></p>
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Suplente" type="hidden" name="noCambio" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].suplenteNombre %>_Suplente" placeholder="<%= tribunales[i].suplenteNombre %>" >
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Suplente'>-</p>
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Suplente" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
+      <% } %>
+      </td>
     </tr>
 <% } %> 
   </tbody>
@@ -106,6 +116,7 @@
       <th scope="col">Presidente</th>
       <th scope="col">Vocal</th>
       <th scope="col">Secretario</th>
+      <th scope="col">Suplente</th>
     </tr>
   </thead>
   <tbody>
@@ -137,6 +148,13 @@
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'><%= tribunales[i].secretarioNombre%></p>
       <% } else{ %>
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'>-</p>
+      <% } %>
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Suplente'>
+      <% if(tribunales[i].suplenteNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Suplente'><%= tribunales[i].suplenteNombre%></p>
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Suplente'>-</p>
       <% } %>
       </td>
     </tr>

@@ -522,7 +522,29 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                     }
                 })
         })
-
+        //hay que incluir las notas que no se asocian a ninguna asignatura sino a grupo
+        .then(() => {
+            let gruposBBDDIds = relacionGrupos.map(function (g) {
+                return g.identificadorViejo;
+            });
+            return models.AsignacionProfesor.findAll({
+                where: {
+                    AsignaturaId: { [op.eq]: null },
+                    GrupoId: { [op.in]: gruposBBDDIds },
+                    Nota: { [op.ne]: null }
+                },
+                raw: true
+            }).each(function (nota) {
+                let idGrupo = relacionGrupos.find(function (obj) { return obj.identificadorViejo === nota.GrupoId; });
+                if (idGrupo) {
+                    let asignacion = {}
+                    asignacion.AsignaturaId = null;
+                    asignacion.GrupoId = idGrupo.identificadorNuevo;
+                    asignacion.Nota = nota.Nota
+                    asignacions.push(asignacion);
+                }
+            })
+        })
         .then(() => {
             cont = 0;
             return models.AsignacionProfesor.bulkCreate(
@@ -881,7 +903,29 @@ exports.abrirCopiaProgDoc = function (req, res, next) {
                     }
                 })
         })
-
+        //hay que incluir las notas que no se asocian a ninguna asignatura sino a grupo
+        .then(()=>{
+            let gruposBBDDIds = relacionGrupos.map(function (g) {
+                return g.identificadorViejo;
+            });
+            return models.AsignacionProfesor.findAll({
+                where: {
+                    AsignaturaId: { [op.eq]: null },
+                    GrupoId: { [op.in]: gruposBBDDIds },
+                    Nota: { [op.ne]: null }
+                },
+                raw: true
+            }).each(function (nota) {
+                let idGrupo = relacionGrupos.find(function (obj) { return obj.identificadorViejo === nota.GrupoId; });
+                if (idGrupo) {
+                let asignacion = {}
+                asignacion.AsignaturaId = null;
+                asignacion.GrupoId = idGrupo.identificadorNuevo;
+                asignacion.Nota = nota.Nota
+                asignacions.push(asignacion);
+                }
+            })
+        })
         .then(() => {
             cont = 0;
             return models.AsignacionProfesor.bulkCreate(

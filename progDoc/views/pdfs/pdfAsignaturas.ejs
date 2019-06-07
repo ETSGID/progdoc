@@ -43,6 +43,7 @@ return found;
             <th scope="col">Presidente</th>
             <th scope="col">Vocal</th>
             <th scope="col">Secretario</th>
+            <th scope="col">Suplente</th>
           </tr>
         </thead>
         <tbody>
@@ -81,7 +82,13 @@ return found;
             <%}else{%>
               <td>
             <%}%>
-            <%=getNombre(asignaturasEncontradas[k].SecretarioTribunalAsignatura)%></td>
+            <%=getNombre(asignaturasEncontradas[k].SuplenteTribunalAsignatura)%></td>
+            <%if(asignVieja && asignaturasEncontradas[k].SuplenteTribunalAsignatura !== asignVieja.SuplenteTribunalAsignatura){%>
+              <td class="cuidado">
+            <%}else{%>
+              <td>
+            <%}%>
+            <%=getNombre(asignaturasEncontradas[k].SuplenteTribunalAsignatura)%></td>
           </tr>
         <% } %>
         </tbody>

@@ -11,6 +11,7 @@
       <th scope="col">Presidente</th>
       <th scope="col">Vocal</th>
       <th scope="col">Secretario</th>
+      <th scope="col">Suplente</th>
     </tr>
   </thead>
   <tbody>
@@ -42,6 +43,13 @@
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'><%= tribunales[i].secretarioNombre%></p>
       <% } else{ %>
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'>-</p>
+      <% } %>
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Suplente'>
+      <% if(tribunales[i].suplenteNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Suplente'><%= tribunales[i].suplenteNombre%></p>
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Suplente'>-</p>
       <% } %>
       </td>
     </tr>

@@ -55,7 +55,7 @@
                                 <% let getNotas = function (){
                                         let found = asignacionsHorario[i].semestres[j].grupos[k].asignaciones.filter(
                                             //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
-                                            asign => ((asign.nota && asign.nota.trim() !== ""))
+                                            asign => ((asign.nota || typeof asign.nota === 'string'))
                                         );
                                         return found;
                                 }%>
@@ -102,7 +102,7 @@
                                 </table>
                                 <div style="border: ridge  2px; padding: 5px;">
                                     <p><b>Notas:</b>
-                                        <button type="button" class="btn btn-default" onclick = "anadirNota('nota_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
+                                        <button type="button" class="btn btn-default" onclick = "anadirNota('nota_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>',false, false)">
                                         Añadir Nota
                                         </button>
                                     </p>
@@ -110,17 +110,16 @@
                                     <div id='nota_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>'>
                                         <% let foundNotas = getNotas();
                                         for (let n=0; n< foundNotas.length; n++){ %>
-                                            <input type='hidden' name='momentaneo' id='horario_<%=asignacionsHorario[i].curso%>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=foundNotas[n].asignaturaIdentificador%>_<%=foundNotas[n].identificador%>' value='<%=foundNotas[n].identificador%>'>
-                                            <p id='nota_horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=foundNotas[n].asignaturaIdentificador%>_<%=foundNotas[n].identificador%>'> 
+                                            <p id='nota_horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=foundNotas[n].identificador%>'> 
                                             <% if (foundNotas[n].asignaturaAcronimo){ %>
                                                 <span title="<%=foundNotas[n].asignaturaNombre%> (<%=foundNotas[n].asignaturaCodigo%>)">(<%=foundNotas[n].asignaturaAcronimo%>)</span>
                                             <%}else{%>
                                                 <span title="<%=foundNotas[n].asignaturaNombre%> (<%=foundNotas[n].asignaturaCodigo%>)">(<%=foundNotas[n].asignaturaNombre%>)</span>
                                             <%}%>
-                                            <button type="button" class="btn btn-default" onclick = "eliminarNota('horario_<%=asignacionsHorario[i].curso%>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=foundNotas[n].asignaturaIdentificador%>_<%=foundNotas[n].identificador%>')">
-                                            <span class="glyphicon glyphicon-trash"></span> 
+                                            <button type="button" class="btn btn-default" onclick = "anadirNota('horario_<%=asignacionsHorario[i].curso%>_<%=asignacionsHorario[i].semestres[j].semestre%>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=foundNotas[n].identificador%>', <%=foundNotas[n].identificador%>, '<%=foundNotas[n].asignaturaIdentificador%>' )">
+                                            <span class="glyphicon glyphicon-pencil"></span> 
                                             </button>
-                                        <%=foundNotas[n].nota%></p>
+                                        <span><%=foundNotas[n].nota%></span></p>
                                         <%}%>
                                     </div>
                                 </div>
@@ -134,6 +133,7 @@
     <%}%>
 
 </div>
+<%- include horarioNota.ejs %>
 <script>
 
 //el multiselect del layout funciona con jquery
@@ -358,84 +358,6 @@ function simplificar(id){
     }
 }
 
-function anadirNota(id){
-  let div = document.createElement('div');
-  //Utilizo un numero para identificar las nuevas notas (acompañado de un string para evitar que pueda coincidir con un número de la bbdd)
-  notas++;
-  let curso = id.split("_")[1];
-  let grupo = Number(id.split("_")[3]);
-  let semestre = Number(id.split("_")[2]);
-  let cursoArray = asignacionsHorario.find(function (obj) { return obj.curso === curso});
-  let semestreArray = cursoArray.semestres.find(function (obj) { return obj.semestre === semestre})
-  let grupoArray = semestreArray.grupos.find(function (obj) { return obj.grupoCodigo === grupo})
-  let asignaturas = grupoArray.asignaturas;
-  let options='';
-  for (let i = 0; i<asignaturas.length; i++){ 
-     let s1 = semestre === 1 && (asignaturas[i].semestre === '1S' || asignaturas[i].semestre === '1S-2S' || asignaturas[i].semestre === 'A' || asignaturas[i].semestre === 'I')
-     let s2 = semestre === 2 && (asignaturas[i].semestre === '2S' || asignaturas[i].semestre === '1S-2S' || asignaturas[i].semestre === 'A' || asignaturas[i].semestre === 'I')    
-     if(s1 || s2){
-        let n = "";
-        asignaturas[i].acronimo !== null ? n=asignaturas[i].acronimo : n=asignaturas[i].nombre;
-        options+=`<option value="${n}" title="${asignaturas[i].nombre} (${asignaturas[i].codigo})">${n}</option>`    
-     }
-    }
-  div.innerHTML =`<p id="nota_horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}">
-  <input type="hidden" name="momentaneo" id="horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}" value="">
-  <select id="select_nuevaNota${notas}">${options}</select>
-  <button type="button" class="btn btn-default" onclick = "guardarNota('horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}')">
-  <span class="glyphicon glyphicon-ok"></span>
-  </button> 
-  <button type="button" class="btn btn-default" onclick = "eliminarNota('horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}')">
-  <span class="glyphicon glyphicon-trash"></span>
-  </button> 
-  <textarea name="textarea" id="text_horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}" cols="80" rows="4" placeholder="Introducir nota" maxlength="300"></textarea>
-  </p>`
-  let node = div.firstChild;
-  let contenedor = document.getElementById(id)
-  contenedor.appendChild(node)
-
-}
-
-function guardarNota(id){
-    let curso = id.split("_")[1];
-    let nuevaNota = id.split("_")[4];
-    let grupo = Number(id.split("_")[3]);
-    let semestre = Number(id.split("_")[2]);
-    let asignaturaNombreOAcronimo = document.getElementById("select_"+nuevaNota).value
-    let cursoArray = asignacionsHorario.find(function (obj) { return obj.curso === curso});
-    let semestreArray = cursoArray.semestres.find(function (obj) { return obj.semestre === semestre})
-    let grupoArray = semestreArray.grupos.find(function (obj) { return obj.grupoCodigo === grupo})
-    let asignatura = grupoArray.asignaturas.find(function (obj) { return (obj.acronimo === asignaturaNombreOAcronimo || obj.nombre === asignaturaNombreOAcronimo )});
-    let text = document.getElementById("text_"+id).value;
-
-    if(text && asignatura &&text.trim() !== ""){
-        let div = document.createElement('div');
-        let p = document.getElementById("nota_"+id);
-        p.parentNode.removeChild(p)
-        div.innerHTML = `<p id="nota_horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}">
-        <input type="hidden" name="anadir" id="horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}" value="${asignatura.identificador}_${grupo}_${text}"> 
-        <span title="${asignatura.nombre} (${asignatura.codigo})">(${asignaturaNombreOAcronimo})</span>
-        <button type="button" class="btn btn-default" onclick = "eliminarNota('horario_${curso}_${semestre}_${grupo}_nuevaNota${notas}')">
-        <span class="glyphicon glyphicon-trash"></span> 
-        </button>
-        ${text}
-        </p>`
-        
-        let node = div.firstChild;
-        let contenedor = document.getElementById("nota_"+curso+"_"+semestre+"_"+grupo)
-        contenedor.appendChild(node)
-    }
-
-}
-
-function eliminarNota(id){
-    let inputHidden = document.getElementById(id);
-    //en el caso de notas que añadi nuevas da igual cambiar esto porque al eliminar p elimino el hidden tambien
-    //no puedo poner eliminiarNota pq se ralla con la función que tiene el mismo nombre
-    inputHidden.setAttribute('name', 'eliminar')
-    let p = document.getElementById("nota_"+id)
-    p.parentNode.removeChild(p); 
-}
 
 function Volver(cancelarpath){
     activado = false

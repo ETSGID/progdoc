@@ -189,7 +189,7 @@ exports.generarPDF = function (req, res, next) {
                                     semestre.grupos.push(newGrupo)
                                     grupo = semestre.grupos.find(function (obj) { return obj.grupoId === Number(g.grupoId) })
                                 } let asignatura = grupo.asignaturas.find(function (obj) { return obj.asignaturaId === Number(g['AsignacionProfesors.AsignaturaId']) })
-                                if (!asignatura && (g['AsignacionProfesors.ProfesorId'] !== null || (g['AsignacionProfesors.Dia'] !== null || g['AsignacionProfesors.Nota']))) {
+                                if (!asignatura && (g['AsignacionProfesors.ProfesorId'] !== null || (g['AsignacionProfesors.Dia'] !== null || (g['AsignacionProfesors.Nota'] && g['AsignacionProfesors.AsignaturaId'] )))) {
                                     let newAsignatura = {};
                                     newAsignatura.asignaturaId = Number(g['AsignacionProfesors.AsignaturaId'])
                                     newAsignatura.asignacions = [];

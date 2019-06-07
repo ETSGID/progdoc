@@ -94,7 +94,7 @@ let getNumeroGruposNoOptativas = function (grupos){
                             <% let getNotas = function (){
                                     let found = cursosConGrupos[i].semestres[j].grupos[k].horarios.filter(
                                         //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
-                                        asign => ((asign.nota && asign.nota.trim() !== ""))
+                                        asign => ((asign.nota || typeof asign.nota === 'string'))
                                     );
                                     return found;
                             }%>
@@ -159,9 +159,10 @@ let getNumeroGruposNoOptativas = function (grupos){
                                     <%} else{%>
                                         (<%=asignat.nombre%>)
                                     <% } %>
-                                    
+                                    <%}else{%>
+                                    (<%=cursosConGrupos[i].semestres[j].grupos[k].nombre%>)
                                     <%}%>
-                                    <%=foundNotas[n].nota%></p>
+                                    <span><%=foundNotas[n].nota%></span></p>
                                 <%}%>
                             </div>
                             <div style="border: ridge  2px; padding: 0.5mm;" class="tableText">

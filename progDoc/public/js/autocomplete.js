@@ -29,11 +29,7 @@ function autocomplete(inp, obj, obj2, opcion) {
         /*insert a input field that will hold the current obj item's value:*/
         /*execute a function when someone clicks on the item value (DIV element):*/
         otro.addEventListener("click", function (e) {
-            let nuevoProfesorForm = document.getElementById("nuevoProfesorForm");
-            nuevoProfesorForm.style.display="block";
-            let divhermano = document.getElementById('hermanoNuevoProfesorForm');
-            divhermano.style.display = "none";
-            document.getElementById("nombreProfesor").focus();
+            $("#nuevoProfesorForm").modal();
         })
         a.appendChild(otro);
 

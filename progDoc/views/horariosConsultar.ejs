@@ -27,7 +27,7 @@
                                 <% let getNotas = function (){
                                         let found = asignacionsHorario[i].semestres[j].grupos[k].asignaciones.filter(
                                             //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
-                                            asign => ((asign.nota && asign.nota.trim() !== ""))
+                                            asign => ((asign.nota || typeof asign.nota === 'string'))
                                         );
                                         return found;
                                 }%>
@@ -82,7 +82,7 @@
                                         <%}else{%>
                                             <span title="<%=foundNotas[n].asignaturaNombre%> (<%=foundNotas[n].asignaturaCodigo%>)">(<%=foundNotas[n].asignaturaNombre%>)</span>
                                         <%}%>
-                                        <%=foundNotas[n].nota%></p>
+                                        <span><%=foundNotas[n].nota%></span></p>
                                     <%}%>
                                 </div>
                             </div>

@@ -57,7 +57,9 @@ exports.getRoles = function (req, res, next) {
                 departamentos: departs.sort(funciones.sortDepartamentos),
                 planID: req.session.planID,
                 planEstudios: res.locals.planEstudios,
-                menu: req.session.menu
+                menu: req.session.menu,
+                //para añadir una persona al sistema no tiene por que ser un profesor.
+                onlyProfesor: false
             });
         })
         .catch(function (error) {
@@ -88,13 +90,6 @@ exports.guardarRoles = function (req, res, next) {
             personaId = null;
         }else{
             personaId = toActualizar.split("_")[1];
-            if (isNaN(personaId)) {
-                //le paso el correo en el caso que sea un profesor que se acaba de añadir.
-                let p = profesoresAnadidos.find(function (obj) { return obj.correo === toActualizar.split("_")[3] });
-                if (p) {
-                    personaId = p.ProfesorId;
-                }
-            }
         } 
         
 

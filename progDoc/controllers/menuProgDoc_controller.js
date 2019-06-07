@@ -439,65 +439,28 @@ exports.getHistorial = function (req, res, next) {
 }
 
 exports.anadirProfesor = function (req, res, next) {
-    let personaToAnadir = [];
-    let profesorToAnadir = [];
-    let profesoresAnadidos = [];
-    let profesoresNuevos = req.body.nuevoProfesor;
-    let promises = [];
-
-    if (Array.isArray(profesoresNuevos)) {
-        //borro los profesores pq pueden haber nuevos.
-        profesoresNuevos.forEach(function (value) {
-            let nombre = value.split("_")[0]
-            let apellido = value.split("_")[1];
-            let correo = value.split("_")[2];
-            let p = {};
-            p.nombre = nombre;
-            p.apellido = apellido;
-            p.email = correo;
-            personaToAnadir.push(p);
+    let id = ""
+    return models.Persona.findOrCreate({
+            where: { email: req.body.email },
+            defaults: { email: req.body.email, nombre: req.body.nombre.toUpperCase(), apellido: req.body.apellido.toUpperCase() }
         })
-    } else if (profesoresNuevos) {
-        //borro los profesores pq pueden haber nuevos.
-        let nombre = profesoresNuevos.split("_")[0]
-        let apellido = profesoresNuevos.split("_")[1];
-        let correo = profesoresNuevos.split("_")[2];
-        let p = {};
-        p.nombre = nombre;
-        p.apellido = apellido;
-        p.email = correo;
-        personaToAnadir.push(p);   
-    }
-    personaToAnadir.forEach(function (per) {
-        promises.push( models.Persona.findOrCreate({
-            where: { email: per.email },
-            defaults: { email: per.email, nombre: per.nombre, apellido: per.apellido }
-        })
-    
         .then((nuevaPersona)=>{
             let prof = {};
-            let profe2 = {}
-            profe2.ProfesorId = nuevaPersona[0].identificador;
-            profe2.correo = nuevaPersona[0].email;
-            profesoresAnadidos.push(profe2);
             prof.ProfesorId = nuevaPersona[0].identificador;
-            profesorToAnadir.push(prof)
-        }))
-    })
-    return Promise.all(promises)
-        .then(() => {
-            // Notice: There are no arguments here, as of right now you'll have to...
-            return models.Profesor.bulkCreate(
-                profesorToAnadir
-            )
+            id = prof.ProfesorId
+            if(req.body.isProfesor === true){
+                let profesorToAnadir = models.Profesor.build(
+                    prof
+                )
+                return profesorToAnadir.save()
+            }
         })
         .then(() => {
-            res.profesoresAnadidos = profesoresAnadidos;
-            next();
+            res.json({ success:true, identificador : id});
         })
         .catch(function (error) {
             console.log("Error:", error);
-            next(error);
+            res.json({success:false})
         });
 }
 

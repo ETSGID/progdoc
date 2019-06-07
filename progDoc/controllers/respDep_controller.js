@@ -175,7 +175,9 @@ exports.editAsignacion = function (req, res, next) {
                         estadosProfesor: estados.estadoProfesor,
                         estadosProgDoc: estados.estadoProgDoc,
                         estadoProfesores: res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
-                        planEstudios: res.locals.planEstudios
+                        planEstudios: res.locals.planEstudios,
+                        //desde esta ventana solo se pueden añadir profesores al sistema.
+                        onlyProfesor: true
                     })
             })
             .catch(function (error) {
@@ -489,13 +491,6 @@ exports.guardarAsignacion = function (req, res, next) {
                         if (toAnadir) {
                             if (!Array.isArray(toAnadir)) {
                                 let profesor = toAnadir.split("_")[3]
-                                if (isNaN(profesor)) {
-                                    //le paso el correo en el caso que sea un profesor que se acaba de añadir.
-                                    let p = profesoresAnadidos.find(function (obj) { return obj.correo === toAnadir.split("_")[4] });
-                                    if (p) {
-                                        profesor = p.ProfesorId;
-                                    }
-                                }
                                 let grupoId = toAnadir.split("_")[2]
                                 if (!isNaN(grupoId)) {
                                     grupoId = Number(grupoId)
@@ -518,13 +513,6 @@ exports.guardarAsignacion = function (req, res, next) {
                             } else {
                                 toAnadir.forEach(function (element, index) {
                                     let profesor = element.split("_")[3]
-                                    if (isNaN(profesor)) {
-                                        //le paso el correo en el caso que sea un profesor que se acaba de añadir.
-                                        let p = profesoresAnadidos.find(function (obj) { return obj.correo === element.split("_")[4] });
-                                        if (p) {
-                                            profesor = p.ProfesorId;
-                                        }
-                                    }
                                     let grupoId = element.split("_")[2]
                                     if (!isNaN(grupoId)) {
                                         grupoId = Number(grupoId)
@@ -605,6 +593,10 @@ exports.aprobarAsignacion = function (req, res, next) {
                 JEcontroller.isPDLista(pdID, res.redirect("" + req.baseUrl + "/respDoc/profesores"))
                 })
             })
+                .catch(function (error) {
+                    console.log("Error:", error);
+                    next(error);
+                });
         } else {
             req.session.save(function () {
             JEcontroller.isPDLista(pdID, res.redirect("" + req.baseUrl + "/respDoc/profesores"))
@@ -634,7 +626,9 @@ exports.getTribunales = function (req, res, next) {
             departamentosResponsables: res.locals.departamentosResponsables,
             estadosTribunal: estados.estadoTribunal,
             estadosProgDoc: estados.estadoProgDoc,
-            planEstudios: res.locals.planEstudios
+            planEstudios: res.locals.planEstudios,
+            //desde esta ventana solo se pueden añadir profesores al sistema.
+            onlyProfesor: true
         })
     }
     //hay que comprobar que no sea una url de consultar.
@@ -655,7 +649,9 @@ exports.getTribunales = function (req, res, next) {
             estadosTribunal: estados.estadoTribunal,
             estadosProgDoc: estados.estadoProgDoc,
             estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
-            planEstudios: res.locals.planEstudios
+            planEstudios: res.locals.planEstudios,
+            //desde esta ventana solo se pueden añadir profesores al sistema.
+            onlyProfesor: true
         })
     }
     else {
@@ -692,7 +688,9 @@ exports.getTribunales = function (req, res, next) {
                         estadosTribunal: estados.estadoTribunal,
                         estadosProgDoc: estados.estadoProgDoc,
                         estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
-                        planEstudios: res.locals.planEstudios
+                        planEstudios: res.locals.planEstudios,
+                        //desde esta ventana solo se pueden añadir profesores al sistema.
+                        onlyProfesor: true
                     })
                 } else {
                     if (res.locals.permisoDenegado) {
@@ -710,7 +708,9 @@ exports.getTribunales = function (req, res, next) {
                             estadosTribunal: estados.estadoTribunal,
                             estadosProgDoc: estados.estadoProgDoc,
                             estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
-                            planEstudios: res.locals.planEstudios
+                            planEstudios: res.locals.planEstudios,
+                            //desde esta ventana solo se pueden añadir profesores al sistema.
+                            onlyProfesor: true
                         })
                     }
                     else {
@@ -802,7 +802,9 @@ exports.getTribunales = function (req, res, next) {
                                         departamentosResponsables: res.locals.departamentosResponsables,
                                         estadosTribunal: estados.estadoTribunal,
                                         estadosProgDoc: estados.estadoProgDoc,
-                                        planEstudios: res.locals.planEstudios
+                                        planEstudios: res.locals.planEstudios,
+                                        //desde esta ventana solo se pueden añadir profesores al sistema.
+                                        onlyProfesor: true
                                     })
                             }).catch(function (error) {
                                 console.log("Error:", error);
@@ -841,13 +843,6 @@ exports.guardarTribunales = function (req, res, next) {
                         next();
                     } else {
                         let profesorIdentificador = toActualizar.split("_")[1]
-                        if (isNaN(profesorIdentificador)){
-                            //le paso el correo en el caso que sea un profesor que se acaba de añadir.
-                            let p = profesoresAnadidos.find(function (obj) { return obj.correo === toActualizar.split("_")[3] });
-                            if(p){
-                                profesorIdentificador = p.ProfesorId;
-                            }
-                        }
                         let puestoTribunal = toActualizar.split("_")[2] + "TribunalAsignatura"
                         let nuevaEntrada = {};
                         nuevaEntrada[puestoTribunal] = profesorIdentificador;
@@ -856,7 +851,9 @@ exports.guardarTribunales = function (req, res, next) {
                             { where: { identificador: tribunalId } } /* where criteria */
                         ).then(() => {
                             next();
-                        })
+                            }).catch(function (error) {
+                                console.log("Error:", error);
+                                next(error);})
                     }
                 } else {
                     let promises = [];
@@ -869,13 +866,6 @@ exports.guardarTribunales = function (req, res, next) {
                             console.log("Ha intentado cambiar una asignatura que no puede")
                         } else {
                             let profesorIdentificador = element.split("_")[1]
-                            if (isNaN(profesorIdentificador)) {
-                                //le paso el correo en el caso que sea un profesor que se acaba de añadir.
-                                let p = profesoresAnadidos.find(function (obj) { return obj.correo === element.split("_")[3] });
-                                if (p) {
-                                    profesorIdentificador = p.ProfesorId;
-                                }
-                            }
                             let puestoTribunal = element.split("_")[2] + "TribunalAsignatura"
                             tribunalToActualizar = tribunalesToActualizar.find(function (obj) { return obj.identificador === tribunalId; });
                             if (tribunalToActualizar) {
@@ -900,6 +890,9 @@ exports.guardarTribunales = function (req, res, next) {
 
                     return Promise.all(promises).then(() => {
                         next()
+                    }).catch(function (error) {
+                        console.log("Error:", error);
+                        next(error);
                     });
 
                 }
