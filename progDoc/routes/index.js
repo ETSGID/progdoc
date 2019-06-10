@@ -294,6 +294,10 @@ router.get('/coordinador/examenes', menuProgDocController.getProgramacionDocente
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
+    res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+  });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, examenController.getFranjas, examenController.getExamenes, examenController.getExamenesView);
 router.get('/consultar/examenes', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, examenController.getFranjas, examenController.getExamenes, examenController.getExamenesView);
@@ -307,6 +311,11 @@ router.get('/coordinador/franjasexamenes', menuProgDocController.getProgramacion
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+  });
+  
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, examenController.getFranjas, examenController.getFranjasView);
 
@@ -410,6 +419,10 @@ router.post('/coordiandor/aprobarExamenes', function (req, res, next) {
   res.locals.rols.push({
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
+  });
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
   });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, examenController.guardarExamenes, examenController.aprobarExamenes, examenController.getExamenes,examenController.generateCsvExamens, examenController.reenviarExamenes);
