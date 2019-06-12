@@ -252,7 +252,7 @@ exports.getExamenesView = function (req, res, next) {
         })
     }
     //hay que comprobar que no sea una url de consultar.
-    else if (estados.estadoExamen.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoExamenes']
+    /*else if (estados.estadoExamen.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoExamenes']
         && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
         && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("examenesCumplimentar", {
@@ -273,7 +273,7 @@ exports.getExamenesView = function (req, res, next) {
             cursos: null,
             pdID: null
         })
-    } else {
+    }*/ else {
         let cancelarpath = "" + req.baseUrl + "/coordinador/examenes?planID=" + req.session.planID
         let selectExamenespath = "" + req.baseUrl + "/coordinador/franjasexamenes?planID=" + req.session.planID
         let nuevopath = "" + req.baseUrl + "/coordinador/guardarExamenes"
@@ -331,7 +331,7 @@ exports.getFranjasView = function (req, res, next) {
         })
     }
     //hay que comprobar que no sea una url de consultar.
-    else if (estados.estadoExamen.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoExamenes']
+   /* else if (estados.estadoExamen.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoExamenes']
         && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
         && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render(view, {
@@ -348,7 +348,7 @@ exports.getFranjasView = function (req, res, next) {
             periodosExamen: null,
             pdID: null
         })
-    } else {
+    }*/ else {
         let cancelarpath = "" + req.baseUrl + "/coordinador/franjasexamenes?planID=" + req.session.planID
         let nuevopath = "" + req.baseUrl + "/coordinador/guardarFranjasExamenes"
         let selectExamenespath = "" + req.baseUrl + "/coordinador/examenes?planID=" + req.session.planID

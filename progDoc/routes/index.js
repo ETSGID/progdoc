@@ -380,6 +380,10 @@ router.post('/coordinador/guardarExamenes', function (req, res, next) {
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
   });
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.listo }]
+  });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, examenController.guardarExamenes, examenController.getExamenes, examenController.generateCsvExamens, examenController.reenviarExamenes);
 
@@ -395,6 +399,10 @@ router.post('/coordinador/guardarFranjasExamenes', function (req, res, next) {
   res.locals.rols.push({
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+  });
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.listo }]
   });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, examenController.guardarFranjasExamenes);
