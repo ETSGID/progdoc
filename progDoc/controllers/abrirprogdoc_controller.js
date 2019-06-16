@@ -226,7 +226,7 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                                 asignBBDD.DepartamentoResponsable = "TFG"
                             }else{
                                 asignBBDD.DepartamentoResponsable = null;
-                                hasDepartamento = false; //no lo uso pq tft si que la quiero y no tiene departamento
+                                hasDepartamento = false; //no lo uso pq las practicas si que la quiero y no tiene departamento
                             }
                         }
                         apiDepartamentos.forEach(function (element, index) {

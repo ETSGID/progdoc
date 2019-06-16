@@ -18,18 +18,7 @@
                 }%> 
          </select>
          <%}%>
-         <% if (locals.submenu === "Calendario") {%>
-            <select id="selectano" onchange="cambiarano()">
-
-                <option value="<%=ano3%>"><%=ano3.substring(2,5)%>/<%= parseInt(ano3.substring(2,5)) + 1%></option>
-            
-                <option value="<%=ano2%>"><%=ano2.substring(2,5)%>/<%= parseInt(ano2.substring(2,5)) + 1%></option> 
-                
-                <option value="<%=ano1%>"><%=ano1.substring(2,5)%>/<%= parseInt(ano1.substring(2,5)) + 1%></option> 
-                
-            
-            </select>
-        <%} %>
+         
 
     <% if (locals.departamentoID && locals.departamentosResponsables && (locals.submenu === "Profesores" || locals.submenu === "Tribunales")) { %>
      <input id='departamentoResponsable' type="hidden" value="<%=departamentoID%>">

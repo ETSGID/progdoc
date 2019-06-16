@@ -1,6 +1,6 @@
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values
-    ademas tiene un campo opcion para algunos menus especificos*/
+    ademas tiene un campo opcion para algunos menus especificos en opcion se le da el nombre del menu*/
 function autocomplete(inp, obj, obj2, opcion) {
     var currentFocus;
     /*execute a function when someone writes in the text field:*/
@@ -67,15 +67,20 @@ function autocomplete(inp, obj, obj2, opcion) {
                         let idList = inp.getAttribute('id');
                         abuelo.removeChild(parent);
                         inp.setAttribute("type", 'hidden')
-                        let nuevoValor = "anadir_profesor_"+grupo+"_"+objeto['identificador']+"_"+objeto['correo'];
+                        let nuevoValor = "anadir_profesor_"+grupo+"_"+objeto['identificador'];
                         inp.setAttribute("name", "anadir")
                         inp.setAttribute("value", nuevoValor )
                         //creo div para despues quedarme con el elemento que contiene y poder utilizr innerHTML
                         let div = document.createElement('div');
-                        div.innerHTML = '<li id="list_' + idList + '">' + nombreCorregido + '<button type="button" onclick="Eliminar2(' + idList +')">Eliminar</button></li>'
+                        div.innerHTML = '<li id="list_' + idList + '">' + nombreCorregido + '<button type="button"  class="btn btn-default" onclick="Eliminar2(' + idList +')">Eliminar</button></li>'
                         let nuevo = div.firstChild;
                         abuelo.appendChild(nuevo);
                         abuelo.appendChild(inp);
+
+                    }
+                    if (opcion && opcion === 'coordinador'){
+                        //debo poner en un input hidden el identificador del coordinador nuevo
+                        document.getElementById(opcion).value = objeto['identificador']
 
                     }
                     if (opcion && opcion === 'tribunales'){
@@ -86,7 +91,7 @@ function autocomplete(inp, obj, obj2, opcion) {
                         let tribunalId = id.split("_")[1]
                         //con el [2] me quedo con el puesto en el tribunal
                         let puesto = id.split("_")[2]
-                        let nuevoValor = tribunalId+"_"+objeto['identificador']+"_"+puesto+"_"+objeto['correo'];
+                        let nuevoValor = tribunalId+"_"+objeto['identificador']+"_"+puesto;
                         abuelo.removeChild(parent);
                         inp.setAttribute("name", "actualizar")
                         inp.setAttribute("type", "hidden");

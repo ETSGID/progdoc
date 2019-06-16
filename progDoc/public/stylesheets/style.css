@@ -21,7 +21,7 @@ html {
       z-index: 1;
       top: 0;
       left: 0;
-      background-color:#babbc5;
+      background-color:#4664a2;
       overflow-x: hidden;
       padding-top: 0px;
   }
@@ -30,7 +30,7 @@ html {
   .sidenav a, .sidenav h2, .dropdown-btn {
       padding: 6px 8px 6px 16px;
       text-decoration: none !important;
-      color: #333131;;
+      color: #fffff9;
       display: block;
       border: none;
       background: none;
@@ -43,7 +43,7 @@ html {
 
   
   .activeMenu{
-      color: #dddddd !important
+      color: #a8aaad !important
   }
   
   /* On mouse-over */
@@ -51,8 +51,8 @@ html {
       color: #f1f1f1 !important;
   }
   .sidenav .active {
-      background-color:#dddddd;
-      color:#333131;
+      background-color:#4664a2;
+      color:#fffff9;
   }
 
 
@@ -114,7 +114,7 @@ html {
   /* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
   .dropdown-container {
       display: none;
-      background-color:rgb(153, 156, 187);
+      background-color:#4664a2;
       padding-left: 8px;
   }
   
@@ -138,8 +138,9 @@ html {
   /* Style the tab */
   .tab {
       overflow: hidden;
-      border: 1px solid #ccc;
-      background-color: #f1f1f1;
+      background-color: #4664a2;
+      width:80%;
+      color: #fffff9;
   }
   
   /* Style the buttons inside the tab */
@@ -161,7 +162,7 @@ html {
   
   /* Create an active/current tablink class */
   .tab button.active {
-      background-color: #ccc;
+      background-color: #a4aaab;
   }
   
   /* Style the tab content */
@@ -199,7 +200,7 @@ html {
     width: 100%;
   }
   input[type=submit] {
-    background-color: DodgerBlue;
+    background-color: #4664a2;
     color: #fff;
     cursor: pointer;
   }
@@ -230,7 +231,7 @@ html {
   }
   .autocomplete-active {
     /*when navigating through the items using the arrow keys:*/
-    background-color: DodgerBlue !important; 
+    background-color: #4664a2 !important; 
     color: #ffffff; 
   }
   
@@ -261,3 +262,4 @@ html {
    .solapa input{
        border-color: rgb(186, 82, 82);
    }
+

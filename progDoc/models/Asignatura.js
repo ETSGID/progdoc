@@ -36,7 +36,7 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.ENUM('1S', '2S', '1S-2S', 'A', 'I'),
                 validate: { notEmpty: { msg: "Falta semestre" } }
             },
-            //para diferenciar si guardarla como grupo comun o no en la asignacion de profesores
+            //para diferenciar si guardarla como grupo comun (N) o por grupo individual (S) en la asignacion de profesores
             estado: {
                 type: DataTypes.ENUM('S', 'N'),
                 validate: { notEmpty: { msg: "Falta estado" } }

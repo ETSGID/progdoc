@@ -33,10 +33,10 @@
                    <option value="FranjaExamenes" title="FranjaExamenes">Franja Exámenes</option>      
                 </select>
                     <%if(estadoExamenes === estadosExamen.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
-                    <input type="submit" value='Guardar y Aprobar Asignación Examenes'>
+                    <input type="submit"  class="btn btn-default" value='Guardar y Aprobar Asignación Examenes'>
                     <%}%>
-                    <button type="button" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
-                    <button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+                    <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
+                    <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
                 </div>
                 <div>
                     <% for (let i=0 ; i<asignacionsExamen.length; i++){%>
@@ -113,7 +113,7 @@
                                         <%= asignacionsExamen[i].asignaturas[j].curso%>
                                     </td>
                                     <td>
-                                    <input class="form-control dateExamen<%=asignacionsExamen[i].periodo%>" value="<%=f%>" name="date_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>" id="date_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>"  placeholder="<%=f%>" type="text" onchange="Change('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" readonly="readonly"/>    
+                                        <input class="form-control dateExamen<%=asignacionsExamen[i].periodo%>" value="<%=f%>" name="date_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>" id="date_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>"  placeholder="<%=f%>" type="text" onchange="Change('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" readonly="readonly"/>    
                                     </td>
                                     <td>
                                     <%if (period.franjas.length>0){%>

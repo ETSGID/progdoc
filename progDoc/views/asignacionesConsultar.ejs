@@ -30,7 +30,7 @@
           </li>
            <!-- Si el estado es N la asignacion se hace por grupo comun -->
            <%if(asignacion[i].estado === "N") {
-              if(asignacion[i].grupos.length > 1){ %>
+              if(asignacion[i].grupos.length > 0){ %>
                 <li>
                   <span> Grupo Común: </span>             
               <%for(var k=0; k< asignacion[i].grupos[0].profesors.length; k++){

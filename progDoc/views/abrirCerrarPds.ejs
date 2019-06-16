@@ -80,7 +80,7 @@
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
       <input type="hidden" id="ocultoanoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="">
       <input type="hidden" id="ocultosemestre_<%=pds[i].PlanEstudioId%>" name="semestre" value="">        
-      <button type="button" class="btn" onclick="Abrir('plan_<%=pds[i].PlanEstudioId%>_gestionar', '<%=abrirpath%>')">Abrir</button>
+      <button type="button"  class="btn btn-default" onclick="Abrir('plan_<%=pds[i].PlanEstudioId%>_gestionar', '<%=abrirpath%>')">Abrir</button>
       </form>
     </td>
     
@@ -91,7 +91,7 @@
         <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
         <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
         <input type="hidden" id="ocultosemestreIncidencia_<%=pds[i].PlanEstudioId%>" name="semestre" value="<%=pds[i].semestre%>">        
-        <button type="button" class="btn" onclick="AbrirIncidencia('plan_<%=pds[i].PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>')"   title="Abrirá incidencia de <%=pds[i].identificador%>">
+        <button type="button"  class="btn btn-default" onclick="AbrirIncidencia('plan_<%=pds[i].PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>')"   title="Abrirá incidencia de <%=pds[i].identificador%>">
         Abrir Incidencia
         </button>
         </form>
@@ -103,19 +103,19 @@
         <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
         <input type="hidden" id="ocultoanoAcademicoReabierto_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
         <input type="hidden" id="ocultosemestreReabierto_<%=pds[i].PlanEstudioId%>" name="semestre" value="<%=pds[i].semestre%>">        
-        <button type="button" class="btn" title="Reabrirá la programación <%=pds[i].identificador%> " onclick="AbrirReabierto('plan_<%=pds[i].PlanEstudioId%>_reabierto', '<%=reabrirpath%>')" >
+        <button type="button"  class="btn btn-default" title="Reabrirá la programación <%=pds[i].identificador%> " onclick="AbrirReabierto('plan_<%=pds[i].PlanEstudioId%>_reabierto', '<%=reabrirpath%>')" >
         Reabrir 2º Semestre
         </button>
         </form>
       </td>
         <%}else{%>
         <td>
-          <button type="button" class="btn" disabled  title="No se puede reabrir ya se reabrió una vez">Reabrir 2º Semestre</button>
+          <button type="button"  class="btn btn-default" disabled  title="No se puede reabrir ya se reabrió una vez">Reabrir 2º Semestre</button>
         </td>
         <%}
       }else{ %>
       <td>
-        <button type="button" class="btn" disabled  title="No hay programación docente anterior">Abrir Incidencia</button>
+        <button type="button"  class="btn btn-default" disabled  title="No hay programación docente anterior">Abrir Incidencia</button>
       </td>
       <%}%>
     
@@ -131,9 +131,9 @@
       <input type="hidden" id="ocultoanoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
       <input type="hidden" id="ocultosemestre_<%=pds[i].PlanEstudioId%>" name="semestre" value="<%=pds[i].semestre%>">
       <%if ( pdAnterior && pdAnterior.estadoProGDoc === estadosProgDoc.incidencia){%> 
-      <button type="button" class="btn"  title="Debe cerrar la incidencia primero" disabled>Cerrar</button>
+      <button type="button"  class="btn btn-default"  title="Debe cerrar la incidencia primero" disabled>Cerrar</button>
       <%}else{%>
-      <button type="button" class="btn" onclick="Cerrar('plan_<%=pds[i].PlanEstudioId%>_gestionar', '<%=cerrarpath%>')" title="Cerrará la programación <%=pds[i].identificador%>">Cerrar</button>
+      <button type="button"  class="btn btn-default" onclick="Cerrar('plan_<%=pds[i].PlanEstudioId%>_gestionar', '<%=cerrarpath%>')" title="Cerrará la programación <%=pds[i].identificador%>">Cerrar</button>
       <%}%>
       </form>
     </td>
@@ -145,17 +145,17 @@
           <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pdAnterior.PlanEstudioId%>" name="anoAcademico" value="<%=pdAnterior.anoAcademico%>">
           <input type="hidden" id="ocultosemestreIncidencia_<%=pdAnterior.PlanEstudioId%>" name="semestre" value="<%=pdAnterior.semestre%>">     
           <%if (pdAnterior.estadoProGDoc === estadosProgDoc.cerrado){%>
-            <button type="button" class="btn" onclick="AbrirIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>')"   title="Abrirá incidencia de <%=pdAnterior.identificador%>">
+            <button type="button"  class="btn btn-default" onclick="AbrirIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>')"   title="Abrirá incidencia de <%=pdAnterior.identificador%>">
             Abrir Incidencia
             </button>
           <%}if (pdAnterior.estadoProGDoc === estadosProgDoc.incidencia){%>
-            <button type="button" class="btn" onclick="CerrarIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=cerrarincidenciapath%>')"  title=" Cerrará la incidencia <%=pdAnterior.identificador%>">
+            <button type="button"  class="btn btn-default" onclick="CerrarIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=cerrarincidenciapath%>')"  title=" Cerrará la incidencia <%=pdAnterior.identificador%>">
             Cerrar Incidencia
             </button>
           <%}%>
           </form>
         <%}else{%>
-          <button type="button" class="btn" disabled  title="No hay programación docente anterior">Abrir Incidencia</button>
+          <button type="button"  class="btn btn-default" disabled  title="No hay programación docente anterior">Abrir Incidencia</button>
         <%}%>
     </td>
   <% } else if(pds[i].estadoProGDoc === estadosProgDoc.abierto) { %>
@@ -167,7 +167,7 @@
       <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
       <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>"> 
-      <button type="button" class="btn" disabled title="La programación docente aun no ha sido rellenada">Cerrar</button>
+      <button type="button"  class="btn btn-default" disabled title="La programación docente aun no ha sido rellenada">Cerrar</button>
       </form>
     </td>
     <td>
@@ -179,17 +179,17 @@
           <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pdAnterior.PlanEstudioId%>" name="anoAcademico" value="<%=pdAnterior.anoAcademico%>">
           <input type="hidden" id="ocultosemestreIncidencia_<%=pdAnterior.PlanEstudioId%>" name="semestre" value="<%=pdAnterior.semestre%>"> 
           <%if (pdAnterior.estadoProGDoc === estadosProgDoc.cerrado){%>
-            <button type="button" class="btn" onclick="AbrirIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>')"  title="Abrirá incidencia de <%=pdAnterior.identificador%>">
+            <button type="button"  class="btn btn-default" onclick="AbrirIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>')"  title="Abrirá incidencia de <%=pdAnterior.identificador%>">
             Abrir Incidencia
             </button>
           <%}else if (pdAnterior.estadoProGDoc === estadosProgDoc.incidencia){%>
-            <button type="button" class="btn" onclick="CerrarIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=cerrarincidenciapath%>')"  title="Cerrará la incidencia <%=pdAnterior.identificador%>">
+            <button type="button"  class="btn btn-default" onclick="CerrarIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=cerrarincidenciapath%>')"  title="Cerrará la incidencia <%=pdAnterior.identificador%>">
             Cerrar Incidencia
             </button>
           <%}%>
           </form>
         <%}else{%>
-          <button type="button" class="btn" disabled  title="No hay programación docente anterior">Abrir Incidencia</button>
+          <button type="button"  class="btn btn-default" disabled  title="No hay programación docente anterior">Abrir Incidencia</button>
         <%}%>
     </td>
   <% }else if(pds[i].estadoProGDoc === estadosProgDoc.incidencia){%>
@@ -253,7 +253,7 @@
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
       <input type="hidden" id="ocultoanoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="">
       <input type="hidden" id="ocultosemestre_<%=pds[i].PlanEstudioId%>" name="semestre" value="">        
-      <button type="button" class="btn" title="Debe cerrar antes la incidencia para poder abrir una nueva programación docente" disabled>Abrir</button>
+      <button type="button"  class="btn btn-default" title="Debe cerrar antes la incidencia para poder abrir una nueva programación docente" disabled>Abrir</button>
       </form>
     </td>
     <td>
@@ -262,7 +262,7 @@
       <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
       <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
       <input type="hidden" id="ocultosemestreIncidencia_<%=pds[i].PlanEstudioId%>" name="semestre" value="<%=pds[i].semestre%>">        
-      <button type="button" class="btn" onclick="CerrarIncidencia('plan_<%=pds[i].PlanEstudioId%>_incidencia', '<%=cerrarincidenciapath%>')"  title="Cerrará la incidencia <%=pds[i].identificador%>">
+      <button type="button"  class="btn btn-default" onclick="CerrarIncidencia('plan_<%=pds[i].PlanEstudioId%>_incidencia', '<%=cerrarincidenciapath%>')"  title="Cerrará la incidencia <%=pds[i].identificador%>">
       Cerrar Incidencia
       </button>
       </form>

@@ -1,0 +1,27 @@
+<script src="<%=contextPath%>/js/funciones.js"></script>
+<%- include gestion.ejs %>
+<div class ="contenido2">
+<%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+  <p><%=permisoDenegado%></p>
+<%}else{%>
+    <p>Programación docente: <%= session.pdID %></p>
+    <% if (locals.estado && locals.estado !== null) { %>
+    <!--ocultar plan -->
+    <p><%=estado%></p>
+    <%}else{%>
+    <!--asignacion por grupo -->
+    <div>
+    <!--actualizar api upm -->
+    <!--<%- include actualizarApiUpm.ejs%>-->
+    </div>
+    <div>
+    <!--gestionar estado -->
+    <h3> Gestionar Estado ProgDoc </h3>
+    <%- include estado.ejs %>
+    </div>
+    <%}%>
+<%}%>
+<script>
+let path = <%-JSON.stringify(path)%>
+window.history.pushState("", "", path)
+</script>

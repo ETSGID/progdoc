@@ -46,7 +46,6 @@ exports.getRoles = function (req, res, next) {
             //foco al cambiar de plan desde la view para que vuelva a ese punto
             let foco = req.query.foco ? true : false
             res.render(view, {
-                contextPath: app.contextPath,
                 roles: cargos.sort(funciones.sortRolesporDepartamento),
                 rolesEnum: enumsPD.rols,
                 profesores: profesores,

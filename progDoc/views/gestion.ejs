@@ -1,8 +1,10 @@
 <body>
 <script src="<%=contextPath%>/js/funciones.js"></script>
 <div class="myHeader sticky">
-    <p>Gestión</p>
-    <%if (locals.planID && locals.planEstudios && (locals.submenu === "Grupos")) { %>
+    <p>Gestión <% if ( session && session.pdID && (locals.submenu === "Grupos")){ %>
+    <%= session.pdID %>
+    <%}%></p>
+    <%if (locals.planID && locals.planEstudios && (locals.submenu === "Grupos" || locals.submenu === "Planes")) { %>
     <div class="row col-sm"  style="margin-left:0px">
         <div clas="container">
             <select id="selectPlan" onchange="cambiarPD()">
@@ -20,11 +22,11 @@
         
         <select id="selectano" onchange="cambiarano()">
 
-                <option value="<%=ano3%>"><%=ano3.substring(2,5)%>/<%= parseInt(ano3.substring(2,5)) + 1%></option>
-            
-                <option value="<%=ano2%>"><%=ano2.substring(2,5)%>/<%= parseInt(ano2.substring(2,5)) + 1%></option> 
                 
-                <option value="<%=ano1%>"><%=ano1.substring(2,5)%>/<%= parseInt(ano1.substring(2,5)) + 1%></option> 
+            
+                <option value="<%=ano2%>" selected><%=ano2.substring(2,5)%>/<%= parseInt(ano2.substring(2,5)) + 1%></option> 
+                
+                <option value="<%=ano1%>" ><%=ano1.substring(2,5)%>/<%= parseInt(ano1.substring(2,5)) + 1%></option> 
                 
             
         </select>
@@ -46,6 +48,8 @@
         <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')">Calendario</button>
         <button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>
         <button id='Acronimos' class="tablinks" onclick="cambiarSubmenu(event, 'Acronimos')">Acrónimos</button>
+        <button id='Planes' class="tablinks" onclick="cambiarSubmenu(event, 'Planes')">Planes</button>
+        <button id='Aulas' class="tablinks" onclick="cambiarSubmenu(event, 'Aulas')">Aulas</button>
     </div>
 
     <% if (locals.planID) { %>
@@ -94,6 +98,14 @@ window.location.replace(url);
 }
 if (submenu === 'Calendario'){
 let url = "<%=contextPath%>/gestion/calendario"
+window.location.replace(url);
+}
+if (submenu === 'Planes'){
+let url = "<%=contextPath%>/gestion/planes"
+window.location.replace(url);
+}
+if (submenu === 'Aulas'){
+let url = "<%=contextPath%>/gestion/aulas"
 window.location.replace(url);
 }
 

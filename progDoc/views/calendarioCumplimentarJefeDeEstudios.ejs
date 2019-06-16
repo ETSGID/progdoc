@@ -5,7 +5,7 @@
     <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
         <p><%=permisoDenegado%></p>
     <%}else{%>
-        <input type="hidden" value="<%=anoSeleccionado%>" id="anoSeleccionado">
+        <input type="hidden" value="<%=ano%>" id="anoSeleccionado">
         <div class="">       
             <h2>Calendario por titulación
                 
@@ -134,7 +134,7 @@
                             <%}else{ %>
                                 <% array_eventos.push.apply(array_eventos, array_dias[i*7 + (j)].eventos);%>
                                 
-                                    <%if(j== 6) {%>
+                                    <%if(j== 6 || j==5) {%>
                                         <td  style="border: 1;background-color: white; color: red; text-align: center; padding: 5px;"  >   <%= calendario[i*7 + (j)] %>
                                         </td>
                                         
@@ -243,7 +243,6 @@
                 document.getElementById("eventoAntiguo").value = 0;
             }else{
                 var evento = JSON.parse(document.getElementById("eventoAntiguo").value)
-               // console.log(evento, evento.evento)
                 //modal.find('.modal-title').text(evento.evento);
             }
             
@@ -268,7 +267,6 @@
             let editableCheck = document.getElementById("editableCheck");
        
             let eventoAntiguo = JSON.parse(document.getElementById("eventoAntiguo").value);
-           // console.log(eventoAntiguo);
             let identificador = eventoAntiguo.identificador;
             
             let url = "<%= contextPath %>/cumplimentar/calendario/eventoEditablePlan"
@@ -278,11 +276,9 @@
                 dataType: "json",
                 url: url,
                 success: function(json) {
-                    //console.log(JSON.stringify(json.estado));
                     location.reload();
                 },
                 error: function(e){
-                    //console.log("F");
                 }
             });
             
@@ -291,7 +287,6 @@
         }
         
         function eventoAntiguoBoton(evento){
-//console.log(evento);
             var modal = $('#eventoModal');
             document.getElementById("eventoAntiguo").value = JSON.stringify(evento);
 
@@ -312,10 +307,8 @@
             
             document.getElementById("text-formularioEvento").innerHTML = evento.nombre;
             document.getElementById("formularioEventoPersonalizado").style.display = "block";
-            //console.log("EE")
             $('#eventoModal').modal('show');
             
-            //console.log("E")
         }
 
         function cambiarano(){
@@ -333,9 +326,7 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             let element3 = document.getElementById('selectano');
-            //console.log("sep");
             if (element3){
-                //console.log(document.getElementById("anoSeleccionado").value);
                 document.getElementById('selectano').value = document.getElementById("anoSeleccionado").value;
             } 
         });

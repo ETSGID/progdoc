@@ -3,8 +3,8 @@
 <div id="hermanoNuevoProfesorForm" class="contenido2">
 <form id="asignacionCumplimentarForm" autocomplete="off" action="<%= nuevopath %>" method="post" >
 <div class="myHeader2 sticky">
-  <input type='submit' value='Guardar'>
-  <button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+  <input type='submit'  class="btn btn-default" value='Guardar'>
+  <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
 </div>
 <input  type="hidden" id="plan" value="<%=session.planID%>">
 <input type="hidden" id="selectPlan" value="<%=session.planID%>">
@@ -18,9 +18,10 @@
 <ul style="list-style-type:none">
     <li>Coordinador:
     <div class="autocomplete" style="width:500px;">
-    <input id="coordinador" type="text" name="coordinador" value="<%= asign.coordinador.nombreCorregido %>" placeholder="<%= asign.coordinador.nombreCorregido %>" onclick= 'LimpiaCoordinador()'>
+    <input id="coordinadorInput" type="text" name="coordinadorInput" value="<%= asign.coordinador.nombreCorregido %>" placeholder="<%= asign.coordinador.nombreCorregido %>" onclick= 'LimpiaCoordinador()'>
+    <input id="coordinador" type="hidden" name="coordinador" value="<%=asign.coordinador.identificador%>">
     </div>
-    <span><button type="button" onclick="EliminarCoordinador()">Eliminar</button></span>
+    <span><button type="button"  class="btn btn-default" onclick="EliminarCoordinador()">Eliminar</button></span>
     </li>
     <!-- Si el estado es N la asignacion se hace por grupo comun -->
     <%if(asign.estado === "N") {
@@ -30,11 +31,11 @@
         <ul style="list-style-type:none">
         <%for(let j=0; j< asign.grupos[0].profesors.length; j++){ %>
         <li id="asignacion_<%= asign.grupos[0].profesors[j].asignacion %>">
-        <%= asign.grupos[0].profesors[j].nombreCorregido %> <button type="button" onclick="Eliminar('asignacion_<%= asign.grupos[0].profesors[j].asignacion %>')">Eliminar</button>
+        <%= asign.grupos[0].profesors[j].nombreCorregido %> <button type="button"  class="btn btn-default" onclick="Eliminar('asignacion_<%= asign.grupos[0].profesors[j].asignacion %>')">Eliminar</button>
         </li>
       <% } %>
       <div id = 'anadir_profesor_<%= asign.grupos[0].GrupoId %>'></div>
-      <button type="button" onclick="AnadirProfesor('anadir_profesor_<%= asign.grupos[0].GrupoId %>')">Añadir Profesor</button>
+      <button type="button"  class="btn btn-default" onclick="AnadirProfesor('anadir_profesor_<%= asign.grupos[0].GrupoId %>')">Añadir Profesor</button>
           </ul>
           </li>
         <%}%>
@@ -49,11 +50,11 @@
         <ul style="list-style-type:none">
         <%for(let j=0; j< asign.grupos[i].profesors.length; j++){ %>
         <li id="asignacion_<%= asign.grupos[i].profesors[j].asignacion %>">
-        <%= asign.grupos[i].profesors[j].nombreCorregido %> <button type="button" onclick="Eliminar('asignacion_<%= asign.grupos[i].profesors[j].asignacion %>')">Eliminar</button>
+        <%= asign.grupos[i].profesors[j].nombreCorregido %> <button type="button"  class="btn btn-default" onclick="Eliminar('asignacion_<%= asign.grupos[i].profesors[j].asignacion %>')">Eliminar</button>
         </li>
       <% } %>
       <div id = 'anadir_profesor_<%= asign.grupos[i].GrupoId %>'></div>
-      <button type="button" onclick="AnadirProfesor('anadir_profesor_<%= asign.grupos[i].GrupoId %>')">Añadir Profesor</button>
+      <button type="button"  class="btn btn-default" onclick="AnadirProfesor('anadir_profesor_<%= asign.grupos[i].GrupoId %>')">Añadir Profesor</button>
           </ul>
           </li>
     <% }
@@ -70,7 +71,7 @@ let numeroIncrementable = 0;
 let profesores = <%- JSON.stringify(profesores) %>
 let profesores2 = quitAcents(profesores)
 
-autocomplete(document.getElementById("coordinador"), profesores, profesores2);
+autocomplete(document.getElementById("coordinadorInput"), profesores, profesores2,'coordinador');
 
 function Eliminar(id) {
    document.getElementById(id).innerHTML = '<input name="eliminar" id="momentaneo" type="hidden" value="">'
@@ -88,9 +89,9 @@ function Eliminar2(id){
 }
 
 function EliminarCoordinador(){
- document.getElementById('coordinador').setAttribute('value', "NO ASIGNADO");
- document.getElementById('coordinador').setAttribute('placeholder', "NO ASIGNADO");
-
+ document.getElementById('coordinadorInput').value = "NO ASIGNADO";
+ document.getElementById('coordinadorInput').placeholder = "NO ASIGNADO";
+ document.getElementById('coordinador').value = null;
 }
 
 function AnadirProfesor(id){
@@ -120,7 +121,7 @@ function Volver(cancelarpath){
 }
 
 function LimpiaCoordinador(){
-  document.getElementById('coordinador').setAttribute('value', "");
+  document.getElementById('coordinadorInput').value = '';
 }
 
 </script>

@@ -80,6 +80,24 @@ exports.getPlanes = function (req, res, next) {
         });
 }
 
+exports.getProgramacionDocenteById = function (pdID){
+    if(pdID){
+        return models.ProgramacionDocente.findOne({
+            attributes: ["identificador", "semestre", "estadoProfesores", "reabierto"],
+            where: {
+                identificador: pdID
+            },
+            raw: true
+        })
+        .then(function(pd){
+            return pd
+        })
+    }else{
+        return null
+    }
+}
+
+//te devuelve la programacion docente sobre la que puede tocar una persona
 exports.getProgramacionDocente = function (req, res, next) {
     let planID = req.query.planID;
     if (!planID) {
@@ -262,10 +280,8 @@ exports.getProgramacionDocentesAnteriores = function (plan, tipoPD, ano, pdIDNoI
             return pds;
         })
 }
-//debo pasarle en la sesión la progDoc
-//mw para recuperar las asignaturas de una progdoc 
-exports.getAsignaturasProgDoc = function (req, res, next) {
-    let pdID = req.session.pdID
+//recuperar las asignaturas de una progdoc 
+exports.getAsignaturasProgDoc = function (pdID) {
     if(pdID){
         return models.Asignatura.findAll({
             where: {
@@ -279,16 +295,10 @@ exports.getAsignaturasProgDoc = function (req, res, next) {
             ],
             raw: true
         }).then(function (asign) {
-            res.locals.asignaturas = asign;
-            next();
+            return asign
         })
-            .catch(function (error) {
-                console.log('Error: ' + error);
-                next(error);
-            });
     }else{
-        res.locals.asignaturas = null;
-        next();
+        return null
     }              
 }
 
@@ -398,10 +408,10 @@ exports.getPersonaCorreo = function (correo) {
     return getPersonCorreo(false, correo);
 }
 
-exports.getGrupos = function (req, res, next) {
-    if (res.locals.progDoc) {
-        let pdID = req.query.pdID ? req.query.pdID : res.locals.progDoc['ProgramacionDocentes.identificador']
-        models.Grupo.findAll({
+//migrar a getGruposNuevo
+exports.getGrupos = function (pdID) {
+    if (pdID) {
+        return models.Grupo.findAll({
             attributes: ["nombre", "curso", "grupoId", "nombreItinerario", "aula"],
             where: { ProgramacionDocenteId: pdID },
             order: [
@@ -411,23 +421,16 @@ exports.getGrupos = function (req, res, next) {
             ],
             raw: true
         }).then(function (grupos) {
-            res.locals.grupos = grupos;
-            next();
+            return grupos
         })
-            .catch(function (error) {
-                console.log("Error:", error);
-                next(error);
-            });
     } else {
-        next();
+        return null
     }
-
 }
 
 
 exports.getHistorial = function (req, res, next) {
     res.render('historial', {
-        contextPath: app.contextPath,
         menu: req.session.menu,
         planID: req.session.planID,
         departamentosResponsables: res.locals.departamentosResponsables,
@@ -529,6 +532,27 @@ exports.getAllProgramacionDocentes = function (planes, tipoPD, ano){
             //caso raro que haya varias I y s1 por ejemplo si tengo s1 I s2 se va a dar. En ese caso me quedo con la anual
             return programacionDocentesPlan;
         })
-
 }
 
+//te da todos los grupos de las programciones docentes pasadas como array
+exports.getAllGruposConAula = async function (progDocs){
+    let gruposPorProgramacionDocente = {
+
+    }
+    for(let i = 0; i<progDocs.length; i++){
+        
+        let grupos = await models.Grupo.findAll({
+            where: {
+                ProgramacionDocenteId: progDocs[i],
+                aula: {
+                    $ne: null,
+                    $ne: ""
+                }
+            }
+        })
+        gruposPorProgramacionDocente[progDocs[i]] = grupos;
+            
+        
+    }
+    return gruposPorProgramacionDocente;
+}

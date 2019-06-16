@@ -234,7 +234,6 @@ exports.getExamenesView = function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         let view = req.originalUrl.toLowerCase().includes("consultar") ? "examenesConsultar" : "examenesCumplimentar"
         res.render(view, {
-            contextPath: app.contextPath,
             estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
@@ -256,7 +255,6 @@ exports.getExamenesView = function (req, res, next) {
         && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
         && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("examenesCumplimentar", {
-            contextPath: app.contextPath,
             estado: "Asignación de exámenes ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
@@ -280,7 +278,6 @@ exports.getExamenesView = function (req, res, next) {
         let view = req.originalUrl.toLowerCase().includes("consultar") ? "examenesConsultar" : "examenesCumplimentar"
         res.render(view,
             {
-                contextPath: app.contextPath,
                 asignacionsExamen: res.locals.asignacionsExamen,
                 franjasExamen: res.locals.franjasExamen,
                 periodosExamen: enumsPD.periodoPD,
@@ -317,7 +314,6 @@ exports.getFranjasView = function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
 
         res.render(view, {
-            contextPath: app.contextPath,
             estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
@@ -331,11 +327,10 @@ exports.getFranjasView = function (req, res, next) {
         })
     }
     //hay que comprobar que no sea una url de consultar.
-   /* else if (estados.estadoExamen.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoExamenes']
+    /*else if (estados.estadoExamen.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoExamenes']
         && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
         && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render(view, {
-            contextPath: app.contextPath,
             estado: "Asignación de exámenes ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
@@ -354,7 +349,6 @@ exports.getFranjasView = function (req, res, next) {
         let selectExamenespath = "" + req.baseUrl + "/coordinador/examenes?planID=" + req.session.planID
         res.render(view,
             {
-                contextPath: app.contextPath,
                 franjasExamen: res.locals.franjasExamen,
                 periodosExamen: enumsPD.periodoPD,
                 nuevopath: nuevopath,
@@ -642,7 +636,9 @@ exports.guardarFranjasExamenes = function (req, res, next) {
                     promises.push(promise1)
                 }
                 Promise.all(promises).then(() => {
+                    req.session.save(function () {
                     res.redirect("" + req.baseUrl + "/coordinador/franjasExamenes")
+                    })
                 })
                     .catch(function (error) {
                         console.log("Error:", error);
@@ -650,7 +646,9 @@ exports.guardarFranjasExamenes = function (req, res, next) {
                     });
             })
     } else {
+        req.session.save(function () {
         res.redirect("" + req.baseUrl + "/coordinador/franjasExamenes")
+        })
     }
 
 }

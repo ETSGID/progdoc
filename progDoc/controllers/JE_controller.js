@@ -176,7 +176,6 @@ exports.gestionProgDoc = function (req, res, next) {
                 })
             } else {
                 res.render("abrirCerrarPds", {
-                    contextPath: app.contextPath,
                     planes: planes,
                     pds: pds,
                     permisoDenegado: res.locals.permisoDenegado,
@@ -212,6 +211,7 @@ function siguienteAnoAcademico(anoActual) {
 //TODO: cuando se añadan las otras funciones hay que ponerlas aquí
 //para comprobar si la pd se puede marcar como lista para que el jefe de estudios la cierre
 exports.isPDLista = function (progID, thenFunction) {
+    let nuevoEstado;
     return models.ProgramacionDocente.findOne(
         {
             where: { identificador: progID },
@@ -224,15 +224,17 @@ exports.isPDLista = function (progID, thenFunction) {
                 && prog['estadoHorarios'] === estados.estadoHorario.aprobadoCoordinador
                 && prog['estadoExamenes'] === estados.estadoExamen.aprobadoCoordinador
             ) {
-                return models.ProgramacionDocente.update(
-                    { estadoProGDoc: estados.estadoProgDoc.listo }, /* set attributes' value */
-                    { where: { identificador: progID } } /* where criteria */
-                ).then(() => {
-                    thenFunction
-                })
+                nuevoEstado = estados.estadoProgDoc.listo
             } else {
-                thenFunction
+                nuevoEstado = estados.estadoProgDoc.abierto
             }
+            return models.ProgramacionDocente.update(
+                { estadoProGDoc: nuevoEstado }, /* set attributes' value */
+                { where: { identificador: progID } } /* where criteria */
+            )
+        })
+        .then(() => {
+            thenFunction
         })
         .catch(function (error) {
             console.log("Error:", error);

@@ -104,6 +104,7 @@ app.use(session({
   app.use(cas.bounce, function (req, res, next) {
     // Hacer visible req.session en las vistas
     res.locals.session = req.session;
+    res.locals.contextPath = contextPath;
     //solo la primera vez
     if (!req.session.user.noFirst) {
       return models.Persona.findOne({

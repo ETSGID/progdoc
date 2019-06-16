@@ -20,6 +20,7 @@
 
 //id de curso semestre grupo y notaId sirve para saber si es editar (id) o añadir una nueva (false)
 function anadirNota(id,notaId,asignaturaId){
+    console.log(asignaturaId)
   notaId === false ?  notaId = false : notaId = Number(notaId)
   let div = document.createElement('div');
   let curso = id.split("_")[1];
@@ -121,7 +122,7 @@ function guardarNota(id){
                 let p = document.getElementById("nota_"+id)
                 p.children[0].title =`${asignatura.nombre} (${asignatura.codigo})">(${asignaturaNombreOAcronimo})`
                 p.children[0].innerHTML = "("+asignaturaNombreOAcronimo+")"
-                p.children[1].onclick = function(){anadirNota(`horario_${curso}_${semestre}_${grupo}_${notaId}`, notaId, `'${asignaturaIdentificador}'`)}
+                p.children[1].onclick = function(){anadirNota(`horario_${curso}_${semestre}_${grupo}_${notaId}`, notaId, `${asignaturaIdentificador}`)}
                 p.children[2].innerHTML = text;
                 break;
         }

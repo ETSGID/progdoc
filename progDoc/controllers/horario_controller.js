@@ -6,7 +6,8 @@ const op = Sequelize.Op;
 let estados = require('../estados');
 let enumsPD = require('../enumsPD');
 let funciones = require('../funciones');
-let JEcontroller = require('./JE_controller')
+let JEcontroller = require('../controllers/JE_controller')
+let menuProgDocController = require('../controllers/menuProgDoc_controller')
 
 
 //para obtener las notas definidas para el grupo completo no ligadas a asignatura
@@ -50,7 +51,6 @@ exports.getHorario = function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         let view = req.originalUrl.toLowerCase().includes("consultar") ? "horariosConsultar" : "horariosCumplimentar"
         res.render(view, {
-            contextPath: app.contextPath,
             estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
@@ -66,7 +66,6 @@ exports.getHorario = function (req, res, next) {
         && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
         && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("horariosCumplimentar", {
-            contextPath: app.contextPath,
             estado: "Asignación de horarios ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
@@ -81,7 +80,7 @@ exports.getHorario = function (req, res, next) {
         let asignacionsHorario = []; //asignaciones existentes
         let cursos = []; //array con los cursos por separado
         let asignaturas = []; //array con los acronimos de las asignaturas por separado
-        let gruposBBDD = res.locals.grupos;
+        let gruposBBDD;
         let pdID = req.session.pdID
         //sino se especifica departamento se queda con el primero del plan responsable. Arriba comprobé que existe el departamento en la pos 0.
         let departamentoID;
@@ -94,8 +93,11 @@ exports.getHorario = function (req, res, next) {
         //si no estaba inicializada la inicializo.
         req.session.departamentoID = departamentoID;
         let departamentoExisteEnElPlan = res.locals.departamentosResponsables.find(function (obj) { return obj.codigo === departamentoID; });
-
-        return getNotasGruposSinAsignatura(gruposBBDD)
+        return menuProgDocController.getGrupos(pdID)
+        .then(function (grupos) {
+            gruposBBDD = grupos
+            return getNotasGruposSinAsignatura(gruposBBDD)
+        })
         .then(function(gruposBBDDConNotas){
             getAsignacionHorario(pdID);
             gruposBBDD = gruposBBDDConNotas
@@ -262,7 +264,6 @@ exports.getHorario = function (req, res, next) {
                         let view = req.originalUrl.toLowerCase().includes("consultar") ? "horariosConsultar" : "horariosCumplimentar"
                         res.render(view,
                             {
-                                contextPath: app.contextPath,
                                 asignacionsHorario: asignacionsHorario,
                                 nuevopath: nuevopath,
                                 aprobarpath: "" + req.baseUrl + "/coordiandor/aprobarHorarios",

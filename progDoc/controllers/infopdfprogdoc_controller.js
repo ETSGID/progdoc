@@ -58,7 +58,6 @@ exports.generarPDF = function (req, res, next) {
     //si no hay progDoc o no hay departamentosResponsables de dicha progDoc
     if (view === "pdfDraftGenerado" && (!res.locals.progDoc || !res.locals.departamentosResponsables)) {
         res.render(view, {
-            contextPath: app.contextPath,
             estado: "Programación docente no abierta",
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -70,7 +69,6 @@ exports.generarPDF = function (req, res, next) {
     }
     else if (view === "pdfDraftGenerado" && estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] && estados.estadoProgDoc.listo !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) {
         res.render(view, {
-            contextPath: app.contextPath,
             estado: "Programación docente no abierta",
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -387,7 +385,6 @@ exports.generarPDF = function (req, res, next) {
                                         franjasExamen : franjasExamen,
                                         cursosConGrupos: cursosConGrupos,
                                         pdID: pdID,
-                                        contextPath: app.contextPath,
                                         periodos: enumsPD.periodoPD,
                                     },
                                     function (err, str) {
@@ -460,7 +457,6 @@ exports.generarPDF = function (req, res, next) {
                                             //console.log("not next");
                                             res.render(view,
                                                 {
-                                                    contextPath: app.contextPath,
                                                     file: file,
                                                     planID: req.session.planID,
                                                     planEstudios: res.locals.planEstudios,
@@ -478,7 +474,6 @@ exports.generarPDF = function (req, res, next) {
                                     }
 
                                     /*res.render('pdfAsignaturas',{
-                                        contextPath: app.contextPath,
                                         asignaturas: asignaturas,
                                         cursosConGrupos: cursosConGrupos,
                                         profesores: profesores

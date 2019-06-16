@@ -26,10 +26,10 @@
         <form id="formulario" autocomplete="off" action="<%=aprobarpath%>" method="post" onsubmit="return Enviar()" >
         <div class="myHeader2 sticky">
         <%if(estadoHorarios === estadosHorario.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
-            <input type="submit" value='Guardar y Aprobar Asignación Horarios'>
+            <input type="submit"  class="btn btn-default" value='Guardar y Aprobar Asignación Horarios'>
             <%}%>
-            <button type="button" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
-            <button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+            <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
+            <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
         </div>
             <% for (let i=0 ; i<asignacionsHorario.length; i++){%>
                 <div>
@@ -148,7 +148,7 @@ function mostrar(id){
     //solo dejo un select picker activo a la vez
     if( pulsado === 0 && document.getElementsByClassName("selectpicker").length === 0){ 
         pulsado =1;
-        //en asingacions se guardan las que quieras que aparezcan seleccionadas
+        //en asignacions se guardan las que quieras que aparezcan seleccionadas
         let asignacions = [];
         let parent = document.getElementById(id);
         let children = document.getElementById(id).children;

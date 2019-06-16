@@ -3,15 +3,17 @@
 
 <div class="contenido" style="padding-top: 120px;">
         <script src="<%=contextPath%>/js/datepicker.js"></script>
-        <input type="hidden" value="<%=anoSeleccionado%>" id="anoSeleccionado">
+        <input type="hidden" value="<%=ano%>" id="anoSeleccionado">
     <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
         <p><%=permisoDenegado%></p>
     <%}else if(estado === 0){ %>
         <p style="margin-top: 30px">Calendario no aprobado.</p>
+    <%}else if(ano === null){ %>
+        <p style="margin-top: 30px">Programación docente cerrada</p>
     <%}else{%>
-        <input type="hidden" value="<%=anoSeleccionado%>" id="anoSeleccionado">
+        
         <div class="">       
-            <h2>Calendario común
+            <h2>Calendario <%=ano%>/<%=parseInt(ano)+1%>
                 
                 <button type="button" class="btn btn-default" data-toggle="popover" title="Leyenda de colores" data-content="">Leyenda de colores</button>
                 
@@ -136,7 +138,7 @@
                                     <%}else{ %>
                                         <% array_eventos.push.apply(array_eventos, array_dias[i*7 + (j)].eventos);%>
                                         
-                                            <%if(j== 6) {%>
+                                            <%if(j== 6 || j==5) {%>
                                                 <td style="background-color: white; color: red; text-align: center; padding: 5px;"  >   <%= calendario[i*7 + (j)] %>
                                                 </td>
                                                 
@@ -257,8 +259,8 @@
             autoclose: true,
             format: "yyyy-mm-dd",
             clearBtn: true,
-            startDate: "<%-anoSeleccionado%>-09-01",
-            endDate: "<%-String(parseInt(anoSeleccionado) + 1)%>-08-30"
+            startDate: "<%-ano%>-09-01",
+            endDate: "<%-String(parseInt(ano) + 1)%>-08-30"
             
         });
     });
@@ -310,7 +312,6 @@
          */
         function eventoTipoChange(){
             var fechaInicioMensaje = document.getElementById("text-fechaInicio").innerHTML;
-            //console.log(fechaInicioMensaje);
             var dia = fechaInicioMensaje.substring(fechaInicioMensaje.length - 11, fechaInicioMensaje.length)
             //SI EL EVENTO SELECCIONADO ES OTRO SE DEBE PRESENTAR UN FOMRULARIO CON TODO VACIO
             if(document.getElementById("eventoTipo").value === "Otro"){
@@ -484,7 +485,6 @@
             let diarioCheck = document.getElementById("diarioCheck");
             let finEvento = document.getElementById("finEvento");
             let objetoEvento = JSON.parse(document.getElementById("eventoAntiguo").value);
-            //console.log(objetoEvento);
             let nombre = document.getElementById("eventoNombreInput");
             
             if(diarioCheck.checked === false && finEvento.value === ""){
@@ -495,7 +495,6 @@
                 document.getElementById("mensajeErrorEvento").style.display = "flex";
             
             }else{
-                //console.log("out");
                 if(diarioCheck.checked){
                     let evento = nombre.value;
                     if(document.getElementById("tipoDeEvento").value == "festivo"){
@@ -509,7 +508,6 @@
                     
                     let fechaFin = null
                     
-                    //console.log(evento,fechaInicio, fechaFin, editable);
                     let url = "<%= contextPath %>/cumplimentar/calendario/eventoGeneral"
                     url += "?evento=" + evento + "&fechaInicio=" + fechaInicio + "&identificador=" + objetoEvento.identificador;
                     $.ajax({
@@ -517,11 +515,9 @@
                         dataType: "json",
                         url: url,
                         success: function(json) {
-                            //console.log(JSON.stringify(json.estado));
                             location.reload();
                         },
                         error: function(e){
-                            //console.log("F");
                         }
                     });
                 }else{
@@ -539,7 +535,6 @@
                     }else if (document.getElementById("tipoDeEvento").value == "examenes"){
                         //COMPROBAR SI LA DURACON DE LA FRANJA ES MAS DE 30 DIAS
                         if(new Date(fechaFin) - new Date(fechaInicio) > 2592000000){
-                            //console.log(document.getElementById("mensajeErrorEvento").innerHTML)
                             if(document.getElementById("mensajeErrorEvento").innerHTML !== "La franja de examenes es mayor de 30 días, ¿está seguro?"){
                                 document.getElementById("mensajeErrorEvento").innerHTML = "La franja de examenes es mayor de 30 días, ¿está seguro?"
                                 document.getElementById("mensajeErrorEvento").style.display = "flex";
@@ -558,7 +553,6 @@
                     }
 
                     
-                    //console.log(evento, fechaInicio, fechaFin, editable);
                     let url = "<%= contextPath %>/cumplimentar/calendario/eventoGeneral"
                     url += "?evento=" + evento + "&fechaInicio=" + fechaInicio + "&fechaFin=" + fechaFin + "&identificador=" + objetoEvento.identificador;
                     $.ajax({
@@ -566,11 +560,9 @@
                         dataType: "json",
                         url: url,
                         success: function(json) {
-                            //console.log(JSON.stringify(json.estado));
                             location.reload();
                         },
                         error: function(e){
-                            //console.log("F");
                         }
                     });
                 }
@@ -618,16 +610,12 @@
             
 
             document.getElementById("formularioEventoPersonalizado").style.display = "block";
-            //console.log("EE")
             $('#eventoModal').modal('show');
             
-            //console.log("E")
         }
 
         function eliminarEvento(){
             let evento = JSON.parse(document.getElementById("eventoAntiguo").value);
-            //console.log(evento)
-            //alert(evento.nombre)
             if(evento.fechaFin === "Evento de dia"){
                 let nombre = evento.nombre;
                 if(evento.tipo == "festivo"){
@@ -652,11 +640,9 @@
                     dataType: "json",
                     url: url,
                     success: function(json) {
-                        //console.log(JSON.stringify(json.estado));
                         location.reload();
                     },
                     error: function(e){
-                        //console.log("F");
                     }
                 });
 
@@ -685,11 +671,9 @@
                     dataType: "json",
                     url: url,
                     success: function(json) {
-                        //console.log(JSON.stringify(json.estado));
                         location.reload();
                     },
                     error: function(e){
-                        //console.log("F");
                     }
                 });
             }
@@ -705,7 +689,6 @@
         }
         
         function aprobar(ano){
-            //console.log("aprobar", ano);
             let url = "<%= contextPath %>/gestion/calendario/aprobarGeneral"
             url += "?ano=" + ano;
             if(confirm("Una vez aprobado el calendario, los coordinadores de las titulaciones podrán comenzar a adaptarlo. ¿Estás seguro de querer aprobarlo?")){
@@ -714,11 +697,9 @@
                     dataType: "json",
                     url: url,
                     success: function(json) {
-                        //console.log(JSON.stringify(json.estado));
                         location.reload();
                     },
                     error: function(e){
-                        //console.log("F");
                     }
                 });
             }
@@ -739,9 +720,7 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             let element3 = document.getElementById('selectano');
-            //console.log("sep");
             if (element3){
-                //console.log(document.getElementById("anoSeleccionado").value);
                 document.getElementById('selectano').value = document.getElementById("anoSeleccionado").value;
             } 
         });

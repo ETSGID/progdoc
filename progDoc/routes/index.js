@@ -17,6 +17,9 @@ let historialController = require('../controllers/historial_controller')
 let acronimosController = require('../controllers/acronimos_controller')
 let examenController = require('../controllers/examen_controller')
 let calendarioController = require('../controllers/calendario_controller')
+let gestionPlanesController = require('../controllers/gestionPlanes_controller')
+let aulaController = require('../controllers/aula_controller')
+
 let estados = require('../estados');
 let enumsPD = require('../enumsPD');
 
@@ -40,10 +43,7 @@ router.all('*', permisosControllerProgDoc.comprobarRolYPersona);
 // Unauthenticated clients will be redirected to the CAS login and then back to
 // this route once authenticated.
 router.get('/', function (req, res) {
-  res.render('index',
-    {
-      contextPath: app.contextPath
-    });
+  res.render('index');
 });
 
 //ruta para comprobar permisos para Asignar profesores(responsableDocente es principal)
@@ -121,7 +121,7 @@ router.get("/respDoc/editAsignacion", menuProgDocController.getProgramacionDocen
       [{ condicion: 'estadoProfesores', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, respController.editAsignacion);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, respController.editAsignacion);
 router.get("/respDoc/editAsignacion/cambioModo", menuProgDocController.getProgramacionDocente, function (req, res, next) {
   res.locals.rols.push({
     rol: enumsPD.rols.ResponsableDocente, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: req.session.departamentoID, condiciones:
@@ -142,7 +142,7 @@ router.get("/respDoc/editAsignacion/cambioModo", menuProgDocController.getProgra
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, respController.changeModeAsignacion);
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, respController.changeModeAsignacion);
 
 router.post("/respDoc/aprobarAsignacion", function (req, res, next) {
   res.locals.rols.push({
@@ -190,7 +190,7 @@ router.post("/respDoc/guardarAsignacion", menuProgDocController.getProgramacionD
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, respController.guardarAsignacion);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, respController.guardarAsignacion);
 
 router.post("/respDoc/aprobarTribunales", function (req, res, next) {
   res.locals.rols.push({
@@ -268,9 +268,9 @@ router.get("/respDoc/profesores", menuProgDocController.getProgramacionDocente, 
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   })
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, respController.getAsignaciones);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, respController.getAsignaciones);
 
-router.get("/consultar/profesores", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, menuProgDocController.getGrupos, respController.getAsignaciones);
+router.get("/consultar/profesores", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, respController.getAsignaciones);
 
 router.get('/coordinador/horarios', menuProgDocController.getProgramacionDocente, function (req, res, next) {
   res.locals.rols.push({
@@ -282,7 +282,7 @@ router.get('/coordinador/horarios', menuProgDocController.getProgramacionDocente
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, menuProgDocController.getGrupos, horarioController.getHorario);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols,horarioController.getHorario);
 
 
 router.get('/coordinador/examenes', menuProgDocController.getProgramacionDocente, function (req, res, next) {
@@ -320,7 +320,7 @@ router.get('/coordinador/franjasexamenes', menuProgDocController.getProgramacion
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, examenController.getFranjas, examenController.getFranjasView);
 
 
-router.get('/consultar/horarios', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, menuProgDocController.getGrupos, horarioController.getHorario);
+router.get('/consultar/horarios', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, horarioController.getHorario);
 router.post('/coordinador/guardarHorarios', function (req, res, next) {
   res.locals.rols.push({
     rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
@@ -503,18 +503,34 @@ router.post("/gestionRoles/guardarRoles", function (req, res, next) {
 router.get("/gestion/acronimos", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next();
-}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, menuProgDocController.getAsignaturasProgDoc, acronimosController.getAcronimos);
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, acronimosController.getAcronimos);
 
 router.post('/gestionAcronimos/guardarAcronimosJE', function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, acronimosController.actualizarAcronimos)
 
+//gestion de plan
+router.get("/gestion/planes", function (req, res, next) {
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next();
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, gestionPlanesController.getGestionPlanes);
+
+router.get("/gestion/actualizarPlanApi", function (req, res, next) {
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionPlanesController.updateAsignaturasApiUpm, gestionPlanesController.getGestionPlanes);
+router.post("/gestion/cambiarEstadoProgDoc", function (req, res, next) {
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionPlanesController.updateEstadoProgDoc);
+
+
+
 //Actividades
 router.get('/consultar/actividades', menuProgDocController.getPlanes, function(req,res,next){
   req.session.submenu = "Actividades"
   res.render('desarrolloConsultar', {
-    contextPath: app.contextPath,
     menu: req.session.menu,
     submenu: req.session.submenu,
     planID: req.session.planID,
@@ -526,7 +542,6 @@ router.get('/consultar/actividades', menuProgDocController.getPlanes, function(r
 router.get('/cumplimentar/actividades', menuProgDocController.getPlanes, function (req, res, next) {
   req.session.submenu = "Actividades"
   res.render('desarrolloCumplimentar', {
-    contextPath: app.contextPath,
     menu: req.session.menu,
     submenu: req.session.submenu,
     planID: req.session.planID,
@@ -555,6 +570,11 @@ router.post('/gestion/calendario/aprobarGeneral', function (req, res, next){
   next(); 
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.aprobarGeneral);
 
+router.post('/gestion/calendario/copiarEventos', function (req, res, next){
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next(); 
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.copiarEventos);
+
 router.get('/cumplimentar/calendario', function (req, res, next) {
   res.locals.rols.push({
     rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
@@ -562,7 +582,7 @@ router.get('/cumplimentar/calendario', function (req, res, next) {
   });
   
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.anoDeTrabajo, calendarioController.eventosPlanDiccionario, calendarioController.eventosDiccionario, calendarioController.getCalendarioPlan)
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols,  calendarioController.anoDeTrabajo, calendarioController.eventosPlanDiccionario, calendarioController.eventosDiccionario, calendarioController.getCalendarioPlan)
 
 router.delete('/cumplimentar/calendario/eventoGeneral', function (req, res, next){
   res.locals.rols.push({
@@ -570,7 +590,7 @@ router.delete('/cumplimentar/calendario/eventoGeneral', function (req, res, next
       []
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.deleteEventoPlan);
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, calendarioController.deleteEventoPlan);
 
 router.post('/cumplimentar/calendario/eventoGeneral', function (req, res, next){
   res.locals.rols.push({
@@ -578,15 +598,22 @@ router.post('/cumplimentar/calendario/eventoGeneral', function (req, res, next){
       []
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.postEventoPlan);
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, calendarioController.postEventoPlan);
 
 router.get('/consultar/calendario', menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, calendarioController.anoDeTrabajo, calendarioController.eventosPlanDiccionario, calendarioController.eventosDiccionario, calendarioController.getCalendarioPlanConsultar);
 
 router.post('/cumplimentar/calendario/eventoEditablePlan', function (req, res, next){
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   next(); 
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, calendarioController.editablePlan);
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, calendarioController.editablePlan);
+
+router.get('/gestion/aulas', function (req, res, next){
+  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  next();
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, aulaController.getAulas)
+ 
 
 module.exports = router;
+
 
 

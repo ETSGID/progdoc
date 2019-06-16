@@ -11,7 +11,6 @@ exports.getGrupos = function (req, res, next) {
     //si no hay progDoc o no hay departamentosResponsables de dicha progDoc
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         res.render(view, {
-            contextPath: app.contextPath,
             estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
@@ -27,7 +26,6 @@ exports.getGrupos = function (req, res, next) {
         && estados.estadoProgDoc.incidencia !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']
         && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("gruposJE", {
-            contextPath: app.contextPath,
             estado: "Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
@@ -81,13 +79,14 @@ exports.getGrupos = function (req, res, next) {
         })
             .then((grupos) => {
                 let nuevopath = "" + req.baseUrl + "/gestionGrupos/guardarGruposJE"
+                let cancelarpath = "" + req.baseUrl + "/gestionGrupos/getGrupos?planID=" + req.session.planID
                 res.render(view, {
-                    contextPath: app.contextPath,
                     estado: null,
                     permisoDenegado: res.locals.permisoDenegado,
                     menu: req.session.menu,
                     submenu: req.session.submenu,
                     nuevopath: nuevopath,
+                    cancelarpath: cancelarpath,
                     planID: req.session.planID,
                     departamentosResponsables: res.locals.departamentosResponsables,
                     planEstudios: res.locals.planEstudios,

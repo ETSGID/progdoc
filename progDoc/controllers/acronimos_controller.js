@@ -3,18 +3,18 @@ let models = require('../models');
 let funciones = require('../funciones');
 let estados = require('../estados');
 let menuProgDocController = require('./menuProgDoc_controller')
-//en res.locals.asignaturas tendre todas las asignaturas de la pd
+
 exports.getAcronimos = function (req, res, next) {
     return menuProgDocController.getAllDepartamentos()
     .then(function (departs) {
         let nuevopath = "" + req.baseUrl + "/gestionAcronimos/guardarAcronimosJE"
+        let cancelarpath = "" + req.baseUrl + "/gestion/acronimos?planID="+ req.session.planID
         let asignaturasPorCursos = {}; 
         req.session.submenu = "Acronimos"
         if (!res.locals.progDoc || !res.locals.departamentosResponsables ||
             (estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) 
             && estados.estadoProgDoc.incidencia !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) {
             res.render("acronimosJE", {
-                contextPath: app.contextPath,
                 estado: "Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada",
                 permisoDenegado: res.locals.permisoDenegado,
                 menu: req.session.menu,
@@ -22,33 +22,38 @@ exports.getAcronimos = function (req, res, next) {
                 planID: req.session.planID,
                 planEstudios: res.locals.planEstudios,
                 nuevopath: nuevopath,
+                cancelarpath: cancelarpath,
                 departamentos: departs.sort(funciones.sortDepartamentos),
-                asignaturasPorCursos: null,
+                asignaturas: null,
             })
-        }else{
-            let pdID = res.locals.progDoc['ProgramacionDocentes.identificador']
-            if (res.locals.asignaturas) {
-                res.locals.asignaturas.forEach(function (as) {
-                    if (asignaturasPorCursos[as.curso] == null) {
-                        asignaturasPorCursos[as.curso] = [];
-                    }
-                    asignaturasPorCursos[as.curso].push(as);
-                });
+            }else{
+                let pdID = res.locals.progDoc['ProgramacionDocentes.identificador']
+                return menuProgDocController.getAsignaturasProgDoc(pdID)
+                    .then(function (asign){
+                            asign.forEach(function (as) {
+                                if (asignaturasPorCursos[as.curso] == null) {
+                                    asignaturasPorCursos[as.curso] = [];
+                                }
+                                asignaturasPorCursos[as.curso].push(as);
+                            });                        
+                        res.render("acronimosJE", {
+                            estado: null,
+                            permisoDenegado: res.locals.permisoDenegado,
+                            menu: req.session.menu,
+                            submenu: req.session.submenu,
+                            planID: req.session.planID,
+                            planEstudios: res.locals.planEstudios,
+                            nuevopath: nuevopath,
+                            cancelarpath: cancelarpath,
+                            asignaturas: asignaturasPorCursos,
+                            departamentos: departs.sort(funciones.sortDepartamentos),
+                            pdID: pdID
+                        })
+                    }).catch(function (error) {
+                        console.log("Error:", error);
+                        next(error);
+                    });
             }
-            res.render("acronimosJE", {
-                contextPath: app.contextPath,
-                estado: null,
-                permisoDenegado: res.locals.permisoDenegado,
-                menu: req.session.menu,
-                submenu: req.session.submenu,
-                planID: req.session.planID,
-                planEstudios: res.locals.planEstudios,
-                nuevopath: nuevopath,
-                asignaturas: asignaturasPorCursos,
-                departamentos: departs.sort(funciones.sortDepartamentos),
-                pdID: pdID
-            })
-        }
         }).catch(function (error) {
             console.log("Error:", error);
             next(error);

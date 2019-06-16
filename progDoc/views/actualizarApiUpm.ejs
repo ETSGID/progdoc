@@ -1,0 +1,111 @@
+<form id="actualizarApiUpmForm" autocomplete="off" action="<%= actualizarpath %>" method="get" >
+      <span>Actualizar asignaturas API UPM</span>
+      <input type='submit'  class="btn btn-default" value='Actualizar'>
+    </form>
+    <%if(actualizar){%>
+    <br>
+    <div>
+    <span><b>Nuevas asignaturas</b></span>
+    <table class="table" id="tb_departamentos">
+        <thead>
+            <tr>
+            <th scope="col">Código</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Nombre Inglés</th>
+            <th scope="col">Cts</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Dep resp</th>
+            <th scope="col">Curso</th>
+            <th scope="col">Sem</th>
+            </tr>
+        </thead>
+        <tbody>
+        <%nuevasAsignaturas.forEach(function(as){%>
+          <tr>
+            <td><%=as.codigo%></td>
+            <td><%=as.nombre%></td>
+            <td><%=as.nombreIngles%></td>
+            <td><%=as.creditos%></td>
+            <td><%=as.tipo%></td>
+            <td><%=as.DepartamentoResponsable%></td>
+            <td><%=as.curso%></td>
+            <td><%=as.semestre%></td>
+          </tr>
+        <%})%>
+        </tbody>
+    </table>
+    </div>
+    <div>
+    <span><b>Asignaturas que desaparacen</b></span>
+    <table class="table" id="tb_departamentos">
+        <thead>
+            <tr>
+            <th scope="col">Código</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Nombre Inglés</th>
+            <th scope="col">Cts</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Dep resp</th>
+            <th scope="col">Curso</th>
+            <th scope="col">Sem</th>
+            </tr>
+        </thead>
+         <tbody>
+        <%desapareceAsignaturas.forEach(function(as){%>
+            <tr>
+            <td><%=as.codigo%></td>
+            <td><%=as.nombre%></td>
+            <td><%=as.nombreIngles%></td>
+            <td><%=as.creditos%></td>
+            <td><%=as.tipo%></td>
+            <td><%=as.DepartamentoResponsable%></td>
+            <td><%=as.curso%></td>
+            <td><%=as.semestre%></td>
+            </tr>
+        <%})%>
+        </tbody>
+      </div>
+      <div>
+    </table>
+    <span><b>Cambios en asignaturas</b></span>
+    <table class="table" id="tb_departamentos">
+        <thead>
+            <tr>
+            <th scope="col">Código</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Nombre Inglés</th>
+            <th scope="col">Cts</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Dep resp</th>
+            <th scope="col">Curso</th>
+            <th scope="col">Sem</th>
+            </tr>
+        </thead>
+        <tbody>
+        <%cambioAsignaturas.forEach(function(as){%>
+          <tr>
+           <td><%=as.codigo%></td>
+            <td><%=as.nombre%></td>
+            <td><%=as.nombreIngles%></td>
+            <td><%=as.creditos%></td>
+            <td><%=as.tipo%></td>
+            <td><%=as.DepartamentoResponsable%></td>
+            <td><%=as.curso%></td>
+            <td><%=as.semestre%></td>
+            </tr>
+            <tr>
+            <%let asAntigua = cambioAsignaturasAntigua.find(function (obj) { return obj.codigo === as.codigo });%>
+            <td>Antigua</td>
+            <td><%=asAntigua.nombre%></td>
+            <td><%=asAntigua.nombreIngles%></td>
+            <td><%=asAntigua.creditos%></td>
+            <td><%=asAntigua.tipo%></td>
+            <td><%=asAntigua.DepartamentoResponsable%></td>
+            <td><%=asAntigua.curso%></td>
+            <td><%=asAntigua.semestre%></td>
+            </tr>
+        <%})%>
+        </tbody>
+    </table>
+    </div>
+<%}%>

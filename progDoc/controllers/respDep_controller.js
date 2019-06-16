@@ -4,7 +4,7 @@ let Sequelize = require('sequelize');
 const op = Sequelize.Op;
 let estados = require('../estados');
 let funciones = require('../funciones');
-let JEcontroller = require('./JE_controller')
+let JEcontroller = require('../controllers/JE_controller')
 let enumsPD = require('../enumsPD');
 let menuProgDocController = require('../controllers/menuProgDoc_controller')
 
@@ -16,7 +16,6 @@ exports.getAsignaciones = function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignacionesCumplimentar"
         res.render(view, {
-            contextPath: app.contextPath,
             estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             profesores: null,
@@ -36,7 +35,6 @@ exports.getAsignaciones = function (req, res, next) {
         && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
         && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("asignacionesCumplimentar", {
-            contextPath: app.contextPath,
             estado: "Asignación de profesores ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe",
             permisoDenegado: res.locals.permisoDenegado,
             profesores: null,
@@ -52,14 +50,14 @@ exports.getAsignaciones = function (req, res, next) {
         })
     } else {
         let asignacion = [];
-        let gruposBBDD = res.locals.grupos;
+        let gruposBBDD
         let pdID = req.session.pdID
         let departamentoID = req.session.departamentoID;
         let departamentoExisteEnElPlan = res.locals.departamentosResponsables.find(function (obj) { return obj.codigo === departamentoID; });
+        let profesores =  []
         if (!departamentoExisteEnElPlan) {
             let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignacionesCumplimentar"
             res.render(view, {
-                contextPath: app.contextPath,
                 estado: "El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior",
                 permisoDenegado: res.locals.permisoDenegado,
                 profesores: null,
@@ -78,7 +76,6 @@ exports.getAsignaciones = function (req, res, next) {
             if (res.locals.permisoDenegado) {
                 let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignacionesCumplimentar"
                 res.render(view, {
-                    contextPath: app.contextPath,
                     estado: null,
                     permisoDenegado: res.locals.permisoDenegado,
                     asignacion: null,
@@ -95,8 +92,11 @@ exports.getAsignaciones = function (req, res, next) {
                 })
             }
             else {
-                let profesores = [];
-                return menuProgDocController.getProfesores()
+                return menuProgDocController.getGrupos(pdID)
+                    .then(function (grupos){
+                        gruposBBDD = grupos
+                        return menuProgDocController.getProfesores()
+                    })
                     .then(function (profesors) {
                         profesores = profesors;
                         return getAsignacion(pdID, departamentoID, profesores, pdID, gruposBBDD);
@@ -109,7 +109,6 @@ exports.getAsignaciones = function (req, res, next) {
                         let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionesConsultar" : "asignacionesCumplimentar"
                         res.render(view,
                             {
-                                contextPath: app.contextPath,
                                 profesores: profesores,
                                 asignacion: asignacion,
                                 nuevopath: nuevopath,
@@ -147,12 +146,16 @@ exports.editAsignacion = function (req, res, next) {
     let pdID = req.session.pdID
     let departamentoID = req.session.departamentoID
     let asignacion = [];
-    let gruposBBDD = res.locals.grupos;
+    let gruposBBDD;
+    let profesores = [];
     //por defecto es acronimo pero si no hay debe ser el nombre TODO: cambiar a codigo
     let asignaturaIdentificador = Number(req.query.asignatura)
     if (!res.locals.permisoDenegado) {
-        let profesores = [];
-        return menuProgDocController.getProfesores()
+        return menuProgDocController.getGrupos(pdID)
+            .then(function (grupos) {
+                gruposBBDD = grupos
+                return menuProgDocController.getProfesores()
+            })
             .then(function (profesors) {
                 profesores = profesors;
                 return getAsignacion(pdID, departamentoID, profesores, pdID, gruposBBDD);
@@ -162,7 +165,6 @@ exports.editAsignacion = function (req, res, next) {
                 let asign = asignacion.find(function (obj) { return (obj.identificador === asignaturaIdentificador); });
                 res.render('asignacionesCumplimentarAsignatura',
                     {
-                        contextPath: app.contextPath,
                         asign: asign,
                         pdID: pdID,
                         cancelarpath: "" + req.baseUrl + "/respDoc/profesores?planID=" + req.session.planID + "&departamentoID=" + departamentoID,
@@ -203,16 +205,20 @@ profesores en todos los grupos.
 exports.changeModeAsignacion = function (req,res,next){
     let pdID = req.session.pdID
     let departamentoID = req.session.departamentoID
-    let gruposBBDD = res.locals.grupos;
+    let gruposBBDD;
     let queryToAnadir = []
     let profesoresIdNoRepetidos = [];
+    let profesores = []
     //por defecto es acronimo pero si no hay debe ser el nombre TODO: cambiar a codigo
     let asignaturaIdentificador = Number(req.query.asignatura)
     let modo = req.query.modo
     let asign;
     if (!res.locals.permisoDenegado) {
-        let profesores = [];
+        return menuProgDocController.getGrupos(pdID)
+            .then(function (grupos) {
+                gruposBBDD = grupos
         return menuProgDocController.getProfesores()
+            })
             .then(function (profesors) {
                 profesores = profesors;
                 return getAsignacion(pdID, departamentoID, profesores, pdID, gruposBBDD);
@@ -366,20 +372,17 @@ function getAsignacion(ProgramacionDocenteIdentificador, DepartamentoResponsable
 exports.guardarAsignacion = function (req, res, next) {
     req.session.submenu = "Profesores"
     let whereEliminar = {};
-    let profesores = [];
+    
     let coordinador;
     let identificador = Number(req.body.asignaturaId)
     let pdID = req.session.pdID
     let planID = req.session.planID
-    let gruposBBDD = res.locals.grupos
+    let gruposBBDD
     let departamentoID = req.session.departamentoID
-    let profesoresAnadidos = res.profesoresAnadidos
-    return menuProgDocController.getProfesores()
-        .then(function (profesors) {
-            profesores = profesors;
-            coordinador = profesores.find(function (obj) { return obj.nombre === req.body.coordinador; });
-            
-            //la 
+    return menuProgDocController.getGrupos(pdID)
+        .then(function (grupos) {
+            gruposBBDD = grupos
+            coordinador = req.body.coordinador ? Number(req.body.coordinador) : null
             return models.Asignatura.findAll(
                 {
                     where: {
@@ -402,9 +405,9 @@ exports.guardarAsignacion = function (req, res, next) {
                 res.locals.permisoDenegado = "No tiene permiso contacte con el Jefe de Estudios si debería tenerlo" //lo unico que hara será saltarse lo siguiente 
             }
             if (!res.locals.permisoDenegado) {
-                if (coordinador || req.body.coordinador.toLowerCase().includes("no asignado")) {
+                if (coordinador ||  !req.body.coordinador) {
                     models.Asignatura.update(
-                        { CoordinadorAsignatura: coordinador ? coordinador.identificador: null }, /* set attributes' value */
+                        { CoordinadorAsignatura: coordinador}, /* set attributes' value */
                         { where: { identificador: identificador } } /* where criteria */
                     ).then(() => {
                         paso2();
@@ -615,7 +618,6 @@ exports.getTribunales = function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
         res.render(view, {
-            contextPath: app.contextPath,
             estado: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             profesores: null,
@@ -637,7 +639,6 @@ exports.getTribunales = function (req, res, next) {
         && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo) 
         && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("tribunalesCumplimentar", {
-            contextPath: app.contextPath,
             estado: "Asignación de tribunales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe",
             permisoDenegado: res.locals.permisoDenegado,
             profesores: null,
@@ -658,7 +659,7 @@ exports.getTribunales = function (req, res, next) {
 
         let pdID = req.session.pdID
         let asignaturas = []
-        let asingaturasAntiguas = []
+        let asignaturasAntiguas = []
         let whereAsignaturas = {}
         whereAsignaturas['$or'] = [];
         let departamentoID = req.session.departamentoID;
@@ -676,7 +677,6 @@ exports.getTribunales = function (req, res, next) {
                 if (!departamentoExisteEnElPlan) {
                     let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
                     res.render(view, {
-                        contextPath: app.contextPath,
                         estado: "El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior",
                         permisoDenegado: res.locals.permisoDenegado,
                         profesores: null,
@@ -696,7 +696,6 @@ exports.getTribunales = function (req, res, next) {
                     if (res.locals.permisoDenegado) {
                         let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunalesConsultar" : "tribunalesCumplimentar"
                         res.render(view, {
-                            contextPath: app.contextPath,
                             estado: null,
                             permisoDenegado: res.locals.permisoDenegado,
                             profesores: null,
@@ -774,7 +773,7 @@ exports.getTribunales = function (req, res, next) {
                                     as.vocal = ej['vocalNombre']
                                     as.secretario = ej['secretarioNombre']
                                     as.suplente = ej['suplenteNombre']
-                                    asingaturasAntiguas.push(as)
+                                    asignaturasAntiguas.push(as)
                                 }
                             })
                             .then(function (e) {
@@ -783,10 +782,9 @@ exports.getTribunales = function (req, res, next) {
                                 let cancelarpath = "" + req.baseUrl + "/respdoc/tribunales?planID=" + req.session.planID + "&departamentoID=" + DepartamentoResponsable
                                 res.render(view,
                                     {
-                                        contextPath: app.contextPath,
                                         profesores: profesores,
                                         tribunales: asignaturas,
-                                        tribunalesAntiguos: asingaturasAntiguas,
+                                        tribunalesAntiguos: asignaturasAntiguas,
                                         nuevopath: nuevopath,
                                         aprobarpath: "" + req.baseUrl + "/respDoc/aprobarTribunales",
                                         cancelarpath: cancelarpath,
@@ -823,7 +821,6 @@ exports.guardarTribunales = function (req, res, next) {
     let departamentoID = req.session.departamentoID;
     let pdID = req.session.pdID;
     let toActualizar = req.body.actualizar;
-    let profesoresAnadidos = res.profesoresAnadidos;
     
     if (toActualizar && !res.locals.permisoDenegado) {
         //debo de comprobar que estoy cambiando asignaturas de mi pd

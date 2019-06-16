@@ -2,16 +2,32 @@ let models = require('../models');
 let Sequelize = require('sequelize');
 let app = require('../app');
 let enumsPD = require('../enumsPD');
+let menuProgDocController = require('./menuProgDoc_controller')
 
 //comprueba el rol o si es delegado de dicho rol en función del estado de la PD pasada
 exports.comprobarRols = function (req, res, next) {
     let rols = req.session.user.rols;
     let rolsCoincidentes = [];
+    //de esta forma también se evita que se cierre una programacion docente y justo alguien edite
     let pdID = req.session.pdID;
-    return models.ProgramacionDocente.findOne({ where: { identificador: pdID } }).then(pd => {
+    let plan = menuProgDocController.getPlanPd(pdID)
+    return models.PlanEstudio.findOne(
+        { where: { codigo: plan },
+          raw: true,
+            include: [{
+                //incluye las asignaciones de profesores y los horarios.
+                model: models.ProgramacionDocente,
+                where: { identificador: pdID },
+                //left join
+                required: false
+            }]
+        }
+    )
+     .then(pd => {
         //cambio en la bbdd remiendo
         if (pd) {
-            pd['reabierto'] === null ? pd['reabierto'] = 0 : pd['reabierto'] = pd['reabierto']
+            res.locals.progDoc = pd
+            pd['ProgramacionDocentes.reabierto'] === null ? pd['ProgramacionDocentes.reabierto'] = 0 : pd['ProgramacionDocentes.reabierto'] = pd['ProgramacionDocentes.reabierto']
         }
         res.locals.rols.forEach(function (r, index) {
             let rolExistente = rols.find(function (obj) { return ((obj.rol === r.rol || enumsPD.delegacion[r.rol] && enumsPD.delegacion[r.rol].includes(obj.rol))   
@@ -29,13 +45,13 @@ exports.comprobarRols = function (req, res, next) {
                         switch (condic.length) {
                             case 1:
                                 //hay que comprobar que existe pd
-                                if (!pd || ("" + pd[condic[0]] !== "" + r.condiciones[i].resultado)) {
+                                if (!pd || ("" + pd['ProgramacionDocentes.'+condic[0]] !== "" + r.condiciones[i].resultado)) {
                                     cumple = false;
                                 }
                                 break;
                             case 2:
                                 //hay que comprobar que existe pd
-                                if (!pd || ("" + pd[condic[0]][condic[1]] !== "" + r.condiciones[i].resultado)) {
+                                if (!pd || ("" + pd['ProgramacionDocentes.'+condic[0]][condic[1]] !== "" + r.condiciones[i].resultado)) {
                                     cumple = false;
                                 }
                                 break;
@@ -53,7 +69,10 @@ exports.comprobarRols = function (req, res, next) {
         }
         res.locals.rolsCoincidentes = rolsCoincidentes
         next();
-    })
+    }).catch(function (error) {
+        console.log("Error:", error);
+        next(error);
+    });
     
 
 }
@@ -81,7 +100,6 @@ exports.comprobarRolYPersona = function (req, res, next) {
             }
             else{
                     res.render('noPermitido', {
-                    contextPath: app.contextPath,
                     layout: false
                 });
             }

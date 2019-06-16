@@ -61,7 +61,6 @@ function generarArrayDias(dic_eventos, ano){
     febrero = []
 
     if(bisiesto(parseInt(ano) + 1)){
-        //console.log("BISIESTO");
         febrero = Array.from(new Array(29),(val,index)=>index+1);
     }else{
         febrero = Array.from(new Array(28),(val,index)=>index+1);
@@ -127,7 +126,6 @@ function generarArrayDias(dic_eventos, ano){
             }
         }
         
-        //console.log(i, dia, dic_dias)
         if(array_numeros[i] === undefined){
             array_calendario.push(undefined);
             continue;
@@ -147,12 +145,10 @@ function generarArrayDias(dic_eventos, ano){
         eventos = dic_eventos[codigo] === undefined ? [] : dic_eventos[codigo];
         
         if(contar){
-            //console.log("EPA")
             let noContar = false
             for(var j =0 ; j < eventos.length; j++){
                 
                 let evento = eventos[j];
-                //console.log(evento)
                 if(evento.nombre === "Fin del periodo lectivo"){
                     contar = false;
                     noContar = true;
@@ -187,7 +183,6 @@ function generarArrayDias(dic_eventos, ano){
                         if(evento.nombre === "Periodo festivo de navidades"){
                             
                         }else{
-                            //console.log((Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio))/86400000)
                             vacaciones_offset = (Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio))/86400000;
                         }
                         
@@ -232,7 +227,6 @@ function generarArrayDias(dic_eventos, ano){
                 dic_dias[dia] += 1
             }
         }else{
-            //console.log("EPAA", vacaciones_offset);
             if(vacaciones_offset > 1){
                 vacaciones_offset -= 1
             }else if(vacaciones_offset === 1){
@@ -242,7 +236,7 @@ function generarArrayDias(dic_eventos, ano){
                 
                 for(var j =0 ; j < eventos.length; j++){
                     let evento = eventos[j];
-                    //console.log(evento)
+                    
                     if(evento.nombre === "Inicio de las clases" || evento.nombre === "Comienzo del segundo cuatrimestre"){
                         in_periodo_lectivo = true;
                         contar = true;
@@ -254,7 +248,6 @@ function generarArrayDias(dic_eventos, ano){
         }
         dia = (dia + 1)%7;
         let comprobarColorArray = comprobarColor(buffer_eventos, eventos, codigo);
-        //console.log(comprobarColorArray);
         let color = "white"
         if(comprobarColorArray[0] !== -1){
             color = enumsPD.coloresEvento[comprobarColorArray[0]];
@@ -272,11 +265,11 @@ function generarArrayDias(dic_eventos, ano){
         };
         array_calendario.push(objeto);
     }
-    //console.log(dic_dias)
     return [array_calendario, array_numeros, dic_dias_1, dic_dias, semanas];
 
 
 }
+
 
 /**
  * Esta funcion se encarga de generar el calendario y renderizar la página con el calendario.
@@ -300,10 +293,14 @@ function generarArrayDias(dic_eventos, ano){
 
 exports.getCalendario = function (req, res, next) {
 
-    //console.log(req.dic_eventos);
     let ano = req.ano;
-    req.session.ano = req.ano;
-    //console.log(ano);
+    req.session.ano = req.ano_mostrar;
+    var vacio = true;
+    if(Object.entries(req.dic_eventos).length !== 0){
+        vacio = false;
+    }
+
+    
     array_datos = generarArrayDias(req.dic_eventos, ano);
 
    
@@ -324,7 +321,6 @@ exports.getCalendario = function (req, res, next) {
             },
             raw: true
         }).then((resultado) => {
-            //console.log(resultado);
             if(resultado.length === 0){
                 let objeto_ano = {
                     ano: ano,
@@ -335,7 +331,6 @@ exports.getCalendario = function (req, res, next) {
                     () => {
                         req.session.submenu = "Calendario";
                         res.render('calendario', {
-                            contextPath: app.contextPath,
                             permisoDenegado: res.locals.permisoDenegado,
                             menu: req.session.menu,
                             submenu: req.session.submenu,
@@ -345,19 +340,18 @@ exports.getCalendario = function (req, res, next) {
                             array_dias: array_datos[0],
                             dic_diasSemana_1: array_datos[2],
                             dic_diasSemana_2: array_datos[3],
-                            ano1: String(parseInt(ano_actual) - 1),
-                            ano2: ano_actual,
-                            ano3: String(parseInt(ano_actual) + 1),
-                            anoSeleccionado: ano,
+                            ano1: ano_actual,
+                            ano2: String(parseInt(ano_actual) + 1),
+                            ano: req.ano_mostrar,
                             estado: 0,
-                            semanas: array_datos[4]
+                            semanas: array_datos[4],
+                            vacio: vacio
                         });
                     }
                 );
             }else{
                 req.session.submenu = "Calendario";
                 res.render('calendario', {
-                    contextPath: app.contextPath,
                     permisoDenegado: res.locals.permisoDenegado,
                     planID: req.session.planID,
                     menu: req.session.menu,
@@ -367,17 +361,16 @@ exports.getCalendario = function (req, res, next) {
                     array_dias: array_datos[0],
                     dic_diasSemana_1: array_datos[2],
                     dic_diasSemana_2: array_datos[3],
-                    ano1: String(parseInt(ano_actual) - 1),
-                    ano2: ano_actual,
-                    ano3: String(parseInt(ano_actual) + 1),
-                    anoSeleccionado: ano,
+                    ano1: ano_actual,
+                    ano2: String(parseInt(ano_actual) + 1),
+                    ano: req.ano_mostrar,
                     estado: resultado[0].estado,
-                    semanas: array_datos[4]
+                    semanas: array_datos[4],
+                    vacio: vacio
                 });
             }
             
         });
-        //console.log("nop");
             
     }else{
         return models.Calendario.findAll({
@@ -386,7 +379,6 @@ exports.getCalendario = function (req, res, next) {
             },
             raw: true
         }).then((resultado) => {
-            //console.log(resultado);
             if(resultado.length === 0){
                 let objeto_ano = {
                     ano: ano,
@@ -397,7 +389,6 @@ exports.getCalendario = function (req, res, next) {
                     () => {
                         req.session.submenu = "Calendario";
                         res.render('calendarioCumplimentarJefeDeEstudios', {
-                            contextPath: app.contextPath,
                             permisoDenegado: res.locals.permisoDenegado,
                             menu: req.session.menu,
                             submenu: req.session.submenu,
@@ -405,10 +396,9 @@ exports.getCalendario = function (req, res, next) {
                             planID: req.session.planID,
                             calendario: array_datos[1],
                             array_dias: array_datos[0],
-                            ano1: String(parseInt(ano_actual) - 1),
-                            ano2: ano_actual,
-                            ano3: String(parseInt(ano_actual) + 1),
-                            anoSeleccionado: ano,
+                            ano1: ano_actual,
+                            ano2: String(parseInt(ano_actual) + 1),
+                            ano: req.ano_mostrar,
                             estado: resultado[0].estado,
                             semanas: array_datos[4]
                         });
@@ -416,7 +406,6 @@ exports.getCalendario = function (req, res, next) {
             }else{
                 req.session.submenu = "Calendario";
                 res.render('calendarioCumplimentarJefeDeEstudios', {
-                    contextPath: app.contextPath,
                     permisoDenegado: res.locals.permisoDenegado,
                     menu: req.session.menu,
                     submenu: req.session.submenu,
@@ -424,10 +413,9 @@ exports.getCalendario = function (req, res, next) {
                     general: general,
                     calendario: array_datos[1],
                     array_dias: array_datos[0],
-                    ano1: String(parseInt(ano_actual) - 1),
-                    ano2: ano_actual,
-                    ano3: String(parseInt(ano_actual) + 1),
-                    anoSeleccionado: ano,
+                    ano1: ano_actual,
+                    ano2: String(parseInt(ano_actual) + 1),
+                    ano: req.ano_mostrar,
                     estado: resultado[0].estado,
                     semanas: array_datos[4]
                 });
@@ -437,14 +425,27 @@ exports.getCalendario = function (req, res, next) {
 }
 exports.getCalendarioPlanConsultar = function(req, res, next){
     req.calendario = {};
-    //console.log(req.dic_eventos);
     let ano = req.ano;
-    req.session.ano = ano;
-    //console.log(ano);
+    if(ano === null){
+        req.session.submenu = "Calendario";
+                    
+        res.render('calendarioCumplimentar', {
+            contextPath: app.contextPath,
+            permisoDenegado: res.locals.permisoDenegado,
+            menu: req.session.menu,
+            submenu: req.session.submenu,
+            planID: req.session.planID,
+            calendario: null,
+            array_dias: null,
+            ano: null,
+            estado: 1
+        });
+        return;
+    }
+    req.session.ano = req.ano_mostrar;
     array_datos = generarArrayDias(req.dic_eventos, ano);
 
     let ano_actual = (new Date()).toString().split(" ")[3];
-    //onsole.log(ano_actual)
     if((new Date()).getMonth() < 8){
         ano_actual = String(parseInt(ano_actual) - 1);
     }
@@ -455,7 +456,6 @@ exports.getCalendarioPlanConsultar = function(req, res, next){
         },
         raw: true
     }).then((resultado) => {
-        //console.log(resultado);
         if(resultado.length === 0){
             let objeto_ano = {
                 ano: ano,
@@ -466,19 +466,14 @@ exports.getCalendarioPlanConsultar = function(req, res, next){
                 () => {
                         
                     req.session.submenu = "Calendario";
-                    //console.log(req.session.submenu);
                     res.render('calendarioConsultar', {
-                        contextPath: app.contextPath,
                         permisoDenegado: res.locals.permisoDenegado,
                         menu: req.session.menu,
                         submenu: req.session.submenu,
                         planID: req.session.planID,
                         calendario: array_datos[1],
                         array_dias: array_datos[0],
-                        ano1: String(parseInt(ano_actual) - 1),
-                        ano2: ano_actual,
-                        ano3: String(parseInt(ano_actual) + 1),
-                        anoSeleccionado: ano,
+                        ano: ano,
                         estado: 0
                     });
                     
@@ -487,37 +482,27 @@ exports.getCalendarioPlanConsultar = function(req, res, next){
         }else{
             if(resultado[0].estado === 0){
                 req.session.submenu = "Calendario";
-                //console.log(req.session.submenu);
                 res.render('calendarioConsultar', {
-                    contextPath: app.contextPath,
                     permisoDenegado: res.locals.permisoDenegado,
                     menu: req.session.menu,
                     submenu: req.session.submenu,
                     planID: req.session.planID,
                     calendario: array_datos[1],
                     array_dias: array_datos[0],
-                    ano1: String(parseInt(ano_actual) - 1),
-                    ano2: ano_actual,
-                    ano3: String(parseInt(ano_actual) + 1),
-                    anoSeleccionado: ano,
+                    ano: ano,
                     estado: 0
                 });
             }else{
                 
                 req.session.submenu = "Calendario";
-                //console.log(req.session.submenu);
                 res.render('calendarioConsultar', {
-                    contextPath: app.contextPath,
                     permisoDenegado: res.locals.permisoDenegado,
                     menu: req.session.menu,
                     submenu: req.session.submenu,
                     planID: req.session.planID,
                     calendario: array_datos[1],
                     array_dias: array_datos[0],
-                    ano1: String(parseInt(ano_actual) - 1),
-                    ano2: ano_actual,
-                    ano3: String(parseInt(ano_actual) + 1),
-                    anoSeleccionado: ano,
+                    ano: ano,
                     estado: 1
                 });
             
@@ -535,12 +520,10 @@ exports.getCalendarioPlanConsultar = function(req, res, next){
  */
 exports.getCalendarioPDF = function(req, res, next){
     req.calendario = {};
-    //console.log(req.dic_eventos);
     let ano = req.ano;
     array_datos = generarArrayDias(req.dic_eventos, ano);
 
     let ano_actual = (new Date()).toString().split(" ")[3];
-    //onsole.log(ano_actual)
     if((new Date()).getMonth() < 8){
         ano_actual = String(parseInt(ano_actual) - 1);
     }
@@ -551,7 +534,6 @@ exports.getCalendarioPDF = function(req, res, next){
         },
         raw: true
     }).then((resultado) => {
-        //console.log(resultado);
         if(resultado.length === 0){
             let objeto_ano = {
                 ano: ano,
@@ -600,18 +582,16 @@ exports.getCalendarioPDF = function(req, res, next){
  * @param {*} next 
  */
 exports.eventosDiccionario = function (req, res, next){
-    //console.log(req);
     let dic_eventos = {};
     if(req.dic_eventos !== undefined){
         dic_eventos = req.dic_eventos
     }
     let editados = []
-    //console.log()
-    //console.log("EDITADOS", req.editados)
+
     if(req.editados !== undefined){
         editados = req.editados
     }
-    //console.log(editados)
+    
     let ano = req.ano;
     let condicionesDeBusqueda = {
         fechaInicio: {
@@ -620,9 +600,7 @@ exports.eventosDiccionario = function (req, res, next){
             lt: Date.parse(String(parseInt(ano) +1) + "-09-01")
         }
     }
-    //console.log("\n", req.query.planID, req.originalUrl, req.baseUrl + "/gestion/calendario")
     if(req.query.planID !== undefined && req.originalUrl.includes("/gestion/calendario")){
-        //console.log("HOLA!");
         condicionesDeBusqueda["editable"] = 0
     }
     
@@ -631,7 +609,6 @@ exports.eventosDiccionario = function (req, res, next){
         where: condicionesDeBusqueda,
         raw: true
     }).each((e) => {
-        //console.log(e)
         var nombre = e.evento;
         if(editados.includes(e.identificador)){
             return;
@@ -640,11 +617,9 @@ exports.eventosDiccionario = function (req, res, next){
         if(nombre.includes("festivo//")){
             tipo = "festivo";
             nombre = nombre.slice(9, nombre.length);
-            //console.log(nombre);
         }else if(nombre.includes("examenes//")){
             tipo = "examenes";
             nombre = nombre.slice(10, nombre.length);
-            //console.log(nombre);
         }else if(nombre.includes("tft//")){
             tipo = "tft";
             nombre = nombre.slice(5, nombre.length);
@@ -664,7 +639,6 @@ exports.eventosDiccionario = function (req, res, next){
             var mensaje = e.fechaInicio.split("-")[2] + ": " + nombre;
             var fechaFin = "Evento de dia";
         }else{
-            //console.log(nombre);
             if(e.fechaInicio.split("-")[1] === e.fechaFin.split("-")[1]){
                 var mensaje = e.fechaInicio.split("-")[2] + "-" + e.fechaFin.split("-")[2] + ": " + nombre;
             }else{
@@ -734,7 +708,6 @@ exports.eventosPlanDiccionario = function (req, res, next){
             },
             raw: true
         }).each((e) => {
-            //console.log("PLAN", e)
             if(req.isJefeDeEstudios && e.EventoGeneralId === null){
                 return
             }
@@ -746,18 +719,15 @@ exports.eventosPlanDiccionario = function (req, res, next){
                 }
                 
             }catch (error){
-                console.log("ERROR", error)
             }
             
             let tipo = "";
             if(nombre.includes("festivo//")){
                 tipo = "festivo";
                 nombre = nombre.slice(9, nombre.length);
-                //console.log(nombre);
             }else if(nombre.includes("examenes//")){
                 tipo = "examenes";
                 nombre = nombre.slice(10, nombre.length);
-                //console.log(nombre);
             }else if(nombre.includes("tft//")){
                 tipo = "tft";
                 nombre = nombre.slice(5, nombre.length);
@@ -777,7 +747,6 @@ exports.eventosPlanDiccionario = function (req, res, next){
                 var mensaje = e.fechaInicio.split("-")[2] + ": " + nombre;
                 var fechaFin = "Evento de dia";
             }else{
-                //console.log(nombre);
                 if(e.fechaInicio.split("-")[1] === e.fechaFin.split("-")[1]){
                     var mensaje = e.fechaInicio.split("-")[2] + "-" + e.fechaFin.split("-")[2] + ": " + nombre;
                 }else{
@@ -824,18 +793,34 @@ exports.eventosPlanDiccionario = function (req, res, next){
 exports.anoDeTrabajo = function (req, res, next){
     //Lo primero que hace el codigo es ver si se le ha metido el año como query
     let ano = req.query.ano;
-    //console.log(ano);
+    
     if(ano === undefined){
+
+        if(req.originalUrl.includes("/cumplimentar/calendario") || req.originalUrl.includes("/consultar/calendario")){
+            if(req.session.pdID === null){
+                ano = null
+            }else{
+                ano = req.session.pdID.split("_")[2].substring(0,4)
+            }
+            
+        }
+
         //En caso negativo, se obtiene el año actual (el de comienzo del curso, ej:19/20 --> 2019)
-        if(req.session.ano === undefined){
+        else if(req.session.ano === undefined){
+            
             ano = (new Date()).toString().split(" ")[3];
             if((new Date()).getMonth() < 8){
                 ano = String(parseInt(ano) - 1);
             }
+            req.ano_mostrar = String(parseInt(ano) + 1);
+            
         }else{
             ano = req.session.ano;
+            req.ano_mostrar = ano;
         }
         
+    }else{
+        req.ano_mostrar = ano;
     }
     req.ano = ano;
     next();
@@ -850,9 +835,7 @@ exports.anoDeTrabajo = function (req, res, next){
  */
 exports.anoDeTrabajoPDF = function (req, res, next){
     /*
-    console.log("ESTAMOS!!!!!!\n\n");
     let planID = req.session.pdID;
-    console.log(planID)
     let ano = planID.split("_")[2].substring(0,4);
     req.ano = ano*/
     try{
@@ -861,13 +844,11 @@ exports.anoDeTrabajoPDF = function (req, res, next){
     catch(err){
         req.ano = 2000 + Number(res.locals.progDoc['anoAcademico'][4] + "" + res.locals.progDoc['anoAcademico'][5]) -1;
     }
-    //console.log("LEEEL", req.session.pdID);
     next();
     
 }
 
 exports.postEventoGeneral = function (req, res, next) {
-    //console.log("AQUI!\n")
     let meses = [" ", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre" , "Octubre", "Noviembre", "Diciembre"];
     let fechaFin = req.query.fechaFin;
     if(fechaFin !== undefined){
@@ -1001,7 +982,6 @@ exports.postEventoPlan = function (req, res, next) {
         });
     }else{
         if(eventoGeneralId === "0"){
-            //console.log("Es 0");
             eventoGeneralId = null;
         }
         
@@ -1050,14 +1030,27 @@ exports.aprobarGeneral = function (req, res, next) {
 }
 
 exports.getCalendarioPlan = function (req, res, next) {
-    //console.log("EVENTOS", req.dic_eventos)
-    //console.log(req.dic_eventos);
+    
     let ano = req.ano;
-    //console.log(ano);
+    if(ano === null){
+        req.session.submenu = "Calendario";
+                    
+        res.render('calendarioCumplimentar', {
+            contextPath: app.contextPath,
+            permisoDenegado: res.locals.permisoDenegado,
+            menu: req.session.menu,
+            submenu: req.session.submenu,
+            planID: req.session.planID,
+            calendario: null,
+            array_dias: null,
+            ano: null,
+            estado: 1
+        });
+        return;
+    }
     array_datos = generarArrayDias(req.dic_eventos, ano);
 
     let ano_actual = (new Date()).toString().split(" ")[3];
-    //onsole.log(ano_actual)
     if((new Date()).getMonth() < 8){
         ano_actual = String(parseInt(ano_actual) - 1);
     }
@@ -1068,7 +1061,6 @@ exports.getCalendarioPlan = function (req, res, next) {
         },
         raw: true
     }).then((resultado) => {
-        //console.log(resultado);
         if(resultado.length === 0){
             let objeto_ano = {
                 ano: ano,
@@ -1078,18 +1070,15 @@ exports.getCalendarioPlan = function (req, res, next) {
             .then(
                 () => {
                     req.session.submenu = "Calendario";
+                    
                     res.render('calendarioCumplimentar', {
-                        contextPath: app.contextPath,
                         permisoDenegado: res.locals.permisoDenegado,
                         menu: req.session.menu,
                         submenu: req.session.submenu,
                         planID: req.session.planID,
                         calendario: array_datos[1],
                         array_dias: array_datos[0],
-                        ano1: String(parseInt(ano_actual) - 1),
-                        ano2: ano_actual,
-                        ano3: String(parseInt(ano_actual) + 1),
-                        anoSeleccionado: ano,
+                        ano: ano,
                         estado: 0
                     });
                 }
@@ -1098,17 +1087,13 @@ exports.getCalendarioPlan = function (req, res, next) {
             
             req.session.submenu = "Calendario";
             res.render('calendarioCumplimentar', {
-                contextPath: app.contextPath,
                 permisoDenegado: res.locals.permisoDenegado,
                 menu: req.session.menu,
                 submenu: req.session.submenu,
                 planID: req.session.planID,
                 calendario: array_datos[1],
                 array_dias: array_datos[0],
-                ano1: String(parseInt(ano_actual) - 1),
-                ano2: ano_actual,
-                ano3: String(parseInt(ano_actual) + 1),
-                anoSeleccionado: ano,
+                ano: ano,
                 estado: resultado[0].estado
             });
             
@@ -1116,16 +1101,13 @@ exports.getCalendarioPlan = function (req, res, next) {
         }
         
     });
-    //console.log("nop");
 }
 
 exports.editablePlan = function (req, res, next) {
     let planID = req.session.planID;
     let identificador = req.query.identificador;
     let editable = req.query.editable;
-    //console.log(editable);
     if(editable === "false"){
-        //console.log("NO EDITABLE")
         return models.EventoPlan.destroy({
             where: {EventoGeneralId: identificador}
         }).then(
@@ -1134,7 +1116,6 @@ exports.editablePlan = function (req, res, next) {
             }
         )
     }else{
-        //console.log("EDITABLE")
         return models.EventoGeneral.find({
             where: {
                 identificador: identificador
@@ -1159,4 +1140,97 @@ exports.editablePlan = function (req, res, next) {
         )
     }
     
+}
+
+exports.copiarEventos = function  (req, res, next) {
+    let ano = req.query.ano;
+    if(ano === undefined){
+        res.status(400);
+        res.json({
+            estado: "falta año"
+        });
+    }else{
+        let ano = req.query.ano;
+        let condicionesDeBusqueda = {
+            fechaInicio: {
+                //Solamente se coge los eventos de ese año
+                gte: Date.parse(String(parseInt(ano) - 1) + "-09-01"),
+                lt: Date.parse(ano + "-09-01")
+            }
+        }
+                
+        
+        return models.EventoGeneral.findAll({
+            where: condicionesDeBusqueda,
+            raw: true
+        }).each(async(e) => {
+            
+                
+                var nombre = e.evento;
+                
+                if(nombre.includes("festivo//")){
+                    e.fechaInicio = String(parseInt(e.fechaInicio.substring(0, 4)) + 1) + e.fechaInicio.substring(4, 10);
+
+                    if(e.fechaFin !== null){
+                        e.fechaFin = String(parseInt(e.fechaFin.substring(0, 4)) + 1) + e.fechaFin.substring(4, 10);
+                    }
+                    delete e.identificador;
+
+                    await models.EventoGeneral.findCreateFind({where: e});
+
+                }else if(nombre.includes("especial//")){
+                    ;   
+                }else{
+                    let fechaInicio = e.fechaInicio;
+                    let fechaFin = e.fechaFin;
+                    if(e.fechaFin === null){
+                        let nuevaFecha = new Date(parseInt(fechaInicio.substring(0,4)) + 1, parseInt(fechaInicio.substring(5, 7)-1), parseInt(fechaInicio.substring(8,10)));
+                        if(nuevaFecha.getDay() === 0){
+                            nuevaFecha.setDate(nuevaFecha.getDate() + 1);
+                        }else if( nuevaFecha.getDay() === 6){
+                            nuevaFecha.setDate(nuevaFecha.getDate() + 2);
+                        }
+                        
+                        fechaInicio = String(nuevaFecha.getFullYear()) + "-" + String(nuevaFecha.getMonth()+1) + "-" + String(nuevaFecha.getDate())
+                       
+                        
+                         e.fechaInicio = fechaInicio;
+                        delete e.identificador;
+
+                        await models.EventoGeneral.findCreateFind({where: e});
+                    }else{
+                        let nuevaFecha = new Date(parseInt(fechaInicio.substring(0,4)) + 1, parseInt(fechaInicio.substring(5, 7)-1), parseInt(fechaInicio.substring(8,10)));
+                        let nuevaFechaFin = new Date(parseInt(fechaFin.substring(0,4)) + 1, parseInt(fechaFin.substring(5, 7)-1), parseInt(fechaFin.substring(8,10)));
+                        
+                        if(nuevaFecha.getDay() === 0){
+                            nuevaFecha.setDate(nuevaFecha.getDate() + 1);
+                            nuevaFechaFin.setDate(nuevaFechaFin.getDate() + 1);
+                        }else if( nuevaFecha.getDay() === 6){
+                            nuevaFecha.setDate(nuevaFecha.getDate() + 2);
+                            nuevaFechaFin.setDate(nuevaFechaFin.getDate() + 2);
+                        }
+                        
+                        fechaInicio = String(nuevaFecha.getFullYear()) + "-" + String(nuevaFecha.getMonth()+1) + "-" + String(nuevaFecha.getDate())
+                        fechaFin = String(nuevaFechaFin.getFullYear()) + "-" + String(nuevaFechaFin.getMonth()+1) + "-" + String(nuevaFechaFin.getDate())
+                        
+                         e.fechaInicio = fechaInicio;
+                         e.fechaFin = fechaFin;
+                        delete e.identificador;
+
+                        await models.EventoGeneral.findCreateFind({where: e});
+                    }
+                }
+            }
+
+            
+        ).then(
+            () => {
+                res.json({estado: "exito"});
+            }
+        )
+
+        
+        
+
+    }
 }
