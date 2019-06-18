@@ -6,9 +6,9 @@
   <p><%=permisoDenegado%></p>
 <%}else{%>
     <ul style="list-style-type:none">
+    <li>
     <% for(let i=0; i < asignacion.length; i++) { %> 
       <% if(i===0) { %>
-        <li>
         <h2>Curso <%= asignacion[i].curso %></h2>
       <% } %>
       <% if(i>=1 && asignacion[i].curso !== asignacion[i-1].curso) { %>
