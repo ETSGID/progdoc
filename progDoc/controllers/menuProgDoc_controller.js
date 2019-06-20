@@ -53,20 +53,7 @@ exports.getVersionPdNumber = function (pdID){
 
 
 exports.getPlanes = function (req, res, next) {
-    let planID = req.query.planID;
-    if (!planID) {
-        planID = req.session.planID
-    }
-    if (!planID) {
-        planID = "09TT"
-    }
-    let departamentoID = req.query.departamentoID;
-    if (!departamentoID) {
-        departamentoID = req.session.departamentoID
-    }
-    req.session.planID = planID
-    req.session.departamentoID = departamentoID
-
+   
     models.PlanEstudio.findAll({
         attributes: ["codigo", "nombre", "nombreCompleto"],
         raw: true

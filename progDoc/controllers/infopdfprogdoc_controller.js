@@ -49,66 +49,43 @@ let configPdfCerrado = {
         }
     },
 }
-
-exports.generarPDF = function (req, res, next) {
-    let view = req.originalUrl.toLowerCase().includes("consultar") ? "pdfDraftGenerado" : "pdfCerrado"
-    if (view === "pdfDraftGenerado") {
-        req.session.submenu = "PDF"
-    }
-    //si no hay progDoc o no hay departamentosResponsables de dicha progDoc
-    if (view === "pdfDraftGenerado" && (!res.locals.progDoc || !res.locals.departamentosResponsables)) {
-        res.render(view, {
-            estado: "Programación docente no abierta",
-            menu: req.session.menu,
-            submenu: req.session.submenu,
-            planID: req.session.planID,
-            departamentosResponsables: res.locals.departamentosResponsables,
-            planEstudios: res.locals.planEstudios,
-            grupos: null
-        })
-    }
-    else if (view === "pdfDraftGenerado" && estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] && estados.estadoProgDoc.listo !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) {
-        res.render(view, {
-            estado: "Programación docente no abierta",
-            menu: req.session.menu,
-            submenu: req.session.submenu,
-            planID: req.session.planID,
-            departamentosResponsables: res.locals.departamentosResponsables,
-            planEstudios: res.locals.planEstudios,
-            grupos: null
-        })
-    } else {
-        let promises = [];
-        let promises2 = [];
-        let cursosConGrupos = [];
-        let profesores = [];
-        let asignaturas = [];
-        let asignaturasViejas = [];
-        let asignacionsExamen = [];
-        let franjasExamen = [];
-        let pdsAnteriores = [];
-        let pdID;
-        let anoFinal;
-        let semestre;
-        switch (view) {
-            case "pdfDraftGenerado":
-                //console.log(2);
-                pdID = res.locals.progDoc['ProgramacionDocentes.identificador']
-                anoFinal = 2000 + Number(res.locals.progDoc['ProgramacionDocentes.anoAcademico'][4] + "" + res.locals.progDoc['ProgramacionDocentes.anoAcademico'][5])
-                semestre = res.locals.progDoc['ProgramacionDocentes.semestre']
-                res.locals.progDoc.semestre = res.locals.progDoc['ProgramacionDocentes.semestre']
-                res.locals.progDoc.version = res.locals.progDoc['ProgramacionDocentes.version']
-                res.locals.progDoc.anoAcademico = res.locals.progDoc['ProgramacionDocentes.anoAcademico']
-                break;
-            case "pdfCerrado":
-                pdID = res.locals.progDoc['identificador']
-                anoFinal = 2000 + Number(res.locals.progDoc['anoAcademico'][4] + "" + res.locals.progDoc['anoAcademico'][5])
-                semestre = res.locals.progDoc['semestre']
-                res.locals.progDoc.nombreCompleto = res.locals.progDoc['PlanEstudio.nombreCompleto']
-                break;
+//pdID el identificador de pd
+//tipoPDF puede ser pdfDraftGenerado si es pintar un draft o pdfCerrado
+//calendario se le pasa la informacion de calendario
+function generatePDFFile (pdID, tipoPDF, calendario){
+    let promises = [];
+    let promises2 = [];
+    let cursosConGrupos = [];
+    let profesores = [];
+    let asignaturas = [];
+    let asignaturasViejas = [];
+    let asignacionsExamen = [];
+    let franjasExamen = [];
+    let pdsAnteriores = [];
+    let anoFinal;
+    let semestre;
+    let plan = menuProgDocController.getPlanPd(pdID);
+    let pd;
+    return models.PlanEstudio.findOne(
+        {
+            where: { codigo: plan },
+            raw: true,
+            include: [{
+                //incluye las asignaciones de profesores y los horarios.
+                model: models.ProgramacionDocente,
+                where: { identificador: pdID },
+                //left join
+                required: false
+            }]
         }
+    ).then(pdBBDD => {
+        pd = pdBBDD
+        anoFinal = 2000 + Number(pd['ProgramacionDocentes.anoAcademico'][4] + "" + pd['ProgramacionDocentes.anoAcademico'][5])
+        semestre = pd['ProgramacionDocentes.semestre']
+        pd.version = pd['ProgramacionDocentes.version']
+        pd.anoAcademico = pd['ProgramacionDocentes.anoAcademico']        
         return menuProgDocController.getProgramacionDocentesAnteriores(pdID.split("_")[1], pdID.split("_")[3], pdID.split("_")[2], pdID, null)
-            .then((pdis) => {
+    }).then((pdis) => {
                 pdsAnteriores = pdis;
                 let whereAsignaturas = {};
                 whereAsignaturas['$or'] = [];
@@ -163,8 +140,12 @@ exports.generarPDF = function (req, res, next) {
                         include: [{
                             model: models.AsignacionProfesor, //obtengo los horarios + asignacion profesores
                         }],
+        //el orden es importante porque sino la asignatura que tenga profesores asignados en otros grupos que no están en el horario aparecerían
+
                         order: [
                             [Sequelize.literal('"grupoId"'), 'ASC'],
+                            [Sequelize.literal('"AsignacionProfesors.Dia"'), 'ASC'],
+                            [Sequelize.literal('"AsignacionProfesors.Nota"'), 'ASC'],
                         ],
                         raw: true
                     }).each((g) => {
@@ -187,13 +168,16 @@ exports.generarPDF = function (req, res, next) {
                                     semestre.grupos.push(newGrupo)
                                     grupo = semestre.grupos.find(function (obj) { return obj.grupoId === Number(g.grupoId) })
                                 } let asignatura = grupo.asignaturas.find(function (obj) { return obj.asignaturaId === Number(g['AsignacionProfesors.AsignaturaId']) })
-                                if (!asignatura && (g['AsignacionProfesors.ProfesorId'] !== null || (g['AsignacionProfesors.Dia'] !== null || (g['AsignacionProfesors.Nota'] && g['AsignacionProfesors.AsignaturaId'] )))) {
+                                //como el orden esta hecho para que muestre primero los que Dia y Nota sean distinto de null ahí es donde se considera que esa asignatura pertenece a ese grupo
+                                if (!asignatura && (g['AsignacionProfesors.Dia'] !== null || (g['AsignacionProfesors.Nota'] && g['AsignacionProfesors.AsignaturaId']))) {
                                     let newAsignatura = {};
                                     newAsignatura.asignaturaId = Number(g['AsignacionProfesors.AsignaturaId'])
                                     newAsignatura.asignacions = [];
                                     grupo.asignaturas.push(newAsignatura)
                                     asignatura = grupo.asignaturas.find(function (obj) { return obj.asignaturaId === Number(g['AsignacionProfesors.AsignaturaId']) })
-                                } if (g['AsignacionProfesors.ProfesorId'] !== null) {
+                                    //puede ocurrir que una asignatura no esté incluida pero si tenga asignacion de profesor en ese grupo
+                                    //en ese caso no se incluye porque sólo se van a mostrar las asignaturas que aparezcan en el horario o con nota en el horario
+                                } if (g['AsignacionProfesors.ProfesorId'] !== null && asignatura) {
                                     asignatura.asignacions.push(g['AsignacionProfesors.ProfesorId'])
 
                                 } if (g['AsignacionProfesors.Dia'] !== null || g['AsignacionProfesors.Nota']) {
@@ -209,9 +193,6 @@ exports.generarPDF = function (req, res, next) {
                             }
                         }
                     })
-                        .then((grupos) => {
-
-                        })
                 })
                 //busco las asignaturas con departamento responsable ya que son las que entran en los exámene
                 let promise2 = models.Asignatura.findAll({
@@ -261,8 +242,6 @@ exports.generarPDF = function (req, res, next) {
                         }
 
                     })
-                    .then(() => {
-                    })
                 let promise3 = models.Persona.findAll({
                     attributes: ['identificador', 'email', 'nombre', 'apellido'],
                     include: [{
@@ -281,10 +260,6 @@ exports.generarPDF = function (req, res, next) {
                         profesores.push(prof);
 
                     })
-                    .then(function (params) {
-
-
-                    })
 
                 let promise4 = examenController.getFranjasExamenes(pdID)
                     .then((franjas) => {
@@ -294,55 +269,55 @@ exports.generarPDF = function (req, res, next) {
                 promises.push(promise2);
                 promises.push(promise3);
                 promises.push(promise4);
-                Promise.all(promises)
-                    .then(() => {
+                return Promise.all(promises)
+                }).then(() => {
                         promises2.push(
                             new Promise(function (resolve, reject) {
                                 //console.log("11");
-                                if(req.calendario.estado === 0){
+                                if (calendario.estado === 0) {
                                     ejs.renderFile("./views/pdfs/pdfAsignaturas.ejs",
-                                    {
-                                        asignaturas: asignaturas,
-                                        asignaturasViejas: asignaturasViejas,
-                                        cursosConGrupos: cursosConGrupos,
-                                        profesores: profesores,
-                                        calendario: [],
-                                        array_dias: [],
-                                        anoSeleccionado: req.ano,
-                                        estadoCalendario: 0,
-                                        progDoc: res.locals.progDoc
-                                    },
-                                    function (err, str) {
-                                        if (err) {
-                                            reject(err);
-                                        } else {
-                                            resolve(str);
+                                        {
+                                            asignaturas: asignaturas,
+                                            asignaturasViejas: asignaturasViejas,
+                                            cursosConGrupos: cursosConGrupos,
+                                            profesores: profesores,
+                                            calendario: [],
+                                            array_dias: [],
+                                            anoSeleccionado: menuProgDocController.getAnoPd(pdID),
+                                            estadoCalendario: 0,
+                                            progDoc: pd
+                                        },
+                                        function (err, str) {
+                                            if (err) {
+                                                reject(err);
+                                            } else {
+                                                resolve(str);
+                                            }
                                         }
-                                    }
-                                )
-                                }else{
+                                    )
+                                } else {
                                     ejs.renderFile("./views/pdfs/pdfAsignaturas.ejs",
-                                    {
-                                        asignaturas: asignaturas,
-                                        asignaturasViejas: asignaturasViejas,
-                                        cursosConGrupos: cursosConGrupos,
-                                        profesores: profesores,
-                                        calendario: req.calendario.calendario,
-                                        array_dias: req.calendario.array_dias,
-                                        anoSeleccionado: req.ano,
-                                        estadoCalendario: 1,
-                                        progDoc: res.locals.progDoc
-                                    },
-                                    function (err, str) {
-                                        if (err) {
-                                            reject(err);
-                                        } else {
-                                            resolve(str);
+                                        {
+                                            asignaturas: asignaturas,
+                                            asignaturasViejas: asignaturasViejas,
+                                            cursosConGrupos: cursosConGrupos,
+                                            profesores: profesores,
+                                            calendario: calendario.calendario,
+                                            array_dias: calendario.array_dias,
+                                            anoSeleccionado: menuProgDocController.getAnoPd(pdID),
+                                            estadoCalendario: 1,
+                                            progDoc: pd
+                                        },
+                                        function (err, str) {
+                                            if (err) {
+                                                reject(err);
+                                            } else {
+                                                resolve(str);
+                                            }
                                         }
-                                    }
-                                )
+                                    )
                                 }
-                                
+
                             })
                         )
                         promises2.push(
@@ -371,18 +346,18 @@ exports.generarPDF = function (req, res, next) {
                                 asignacionsExamen.forEach(function (as, index) {
                                     let fr = franjasExamen.find(function (obj) { return obj.periodo === as.periodo; });
                                     as.franjas = fr.franjas
-                                    as.examenes.forEach(function (ex,index){
-                                        if(fr.franjas.length === 0){
+                                    as.examenes.forEach(function (ex, index) {
+                                        if (fr.franjas.length === 0) {
                                             ex.franja = '-'
-                                        }else{
-                                            ex.franja = isExamenInFranjas(ex,fr.franjas)
+                                        } else {
+                                            ex.franja = isExamenInFranjas(ex, fr.franjas)
                                         }
                                     })
                                 })
                                 ejs.renderFile("./views/pdfs/pdfExamenes.ejs",
                                     {
                                         asignacionsExamen: asignacionsExamen,
-                                        franjasExamen : franjasExamen,
+                                        franjasExamen: franjasExamen,
                                         cursosConGrupos: cursosConGrupos,
                                         pdID: pdID,
                                         periodos: enumsPD.periodoPD,
@@ -399,8 +374,8 @@ exports.generarPDF = function (req, res, next) {
                                 )
                             })
                         )
-                        Promise.all(promises2)
-                            .then(function (datos) {
+                        return Promise.all(promises2)
+                    }).then(function (datos) {
                                 //ojo el css del header y el footer no puede ir en el fichero pq no carga debe ir en el propio html
                                 let html = `<html><head>
                     <link rel='stylesheet' href='stylesheets/pdf.css' />
@@ -436,63 +411,71 @@ exports.generarPDF = function (req, res, next) {
                                 html += `<img style="display:none" src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg">`
 
                                 html += `</body></html>`
-                                let file = req.originalUrl.toLowerCase().includes("consultar") ? pdID + '_borrador.pdf' : pdID + '.pdf'
-                                let borrador = req.originalUrl.toLowerCase().includes("consultar") ? 'borrador/' : ''
-                                file = menuProgDocController.getAnoPd(pdID) + "/" + menuProgDocController.getTipoPd(pdID) + "/" + menuProgDocController.getPlanPd(pdID) + "/" + menuProgDocController.getVersionPd(pdID) + "/"  + borrador + file
+                                let file = tipoPDF.toLowerCase().includes("draft") ? pdID + '_borrador.pdf' : pdID + '.pdf'
+                                let borrador = tipoPDF.toLowerCase().includes("draft") ? 'borrador/' : ''
+                                file = menuProgDocController.getAnoPd(pdID) + "/" + menuProgDocController.getTipoPd(pdID) + "/" + menuProgDocController.getPlanPd(pdID) + "/" + menuProgDocController.getVersionPd(pdID) + "/" + borrador + file
                                 //console.log("the fileç: ", file);
-                                let ruta = app.pathPDF+'/pdfs/' + file
+                                let ruta = app.pathPDF + '/pdfs/' + file
                                 let options = {
                                     'text': 'draft',
                                     'dstPath': ruta
                                 }
-                                let configPdfOptions = req.originalUrl.toLowerCase().includes("consultar") ? configPdfDraft : configPdfCerrado
-                                //console.log(html);
-                                //console.log(configPdfOptions);
-                                //console.log(ruta);
-                                pdf.create(html, configPdfOptions).toFile(ruta, function (err, resp) {
-                                    if (err) return console.log(err);
-                                    //console.log("eeee" ,view);
-                                    switch (view) {
-                                        case "pdfDraftGenerado":
-                                            //console.log("not next");
-                                            res.render(view,
-                                                {
-                                                    file: file,
-                                                    planID: req.session.planID,
-                                                    planEstudios: res.locals.planEstudios,
-                                                    pdID: pdID,
-                                                    menu: req.session.menu,
-                                                    submenu: req.session.submenu,
-                                                    estado: null,
-                                                });
-                                            break;
-
-                                        case "pdfCerrado":
-                                            
-                                            next();
-                                            break;
-                                    }
-
-                                    /*res.render('pdfAsignaturas',{
-                                        asignaturas: asignaturas,
-                                        cursosConGrupos: cursosConGrupos,
-                                        profesores: profesores
-                                    },)*/
-                                })
+                                let configPdfOptions = tipoPDF.toLowerCase().includes("draft") ? configPdfDraft : configPdfCerrado
+                                return {html:html, configPdfOptions: configPdfOptions, ruta: ruta, file:file}
                             })
                             .catch(function (error) {
                                 console.log("Error:", error);
-                                next(error);
+                            });      
+}
+
+
+exports.generarPDF = function (req, res, next) {
+    let view = req.originalUrl.toLowerCase().includes("consultar") ? "pdfDraftGenerado" : "pdfCerrado"
+    if (view === "pdfDraftGenerado") {
+        req.session.submenu = "PDF"
+    }
+    //si no hay progDoc o no hay departamentosResponsables de dicha progDoc
+    if (view === "pdfDraftGenerado" && (!res.locals.progDoc || !res.locals.departamentosResponsables)) {
+        res.render(view, {
+            estado: "Programación docente no abierta",
+            menu: req.session.menu,
+            submenu: req.session.submenu,
+            planID: req.session.planID,
+            departamentosResponsables: res.locals.departamentosResponsables,
+            planEstudios: res.locals.planEstudios,
+            grupos: null
+        })
+    }else {
+        let pdID = res.locals.progDoc['ProgramacionDocentes.identificador'] || res.locals.progDoc['identificador']
+        return generatePDFFile(pdID, view, req.calendario)
+        .then((pdfDatos)=>{
+            pdf.create(pdfDatos.html, pdfDatos.configPdfOptions).toFile(pdfDatos.ruta, function (err, resp) {
+                if (err) return console.log(err);
+                switch (view) {
+                    case "pdfDraftGenerado":
+                        res.render(view,
+                            {
+                                file: pdfDatos.file,
+                                planID: req.session.planID,
+                                planEstudios: res.locals.planEstudios,
+                                pdID: pdID,
+                                menu: req.session.menu,
+                                submenu: req.session.submenu,
+                                estado: null,
                             });
-                    }).catch(function (error) {
-                        console.log("Error:", error);
-                        next(error);
-                    });
-            }).catch(function (error) {
+                        break;
+
+                    case "pdfCerrado":
+                        next()
+                        break;
+                }
+            })
+           
+            })
+        .catch(function (error) {
                 console.log("Error:", error);
                 next(error);
             });
-
     }
 }
 

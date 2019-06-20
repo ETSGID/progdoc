@@ -520,49 +520,54 @@ exports.getCalendarioPlanConsultar = function(req, res, next){
  */
 exports.getCalendarioPDF = function(req, res, next){
     req.calendario = {};
-    let ano = req.ano;
-    array_datos = generarArrayDias(req.dic_eventos, ano);
+    if (res.locals.progDoc) {
+        let ano = req.ano;
 
-    let ano_actual = (new Date()).toString().split(" ")[3];
-    if((new Date()).getMonth() < 8){
-        ano_actual = String(parseInt(ano_actual) - 1);
-    }
+        array_datos = generarArrayDias(req.dic_eventos, ano);
 
-    return models.Calendario.findAll({
-        where:{
-            ano: parseInt(ano)
-        },
-        raw: true
-    }).then((resultado) => {
-        if(resultado.length === 0){
-            let objeto_ano = {
-                ano: ano,
-                estado: 0
-            };
-            return models.Calendario.findCreateFind({where: objeto_ano })
-            .then(
-                () => {
-                        
-                        req.calendario.estado = 0;
-                        next();
-                    
-                }
-            );
-        }else{
-            if(resultado[0].estado === 0){
-                req.calendario.estado = 0;
-                next();
-            }else{
-                
-                req.calendario.calendario = array_datos[1],
-                req.calendario.array_dias = array_datos[0],
-                req.calendario.estado = 1
-                next();
-            
-            }
+        let ano_actual = (new Date()).toString().split(" ")[3];
+        if((new Date()).getMonth() < 8){
+            ano_actual = String(parseInt(ano_actual) - 1);
         }
-        
-    });
+
+        return models.Calendario.findAll({
+            where:{
+                ano: parseInt(ano)
+            },
+            raw: true
+        }).then((resultado) => {
+            if(resultado.length === 0){
+                let objeto_ano = {
+                    ano: ano,
+                    estado: 0
+                };
+                return models.Calendario.findCreateFind({where: objeto_ano })
+                .then(
+                    () => {
+                            
+                            req.calendario.estado = 0;
+                            next();
+                        
+                    }
+                );
+            }else{
+                if(resultado[0].estado === 0){
+                    req.calendario.estado = 0;
+                    next();
+                }else{
+                    
+                    req.calendario.calendario = array_datos[1],
+                    req.calendario.array_dias = array_datos[0],
+                    req.calendario.estado = 1
+                    next();
+                
+                }
+            }
+            
+        });
+    }else{
+        next();
+    }
 }
 
 
@@ -690,10 +695,10 @@ exports.eventosPlanDiccionario = function (req, res, next){
 
     let editados = [];
 
-    let planID = req.session.planID;
+    let planID = req.query.planID;
 
     if(planID === undefined || planID === "General"){
-        return
+        next();
     }else{
         
         let ano = req.ano;
@@ -807,12 +812,8 @@ exports.anoDeTrabajo = function (req, res, next){
 
         //En caso negativo, se obtiene el año actual (el de comienzo del curso, ej:19/20 --> 2019)
         else if(req.session.ano === undefined){
-            
             ano = (new Date()).toString().split(" ")[3];
-            if((new Date()).getMonth() < 8){
-                ano = String(parseInt(ano) - 1);
-            }
-            req.ano_mostrar = String(parseInt(ano) + 1);
+            req.ano_mostrar = ano;
             
         }else{
             ano = req.session.ano;
@@ -838,14 +839,15 @@ exports.anoDeTrabajoPDF = function (req, res, next){
     let planID = req.session.pdID;
     let ano = planID.split("_")[2].substring(0,4);
     req.ano = ano*/
-    try{
-        req.ano = 2000 + Number(res.locals.progDoc['ProgramacionDocentes.anoAcademico'][4] + "" + res.locals.progDoc['ProgramacionDocentes.anoAcademico'][5]) - 1;
-    }
-    catch(err){
-        req.ano = 2000 + Number(res.locals.progDoc['anoAcademico'][4] + "" + res.locals.progDoc['anoAcademico'][5]) -1;
+    if (res.locals.progDoc){
+        try {
+            req.ano = 2000 + Number(res.locals.progDoc['ProgramacionDocentes.anoAcademico'][4] + "" + res.locals.progDoc['ProgramacionDocentes.anoAcademico'][5]) - 1;
+        }
+        catch (err) {
+            req.ano = 2000 + Number(res.locals.progDoc['anoAcademico'][4] + "" + res.locals.progDoc['anoAcademico'][5]) - 1;
+        }
     }
     next();
-    
 }
 
 exports.postEventoGeneral = function (req, res, next) {
@@ -983,27 +985,41 @@ exports.postEventoPlan = function (req, res, next) {
     }else{
         if(eventoGeneralId === "0"){
             eventoGeneralId = null;
-        }
-        
-        let evento = {
-            evento: nombre,
-            color: undefined,
-            fechaInicio: Date.parse(fechaInicio),
-            fechaFin: fechaFin,
-            PlanEstudioId: planID,
-            EventoGeneralId: eventoGeneralId
-        }
-        return models.EventoPlan.destroy({where: {
-            PlanEstudioId: planID,
-            EventoGeneralId: eventoGeneralId
-        }
-        }).then(() => {
+            let evento = {
+                evento: nombre,
+                color: undefined,
+                fechaInicio: Date.parse(fechaInicio),
+                fechaFin: fechaFin,
+                PlanEstudioId: planID,
+                EventoGeneralId: eventoGeneralId
+            }
             return models.EventoPlan.findCreateFind({where: evento})
             .then(() => {
                 //res.status(409);
                 res.json({estado: "exito"});
             });
-        });
+        }else{
+            
+            let evento = {
+                evento: nombre,
+                color: undefined,
+                fechaInicio: Date.parse(fechaInicio),
+                fechaFin: fechaFin,
+                PlanEstudioId: planID,
+                EventoGeneralId: eventoGeneralId
+            }
+            return models.EventoPlan.destroy({where: {
+                PlanEstudioId: planID,
+                EventoGeneralId: eventoGeneralId
+            }
+            }).then(() => {
+                return models.EventoPlan.findCreateFind({where: evento})
+                .then(() => {
+                    //res.status(409);
+                    res.json({estado: "exito"});
+                });
+            });
+        }
     }
  
 }

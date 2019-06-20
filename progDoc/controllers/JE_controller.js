@@ -50,8 +50,8 @@ exports.gestionProgDoc = function (req, res, next) {
         .then(() => {
         })
         .catch(function (error) {
+            //no haces un next(error) pq quieres que siga funcionando aunque api upm falle en este punto
             console.log("Error:", error);
-            next(error);
         });
         //borra todos las programaciones docentes con errores que no deberia haberlas y lo vacio que no deberia estar
     let promise2 = models.sequelize.query(query = `DELETE FROM public."ProgramacionDocentes" p  WHERE p."estadoProGDoc" = -1; 
@@ -94,6 +94,9 @@ exports.gestionProgDoc = function (req, res, next) {
             return models.PlanEstudio.bulkCreate(
                 nuevosPlanes
             )
+        }).catch(function (error) {
+            //no haces un next(error) pq quieres que siga funcionando aunque api upm falle en este punto
+            console.log("Error:", error);
         })
         .then(() => {
             //la incidencia se marca sobre la pd anterior (no la versión anterior)
@@ -285,7 +288,7 @@ exports.abrirProgDoc = function (req, res, next) {
     }
 
 }
-
+//obtener la pd que se va a cerrar
 exports.cerrarProgDoc = function (req, res, next) {
     if (!res.locals.permisoDenegado) {
         let pdID = req.body.pdIdentificador.split("-")[1];
@@ -427,6 +430,7 @@ exports.reabrirProgDoc = function (req, res, next) {
 
 }
 
+//cerrar la progdoc
 exports.cerrarProgDoc2 = function (req, res, next) {
     let pdID = res.locals.progDoc['identificador']
     models.ProgramacionDocente.update(

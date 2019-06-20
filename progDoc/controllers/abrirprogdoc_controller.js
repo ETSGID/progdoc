@@ -25,6 +25,8 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
     let nuevasAsignaturas = [];
     let viejasAsignaturas = [];
     let cambioAsignaturas = [];
+    //en cambioAsignaturas2 solo guardas el codigo de la asignatura y los cambios que hay
+    let cambioAsignaturas2 = [];
     let desapareceAsignaturas = [];
     let asignacions = [];
     let examens = [];
@@ -134,8 +136,6 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                 newGrupo.nombreItinerario = g.nombreItinerario;
                 gruposToAnadir.push(newGrupo)
                 relacionGrupos.push({ nombre: g.nombre, identificadorViejo: g.grupoId, curso: g.curso })
-
-
             })
 
             return models.Grupo.bulkCreate(
@@ -174,9 +174,6 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
 
             })
                 .each(function (asignBBDD) {
-                    if (cont === 0) {
-                        cont = 1;
-                    }
                     let cursoCambio = false;
                     //cambio de tipo es de optativa a otro tipo o al revés de momento no se utiliza
                     let tipoCambio = false;
@@ -284,7 +281,7 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                         As.SecretarioTribunalAsignatura = asignBBDD.SecretarioTribunalAsignatura;
                         As.SuplenteTribunalAsignatura = asignBBDD.SuplenteTribunalAsignatura;
                         //si  cambio el curso o el semestre se pone el estado S: los profesores se asignan por grupo, no comun
-                        As.estado = (!cursoCambio && !semestreCambio) ? asignBBDD.estado : 'S';
+                        As.estado = asignBBDD.estado;
                         if (!cursoCambio && !semestreCambio  && hasCurso && hasSemestre) {
                             //no puedo meter asignaturas del primer semestre en el segundo cuando consulto una I para rellenar una 1S
                             if (tipoPD === "I" || (tipoPD === '1S' && asignBBDD.semestre !== '2S') || (tipoPD === '2S' && asignBBDD.semestre !== '1S')) {
@@ -312,8 +309,10 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                             desapareceAsignaturas.push(As);
                         } else if (cursoCambio || semestreCambio) {
                             if (tipoPD === "I" || (tipoPD === '1S' && asignBBDD.semestre !== '2S') || (tipoPD === '2S' && asignBBDD.semestre !== '1S')) {
-                                // Ahora mismo si una asignatura cambia en algo lo unico que sigue es el tribunal, el horario y los profesores no siguen
+                                // Ahora mismo si una asignatura cambia en algo lo unico que sigue es el tribunal. Los profesores se añaden a todos los grupos. Los examenes si solo cambia el grupo no el semestre
+                                //El horario no sigue.
                                 cambioAsignaturas.push(As);
+                                cambioAsignaturas2.push({codigo: As.codigo, cursoCambio: cursoCambio, semestreCambio:semestreCambio, tipoCambio: tipoCambio})
                             }
 
                         }
@@ -337,22 +336,23 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
 
                         }
                         
-                    } //asignatura que cambia de cuatrimestre o curso o tipo solo meto los profesores en el primer grupo y sin repetirh y no meto horarios
+                    } //asignatura que cambia de cuatrimestre (aunque cambie de 1S a I o 2S a I) o curso solo meto los profesores en el primer grupo y sin repetirh y no meto horarios
                     else if (apiAsignaturas[asignBBDD.codigo] && cambioAsignatura) {
+                        //necesito As para obtener la info actualizada de curso, tipo y semestre
+                        let As = cambioAsignaturas.find(function (obj){return obj.codigo === asignBBDD.codigo;})
                         if (asignBBDD["AsignacionProfesors.ProfesorId"]) {
-                            let asignacion = {};
-                            //pongo el _a pq sino en el while de abajo podría quedarseme hasta el infinito
-                            asignacion.AsignaturaId = asignBBDD.codigo + "_a"; //este es el viejo después deberé de sustituirlo por el id nuevo no por el codigo el codigo para identificar
-                            asignacion.ProfesorId = asignBBDD['AsignacionProfesors.ProfesorId']
                             for (let i = 0; i < relacionGrupos.length; i++) {
-                                if (relacionGrupos[i].curso === Number(asignBBDD.curso)) {
-                                    asignacion.GrupoId = relacionGrupos[i].identificadorNuevo;
+                                if (relacionGrupos[i].curso === Number(As.curso)) {
+                                    let asignacion = {};
+                                    //pongo el _a pq sino en el while de abajo podría quedarseme hasta el infinito
+                                    asignacion.AsignaturaId = asignBBDD.codigo + "_a"; //este es el viejo después deberé de sustituirlo por el id nuevo no por el codigo el codigo para identificar
+                                    asignacion.ProfesorId = asignBBDD['AsignacionProfesors.ProfesorId']      
+                                    asignacion.GrupoId = relacionGrupos[i].identificadorNuevo; 
                                     // no meto profesores repetidos
-                                    let asigEsxitente = asignacions.find(function (obj) { return (obj.GrupoId === asignacion.GrupoId && obj.AsignaturaId === asignacion.AsignaturaId && obj.ProfesorId === asignacion.ProfesorId) });
-                                    if (!asigEsxitente) {
+                                    let asigExistente = asignacions.find(function (obj) { return (obj.GrupoId === asignacion.GrupoId && obj.AsignaturaId === asignacion.AsignaturaId && obj.ProfesorId === asignacion.ProfesorId) });
+                                    if (!asigExistente) {
                                         asignacions.push(asignacion);
                                     }
-                                    break;
                                 }
 
 
@@ -363,11 +363,9 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                     //asignatura que desaparece, no hace nada. Es pq una asignatura que desaparece puede tener muchas asignaciones
                     else {
                     }
-
-                    //ahora debo comprobar que asignaturas son nuevas de api upm
                 })
         })
-
+        //ahora debo comprobar que asignaturas son nuevas de api upm
         .then(function (asignaturasBBDD) {
             cont = 0
             for (let apiCodigo in apiAsignaturas) {
@@ -462,11 +460,11 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
 
             })
                 .each(function (ex) {
-                    let viejaAsignatura = viejasAsignaturas.find(function (obj) { return obj.codigo === ex.codigo; });
-                    if (viejaAsignatura) {
+                    //los examenes se copian en las asignaturas que son viejas o que cambian de año no de semestre
+                    let asignaturaConExamen = viejasAsignaturas.find(function (obj) { return obj.codigo === ex.codigo; }) || cambioAsignaturas2.find(function (obj) { return (obj.codigo === ex.codigo && !obj.semestreCambio )});
+                    if (asignaturaConExamen) {
                         let nuevoExamen = {};
                         if (funciones.addYear(ex['Examens.fecha'])) {
-
                             //pongo el _a pq sino en el while de abajo podría quedarseme hasta el infinito
                             nuevoExamen.AsignaturaIdentificador = ex.codigo + "_a"; //este es el viejo después deberé de sustituirlo por el id nuevo no por el codigo el codigo para identificar
                             nuevoExamen.fecha = funciones.addYear(ex['Examens.fecha'])
@@ -496,6 +494,7 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
             return models.Asignatura.findAll({
                 attributes: ["identificador", "codigo", "DepartamentoResponsable"],
                 where: {
+                    //de la nueva pd
                     ProgramacionDocenteIdentificador: res.locals.identificador
                 },
                 raw: true
@@ -682,7 +681,7 @@ exports.abrirCopiaProgDoc = function (req, res, next) {
     let s1 = false;
     let s2 = false;
     let I = false;
-    //las nuevas asignaturas son o nuevas o que cambian de semestre o de curso o de itinerario o que cambian de obligatoria a optativa o al revés
+    //al abrir copia solo son asignaturas viejas no comprueba nada de la api.
     let viejasAsignaturas = [];
     let asignacions = [];
     let examens = [];
@@ -780,10 +779,6 @@ exports.abrirCopiaProgDoc = function (req, res, next) {
 
             })
                 .each(function (asignBBDD) {
-                    if (cont === 0) {
-                        cont = 1;
-                    }
-
                     let viejaAsignatura = viejasAsignaturas.find(function (obj) { return obj.codigo === asignBBDD.codigo; });
                     //asignatura que está en la api pero es la primera vez que la metemos con su primera asignación
                     if (!viejaAsignatura) {

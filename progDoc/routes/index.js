@@ -27,6 +27,20 @@ let enumsPD = require('../enumsPD');
 
 
 router.all('*', function(req,res,next){
+  //actualizo la sesion el planID y el departamento seleccionado
+  let planID = req.query.planID;
+  if (!planID) {
+    planID = req.session.planID
+  }
+  if (!planID) {
+    planID = "09TT"
+  }
+  let departamentoID = req.query.departamentoID;
+  if (!departamentoID) {
+    departamentoID = req.session.departamentoID
+  }
+  req.session.planID = planID
+  req.session.departamentoID = departamentoID
   //roles que pueden hacer todo son admin y subdirector de posgrado
   res.locals.rols = [];
   if (process.env.DEV === 'true') {
@@ -282,10 +296,11 @@ router.get('/coordinador/horarios', menuProgDocController.getProgramacionDocente
       [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
   });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols,horarioController.getHorario);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, horarioController.getHorario);
 
 
 router.get('/coordinador/examenes', menuProgDocController.getProgramacionDocente, function (req, res, next) {
+  
   res.locals.rols.push({
     rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
       [{ condicion: 'estadoExamenes', resultado: estados.estadoExamen.abierto }, { condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
@@ -580,7 +595,7 @@ router.get('/cumplimentar/calendario', function (req, res, next) {
     rol: enumsPD.rols.CoordinadorTitulacion, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: null, condiciones:
       []
   });
-  
+   
   next();
 }, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols,  calendarioController.anoDeTrabajo, calendarioController.eventosPlanDiccionario, calendarioController.eventosDiccionario, calendarioController.getCalendarioPlan)
 
