@@ -336,7 +336,7 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
 
                         }
                         
-                    } //asignatura que cambia de cuatrimestre (aunque cambie de 1S a I o 2S a I) o curso solo meto los profesores en el primer grupo y sin repetirh y no meto horarios
+                    } //asignatura que cambia de cuatrimestre (aunque cambie de 1S a I o 2S a I) o curso meto los profesores en todos los grupos y sin repetir y no meto horarios
                     else if (apiAsignaturas[asignBBDD.codigo] && cambioAsignatura) {
                         //necesito As para obtener la info actualizada de curso, tipo y semestre
                         let As = cambioAsignaturas.find(function (obj){return obj.codigo === asignBBDD.codigo;})

@@ -665,7 +665,7 @@
                     fechaInicio = document.getElementById("inicioEvento").value;
                 }
                 let fechaFin = document.getElementById("finEvento").value;
-                if(new Date(fechaFin) - new Date(fechaInicio) <= 0){
+                if(new Date(fechaFin) - new Date(fechaInicio) < 0){
                     document.getElementById("mensajeErrorEvento").innerHTML = "La fecha final debe ser posterior a la de inicio."
                     document.getElementById("mensajeErrorEvento").style.display = "flex";
                     return;
@@ -681,7 +681,7 @@
                             return;
                         }
                     }
-                    if(document.getElementById("tipoDeExamen").value == "ordinario"){  
+                    if(document.getElementById("tipoDeExamen").value.toLowerCase() == "ordinario"){
                         evento += " ordinarios";
                     }else{
                         evento += " extraordinarios";

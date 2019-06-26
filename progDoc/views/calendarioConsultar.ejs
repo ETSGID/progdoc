@@ -525,7 +525,7 @@
                     let fechaInicio = document.getElementById("fechaInicio").value;
                     let fechaFin = document.getElementById("finEvento").value;
                     
-                    if(new Date(fechaFin) - new Date(fechaInicio) <= 0){
+                    if(new Date(fechaFin) - new Date(fechaInicio) < 0){
                         document.getElementById("mensajeErrorEvento").innerHTML = "La fecha final debe ser posterior a la de inicio."
                         document.getElementById("mensajeErrorEvento").style.display = "flex";
                         return;

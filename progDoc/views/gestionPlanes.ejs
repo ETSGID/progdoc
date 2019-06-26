@@ -23,5 +23,9 @@
 <%}%>
 <script>
 let path = <%-JSON.stringify(path)%>
+/**
+*para poner siempre el path inicial y no que quede el de otra ruta al darle a guardar
+*evitas que si recarga la pagina vuelva a hacer una accion que ya ha hecho
+*/
 window.history.pushState("", "", path)
 </script>

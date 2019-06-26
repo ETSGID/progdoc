@@ -1,7 +1,8 @@
-<form id="actualizarApiUpmForm" autocomplete="off" action="<%= actualizarpath %>" method="get" >
+<form id="actualizarApiUpmForm" autocomplete="off" action="<%= actualizarpath %>" method="post" >
       <span>Actualizar asignaturas API UPM</span>
-      <input type='submit'  class="btn btn-default" value='Actualizar'>
-    </form>
+      <input type='submit'  class="btn btn-default" value='Ver cambios'>
+      <input type='hidden' name='aplicarCambios'  value=1>
+</form>
     <%if(actualizar){%>
     <br>
     <div>
@@ -108,4 +109,20 @@
         </tbody>
     </table>
     </div>
+    <%if(actualizar == 1){%>
+    <form id="actualizarApiUpmForm" autocomplete="off" action="<%= actualizarpath %>" method="post">
+    <input type='submit'  class="btn btn-default" value='Aplicar cambios'>
+    <button type="button"  class="btn btn-default" onclick="Volver('<%=path%>')">Cancelar</button>
+    <input type='hidden' name='aplicarCambios'  value=2>
+    </form>
+    <%}%>
+    <%if(actualizar == 2){%>
+    <p class="incidencia">Cambios aplicados</p>
+    <%}%>
 <%}%>
+
+<script>
+function Volver(cancelarpath){
+  window.location.replace(cancelarpath);
+}
+</script>

@@ -753,7 +753,7 @@
                 }
                 let fechaFin = document.getElementById("finEvento").value;
                 let editable = editableCheck.checked;
-                if(new Date(fechaFin) - new Date(fechaInicio) <= 0){
+                if(new Date(fechaFin) - new Date(fechaInicio) < 0){
                     document.getElementById("mensajeErrorEvento").innerHTML = "La fecha final debe ser posterior a la de inicio."
                     document.getElementById("mensajeErrorEvento").style.display = "flex";
                     return;
@@ -769,7 +769,7 @@
                             return;
                         }
                     }
-                    if(document.getElementById("tipoDeExamen").value == "ordinario"){  
+                    if(document.getElementById("tipoDeExamen").value.toLowerCase() == "ordinario"){  
                         evento += " ordinarios";
                     }else{
                         evento += " extraordinarios";
@@ -782,7 +782,6 @@
                 }else if(document.getElementById("tipoDeEvento").value == "navidades"){
                     evento = "festivo//Periodo festivo de navidades"
                 }
-
                 
                 let url = "<%= contextPath %>/gestion/calendario/eventoGeneral"
                 url += "?evento=" + evento + "&fechaInicio=" + fechaInicio + "&fechaFin=" + fechaFin + "&editable=" + editable + "&identificador=" + identificador;

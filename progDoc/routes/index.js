@@ -531,12 +531,34 @@ router.get("/gestion/planes", function (req, res, next) {
   next();
 }, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, gestionPlanesController.getGestionPlanes);
 
-router.get("/gestion/actualizarPlanApi", function (req, res, next) {
-  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+router.post("/gestion/actualizarPlanApi", function (req, res, next) {
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
+  });
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+  });
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.listo }]
+  });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionPlanesController.updateAsignaturasApiUpm, gestionPlanesController.getGestionPlanes);
 router.post("/gestion/cambiarEstadoProgDoc", function (req, res, next) {
-  res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
+  });
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.abierto }]
+  });
+  res.locals.rols.push({
+    rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.listo }]
+  });
   next();
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionPlanesController.updateEstadoProgDoc);
 
