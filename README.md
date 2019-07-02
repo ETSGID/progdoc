@@ -129,10 +129,14 @@ El puerto en el que corre la aplicación dentro del contenedor es el `3000` (Ver
 Existen dos bases de datos una para almacenar las sesiones y otra con la información de la aplicación. Por ahora la conexión es a travéś de una red privada.
 Deben configurarse los archivos donde se le pase las variables de entorno para la creación y conexión de la aplicación
 
-## Almacenamiento de pdfs
+## Almacenamiento de pdfs y csv
 Los pdfs se almacenan en el volumen progdoc:/storage/progdoc
 Si se desea cambiar la carpeta: `/storage/progdoc/` debe hacerse tanto en `progDoc.env` como en `docker-compose.yml`
-Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/progdoc/pdfs/`
+Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/progdoc/pdfs/
+
+## Gestor de archivos
+La configuración del gestor de archivos se realiza en el fichero de confguración `/progDoc/public/config/filemanager.config.json` y en concreto en la línea `"connectorUrl"` debe indicarse el `contexto` + `"archivos/filemanager"`.
+A modo de ejemplo `"connectorUrl": "/pdi/progdoc/archivos/filemanager"`
 
 ## Ejecución en producción
 Una vez configuradas las variables de entorno y el puerto correctamente, para desplegar la aplicación, hay que ir al directorio `progDoc`, y desde ahí ejecutar el siguiente comando:
