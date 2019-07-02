@@ -132,7 +132,7 @@ Deben configurarse los archivos donde se le pase las variables de entorno para l
 ## Almacenamiento de pdfs y csv
 Los pdfs se almacenan en el volumen progdoc:/storage/progdoc
 Si se desea cambiar la carpeta: `/storage/progdoc/` debe hacerse tanto en `progDoc.env` como en `docker-compose.yml`
-Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/progdoc/pdfs/
+Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/progdoc/pdfs/`
 
 ## Gestor de archivos
 La configuración del gestor de archivos se realiza en el fichero de confguración `/progDoc/public/config/filemanager.config.json` y en concreto en la línea `"connectorUrl"` debe indicarse el `contexto` + `"archivos/filemanager"`.
