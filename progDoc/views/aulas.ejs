@@ -10,17 +10,18 @@
             
             
         </h2>
-        <select class="form-control form-control-lg" id="anoSelector" onchange="changeAno()" style="margin-bottom: 1em;">
+        <select id="anoSelector" onchange="changeAno()" style="margin-bottom: 1em;">
                 <option value="<%=ano2%>" selected><%=ano2.substring(2,5)%>/<%= parseInt(ano2.substring(2,5)) + 1%></option> 
                 <option value="<%=ano1%>" ><%=ano1.substring(2,5)%>/<%= parseInt(ano1.substring(2,5)) + 1%></option> 
         </select>
         
-        <select class="form-control form-control-lg" id="cuatrimestreSelector" onchange="changeCuatrimestre()" style="margin-bottom: 1em;">
+        <select id="cuatrimestreSelector" onchange="changeCuatrimestre()" style="margin-bottom: 1em;">
             <option selected>Primer cuatrimestre</option>
             <option>Segundo cuatrimestre</option>
         </select>
-        
+        <div class="autocomplete" style="width:500px;">
         <input type="text" id="buscador" onkeypress="buscadorOnKeyPress(event)" placeholder="buscar..."/>
+        </div>
         <div id="aulas1">
         <%for (let i=0 ; i<aulas1.length; i++){%>
             <div id="div-1-<%=aulas1[i] %>">

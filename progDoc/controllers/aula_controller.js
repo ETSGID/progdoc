@@ -20,12 +20,11 @@ exports.getAulas = async function (req, res, next) {
         ano = String(parseInt(ano) - 1);
     }
     req.ano_mostrar = String(parseInt(ano) + 1);
-        
-    if(anoSeleccionado === undefined){
-        anoSeleccionado = ano;
-    }
     let ano1 = ano;
     let ano2 = parseInt(ano) + 1;
+    if (anoSeleccionado === undefined) {
+        anoSeleccionado = ano2;
+    }
     let ano_codigo = anoSeleccionado + String(parseInt(anoSeleccionado) + 1).substring(2,4);
     let planes = res.locals.planEstudios.map( (obj) => {
         return obj.codigo

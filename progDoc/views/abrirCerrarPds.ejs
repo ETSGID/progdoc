@@ -9,8 +9,10 @@
 <table class="table" style="width:70%">
 <tbody>
 <% for(let i=0; i < pds.length; i++) { %> 
-<tr>
-
+<% 
+let pdAnterior = pdsAnteriores.find(function (obj) { return obj.PlanEstudioId === pds[i].PlanEstudioId })
+let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnterior && pdAnterior.estadoProGDoc === estadosProgDoc.incidencia)) ? "incidencia" : ""%>
+<tr class="<%=incidencia%>">
   <% if (pds[i].nombre !== null) { %>
     <th><span title="<%=pds[i].nombreCompleto%> (<%=pds[i].PlanEstudioId%>)"><%=pds[i].nombre%></span></th>                 
   <% } else { %>
@@ -120,10 +122,14 @@
       <%}%>
     
   <% }  else if(pds[i].estadoProGDoc === estadosProgDoc.listo) { %>
-    <% let pdAnterior = pdsAnteriores.find(function (obj) { return obj.PlanEstudioId === pds[i].PlanEstudioId }) %>
-    <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>"> 
+    <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
+    <% if (pdAnterior && pdAnterior.estadoProGDoc === estadosProgDoc.incidencia){ %>
+    <td><%=pdAnterior.anoAcademico%></td>
+    <td><%=pdAnterior.semestre%></td>
+    <%}else{%>
     <td><%=pds[i].anoAcademico%></td>
     <td><%=pds[i].semestre%></td>
+    <%}%> 
     <td>
       <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
@@ -161,8 +167,13 @@
   <% } else if(pds[i].estadoProGDoc === estadosProgDoc.abierto) { %>
     <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>"> 
     <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>"> 
+    <% if (pdAnterior && pdAnterior.estadoProGDoc === estadosProgDoc.incidencia){ %>
+    <td><%=pdAnterior.anoAcademico%></td>
+    <td><%=pdAnterior.semestre%></td>
+    <%}else{%>
     <td><%=pds[i].anoAcademico%></td>
     <td><%=pds[i].semestre%></td>
+    <%}%> 
     <td>
       <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
@@ -171,8 +182,7 @@
       </form>
     </td>
     <td>
-      <% let pdAnterior = pdsAnteriores.find(function (obj) { return obj.PlanEstudioId === pds[i].PlanEstudioId })
-        if (pdAnterior){ %>
+      <%  if (pdAnterior){ %>
           <form id="plan_<%=pdAnterior.PlanEstudioId%>_incidencia" action="/hola" method="post">
           <input type="hidden" name="plan" value="<%=pdAnterior.PlanEstudioId%>">
           <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pdAnterior.identificador%>">
@@ -193,61 +203,8 @@
         <%}%>
     </td>
   <% }else if(pds[i].estadoProGDoc === estadosProgDoc.incidencia){%>
-      <% switch(pds[i].semestre){
-      case '1S' : %>
-         <td>
-         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control" title="Debe cerrar antes la incidencia para poder abrir una nueva programación docente" disabled>
-            <option value='<%=pds[i].anoAcademico%>'><%=pds[i].anoAcademico%></option>
-         </select>
-        </td>
-        <td>
-         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control" title="Debe cerrar antes la incidencia para poder abrir una nueva programación docente" disabled>
-            <option value='2S'>2S</option>
-         </select>
-        </td>
-        <% break;
-        case '2S' : %>
-         <td>
-         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control" title="Debe cerrar antes la incidencia para poder abrir una nueva programación docente" disabled>
-            <option value="<%=pds[i].siguienteAnoAcademico%>"><%=pds[i].siguienteAnoAcademico%></option>
-         </select>
-        </td>
-        <td>
-         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control" title="Debe cerrar antes la incidencia para poder abrir una nueva programación docente"disabled>
-            <option value='1S'>1S</option>
-            <option value='I'>I</option>
-         </select>
-        </td>
-        <% break;
-      case 'I' : %>
-         <td>
-         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control" title="Debe cerrar antes la incidencia para poder abrir una nueva programación docente" disabled>
-            <option value="<%=pds[i].siguienteAnoAcademico%>"><%=pds[i].siguienteAnoAcademico%></option>
-         </select>
-        </td>
-        <td>
-         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control" title="Debe cerrar antes la incidencia para poder abrir una nueva programación docente" disabled>
-            <option value='I'>I</option>
-            <option value='1S'>1S</option>
-         </select>
-        </td>
-        <% break;
-      case null : %>
-        <td>
-         <select id="anoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" class="form-control" title="Debe cerrar antes la incidencia para poder abrir una nueva programación docente" disabled>
-            <option value='<%=anos[0]%>'><%=anos[0]%></option>
-            <option value='<%=anos[1]%>'><%=anos[1]%></option>
-         </select>
-        </td>
-        <td>
-         <select id="semestre_<%=pds[i].PlanEstudioId%>" name="semestre" class="form-control" title="Debe cerrar antes la incidencia para poder abrir una nueva programación docente" disabled>
-            <option value='I'>I</option>
-            <option value='1S'>1S</option>
-            <option value='2S'>2S</option>
-         </select>
-        </td>
-        <% break; 
-    }%>      
+      <td><%=pds[i].anoAcademico%></td>
+      <td><%=pds[i].semestre%></td>    
     <td>
       <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  

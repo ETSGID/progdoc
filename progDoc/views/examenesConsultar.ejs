@@ -146,8 +146,8 @@ if(pdID && periodos){
 anoInicial = 2000+ Number(pdID.split("_")[2][2]+""+pdID.split("_")[2][3])
 anoFinal = 2000+ Number(pdID.split("_")[2][4]+""+pdID.split("_")[2][5])
 //las fecha limite para poner los exámenes
-fechasLimite ={S1_O:["01/01/"+anoFinal, "28/02/"+anoFinal], S1_E:["01/06/"+anoFinal,"31/07/"+anoFinal], 
-S2_O:["01/05/"+anoFinal,"31/06/"+anoFinal], S2_E:["01/06/"+anoFinal,"31/07/"+anoFinal]}
+fechasLimite ={S1_O:["01/01/"+anoFinal, "31/03/"+anoFinal], S1_E:["01/06/"+anoFinal,"31/07/"+anoFinal], 
+S2_O:["01/05/"+anoFinal,"31/07/"+anoFinal], S2_E:["01/06/"+anoFinal,"31/07/"+anoFinal]}
 }
 
 //inicio el calendario
@@ -236,11 +236,14 @@ function mostrarCalendario(id){
     let found=false;
     let periodo = id.split("_")[1]
     let period = franjas.find(function (obj) { return obj.periodo === periodo });
+    //compruebo sinFranjas porque cuando no hay franjas period.franjas.length seria 0 y no entraria en el bucle
+    let sinFranjas = period.franjas.length === 0 ? 1 : 0;
+    let numFranjas =  period.franjas.length === 0 ? 1 : period.franjas.length;
     let tableDatos = document.getElementById("table_"+periodo)
     let buttonCalendario = document.getElementById('buttonCalendario_div_'+periodo)
     let text = buttonCalendario.innerHTML.trim();
     let primeroEncontrado = false;
-    let ultimoEncontrado = -1;
+    let ultimoEncontrado = false;
     let periodoKey;
     for(let i in periodos){
         if(periodos[i] === periodo){
@@ -277,10 +280,32 @@ function mostrarCalendario(id){
                 ex => (ex.fecha === fechaFila)
                 );
                 coincidenciasFecha.length === 0 ? primeroEncontrado = false : primeroEncontrado = true;
+                //pinta el mes en la primera fila que tiene examenes excepto si es 1 que lo pinta abajo
+                if (primeroEncontrado && getDia(fechaFila)[2] !== 1){
+                let rowMes = tableBody.insertRow();
+                rowMes.classList.add("noExamen")
+                let cellMes = rowMes.insertCell();
+                cellMes.colSpan=""+(cursos.length+1);
+                cellMes.style.textAlign="center"
+                //pinto el mes
+                cellMes.innerHTML = getDia(fechaFila)[1]
+                }
             }
             if(primeroEncontrado){
-                //compruebo sinFranjas porque cuando no hay franjas period.franjas.length seria 0 y no entraria en el bucle
-                let sinFranjas = period.franjas.length === 0 ? 1 : 0;
+                if(getDia(fechaFila)[2] === 1){
+                    let rowMes = tableBody.insertRow();
+                    rowMes.classList.add("noExamen")
+                    let cellMes = rowMes.insertCell();
+                    cellMes.colSpan=""+(cursos.length+1)
+                    cellMes.style.textAlign="center"
+                    //pinto el mes
+                    cellMes.innerHTML = getDia(fechaFila)[1] 
+                }
+                /**noEncontrado se usa para borrar las ultimas filas que no tengan contenido
+                noEncontrado puede valer desde 1 hasta el numero de franjas
+                se borraran un dia completo si todas las franjas estan vacias
+                **/
+                let noEncontrado = 1;      
                 for(let k=0; k<(period.franjas.length || sinFranjas); k++){
                     let row = tableBody.insertRow();
                     let cell0 = row.insertCell();
@@ -292,8 +317,9 @@ function mostrarCalendario(id){
                     }
                     //la fecha la pinto centrada
                     if(Math.trunc(period.franjas.length/2)===k){
-                        cell0.innerHTML = getDia(fechaFila)+ " " +fechaFila.split("/")[0];
-                    }                    
+                        cell0.innerHTML = getDia(fechaFila)[0]+ " " +fechaFila.split("/")[0];
+                    }
+                    let sinCoincidencias = true;              
                     for(let l=0; l<cursos.length; l++){
                         let cell = row.insertCell();
                         cell.innerHTML ="&nbsp"
@@ -306,27 +332,31 @@ function mostrarCalendario(id){
                             if(m>0){
                                 cell.innerHTML+= " / "+coincidencias[m].asignatura;
                             }else{
-                                ultimoEncontrado = tableBody.rows.length -1;
+                                sinCoincidencias = false
                                 cell.innerHTML+= coincidencias[m].asignatura;
                             }
                         }
-
                     }
+                    if(sinCoincidencias) row.classList.add("noExamen"+(noEncontrado++))
                 }       
  
             }
 
-            fechaFila = aumentarDia(fechaFila)  
+            fechaFila = aumentarDia(fechaFila)
         }
         //borro las últimas filas que no hay
-        if(ultimoEncontrado !== -1){
-            if(period.franjas.length > 0){
-                if((ultimoEncontrado+1)%period.franjas.length > 0){
-                    ultimoEncontrado += period.franjas.length-(ultimoEncontrado+1)%period.franjas.length
-                }
-            }
-            for (let n=tableBody.rows.length -1; n>ultimoEncontrado; n--){
+        let n=tableBody.rows.length -1
+        while(!ultimoEncontrado && n >= 0){
+            if (tableBody.rows[n].classList.contains('noExamen')){
                 tableBody.deleteRow(n);
+                n--;
+            }else if(tableBody.rows[n].classList.contains('noExamen'+numFranjas)){
+                for (let p=0; p<numFranjas; p++){
+                    tableBody.deleteRow(n);
+                    n--;
+                }
+            }else{
+                ultimoEncontrado = true;
             }
         }
         buttonCalendario.innerHTML = 'Ocultar Calendario'
@@ -367,8 +397,10 @@ function getDia(fecha) {
     weekday[4] = "J";
     weekday[5] = "V";
     weekday[6] = "S";
+    let month= ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
-    return weekday[d.getDay()];  
+
+    return [weekday[d.getDay()], month[d.getMonth()], d.getDate()];  
 }
 
 </script>
