@@ -29,13 +29,13 @@
 <%}else{%>
     <% if(estadoProfesores[departamentoID] === estadosProfesor.abierto && estadoProgDoc === estadosProgDoc.abierto ) { %>
     <form action="<%= aprobarpath %>" method="post" onsubmit="return Enviar()" class="myHeader2 sticky">
-    <input type='submit'  class="btn btn-default" value='Aprobar responsable docente'>
+    <input type='submit'  class="btn btn-default" value='Aprobar Responsable Docente'>
     </form>
     <% } %>
     <% if(estadoProfesores[departamentoID] === estadosProfesor.aprobadoResponsable && estadoProgDoc === estadosProgDoc.abierto) { %>
     <form id="formDecision" action="<%= aprobarpath %>" method="post" class="myHeader2 sticky">
     <input id="decision" type="hidden" name="decision" value='aceptar'>
-    <button type="button"  class="btn btn-default" onclick="Decidir('aceptar')">Aprobar Coordinador titulación</button>
+    <button type="button"  class="btn btn-default" onclick="Decidir('aceptar')">Aprobar Director Departamento</button>
     <button type="button"  class="btn btn-default" onclick="Decidir('rechazar')">No aprobar</button>
     </form>
     <% } if(estadosProgDoc === estadosProgDoc.incidencia){%>

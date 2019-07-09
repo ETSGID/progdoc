@@ -1,0 +1,44 @@
+<tr>
+<td title="<%=buscaDep(departamentos,departamento).nombre.toLowerCase()%> (<%=departamento%>)">
+<%=buscaDep(departamentos,departamento).nom%>
+</td>
+<td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
+<form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+<input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
+<% let prof = buscaPers(profesores, r.PersonaId) %>
+<p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+<input id="<%=rol%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
+</form>
+</td>
+<td>
+<div id="buttons_<%=rol%>_<%=index%>" style="visibility:hidden">
+<button type="button"  class="btn btn-default" onclick="Guardar('<%=rol%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
+<button type="button"  class="btn btn-default" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
+<button type="button"  class="btn btn-default" onclick="Eliminar('<%=rol%>_<%=index%>')">Eliminar</button>
+<div>
+</td>
+</tr>
+<%let rol2 = rolesEnum.ResponsableDocenteX2 
+delegado = filterByRol(roles, rol2, plan, departamento)
+if (delegado.length === 0) prof = buscaPers(profesores, null)
+else prof = buscaPers(profesores, delegado[0].PersonaId);
+%>
+<tr>
+<td style="border: 0; padding-left:5em">
+<em>Delegado en<em>
+</td>
+<td id="td_<%=rol2%>_<%=index%>" onclick="mostrar('<%=rol2%>_<%=index%>')" >
+<form id="<%=rol2%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+<input type="hidden" name="rol" value="<%=rol2%>_<%=plan%>_<%=departamento%>">
+<p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
+<input id="<%=rol2%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
+</form>
+</td>
+<td>
+<div id="buttons_<%=rol2%>_<%=index%>" style="visibility:hidden">
+<button type="button"  class="btn btn-default" onclick="Guardar('<%=rol2%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
+<button type="button"  class="btn btn-default" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
+<button type="button"  class="btn btn-default" onclick="Eliminar('<%=rol2%>_<%=index%>')">Eliminar</button>
+<div>
+</td>
+</tr>

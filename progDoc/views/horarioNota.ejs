@@ -20,7 +20,6 @@
 
 //id de curso semestre grupo y notaId sirve para saber si es editar (id) o añadir una nueva (false)
 function anadirNota(id,notaId,asignaturaId){
-    console.log(asignaturaId)
   notaId === false ?  notaId = false : notaId = Number(notaId)
   let div = document.createElement('div');
   let curso = id.split("_")[1];

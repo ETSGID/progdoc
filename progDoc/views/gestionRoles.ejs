@@ -35,6 +35,14 @@ if(!dep.acronimo){
 }
 return dep
 }%>
+<% let buscaDep2 = function (departamento){
+if(!departamento.acronimo){
+    departamento.nom = departamento.codigo
+}else{
+    departamento.nom= departamento.acronimo
+}
+return departamento
+}%>
 <h3>Gestión Roles Aplicación</h3>
 <div id='hermanoNuevoProfesorForm'>
     <h3><em>Roles comunes a todas las titulaciones</em></h3>
@@ -45,7 +53,9 @@ return dep
             let departamento = null
             let plan = null
             let rols = filterByRol(roles, rol, plan, departamento)
-            rols.forEach(function(r,index){ %>
+            let r = rols.length > 0 ? rols[0] : {}
+            let index = 0;
+            %>
                 <tr>
                 <td>
                 Jefe de Estudios
@@ -66,13 +76,14 @@ return dep
                 <div>
                 </td>
                 </tr>
-            <%})%>
              <% 
             rol = rolesEnum.SecretarioTitulacion
             departamento = null
             plan = null
             rols = filterByRol(roles, rol, plan, departamento)
-            rols.forEach(function(r,index){ %>
+            r = rols.length > 0 ? rols[0] : {}
+            index = 0;
+            %>
                 <tr>
                 <td>
                 Secretaría Jefe de Estudios
@@ -80,7 +91,7 @@ return dep
                 <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
                 <form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
                 <input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
-                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <%prof = buscaPers(profesores, r.PersonaId) %>
                 <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
                 <input id="<%=rol%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
                 </form>
@@ -92,15 +103,15 @@ return dep
                 <button type="button"  class="btn btn-default" onclick="Eliminar('<%=rol%>_<%=index%>')">Eliminar</button>
                 <div>
                 </td>
-                </tr>
-            <%})%>
-           
+                </tr>           
             <% 
             rol = rolesEnum.SubdirectorPosgrado
             departamento = null
             plan = null
             rols = filterByRol(roles, rol, plan, departamento)
-            rols.forEach(function(r,index){ %>
+            r = rols.length > 0 ? rols[0] : {}
+            index = 0;
+            %>
                 <tr>
                 <td>
                 SubdirectorPosgrado
@@ -108,7 +119,7 @@ return dep
                 <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
                 <form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
                 <input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
-                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <%prof = buscaPers(profesores, r.PersonaId) %>
                 <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
                 <input id="<%=rol%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
                 </form>
@@ -121,7 +132,6 @@ return dep
                 <div>
                 </td>
                 </tr>
-            <%})%>
             <tr>
             <td><u>Directores departamentos</u></td>
             <td>&nbsp</td>
@@ -129,14 +139,15 @@ return dep
             </tr>
             <%
             rol = rolesEnum.DirectorDepartamento 
-            departamento = null
             plan = null
+            departamentos.forEach(function(d,index){
+            let departamento = d.codigo
             let directores = filterByRol(roles, rol, plan, departamento)
-            directores.forEach(function(r,index){ %>
-                <% departamento = r.DepartamentoCodigo%>
+            r = directores.length > 0 ? directores[0] : {}
+            %>
                 <tr>
                 <td title="<%=buscaDep(departamentos,departamento).nombre.toLowerCase()%> (<%=departamento%>)">
-                <%=buscaDep(departamentos,departamento).nom%>
+                <%=buscaDep2(d).nom%>
                 </td>
                 <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
                 <form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
@@ -208,7 +219,9 @@ return dep
             departamento = null
             plan = planID
             rols = filterByRol(roles, rol, plan, departamento)
-            rols.forEach(function(r,index){ %>
+            r = rols.length > 0 ? rols[0] : {}
+            index = 0;
+            %>
                 <tr>
                 <td>
                 Coordinador Titulación
@@ -216,7 +229,7 @@ return dep
                 <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
                 <form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
                 <input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
-                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <%prof = buscaPers(profesores, r.PersonaId) %>
                 <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
                 <input id="<%=rol%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
                 </form>
@@ -252,8 +265,7 @@ return dep
             <button type="button"  class="btn btn-default" onclick="Eliminar('<%=rol2%>_<%=index%>')">Eliminar</button>
             <div>
             </td>
-            </tr>
-            <%})%>         
+            </tr>       
             <tr>
             <td><u>Responsables Docentes</u></td>
             <td>&nbsp</td>
@@ -263,54 +275,21 @@ return dep
             rol = rolesEnum.ResponsableDocente
             departamento = null
             plan = planID
+            <!--Si hay progdoc coge los departamentos responsables sino coge lo que haya en la bbdd-->
+            if(progDoc){
+                departamentosResponsables.forEach(function(d,index){
+                departamento = d.codigo
+                responsables = filterByRol(roles, rol, plan, departamento)
+                r = responsables.length > 0 ? responsables[0] : {} %>
+                <%- include rolesResponsableDocente.ejs %>
+                <%})
+            }else{
             responsables = filterByRol(roles, rol, plan, departamento) 
             responsables.forEach(function(r,index){ %>
                 <% departamento = r.DepartamentoCodigo%>
-                <tr>
-                <td title="<%=buscaDep(departamentos,departamento).nombre.toLowerCase()%> (<%=departamento%>)">
-                <%=buscaDep(departamentos,departamento).nom%>
-                </td>
-                <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
-                <form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
-                <input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
-                <% let prof = buscaPers(profesores, r.PersonaId) %>
-                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
-                <input id="<%=rol%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
-                </form>
-                </td>
-                <td>
-                <div id="buttons_<%=rol%>_<%=index%>" style="visibility:hidden">
-                <button type="button"  class="btn btn-default" onclick="Guardar('<%=rol%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
-                <button type="button"  class="btn btn-default" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-                <button type="button"  class="btn btn-default" onclick="Eliminar('<%=rol%>_<%=index%>')">Eliminar</button>
-                <div>
-                </td>
-                </tr>
-            <%let rol2 = rolesEnum.ResponsableDocenteX2 
-            delegado = filterByRol(roles, rol2, plan, departamento)
-            if (delegado.length === 0) prof = buscaPers(profesores, null)
-            else prof = buscaPers(profesores, delegado[0].PersonaId);
-            %>
-            <tr>
-            <td style="border: 0; padding-left:5em">
-            <em>Delegado en<em>
-            </td>
-            <td id="td_<%=rol2%>_<%=index%>" onclick="mostrar('<%=rol2%>_<%=index%>')" >
-            <form id="<%=rol2%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
-            <input type="hidden" name="rol" value="<%=rol2%>_<%=plan%>_<%=departamento%>">
-            <p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
-            <input id="<%=rol2%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">
-            </form>
-            </td>
-            <td>
-            <div id="buttons_<%=rol2%>_<%=index%>" style="visibility:hidden">
-            <button type="button"  class="btn btn-default" onclick="Guardar('<%=rol2%>_<%=plan%>_<%=departamento%>','<%=nuevopath%>')" disabled>Aceptar</button>
-            <button type="button"  class="btn btn-default" onclick="Volver('<%=cancelarpath%>')">Cancelar</button>
-            <button type="button"  class="btn btn-default" onclick="Eliminar('<%=rol2%>_<%=index%>')">Eliminar</button>
-            <div>
-            </td>
-            </tr>
-            <%})%>
+                <%- include rolesResponsableDocente.ejs %>
+            <%})
+            }%>
         </tbody>
     </table>
 </div> 

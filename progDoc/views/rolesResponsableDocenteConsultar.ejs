@@ -1,0 +1,26 @@
+<tr>
+<td title="<%=buscaDep(departamentos,departamento).nombre.toLowerCase()%> (<%=departamento%>)">
+<%=buscaDep(departamentos,departamento).nom%>
+</td>
+<td id="td_<%=rol%>_<%=index%>">
+<% let prof = buscaPers(profesores, r.PersonaId) %>
+<p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+</td>
+<td>
+</td>
+</tr>
+<%let rol2 = rolesEnum.ResponsableDocenteX2 
+delegado = filterByRol(roles, rol2, plan, departamento)
+if (delegado.length === 0) prof = buscaPers(profesores, null)
+else prof = buscaPers(profesores, delegado[0].PersonaId);
+%>
+<tr>
+<td style="border: 0; padding-left:5em">
+<em>Delegado en<em>
+</td>
+<td id="td_<%=rol2%>_<%=index%>">
+<p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
+</td>
+<td>
+</td>
+</tr>

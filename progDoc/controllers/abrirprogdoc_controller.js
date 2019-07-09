@@ -41,7 +41,6 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
     let pdId2 = "no programacion"
 
     res.locals.departamentosResponsables = [];
-    let promisesRoles = [];
     let planBBDD = res.locals.planEstudios.find(function (obj) { return obj.codigo === plan; });
 
     axios.get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/plan.json/" + plan + "/asignaturas?anio=" + ano)
@@ -592,20 +591,6 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
             })
         })
         .then(() => {
-            let pd = res.locals.identificador.split("_")[1];
-            //aqui es donde tienes que meter el metodo adyacente que te comprueba si esta el director de departamento no creado o no
-            promisesRoles.push(coordinadorTitulacion(pd));
-            res.locals.departamentosResponsables.forEach(function (dep) {
-                //aqui es donde tienes que meter el metodo adyacente que te comprueba si esta el responsableDocente creado o no
-                promisesRoles.push(responsablesDocentes(dep, pd));
-                //aqui es donde tienes que meter el metodo adyacente que te comprueba si esta el director de departamento no creado o no
-                promisesRoles.push(directoresDepartamento(dep));
-
-
-            });
-            return Promise.all(promisesRoles);
-        })
-        .then(() => {
             if ((viejasAsignaturas.length === 0 && nuevasAsignaturas.length === 0 && cambioAsignaturas.length === 0)) {
                 let err = new Error('Error en la información de Universitas XXI, ahora mismo no puede abrir esta programación docente');
                 throw err
@@ -643,6 +628,8 @@ function responsablesDocentes(departamento, pd) {
 
         })
 }
+ 
+//crea el rol si no existe ya no se usa pq se hacen dinámicamente en gestion roles
 function directoresDepartamento(departamento) {
 
     return models.Rol.findOrCreate(
@@ -654,6 +641,8 @@ function directoresDepartamento(departamento) {
         })
 
 }
+
+//crea el rol si no existe no se usa pq se hacen dinámicamente en gestion roles
 function coordinadorTitulacion(pd) {
 
     return models.Rol.findOrCreate(
@@ -978,6 +967,11 @@ exports.abrirCopiaProgDoc = function (req, res, next) {
         });
 
 }
+
+exports.responsablesDocentes = responsablesDocentes;
+exports.directoresDepartamento = directoresDepartamento;
+exports.coordinadorTitulacion = coordinadorTitulacion;
+
 
 
     /* es decir si una asignatura cambia de semestre o curso o itinerario se trata como una nueva. 

@@ -33,7 +33,7 @@
                    <option value="FranjaExamenes" title="FranjaExamenes">Franja Exámenes</option>      
                 </select>
                     <%if(estadoExamenes === estadosExamen.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
-                    <input type="submit"  class="btn btn-default" value='Aprobar Coordinador titulación'>
+                    <input type="submit"  class="btn btn-default" value='Aprobar Coordinador Titulación'>
                     <%}%>
                     <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
                     <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
@@ -182,8 +182,8 @@ if(pdID && periodos){
 anoInicial = 2000+ Number(pdID.split("_")[2][2]+""+pdID.split("_")[2][3])
 anoFinal = 2000+ Number(pdID.split("_")[2][4]+""+pdID.split("_")[2][5])
 //las fecha limite para poner los exámenes
-fechasLimite ={S1_O:["01/01/"+anoFinal, "31/03/"+anoFinal], S1_E:["01/06/"+anoFinal,"31/07/"+anoFinal], 
-S2_O:["01/05/"+anoFinal,"31/07/"+anoFinal], S2_E:["01/06/"+anoFinal,"31/07/"+anoFinal]}
+fechasLimite ={S1_O:["01/09/"+anoInicial, "31/07/"+anoFinal], S1_E:["01/09/"+anoInicial, "31/07/"+anoFinal], 
+S2_O:["01/09/"+anoInicial, "31/07/"+anoFinal], S2_E:["01/09/"+anoInicial, "31/07/"+anoFinal]}
 }
 
 //inicio el calendario
@@ -203,7 +203,8 @@ $(function() {
             format: "dd/mm/yyyy",
             clearBtn: true,
             startDate: fechasLimite.S1_O[0],
-            endDate: fechasLimite.S1_O[1]
+            endDate: fechasLimite.S1_O[1],
+            daysOfWeekDisabled:[0]
             
         });
         $('.dateExamen'+periodos.S1_E).datepicker({
@@ -214,7 +215,8 @@ $(function() {
             format: "dd/mm/yyyy",
             clearBtn: true,
             startDate: fechasLimite.S1_E[0],
-            endDate: fechasLimite.S1_E[1]
+            endDate: fechasLimite.S1_E[1],
+            daysOfWeekDisabled:[0]
             
         });
         $('.dateExamen'+periodos.S2_O).datepicker({
@@ -225,7 +227,10 @@ $(function() {
             format: "dd/mm/yyyy",
             clearBtn: true,
             startDate: fechasLimite.S2_O[0],
-            endDate: fechasLimite.S2_O[1]
+            endDate: fechasLimite.S2_O[1],
+            daysOfWeekDisabled:[0]
+
+
             
         });
         $('.dateExamen'+periodos.S2_E).datepicker({
@@ -236,7 +241,8 @@ $(function() {
             format: "dd/mm/yyyy",
             clearBtn: true,
             startDate: fechasLimite.S2_E[0],
-            endDate: fechasLimite.S2_E[1]
+            endDate: fechasLimite.S2_E[1],
+            daysOfWeekDisabled:[0]
             
         });     
     }

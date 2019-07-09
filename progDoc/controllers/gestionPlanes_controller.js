@@ -83,6 +83,9 @@ exports.updateAsignaturasApiUpm = function (req, res, next) {
     let tipoPD = menuProgDocController.getTipoPd(pdID);
     let planBBDD = res.locals.planEstudios.find(function (obj) { return obj.codigo === plan; });
     let promisesUpdate = [];
+
+    //si aparece una asignatura de un departamento que no tenia asignado debo meterla y al reves, igual se tiene que eliminar un departamento
+    let departamentosResponsables = []
     
     //el set para no tener elementos repetidos
     //los profesores se deben copiar a los nuevos grupos si cambia de semestre o año
@@ -104,7 +107,7 @@ exports.updateAsignaturasApiUpm = function (req, res, next) {
     axios.get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/plan.json/" + plan + "/asignaturas?anio=" + ano)
         .then(function (response) {
             apiAsignaturas = response.data;
-        return menuProgDocController.getGrupos(pdID)
+            return menuProgDocController.getGrupos(pdID)
         })
         .then(function(g){
             //los grupos de las nuevas asignatuas
@@ -190,8 +193,6 @@ exports.updateAsignaturasApiUpm = function (req, res, next) {
                             }
                         });
                         let departamentoResponsableCambio = as.DepartamentoResponsable === asignBBDD.DepartamentoResponsable ? false : true;
-
-
                         if (apiAsignatura['curso'] === "") {
                             hasCurso = false;
                         } else {
@@ -222,6 +223,11 @@ exports.updateAsignaturasApiUpm = function (req, res, next) {
                             whereEliminarHorario.AsignaturaId.push(identificador)
                             whereEliminarExamen.AsignaturaIdentificador.push(identificador)
                         } else if (nombreCambio || nombreInglesCambio || creditosCambio || tipoCambio || departamentoResponsableCambio || cursoCambio || semestreCambio) {
+                            //añado el departamentoResponsable si no estaba. Solo en las asignaturas nuevas que se añaden o las que permanecen
+                            let index = departamentosResponsables.indexOf(as.DepartamentoResponsable)
+                            if (index < 0 && as.DepartamentoResponsable) {
+                                departamentosResponsables.push(as.DepartamentoResponsable)
+                            }
                             cambioAsignaturas.push(as)
                             cambioAsignaturasAntigua.push(asignBBDD)
                             if(cursoCambio){
@@ -248,6 +254,11 @@ exports.updateAsignaturasApiUpm = function (req, res, next) {
                             as.identificador = asignBBDD.identificador
                         
                         } else {
+                            //añado el departamentoResponsable si no estaba. Solo en las asignaturas nuevas que se añaden o las que permanecen
+                            let index = departamentosResponsables.indexOf(as.DepartamentoResponsable)
+                            if (index < 0 && as.DepartamentoResponsable) {
+                                departamentosResponsables.push(as.DepartamentoResponsable)
+                            }
                             viejasAsignaturas.push(as)
                         }
                     } else {
@@ -353,6 +364,11 @@ exports.updateAsignaturasApiUpm = function (req, res, next) {
                             nuevaAsign.tipo = null;
                             break;
                     }
+                    //añado el departamentoResponsable si no estaba. Solo en las asignaturas nuevas que se añaden o las que permanecen
+                    let index = departamentosResponsables.indexOf(depResponsable)
+                    if (index < 0 && depResponsable) {
+                        departamentosResponsables.push(depResponsable)
+                    }
                     nuevasAsignaturas.push(nuevaAsign);
                 }
             }
@@ -436,7 +452,28 @@ exports.updateAsignaturasApiUpm = function (req, res, next) {
                 )
             })
             .then(() => {
-                next()
+                /**añado los nuevos o quito los departamentos que desaparecen en el plan. Si aparece uno nuevo se pone en cerrado
+                * el jefe de estudios debería retraer su estado
+                * si desaparece un departamentoResponsable también desaparecerá en el estado
+                **/
+                let estadoProfesores={}
+                let estadoTribunales={}
+                let nuevaEntrada = {};
+                departamentosResponsables.forEach(function (element) {
+                    estadoProfesores[element] = res.locals.progDoc['ProgramacionDocentes.estadoProfesores'][element] || estados.estadoProfesor.aprobadoDirector;
+                    estadoTribunales[element] = res.locals.progDoc['ProgramacionDocentes.estadoTribunales'][element] || estados.estadoTribunal.aprobadoDirector;
+                })
+                nuevaEntrada.estadoProfesores = estadoProfesores;
+                nuevaEntrada.fechaProfesores = new Date();
+                nuevaEntrada.estadoTribunales = estadoTribunales;
+                nuevaEntrada.fechaTribunales = new Date();
+                return models.ProgramacionDocente.update(
+                    nuevaEntrada, /* set attributes' value */
+                    { where: { identificador: pdID } } /* where criteria */
+                )    
+            })
+            .then(() => {
+                next();
             })
             .catch(function (error) {
                 console.log("Error:", error);

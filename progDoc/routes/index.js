@@ -501,12 +501,12 @@ router.post("/cerrarIncidenciaProgDoc", function (req, res, next) {
 }, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarIncidenciaProgDoc, calendarioController.anoDeTrabajoPDF, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF, examenController.getExamenes, examenController.generateCsvExamens, gestionController.cerrarProgDoc2);
 
 //consultarRoles
-router.get("/consultar/roles", menuProgDocController.getPlanes,gestionRoles.getRoles)
+router.get("/consultar/roles", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, gestionRoles.getRoles)
 //gestionRoles
 router.get("/gestionRoles", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionRoles.getRoles);
+}, menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, permisosControllerProgDoc.comprobarRols, gestionRoles.getRoles);
 //ruta para guardar
 
 router.post("/gestionRoles/guardarRoles", function (req, res, next) {

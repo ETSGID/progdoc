@@ -253,7 +253,7 @@ exports.abrirProgDoc = function (req, res, next) {
     if (!res.locals.permisoDenegado) {
         res.locals.departamentosResponsables.forEach(function (element) {
             estadoProfesores[element] = estados.estadoProfesor.abierto;
-            estadoTribunales[element] = estados.estadoProfesor.abierto;
+            estadoTribunales[element] = estados.estadoTribunal.abierto;
         })
         nuevaEntrada.estadoProfesores = estadoProfesores;
         nuevaEntrada.fechaProfesores = new Date();

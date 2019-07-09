@@ -4,6 +4,7 @@ let funciones = require('../funciones');
 let Sequelize = require('sequelize');
 let menuProgDocController = require('../controllers/menuProgDoc_controller')
 let enumsPD = require('../enumsPD');
+const op = Sequelize.Op;
 
 //funcion de getRoles para directores de departamentos jefe de estudios y subdirector de posgrado
 exports.getRoles = function (req, res, next) {
@@ -12,9 +13,17 @@ exports.getRoles = function (req, res, next) {
     let profesores = [];
     let cargos = []
     let programacionesDocentes = [];
+    let wherePlan = {}
+    wherePlan.PlanEstudioCodigo = [null, req.session.planID];
+
     //responsables docentes
     return models.Rol.findAll({
         attributes: ['rol', 'PlanEstudioCodigo', 'PersonaId', 'DepartamentoCodigo'],
+        where:{
+            PlanEstudioCodigo: {
+                [op.or]: wherePlan.PlanEstudioCodigo
+            }
+        },
         include: [{
             model: models.Persona,
             attributes: ['nombre', 'apellido'],
@@ -57,6 +66,8 @@ exports.getRoles = function (req, res, next) {
                 planID: req.session.planID,
                 planEstudios: res.locals.planEstudios,
                 menu: req.session.menu,
+                departamentosResponsables: res.locals.departamentosResponsables,
+                progDoc: res.locals.progDoc, 
                 //para añadir una persona al sistema no tiene por que ser un profesor.
                 onlyProfesor: false
             });
