@@ -429,7 +429,7 @@ exports.getCalendarioPlanConsultar = function(req, res, next){
     if(ano === null){
         req.session.submenu = "Calendario";
                     
-        res.render('calendarioCumplimentar', {
+        res.render('calendarioConsultar', {
             contextPath: app.contextPath,
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
@@ -696,7 +696,6 @@ exports.eventosPlanDiccionario = function (req, res, next){
     let editados = [];
 
     let planID = req.query.planID;
-
     if(planID === undefined || planID === "General"){
         next();
     }else{

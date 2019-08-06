@@ -7,6 +7,7 @@ let estados = require('../estados');
 let funciones = require('../funciones');
 let menuProgDocController = require('../controllers/menuProgDoc_controller')
 let enumsPD = require('../enumsPD');
+const moment = require('moment')
 
 
 
@@ -446,7 +447,10 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
             )
         })
         .then(() => {
-            //copio los examenes de asignaturas que no han cambiado en el año siguiente al mismo dia de la semana
+            //copio los examenes de asignaturas que no han cambiado en el año siguiente en el mismo dia desplazando los findes
+            //anteriorFecha se necesita para ver si se reinicia el offset en funcion addYear2
+            let anteriorFecha;
+            let offsetFinde = 0;
             return models.Asignatura.findAll({
                 where: wherePdsAnteriores,
                 include: [{
@@ -454,6 +458,10 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                     //left join
                     required: true
                 }
+                ],
+                order: [
+                    //el orden es muy importante para llamar a addYear2 y debe ser ascendente
+                    [Sequelize.literal('"Examens"."fecha"'), 'ASC'],
                 ],
                 raw: true
 
@@ -463,13 +471,14 @@ exports.abrirNuevaProgDoc = function (req, res, next) {
                     let asignaturaConExamen = viejasAsignaturas.find(function (obj) { return obj.codigo === ex.codigo; }) || cambioAsignaturas2.find(function (obj) { return (obj.codigo === ex.codigo && !obj.semestreCambio )});
                     if (asignaturaConExamen) {
                         let nuevoExamen = {};
-                        if (funciones.addYear(ex['Examens.fecha'])) {
+                        if (moment(funciones.formatFecha(ex['Examens.fecha']), 'DD/MM/YYYY').isValid()) {
                             //pongo el _a pq sino en el while de abajo podría quedarseme hasta el infinito
                             nuevoExamen.AsignaturaIdentificador = ex.codigo + "_a"; //este es el viejo después deberé de sustituirlo por el id nuevo no por el codigo el codigo para identificar
-                            nuevoExamen.fecha = funciones.addYear(ex['Examens.fecha'])
+                            [nuevoExamen.fecha, offsetFinde] = funciones.addYear2(ex['Examens.fecha'], anteriorFecha, offsetFinde)
                             nuevoExamen.periodo = ex['Examens.periodo'];
                             nuevoExamen.horaInicio = ex['Examens.horaInicio']
                             nuevoExamen.duracion = ex['Examens.duracion']
+                            anteriorFecha = ex['Examens.fecha']
                             let cuadraExamen = false;
                             switch (tipoPD) {
                                 case "1S":

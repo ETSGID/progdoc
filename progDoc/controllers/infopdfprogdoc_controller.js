@@ -83,7 +83,8 @@ function generatePDFFile (pdID, tipoPDF, calendario){
         anoFinal = 2000 + Number(pd['ProgramacionDocentes.anoAcademico'][4] + "" + pd['ProgramacionDocentes.anoAcademico'][5])
         semestre = pd['ProgramacionDocentes.semestre']
         pd.version = pd['ProgramacionDocentes.version']
-        pd.anoAcademico = pd['ProgramacionDocentes.anoAcademico']        
+        pd.anoAcademico = pd['ProgramacionDocentes.anoAcademico']
+        pd.semestre = menuProgDocController.getTipoPd(pdID)        
         return menuProgDocController.getProgramacionDocentesAnteriores(pdID.split("_")[1], pdID.split("_")[3], pdID.split("_")[2], pdID, null)
     }).then((pdis) => {
                 pdsAnteriores = pdis;

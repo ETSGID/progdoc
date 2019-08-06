@@ -243,7 +243,7 @@ function Abrir(formID,abrirPath){
   formSemestre.value = semestre;
   formAnoAcademico.value = anoAcademico;
   if (confirm("¿Está seguro de que quiere abrir la programación docente de " +planEstudioId+ " para el año " +anoAcademico+ " y semestre " +semestre+ "? No podrá deshacer esta acción")){
-    form.setAttribute('action', abrirPath);
+    form.setAttribute('action', abrirPath+"?planID="+planEstudioId);
     form.submit();
   }
 }
@@ -253,7 +253,7 @@ function Cerrar(formID,cerrarPath){
   let semestre = document.getElementById("ocultosemestre_"+planEstudioId).value;
   let anoAcademico = document.getElementById("ocultoanoAcademico_"+planEstudioId).value;
   if (confirm("¿Está seguro de que quiere cerrar la programación docente de " +planEstudioId+ " para el año " +anoAcademico+ " y semestre " +semestre+ "? No podrá deshacer esta acción")){
-    form.setAttribute('action', cerrarPath);
+    form.setAttribute('action', cerrarPath+"?planID="+planEstudioId);
     form.submit();
   }
 }
@@ -264,7 +264,7 @@ function AbrirIncidencia(formID,abrirIncidenciaPath){
   let semestre = document.getElementById("ocultosemestreIncidencia_"+planEstudioId).value;
   let anoAcademico = document.getElementById("ocultoanoAcademicoIncidencia_"+planEstudioId).value;
   if (confirm("¿Está seguro de que quiere abrir incidencia de la programación docente de " +planEstudioId+ " para el año " +anoAcademico+ " y semestre " +semestre+ "? No podrá deshacer esta acción")){
-    form.setAttribute('action', abrirIncidenciaPath);
+    form.setAttribute('action', abrirIncidenciaPath+"?planID="+planEstudioId);
     form.submit();
   }
 }
@@ -275,7 +275,7 @@ function AbrirReabierto(formID,reabrirPath){
   let semestre = 'I';
   let anoAcademico = document.getElementById("ocultoanoAcademicoReabierto_"+planEstudioId).value;
   if (confirm("¿Está seguro de que quiere reabrir la programación docente de " +planEstudioId+ " para el año " +anoAcademico+ " y semestre 2 ? No podrá deshacer esta acción")){
-    form.setAttribute('action', reabrirPath);
+    form.setAttribute('action', reabrirPath+"?planID="+planEstudioId);
     form.submit();
   }
 }
@@ -286,7 +286,7 @@ function CerrarIncidencia(formID,cerrarPath){
   let semestre = document.getElementById("ocultosemestreIncidencia_"+planEstudioId).value;
   let anoAcademico = document.getElementById("ocultoanoAcademicoIncidencia_"+planEstudioId).value;
   if (confirm("¿Está seguro de que quiere cerrar la incidencia de la programación docente de " +planEstudioId+ " para el año " +anoAcademico+ " y semestre " +semestre+ "? No podrá deshacer esta acción")){
-    form.setAttribute('action', cerrarPath);
+    form.setAttribute('action', cerrarPath+"?planID="+planEstudioId);
     form.submit();
   }
 }
@@ -294,7 +294,7 @@ function CerrarIncidencia(formID,cerrarPath){
 function Consultar(plan,cerrarPath){
   let nombre = plan.split("_")[1];
   let url;
-  url = cerrarPath+"?planID="+plan.split("_")[0];
+  url = cerrarPath+"?planID="+planEstudioId
   
   
   window.location.replace(url);

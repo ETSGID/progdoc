@@ -117,8 +117,8 @@ router.get("/respDoc/tribunales", menuProgDocController.getProgramacionDocente, 
 }, menuProgDocController.getPlanes,permisosControllerProgDoc.comprobarRols, respController.getTribunales);
 
 router.get("/consultar/tribunales", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, respController.getTribunales);
-router.get("/consultar/PDF", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, calendarioController.anoDeTrabajoPDF, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF);
-router.get("/cumplimentar/PDF", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, calendarioController.anoDeTrabajoPDF, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF); 
+router.get("/consultar/PDF", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, calendarioController.anoDeTrabajoPDF, calendarioController.eventosPlanDiccionario, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF);
+router.get("/cumplimentar/PDF", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, calendarioController.anoDeTrabajoPDF, calendarioController.eventosPlanDiccionario, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF); 
 router.get("/respDoc/editAsignacion", menuProgDocController.getProgramacionDocente, function (req, res, next) {
   res.locals.rols.push({
     rol: enumsPD.rols.ResponsableDocente, PlanEstudioCodigo: req.session.planID, DepartamentoCodigo: req.session.departamentoID, condiciones:
@@ -479,7 +479,7 @@ router.post("/abrirProgDoc", function (req, res, next) {
 router.post("/cerrarProgDoc", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarProgDoc, calendarioController.anoDeTrabajoPDF, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF, gestionController.cerrarProgDoc2);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarProgDoc, calendarioController.anoDeTrabajoPDF, calendarioController.eventosPlanDiccionario, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF, gestionController.cerrarProgDoc2);
 
 router.post("/abrirIncidenciaProgDoc", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null });
@@ -498,7 +498,7 @@ router.post("/reabrirProgDoc", function (req, res, next) {
 router.post("/cerrarIncidenciaProgDoc", function (req, res, next) {
   res.locals.rols.push({ rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:[] });
   next();
-}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarIncidenciaProgDoc, calendarioController.anoDeTrabajoPDF, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF, examenController.getExamenes, examenController.generateCsvExamens, gestionController.cerrarProgDoc2);
+}, menuProgDocController.getPlanes, permisosControllerProgDoc.comprobarRols, gestionController.cerrarIncidenciaProgDoc, calendarioController.anoDeTrabajoPDF, calendarioController.eventosPlanDiccionario, calendarioController.eventosDiccionario, calendarioController.getCalendarioPDF, infopdfprogdocController.generarPDF, examenController.getExamenes, examenController.generateCsvExamens, gestionController.cerrarProgDoc2);
 
 //consultarRoles
 router.get("/consultar/roles", menuProgDocController.getPlanes, menuProgDocController.getProgramacionDocente, gestionRoles.getRoles)

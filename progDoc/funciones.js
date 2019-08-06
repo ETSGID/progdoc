@@ -127,7 +127,7 @@ formatFecha = function (fecha){
         
 }
 
-exports.formatFecha
+exports.formatFecha = formatFecha
 
 
 //le pasas una fecha y te devuelve el dia más proximo de dentro de un año que caiga
@@ -153,5 +153,44 @@ exports.addYear = function (fechaActual) {
         return null;
     }
        
+}
+
+/**
+ * le pasas una fecha y te devuelve el mismo dia del año siguiente si cae en fin de semana el lunes siguiente
+ * le pasas la fechaAnterior para que el offset se reinicie si hay una diferencia mayor a 6 dias
+ * porque se consideran distintos periodos a partir de 6 dias. Sino hay fecha anterior es la propia
+ * el offset son los dias que quieres que desplace la fecha nueva asi si una fecha cae en sabado y otra en domino
+ * en vez de caer las dos en lunes , la del sabado caera en lunes y la del domingo en martes
+ * ¡¡las fechas al llamar a este método deberán estar ordenadas de manera creciente!!
+**/
+
+exports.addYear2 = function (fechaActual, fechaAnterior, offset) {
+    fechaActual = formatFecha(fechaActual)
+    fechaAnterior = fechaAnterior ? formatFecha(fechaAnterior) : fechaActual
+    try {
+        let actual = moment(fechaActual, 'DD/MM/YYYY');
+        let anterior = moment(fechaAnterior, 'DD/MM/YYYY')
+        //si hay 6 dias de diferencia entre dos examenes se interpretan como independientes, franjas distitnas
+        if (actual - anterior >= 6 * 24 * 3600 * 1000 ) {offset = 0;}
+        let siguiente = actual.clone().add(1, 'year').add(offset,'day');
+        let a = siguiente.day()
+        let b = 0; //nuevo offset si vuelve a tocar fin de semana
+        switch (a){
+            case 0 :
+            b = 1;
+            break;
+            case 6 :
+            b = 2;
+            break;
+            default:
+            break;
+        }
+        siguiente = siguiente.add(b, 'day')
+        offset += b;
+        return [siguiente, offset]
+    } catch (error) {
+        return [null,null];
+    }
+
 }
 

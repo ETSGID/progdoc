@@ -34,7 +34,7 @@ exports.getAsignaturasPD = function (req, res, next) {
     
     if (req.params.curso)filtro.curso = req.params.curso
 
-    return menuProgDocController.getProgramacionDocentesAnteriores(req.params.plan, req.params.semestre, req.params.anoAcademico, null, estados.estadoProgDoc.cerrado)
+    return menuProgDocController.getProgramacionDocentesAnteriores(req.params.plan, req.params.semestre, req.params.anoAcademico, null, null)
         .then((pdis) => {
             //debo comprobar el año ya que getProgramacionDocnetesAnteriores te da la ultima cerrada o anteriores
             switch (pdis.length) {
@@ -102,7 +102,7 @@ exports.getAsignaturasHorario = function (req, res, next) {
     }
 
     if (req.params.semestre && req.params.semestre !== "I") filtro.semestre = { [op.or]: semestreAsignatura }
-    return menuProgDocController.getProgramacionDocentesAnteriores(req.params.plan, req.params.semestre, req.params.anoAcademico, null, estados.estadoProgDoc.cerrado)
+    return menuProgDocController.getProgramacionDocentesAnteriores(req.params.plan, req.params.semestre, req.params.anoAcademico, null, null)
         .then((pdis) => {
             //debo comprobar el año ya que getProgramacionDocnetesAnteriores te da la ultima cerrada o anteriores
             switch (pdis.length) {
@@ -213,7 +213,7 @@ exports.getAsignaturasExamen = function (req, res, next) {
     }
 
     if (req.params.semestre && req.params.semestre !== "I") filtro.semestre = { [op.or]: semestreAsignatura }
-    return menuProgDocController.getProgramacionDocentesAnteriores(req.params.plan, req.params.semestre, req.params.anoAcademico, null, estados.estadoProgDoc.cerrado)
+    return menuProgDocController.getProgramacionDocentesAnteriores(req.params.plan, req.params.semestre, req.params.anoAcademico, null, null)
         .then((pdis) => {
             //debo comprobar el año ya que getProgramacionDocnetesAnteriores te da la ultima cerrada o anteriores
             switch (pdis.length) {
@@ -292,7 +292,7 @@ exports.getGruposAsignatura = function (req, res, next) {
     let pdID2 = "no programacion";
     let resp = {}
     let respError
-    return menuProgDocController.getProgramacionDocentesAnteriores(req.params.plan, req.params.semestre, req.params.anoAcademico, null, estados.estadoProgDoc.cerrado)
+    return menuProgDocController.getProgramacionDocentesAnteriores(req.params.plan, req.params.semestre, req.params.anoAcademico, null, null)
         .then((pdis) => {
             switch (pdis.length) {
                 //debo comprobar el año ya que getProgramacionDocnetesAnteriores te da la ultima cerrada o anteriores
@@ -321,12 +321,13 @@ exports.getGruposAsignatura = function (req, res, next) {
                     break;
             }
 
-            return models.sequelize.query(query = `SELECT distinct a.identificador, a.codigo, a.nombre as "nombreAsignatura", a.acronimo, g.nombre, g."nombreItinerario", g.aula, g.capacidad, a."anoAcademico"
+            return models.sequelize.query(query = `SELECT distinct a.identificador, a.codigo, a.nombre as "nombreAsignatura", a.acronimo, g.nombre, g."nombreItinerario", g.aula, g.capacidad, g."nombreItinerario", a."anoAcademico"
   FROM public."Asignaturas" as a
   left join public."AsignacionProfesors" as s on a.identificador = s."AsignaturaId"
   inner join public."Grupos" as g on s."GrupoId" = g."grupoId"
   where a."ProgramacionDocenteIdentificador" in (:pdID1, :pdID2)
   and a.codigo = :codigo
+  and (s."Dia" IS NOT NULL or s."Nota" IS NOT NULL)
   order by a.codigo, g.nombre`,
                 { replacements: { pdID1: pdID1, pdID2: pdID2, semestre: semestreGrupo, codigo: req.params.codigoAsignatura } },
             )
@@ -342,7 +343,7 @@ exports.getGruposAsignatura = function (req, res, next) {
                     asignatura.codigo = grupos[0][0].codigo;
                     asignatura.acronimo = grupos[0][0].acronimo;
                     if (gr.nombre.includes(semestreGrupo)) {
-                        asignatura.grupos.push({ nombre: gr.nombre, aula: gr.aula, capacidad: gr.capacidad })
+                        asignatura.grupos.push({ nombre: gr.nombre, aula: gr.aula, capacidad: gr.capacidad, itinerario: gr.nombreItinerario })
                     }
                 }
             })
