@@ -1,11 +1,10 @@
-let createError = require('http-errors');
 let express = require('express');
 const normalize = require('normalize-path');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let partials = require('express-partials');
 let morgan = require('morgan');
-const filemanager = require('rich-filemanager-node');
+
 
 //context path para la aplicacion en el servidor
 let session = require('express-session');
@@ -20,8 +19,7 @@ exports.pathPDF = pathPDF;
 //TODO repetida en bin www solo en un sitio
 const filePathPDF = path.join(pathPDF, 'pdfs', 'files')
 
-//fichero de configuracion del gestor de archivos
-const config = __dirname + "/public/config/filemanager.config.json";
+
 //cas autentication
 let CASAuthentication = require('cas-authentication');
 // Create a new instance of CASAuthentication.
@@ -45,9 +43,6 @@ let app = express();
 let router = require('./routes/index')
 let routerApi = require('./routes/api')
 let models = require('./models');
-let Sequelize = require('sequelize');
-let rolController = require('./controllers/rol_controller');
-let progDocController = require('./controllers/progDoc_controller')
 let funciones = require('./funciones')
 
 // view engine setup
@@ -149,19 +144,8 @@ app.use(cas.bounce, async function (req, res, next) {
     next();
   }
 });
-//gestor de archivos, puede acceder todo el mundo que esté en progdoc o sea profesor
-//debe existir esa carpeta sino dara error
 
-app.use(path.join(contextPath, 'archivos/filemanager'), function (req, res, next) {
-  funciones.ensureDirectoryExistence(filePathPDF)
-  if (!req.query.path) req.query.path = '/'
-  let pathExiste = path.join(pathPDF, 'pdfs', req.query.path, 'file')
-  let existe = funciones.ensureDirectoryExistence(pathExiste, true)
-  if (!existe) req.query.path = '/';
-  next()
-});
-app.use(path.join(contextPath, 'archivos/filemanager'), filemanager((path.join(pathPDF, 'pdfs')), config));
-app.use(path.join(contextPath, 'archivos'), express.static('node_modules/rich-filemanager'));
+
 //router para contexto
 app.use(contextPath, router);
 

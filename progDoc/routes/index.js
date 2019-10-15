@@ -23,6 +23,7 @@ let aulaController = require('../controllers/aula_controller')
 let actividadParcialController = require('../controllers/actividadParcial_controller')
 let personaYProfesorController = require('../controllers/personaYProfesor_controller')
 let historialController = require('../controllers/historial_controller')
+let jqueryFileTreeController = require('../controllers/jqueryFileTree_controller')
 
 let estados = require('../estados');
 let enumsPD = require('../enumsPD');
@@ -740,5 +741,7 @@ router.post('/coordiandor/eliminarConjuntoActividadParcial', function (req, res,
   });
   next();
 }, planController.getPlanes, rolController.comprobarRols, actividadParcialController.eliminarConjuntoActividadParcial);
+
+router.post('/pdfs', planController.getPlanes, jqueryFileTreeController.getDirList);
 
 module.exports = router;
