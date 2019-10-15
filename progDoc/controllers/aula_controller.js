@@ -225,7 +225,7 @@ exports.getAulas = async function (req, res, next) {
             html += `<img style="display:none" src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg">`
             html += `</body></html>`
             let file = `aulas_${ano_codigo}_${cuatrimestreSeleccionado}.pdf`;
-            file = `${ano_codigo}/${file}`;
+            file = `${ano_codigo}/aulas/${file}`;
             //console.log("the fileç: ", file);
             let ruta = app.pathPDF + '/pdfs/' + file
             let configPdfOptions = configPdfCerrado

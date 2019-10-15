@@ -1,7 +1,7 @@
 /**
 *	jQuery File Tree Node.js Connector
-*	Version 1.0
-*	wangpeng_hit@live.cn
+*	https://www.abeautifulsite.net/jquery-file-tree
+*	modificado pro javier.conde.diaz@alumnos.upm.es
 *	21 May 2014
 */
 let fs = require('fs');
