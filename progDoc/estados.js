@@ -28,6 +28,7 @@ exports.estadoExamen = {
 }
 
 exports.estadoCalendario = {
-    abierto: 1
+    abierto: 1,
+    aprobadoCoordinador: 2
     
 }

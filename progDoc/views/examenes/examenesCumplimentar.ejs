@@ -1,0 +1,579 @@
+<script src="<%=contextPath%>/js/datepicker.js"></script>
+<link rel='stylesheet' type="text/css" href='<%=contextPath%>/stylesheets/datepicker.css' />
+<script src="<%=contextPath%>/js/moment.js"></script>
+<%- include ../menus/cumplimentar.ejs %>
+<%- include ../../public/js/funciones.ejs %>
+<div class="contenido2">
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+    <% switch(estadoExamenes){
+      case estadosExamen.abierto : %>
+        <p>Los exámenes están siendo cubiertos por el coordinador del plan de estudios</p>
+        <% break;
+      case estadosExamen.aprobadoCoordinador : %>
+        <p>Los exámenes han sido aprobados por el coordinador del plan de estudios</p>
+        <% break;
+      default:
+      break;
+    }%> 
+  <p><%=permisoDenegado%></p>
+  </br>
+  <p>Permisos en función del estado</p>
+  <ul>
+    <li>Abierto: el coordinador del plan de estudios </li>
+    <li>Aprobado: nadie tiene permiso </li>
+    <li>Incidencia: el jefe de estudios</li>
+  </ul>
+<%}else{%>
+        <form id="formulario" role="form" data-toggle="validator" autocomplete="off" action="<%=aprobarpath%>" method="post">
+                <div>
+                    <% for (let i=0 ; i<asignacionsExamen.length; i++){%>
+                        <h2><%= asignacionsExamen[i].periodoNombre %>
+                        <button type="button" class="btn btn-default" onclick = "MostrarOcultar('div_<%=asignacionsExamen[i].periodo%>')">
+                        <span id ='button_div_<%=asignacionsExamen[i].periodo%>'  class="glyphicon glyphicon-chevron-down"></span> 
+                        </button>
+                        <button type="button" id='buttonCalendario_div_<%=asignacionsExamen[i].periodo%>' class="btn btn-default hidden" onclick = "mostrarCalendario('calendario_<%=asignacionsExamen[i].periodo%>')">
+                        Modo Calendario
+                        </button></h2>
+                        <div class="hidden" id="div_<%=asignacionsExamen[i].periodo%>">
+                            <div id="div_<%=franjasExamen[i].periodo%>">
+                                <% 
+                                let period = franjasExamen.find(function (obj) { return obj.periodo === asignacionsExamen[i].periodo; });
+                                if (period.franjas.length>0){%>
+                                    <table class="table" id="tableFranjas_<%=period.periodo%>">
+                                        <tr>
+                                        <th>Franja</th>
+                                        <th>Hora Inicio</th>
+                                        <th>Duración (Minutos)</th>
+                                        </tr>
+                                    <%for (let j=0 ; j<period.franjas.length; j++){%>
+                                        <tr id="fila_<%=period.franjas[j].identificador%>">
+                                            <%
+                                            let hora= +period.franjas[j].horaInicio.split(':')[0]
+                                            let minutos = +period.franjas[j].horaInicio.split(':')[1]
+                                            let duracion = period.franjas[j].duracion
+                                            if(!hora)hora=8;
+                                            if(!minutos)minutos=0;
+                                            if(!duracion)duracion=0;
+                                            if(parseInt(hora,10)<10)hora='0'+hora;
+                                            if(parseInt(minutos,10)<10)minutos='0'+minutos;
+                                                %>
+                                            <td><%=j+1%></td>
+                                            <td><%=hora%>:<%=minutos%></td>
+                                            <td><%=duracion%></td>
+                                        </tr>
+                                    <%}%>
+                                </table>
+                                <%}else{%>
+                                <p>No hay franjas de exámenes definidas</p>
+                                <%}%>
+                            </div>
+                            <table class="table" id="table_<%=asignacionsExamen[i].periodo%>">
+                                <thead>
+                                    <tr>
+                                    <th scope="col">Asignatura</th>
+                                    <th scope="col">Curso</th>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Franja</th>
+                                    <th>Hora Inicio</th>
+                                    <th>Duración (Minutos)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <% for (let j=0 ; j<asignacionsExamen[i].asignaturas.length; j++){
+                                    let momentaneoType = asignacionsExamen[i].asignaturas[j].examen.identificador ? "momentaneo" : "momentaneo2"
+                                    let f = "DD/MM/YYYY"
+                                        if (asignacionsExamen[i].asignaturas[j].examen.fecha !== null){ 
+                                            f= asignacionsExamen[i].asignaturas[j].examen.fecha.split("-")[2]+"/"+asignacionsExamen[i].asignaturas[j].examen.fecha.split("-")[1]+"/"+asignacionsExamen[i].asignaturas[j].examen.fecha.split("-")[0]
+                                        }
+                                     let enable = f === "DD/MM/YYYY" ? "disabled": "enabled"
+                                    %> 
+                                 <input type="hidden" id="hidden_date_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>" name="<%=momentaneoType%>" value='<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>'/>
+                                <tr id="<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>">
+                                    <th scope="row">
+                                        <%if (asignacionsExamen[i].asignaturas[j].acronimo !== null){ %>
+                                            <span title="<%=asignacionsExamen[i].asignaturas[j].nombre%> (<%=asignacionsExamen[i].asignaturas[j].codigo%>)"><%= asignacionsExamen[i].asignaturas[j].acronimo%></span>
+                                        <% }else{%>
+                                        <span  title="<%=asignacionsExamen[i].asignaturas[j].nombre%> (<%=asignacionsExamen[i].asignaturas[j].codigo%>)"><%= asignacionsExamen[i].asignaturas[j].codigo%></span>
+                                        <% } %> 
+                                    </th>
+                                    <td>
+                                        <%= asignacionsExamen[i].asignaturas[j].curso%>
+                                    </td>
+                                    <td>
+                                        <input class="form-control dateExamen<%=asignacionsExamen[i].periodo%>" value="<%=f%>" name="date_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>" id="date_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>"  placeholder="<%=f%>" type="text" onchange="Change('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" readonly="readonly"/>    
+                                    </td>
+                                    <td>
+                                    <%if (period.franjas.length>0){%>
+                                        <select id='franja_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>'  onchange="cambiarFranjaExamen('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>>
+                                        <option value="-">-</option>
+                                        <%for (let k=0 ; k<period.franjas.length; k++){%>
+                                        <option value="<%=k+1%>"><%=k+1%></option>
+                                    <%}%>
+                                        </select>
+                                    <%}else{%>
+                                    <select id='franja_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>'  onchange="cambiarFranjaExamen('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>>
+                                        <option value="-">-</option>
+                                    </select>
+                                    <%}%>
+                                    </td>
+                                     <%
+                                    let hora= asignacionsExamen[i].asignaturas[j].examen.horaInicio ? +asignacionsExamen[i].asignaturas[j].examen.horaInicio.split(':')[0] : null
+                                    let minutos = asignacionsExamen[i].asignaturas[j].examen.horaInicio ? +asignacionsExamen[i].asignaturas[j].examen.horaInicio.split(':')[1]:null
+                                    let duracion = asignacionsExamen[i].asignaturas[j].examen.duracion ? asignacionsExamen[i].asignaturas[j].examen.duracion : null
+                                    if(parseInt(hora,10)<10)hora='0'+hora;
+                                    if(parseInt(minutos,10)<10)minutos='0'+minutos;
+                                        %>
+                                     <td><input type="number" min='0' max='23' id='hora_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>'   name='hora_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="hh" value="<%=hora%>" onChange="formatHora(this);Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>><b>:</b>
+                                    <input type="number"  min='0' max='59' id='minutos_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' name='minutos_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="mm" value="<%=minutos%>" onChange="formatHora(this);Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>>
+                                    </td>
+                                    <td><input type="number" min='0' max='500' id='duracion_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' name='duracion_<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>' placeholder="mm" value="<%=duracion%>" onChange="Change2('<%=asignacionsExamen[i].asignaturas[j].identificador%>_<%=asignacionsExamen[i].asignaturas[j].examen.identificador%>_<%=asignacionsExamen[i].periodo%>')" <%=enable%>></td>
+                                </tr>
+                                <%}%>
+                                </tbody>
+                            </table>
+                            <table class="table table-bordered" style="display: none;" id="table_calendario_<%=asignacionsExamen[i].periodo%>">
+                                <thead>
+                                    <tr>
+                                    <th scope="col">Día</th>
+                                    <% for (let k=0 ; k<cursos.length; k++){%>
+                                        <th scope="col">Curso <%=cursos[k]%></th>
+                                    <%}%> 
+                                    </tr>
+                                </thead>
+                                <tbody id="body_table_calendario_<%=asignacionsExamen[i].periodo%>">
+                                </tbody>
+                            </table>
+                        </div>
+                    <%}%>
+                </div>
+        </form>
+    <%}%>
+
+</div>
+<script>
+let periodos = <%-JSON.stringify(periodosExamen)%>
+let franjas = <%-JSON.stringify(franjasExamen)%>
+let pdID = <%-JSON.stringify(pdID)%>
+let cursos = <%-JSON.stringify(cursos)%>
+//el multiselect del layout funciona con jquery
+let estado = <%-JSON.stringify(estado)%>
+let asignacionsExamen = <%-JSON.stringify(asignacionsExamen)%>;
+let estadoProgDoc = <%-JSON.stringify(estadoProgDoc)%>
+let estadosProgDoc = <%-JSON.stringify(estadosProgDoc)%>
+let confirmarSalirSinGuardar = <%-confirmarSalirSinGuardar%>
+let formatHora = <%-formatHora%>
+let aumentarDia = <%-aumentarDia%>
+let getDia = <%-getDia%>
+let anoInicial;
+let anoFinal;
+let fechasLimite;
+//se utiliza para disparar el evento de onbeforeunload
+let activado = true;
+if(pdID && periodos){
+anoInicial = 2000+ Number(pdID.split("_")[2][2]+""+pdID.split("_")[2][3])
+anoFinal = 2000+ Number(pdID.split("_")[2][4]+""+pdID.split("_")[2][5])
+//las fecha limite para poner los exámenes
+fechasLimite ={S1_O:["01/09/"+anoInicial, "31/07/"+anoFinal], S1_E:["01/09/"+anoInicial, "31/07/"+anoFinal], 
+S2_O:["01/09/"+anoInicial, "31/07/"+anoFinal], S2_E:["01/09/"+anoInicial, "31/07/"+anoFinal]}
+}
+
+//inicio el calendario
+$(function() {
+    let momentaneos = document.getElementsByName("momentaneo")
+    for (let i=0; i< momentaneos.length; i++){
+        isExamenInFranjas(momentaneos[i].value)
+    }
+    
+    if(pdID && periodos){
+
+        $('.dateExamen'+periodos.S1_O).datepicker({
+            language: "es",
+            keyboardNavigation: false,
+            todayHighlight: true,
+            autoclose: true,
+            format: "dd/mm/yyyy",
+            clearBtn: true,
+            startDate: fechasLimite.S1_O[0],
+            endDate: fechasLimite.S1_O[1],
+            daysOfWeekDisabled:[0]
+            
+        });
+        $('.dateExamen'+periodos.S1_E).datepicker({
+            language: "es",
+            keyboardNavigation: false,
+            todayHighlight: true,
+            autoclose: true,
+            format: "dd/mm/yyyy",
+            clearBtn: true,
+            startDate: fechasLimite.S1_E[0],
+            endDate: fechasLimite.S1_E[1],
+            daysOfWeekDisabled:[0]
+            
+        });
+        $('.dateExamen'+periodos.S2_O).datepicker({
+            language: "es",
+            keyboardNavigation: false,
+            todayHighlight: true,
+            autoclose: true,
+            format: "dd/mm/yyyy",
+            clearBtn: true,
+            startDate: fechasLimite.S2_O[0],
+            endDate: fechasLimite.S2_O[1],
+            daysOfWeekDisabled:[0]
+
+
+            
+        });
+        $('.dateExamen'+periodos.S2_E).datepicker({
+            language: "es",
+            keyboardNavigation: false,
+            todayHighlight: true,
+            autoclose: true,
+            format: "dd/mm/yyyy",
+            clearBtn: true,
+            startDate: fechasLimite.S2_E[0],
+            endDate: fechasLimite.S2_E[1],
+            daysOfWeekDisabled:[0]
+            
+        });     
+    }
+   
+}); 
+
+
+function isExamenInFranjas(examenId){
+    let rowsSolapa = false;
+    let period = franjas.find(function (obj) { return obj.periodo === examenId.split("_")[2]; });
+    let hora = +document.getElementsByName("hora_"+examenId)[0].value;
+    let minutos = +document.getElementsByName("minutos_"+examenId)[0].value;
+    let duracion = +document.getElementsByName("duracion_"+examenId)[0].value;
+    let horaInicial = moment.duration(hora+":"+minutos)
+    let horaFinal = (moment.duration(hora+":"+minutos).add(duracion,"m"));
+    if(period.franjas.length === 0){
+        //en este caso no hay franjas
+       if(!isNaN(hora) && hora !== 0 && !isNaN(minutos) && !isNaN(duracion) && horaInicial.isValid() && horaFinal.isValid()){
+        document.getElementById(examenId).classList.remove("solapa");
+        return true;
+       }    
+        document.getElementById(examenId).classList.add("solapa");
+        return false;
+    }
+    document.getElementById(examenId).classList.add("solapa");
+    for (let i=0; i<period.franjas.length; i++){    
+            //encaja con un examen si la horaInicial es posterior o igual a la hora inicial de la period
+            //y la hora final es anterior o igual a la hora de la period
+            if((horaInicial - moment.duration(period.franjas[i].horaInicio) >= 0)&&
+            (horaFinal - moment.duration(period.franjas[i].horaInicio).add(period.franjas[i].duracion, "m") <=0)) {
+                document.getElementById('franja_'+examenId).value = i+1;
+                document.getElementById(examenId).classList.remove("solapa");
+                return i+1;     
+        }
+    }
+    document.getElementById('franja_'+examenId).value = "-";
+    return false;
+}
+
+//momentaneo es el que esta en la bbdd. De momentaneo puede pasar a anadir o a actualizar
+//momentaneo2 es uno no cubierto pero no esta en la bbdd. De momentaneo2 puede pasar a anadir
+function Change(id){
+    let element = document.getElementById("date_"+id);
+    let hora = document.getElementById("hora_"+id);
+    let minutos = document.getElementById("minutos_"+id);
+    let duracion = document.getElementById("duracion_"+id);
+    let franja = document.getElementById("franja_"+id);
+    let elementHidden = document.getElementById("hidden_date_"+id);
+    if (element.value === element.placeholder || element.value === ""){
+        element.placeholder = "DD/MM/YYYY"
+        hora.disabled = true;
+        minutos.disabled = true;
+        duracion.disabled = true;
+        franja.value="-"
+        franja.disabled = true;
+
+
+        if (id.split("_")[1] === ""){
+            elementHidden.setAttribute('name', "momentaneo2");
+            document.getElementById(id).classList.remove("solapa");
+        }else{
+            elementHidden.setAttribute('name', "eliminar");
+            document.getElementById(id).classList.remove("solapa");
+        }      
+    }else if (id.split("_")[1] === ""){
+        hora.disabled = false;
+        minutos.disabled = false;
+        duracion.disabled = false;
+        franja.disabled = false;
+        elementHidden.setAttribute('name', "anadir");
+        isExamenInFranjas(id)
+    }else{
+        hora.disabled = false;
+        minutos.disabled = false;
+        duracion.disabled = false;
+        franja.disabled = false;
+        elementHidden.setAttribute('name', "actualizar");
+        isExamenInFranjas(id)
+    }
+
+}
+
+//cuando cambia la hora los minutos o la duracion
+function Change2(id){
+    let hora = document.getElementById("hora_"+id);
+    let minutos = document.getElementById("minutos_"+id);
+    let duracion = document.getElementById("duracion_"+id);
+    let elementHidden = document.getElementById("hidden_date_"+id);
+    isExamenInFranjas(id)
+    if (id.split("_")[1] === ""){
+        elementHidden.setAttribute('name', "anadir");
+    }else{
+        elementHidden.setAttribute('name', "actualizar");
+    }
+}
+
+
+function MostrarOcultar(id){
+    let div = document.getElementById(id);
+    let buttonSpan = document.getElementById('button_'+id)
+    let buttonCalendario = document.getElementById('buttonCalendario_'+id)
+    let clases = div.className.split(" ");
+    let clases2 = buttonCalendario.className.split(" ");
+    let oculto = clases.find(function (obj) { return obj === 'hidden'});
+    //si estaba oculto debo quitarlo
+    if (oculto){
+        div.className = "";
+        buttonCalendario.className = "";
+        for (let i =0; i<clases.length; i++){
+            if (clases[i] !== 'hidden'){
+                div.className += " " +clases[i]
+            }    
+        }
+        for (let i =0; i<clases2.length; i++){
+            if (clases2[i] !== 'hidden'){
+                buttonCalendario.className += " " + clases2[i]
+            }    
+        }
+        
+        buttonSpan.className = "glyphicon glyphicon-chevron-up"
+    }
+    //debo ocultarlo
+    else{
+        div.className += " hidden"
+        buttonCalendario.className += " hidden"
+        buttonSpan.className = "glyphicon glyphicon-chevron-down"
+
+    }
+
+}
+
+function mostrarCalendario(id){
+    let estadoExamenes=[];
+    let table = document.getElementById("table_"+id);
+    let tableBody = document.getElementById("body_table_"+id);
+    let cellsOfRow="";
+    let found=false;
+    let periodo = id.split("_")[1]
+    let period = franjas.find(function (obj) { return obj.periodo === periodo });
+    //compruebo sinFranjas porque cuando no hay franjas period.franjas.length seria 0 y no entraria en el bucle
+    let sinFranjas = period.franjas.length === 0 ? 1 : 0;
+    let numFranjas =  period.franjas.length === 0 ? 1 : period.franjas.length;
+    let tableDatos = document.getElementById("table_"+periodo)
+    let buttonCalendario = document.getElementById('buttonCalendario_div_'+periodo)
+    let text = buttonCalendario.innerHTML.trim();
+    let primeroEncontrado = false;
+    let ultimoEncontrado = false;
+    let periodoKey;
+    for(let i in periodos){
+        if(periodos[i] === periodo){
+            periodoKey = i;
+        }
+    }
+
+    // Recorremos todas las filas con contenido de la tabla en la que metemos los datos
+    for (let j = 1; j < tableDatos.rows.length; j++){
+        cellsOfRow = tableDatos.rows[j].getElementsByTagName('th');
+        cellsOfRow2 = tableDatos.rows[j].getElementsByTagName('td');
+        // Recorremos todas las celdas de la fila que me interesan
+        let nuevoExamen = {};
+        nuevoExamen.asignatura = cellsOfRow[0].innerHTML.trim();
+        nuevoExamen.curso = cellsOfRow2[0].innerHTML.trim();
+        nuevoExamen.asignaturaNombre = cellsOfRow[0].title
+        nuevoExamen.franja = ""+cellsOfRow2[2].children[0].value
+        cellsOfRow2[1].children[0].value.trim() === "" ? nuevoExamen.fecha = cellsOfRow2[1].children[0].placeholder : nuevoExamen.fecha =cellsOfRow2[1].children[0].value;
+        estadoExamenes.push(nuevoExamen);
+    }
+    let fechaLimiteInicio = fechasLimite[periodoKey][0]
+    let fechaLimiteFinal = fechasLimite[periodoKey][1]
+    if(text === 'Modo Calendario'){
+        //borro lo que había en el body para repintarlo
+        while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
+        }
+        let fechaFila = fechaLimiteInicio
+        // Recorremos todas las filas con contenido de la tabla
+        while (fechaFila !== aumentarDia(fechaLimiteFinal,1)){
+            if(!primeroEncontrado){
+                let coincidenciasFecha = estadoExamenes.filter(
+                //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                ex => (ex.fecha === fechaFila)
+                );
+                coincidenciasFecha.length === 0 ? primeroEncontrado = false : primeroEncontrado = true;
+                //pinta el mes en la primera fila que tiene examenes excepto si es 1 que lo pinta abajo
+                if (primeroEncontrado && getDia(fechaFila)[2] !== 1){
+                let rowMes = tableBody.insertRow();
+                rowMes.classList.add("noExamen")
+                let cellMes = rowMes.insertCell();
+                cellMes.colSpan=""+(cursos.length+1);
+                cellMes.style.textAlign="center"
+                //pinto el mes
+                cellMes.innerHTML = getDia(fechaFila)[1]
+                }
+            }
+            if(primeroEncontrado){
+                if(getDia(fechaFila)[2] === 1){
+                    let rowMes = tableBody.insertRow();
+                    rowMes.classList.add("noExamen")
+                    let cellMes = rowMes.insertCell();
+                    cellMes.colSpan=""+(cursos.length+1)
+                    cellMes.style.textAlign="center"
+                    //pinto el mes
+                    cellMes.innerHTML = getDia(fechaFila)[1] 
+                }
+                /**noEncontrado se usa para borrar las ultimas filas que no tengan contenido
+                noEncontrado puede valer desde 1 hasta el numero de franjas
+                se borraran un dia completo si todas las franjas estan vacias
+                **/
+                let noEncontrado = 1;      
+                for(let k=0; k<(period.franjas.length || sinFranjas); k++){
+                    let row = tableBody.insertRow();
+                    let cell0 = row.insertCell();
+                    if(k===0){
+                        cell0.classList.add("noBordeInferior")
+                    }
+                    else{
+                        cell0.classList.add("noBorde");
+                    }
+                    //la fecha la pinto centrada
+                    if(Math.trunc(period.franjas.length/2)===k){
+                        cell0.innerHTML = getDia(fechaFila)[0]+ " " +fechaFila.split("/")[0];
+                    }
+                    let sinCoincidencias = true;              
+                    for(let l=0; l<cursos.length; l++){
+                        let cell = row.insertCell();
+                        cell.innerHTML ="&nbsp"
+                        let condicionFranja = sinFranjas === 1 ? "-" : ""+(+k+1)
+                        let coincidencias = estadoExamenes.filter(
+                        //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                        ex => (ex.fecha === fechaFila && Number(ex.curso)===Number(cursos[l]) && ex.franja === condicionFranja)
+                        );
+                        for (let m=0; m<coincidencias.length; m++){
+                            if(m>0){
+                                cell.innerHTML+= " / "+coincidencias[m].asignatura;
+                            }else{
+                                sinCoincidencias = false
+                                cell.innerHTML+= coincidencias[m].asignatura;
+                            }
+                        }
+                    }
+                    if(sinCoincidencias) row.classList.add("noExamen"+(noEncontrado++))
+                }       
+ 
+            }
+
+            fechaFila = aumentarDia(fechaFila,1)
+        }
+        //borro las últimas filas que no hay
+        let n=tableBody.rows.length -1
+        while(!ultimoEncontrado && n >= 0){
+            if (tableBody.rows[n].classList.contains('noExamen')){
+                tableBody.deleteRow(n);
+                n--;
+            }else if(tableBody.rows[n].classList.contains('noExamen'+numFranjas)){
+                for (let p=0; p<numFranjas; p++){
+                    tableBody.deleteRow(n);
+                    n--;
+                }
+            }else{
+                ultimoEncontrado = true;
+            }
+        }
+        buttonCalendario.innerHTML = 'Modo Lista'
+        tableDatos.style.display = "none";
+        table.style.display = "block";
+    }else{
+        buttonCalendario.innerHTML = 'Modo Calendario'
+        tableDatos.style.display = "block";
+        table.style.display = "none";
+    }
+}
+
+function Volver(cancelarpath){
+    activado = false;
+    window.location.replace(cancelarpath);
+}
+function Guardar(nuevopath){
+    activado = false;
+    let rowsSolapan = document.getElementsByClassName('solapa').length;
+    if (rowsSolapan > 0 && estadoProgDoc === estadosProgDoc.incidencia){
+        alert("Hay exámenes que no encajan con ninguna de las franjas definidas o no tienen hora asignada, no puede guardar los exámenes hasta solucionarlo");
+    }else{
+    let form2 = document.getElementById("formulario");
+    form2.setAttribute('action', nuevopath);
+    form2.submit();
+}
+}
+
+function Enviar(aprobarpath){
+    activado = false;
+    let rowsSolapan = document.getElementsByClassName('solapa').length;
+    if (rowsSolapan > 0){
+        alert("Hay exámenes que no encajan con ninguna de las franjas definidas o no tienen hora asignada, no puede aprobar los exámenes hasta solucionarlo");
+        return false;
+    }else{
+        if (confirm("Una vez aprobados los exámenes no podrá modificarlos ¿Seguro que quiere aprobarlos?")){
+            let form2 = document.getElementById("formulario");
+            form2.setAttribute('action', aprobarpath);
+            form2.submit();
+        }else{
+            activado = true
+            return false;
+        }
+    }
+}
+
+function cambiarFranjaExamen(id){
+    let period = franjas.find(function (obj) { return obj.periodo === id.split("_")[2]; });
+    let selectValue = document.getElementById("franja_"+id).value
+    if(selectValue !== "-"){
+        selectValue = +selectValue
+        let hora = document.getElementById("hora_"+id);
+        let minutos = document.getElementById("minutos_"+id);
+        let duracion = document.getElementById("duracion_"+id);
+        hora.value= period.franjas[+selectValue-1].horaInicio.split(":")[0];
+        minutos.value = period.franjas[+selectValue-1].horaInicio.split(":")[1];
+        duracion.value = period.franjas[+selectValue-1].duracion;
+    }
+   
+    //debo comprobar que no solape si elige -
+    isExamenInFranjas(id)
+    Change2(id)
+
+}
+
+function cambiarSelectExamen(selectExamenespath){
+    activado = true;
+    window.location.replace(selectExamenespath);
+}
+
+window.onbeforeunload = function(){
+  //primero debes mirar que activado sea true o false (en confirmarSalirSinGuarar y despues marcarlo como true) 
+  let confirma = confirmarSalirSinGuardar(["anadir","actualizar", "eliminar"], activado)
+  activado = true
+    //debo reinicializar esto por si le da a seguir en la página
+  document.getElementById('selectPlan') ? document.getElementById('selectPlan').value = selectPlanValue : null;
+  document.getElementById('selectDepartamento') ? document.getElementById('selectDepartamento').value = selectDepartamentoValue : null;
+  document.getElementById('selectExamenes') ? document.getElementById('selectExamenes').value = 'Examenes' : null;
+  return confirma;
+}
+</script>

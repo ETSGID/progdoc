@@ -1,6 +1,6 @@
-    /*the autocomplete function takes two arguments,
-    the text field element and an array of possible autocompleted values
-    ademas tiene un campo opcion para algunos menus especificos en opcion se le da el nombre del menu*/
+/*the autocomplete function takes two arguments,
+the text field element and an array of possible autocompleted values
+ademas tiene un campo opcion para algunos menus especificos en opcion se le da el nombre del menu*/
 function autocomplete(inp, obj, obj2, opcion) {
     var currentFocus;
     /*execute a function when someone writes in the text field:*/
@@ -8,7 +8,7 @@ function autocomplete(inp, obj, obj2, opcion) {
         let a, b, i = this.value;
         let val = quitAcents(this.value)
         let values = this.value.split(" ")
-        values.forEach(function (element, index){
+        values.forEach(function (element, index) {
             values[index] = quitAcents(element)
         })
         /*close any already open lists of autocompleted values*/
@@ -24,7 +24,7 @@ function autocomplete(inp, obj, obj2, opcion) {
         /*for each item in the object...*/
 
         //otros profesores ...
-        let otro= document.createElement("DIV");
+        let otro = document.createElement("DIV");
         otro.innerHTML = "...OTRO";
         /*insert a input field that will hold the current obj item's value:*/
         /*execute a function when someone clicks on the item value (DIV element):*/
@@ -36,7 +36,7 @@ function autocomplete(inp, obj, obj2, opcion) {
         for (i = 0; i < obj.length; i++) {
             let encontrado = true;
             for (k = 0; k < values.length; k++) {
-                if (!obj2[i]['nombre'].toUpperCase().includes(values[k].toUpperCase())){
+                if (!obj2[i]['nombre'].toUpperCase().includes(values[k].toUpperCase())) {
                     encontrado = false;
                 }
             }
@@ -55,35 +55,35 @@ function autocomplete(inp, obj, obj2, opcion) {
                     /*insert the value for the autocomplete text field:*/
                     inp.value = this.getElementsByTagName("input")[0].value;
                     inp.setAttribute("placeholder", nombre)
-                    inp.setAttribute('value', nombre )
+                    inp.setAttribute('value', nombre)
                     //En el caso de añadir un nuevo profesor
-                    if(opcion && opcion === 'asignacionProfesores' ){
+                    if (opcion && opcion === 'asignacionProfesores') {
                         let parent = inp.parentNode;
                         let abuelo = parent.parentNode;
                         let grupo = abuelo.getAttribute('id').split("_")[2]
-                        if(grupo === ""){
+                        if (grupo === "") {
                             grupo = "No hay grupo"
                         }
                         let idList = inp.getAttribute('id');
                         abuelo.removeChild(parent);
                         inp.setAttribute("type", 'hidden')
-                        let nuevoValor = "anadir_profesor_"+grupo+"_"+objeto['identificador'];
+                        let nuevoValor = "anadir_profesor_" + grupo + "_" + objeto['identificador'];
                         inp.setAttribute("name", "anadir")
-                        inp.setAttribute("value", nuevoValor )
+                        inp.setAttribute("value", nuevoValor)
                         //creo div para despues quedarme con el elemento que contiene y poder utilizr innerHTML
                         let div = document.createElement('div');
-                        div.innerHTML = '<li id="list_' + idList + '">' + nombreCorregido + '<button type="button"  class="btn btn-default" onclick="Eliminar2(' + idList +')">Eliminar</button></li>'
+                        div.innerHTML = '<li id="list_' + idList + '">' + nombreCorregido + '<button type="button"  class="btn btn-default" onclick="Eliminar2(' + idList + ')">Eliminar</button></li>'
                         let nuevo = div.firstChild;
                         abuelo.appendChild(nuevo);
                         abuelo.appendChild(inp);
 
                     }
-                    if (opcion && opcion === 'coordinador'){
+                    if (opcion && opcion === 'coordinador') {
                         //debo poner en un input hidden el identificador del coordinador nuevo
                         document.getElementById(opcion).value = objeto['identificador']
 
                     }
-                    if (opcion && opcion === 'tribunales'){
+                    if (opcion && opcion === 'tribunales') {
                         let parent = inp.parentNode;
                         let abuelo = parent.parentNode;
                         let id = inp.getAttribute('id');
@@ -91,20 +91,20 @@ function autocomplete(inp, obj, obj2, opcion) {
                         let tribunalId = id.split("_")[1]
                         //con el [2] me quedo con el puesto en el tribunal
                         let puesto = id.split("_")[2]
-                        let nuevoValor = tribunalId+"_"+objeto['identificador']+"_"+puesto;
+                        let nuevoValor = tribunalId + "_" + objeto['identificador'] + "_" + puesto;
                         abuelo.removeChild(parent);
                         inp.setAttribute("name", "actualizar")
                         inp.setAttribute("type", "hidden");
                         inp.setAttribute("value", nuevoValor)
                         //creo div para despues quedarme con el elemento que contiene y poder utilizr innerHTML
                         let div = document.createElement('div');
-                        div.innerHTML = '<p id="p_tribunal_'+tribunalId+'_'+puesto+'_provisional">'+nombreCorregido+'</p>'
+                        div.innerHTML = '<p id="p_tribunal_' + tribunalId + '_' + puesto + '_provisional">' + nombreCorregido + '</p>'
                         let nuevo = div.firstChild;
                         abuelo.appendChild(nuevo);
                         abuelo.appendChild(inp);
-                       
+
                     }
-                    
+
                     /*close the list of autocompleted values,
                     (or any other open lists of autocompleted values:*/
                     closeAllLists();
@@ -165,7 +165,7 @@ function autocomplete(inp, obj, obj2, opcion) {
         }
     }
     /*execute a function when someone clicks in the document:*/
-   document.addEventListener("click", function (e) {
+    document.addEventListener("click", function (e) {
         closeAllLists(e.target);
     });
 }
@@ -201,12 +201,12 @@ function quitAcents(reemplaza) {
             rExps.forEach(function (v) {
                 nombre = nombre.replace(v.re, v.ch);
             });
-            nombre= nombre.trim();
+            nombre = nombre.trim();
             let p = {};
             p.nombre = nombre;
             p.identificador = identificador;
             search.push(p);
-                
+
         })
     } else {
         search = reemplaza;
@@ -216,6 +216,6 @@ function quitAcents(reemplaza) {
         });
     }
     return search;
-    
+
 };
 

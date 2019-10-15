@@ -1,0 +1,250 @@
+<%- include ../menus/consultar.ejs %>
+<div class="contenido">
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else{ %>
+<h3>Gestión Roles Aplicacion</h3>
+<% let filterByRol = function (roles, rol, plan, departamento){
+    let filtro
+    if (departamento) filtro = r => ((r.rol === rol && r.PlanEstudioCodigo === plan && r.DepartamentoCodigo === departamento))
+    else filtro = r => ((r.rol === rol && r.PlanEstudioCodigo === plan))
+    let found = roles.filter(
+        filtro
+    );
+    return found;
+}%>
+<% let buscaPers = function (profesores, id){
+let prof = profesores.find(function (obj) { return obj.identificador === id; });
+if(!prof){
+    prof={}
+    prof.nombre="No asignado";
+    prof.nombreCorregido = "No asignado";
+}
+return prof
+}%>
+<% let buscaDep = function (departamentos, id){
+let dep = departamentos.find(function (obj) { return obj.codigo=== id; });
+if(!dep.acronimo){
+    dep.nom = dep.codigo
+}else{
+    dep.nom= dep.acronimo
+}
+return dep
+}%>
+<% let buscaDep2 = function (departamento){
+if(!departamento.acronimo){
+    departamento.nom = departamento.codigo
+}else{
+    departamento.nom= departamento.acronimo
+}
+return departamento
+}%>
+    <h3><em>Roles comunes a todas las titulaciones</em></h3>
+     <table class="table">          
+        <tbody id='body_tb_departamentos'>
+            <% 
+            let rol = rolesEnum.JefeEstudios
+            let departamento = null
+            let plan = null
+            let rols = filterByRol(roles, rol, plan, departamento)
+            let r = rols.length > 0 ? rols[0] : {}
+            let index = 0;
+            %>
+                <tr>
+                <td>
+                Jefe de Estudios
+                </td>
+                <td id="td_<%=rol%>_<%=index%>">
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                </td>
+                <td>
+                </td>
+                </tr>
+             <% 
+            rol = rolesEnum.SecretarioTitulacion
+            departamento = null
+            plan = null
+            rols = filterByRol(roles, rol, plan, departamento)
+            r = rols.length > 0 ? rols[0] : {}
+            index = 0;
+            %>
+                <tr>
+                <td>
+                Secretaría Jefe de Estudios
+                </td>
+                <td id="td_<%=rol%>_<%=index%>">
+                <%prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                </td>
+                <td>
+                </td>
+                </tr>           
+            <% 
+            rol = rolesEnum.SubdirectorPosgrado
+            departamento = null
+            plan = null
+            rols = filterByRol(roles, rol, plan, departamento)
+            r = rols.length > 0 ? rols[0] : {}
+            index = 0;
+            %>
+                <tr>
+                <td>
+                SubdirectorPosgrado
+                </td>
+                <td id="td_<%=rol%>_<%=index%>">
+                <%prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                </td>
+                <td>
+                </td>
+                </tr>
+            <tr>
+            <td><u>Directores departamentos</u></td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            </tr>
+            <%
+            rol = rolesEnum.DirectorDepartamento 
+            plan = null
+            departamentos.forEach(function(d,index){
+            let departamento = d.codigo
+            let directores = filterByRol(roles, rol, plan, departamento)
+            r = directores.length > 0 ? directores[0] : {}
+            %>
+                <tr>
+                <td title="<%=buscaDep(departamentos,departamento).nombre.toLowerCase()%> (<%=departamento%>)">
+                <%=buscaDep2(d).nom%>
+                </td>
+                <td id="td_<%=rol%>_<%=index%>">
+                <% let prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                </td>
+                <td>
+                </td>
+                </tr>
+            <%let rol2 = rolesEnum.DirectorDepartamentoX2 
+            let delegado = filterByRol(roles, rol2, plan, departamento)
+            if (delegado.length === 0) prof = buscaPers(profesores, null)
+            else prof = buscaPers(profesores, delegado[0].PersonaId);
+            %>
+            <tr>
+            <td style="border: 0; padding-left:5em">
+            <em>Delegado en<em>
+            </td>
+            <td id="td_<%=rol2%>_<%=index%>">
+            <p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
+            </td>
+            <td>
+            </td>
+            </tr>
+            <%})%>
+            <tr id="foco">
+            <td></td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3 style="display:inline;"><em>Roles específicos de titulación</em></h3>
+    <select id="selectCoordinador" onChange="cambiarPDCoordinador()" >
+        <% for(let i=0; i < planEstudios.length; i++) { 
+            if (planEstudios[i].nombre !== null && (planID !== planEstudios[i].codigo)){ %>
+        <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option>
+            <% }else if (planEstudios[i].nombre !== null && (planID === planEstudios[i].codigo)){ %>
+        <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)" selected><%=planEstudios[i].nombre%></option>  
+            <%}else if (planEstudios[i].nombre === null && (planID !== planEstudios[i].codigo)) {%>
+        <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].codigo%></option>
+        <%}else{%>
+        <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>"  title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"selected><%=planEstudios[i].codigo%></option>
+            <%}
+        }%>
+    </select>
+    <table class="table">          
+        <tbody id='body_tb_departamentos'>
+            <% 
+            rol = rolesEnum.CoordinadorTitulacion
+            departamento = null
+            plan = planID
+            rols = filterByRol(roles, rol, plan, departamento)
+            r = rols.length > 0 ? rols[0] : {}
+            index = 0;
+            %>
+                <tr>
+                <td>
+                Coordinador Titulación
+                </td>
+                <td id="td_<%=rol%>_<%=index%>">
+                <%prof = buscaPers(profesores, r.PersonaId) %>
+                <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
+                </td>
+                <td>
+                </td>
+                </tr>
+            <%let rol2 = rolesEnum.CoordinadorTitulacionX2 
+            delegado = filterByRol(roles, rol2, plan, departamento)
+            if (delegado.length === 0) prof = buscaPers(profesores, null)
+            else prof = buscaPers(profesores, delegado[0].PersonaId);
+            %>
+            <tr>
+            <td style="border: 0; padding-left:5em">
+            <em>Delegado en<em>
+            </td>
+            <td id="td_<%=rol2%>_<%=index%>">
+            <p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
+            </td>
+            <td>
+            </td>
+            </tr>       
+            <tr>
+            <td><u>Responsables Docentes</u></td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            </tr>
+            <%
+            rol = rolesEnum.ResponsableDocente
+            departamento = null
+            plan = planID
+            <!--Si hay progdoc coge los departamentos responsables sino coge lo que haya en la bbdd-->
+            if(progDoc){
+                departamentosResponsables.forEach(function(d,index){
+                departamento = d.codigo
+                responsables = filterByRol(roles, rol, plan, departamento)
+                r = responsables.length > 0 ? responsables[0] : {} %>
+                <%- include ./rolesResponsableDocenteConsultar.ejs %>
+                <%})
+            }else{
+            responsables = filterByRol(roles, rol, plan, departamento) 
+            responsables.forEach(function(r,index){ %>
+                <% departamento = r.DepartamentoCodigo%>
+                <%- include ./rolesResponsableDocenteConsultar.ejs %>
+            <%})
+            }%>
+        </tbody>
+    </table>
+</div>
+<%}%> 
+<script>
+
+//se utiliza para que al cambiar plan el foco vaya a donde estabas
+let foco = <%- JSON.stringify(foco) %>
+
+function cambiarPDCoordinador(){
+    let pAcronimo = document.getElementById("selectCoordinador").value;
+    let search = parseQueryString();
+    delete search.pdID;
+    search.planID = pAcronimo;
+    search.foco = true;
+    let url = parseStringQuery(search);
+    window.location.replace(url);
+    
+}
+
+$(function() {
+
+    if (foco)window.scrollTo(0, document.getElementById('foco').offsetTop + 20);
+});
+    
+</script>
+

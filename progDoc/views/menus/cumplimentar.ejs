@@ -1,0 +1,168 @@
+<body>
+<%- include ../../public/js/funcionesMenu.ejs %>
+<div class="myHeader">
+    <p>Cumplimentar Programación:
+    <% if ( session && session.pdID){ %>
+        <%= session.pdID %>
+    <% } %>
+    </p>
+    <div class="row col-sm"  style="margin-left:0px">
+        <% if (locals.submenu !== "Profesores2") { %>
+         <select id="selectPlan" onchange="cambiarPD()">
+                <% for(let i=0; i < planEstudios.length; i++) { 
+                    if (planEstudios[i].nombre !== null){ %>
+                    <option value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option> 
+                    <%}else {%>
+                    <option value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].codigo%></option> 
+                    <%}
+                }%> 
+         </select>
+         <%}%>
+         
+
+    <% if (locals.departamentoID && locals.departamentosResponsables && (locals.submenu === "Profesores" || locals.submenu === "Tribunales")) { %>
+     <input id='departamentoResponsable' type="hidden" value="<%=departamentoID%>">
+         <select id="selectDepartamento"  onchange="cambiarDepart()">
+            <% for(let i=0; i < departamentosResponsables.length; i++) { 
+                if (departamentosResponsables[i].acronimo !== null){ %>
+                    <option value="<%=departamentosResponsables[i].codigo%>" title="<%=departamentosResponsables[i].nombre%>"><%=departamentosResponsables[i].acronimo%></option> 
+                    <%}else {%>
+                    <option value="<%=departamentosResponsables[i].codigo%>" title="<%=departamentosResponsables[i].nombre%>"><%=departamentosResponsables[i].codigo%></option> 
+                <%}%>   
+            <%}%>
+         </select>
+        <%}%>
+    </div>
+    <div class="tab">
+        <button id='Estado' class="tablinks" onclick="cambiarSubmenu(event, 'Estado')">Estado</button>
+        <!--<button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>-->
+        <button id='Profesores' class="tablinks" onclick="cambiarSubmenu(event, 'Profesores')">Profesores</button>
+        <button id='Tribunales' class="tablinks" onclick="cambiarSubmenu(event, 'Tribunales')">Tribunales</button>
+        <button id='Horarios' class="tablinks" onclick="cambiarSubmenu(event, 'Horarios')">Horarios</button>
+        <button id='Actividades' class="tablinks" onclick="cambiarSubmenu(event, 'Actividades')">Actividades</button>
+        <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Exámenes</button>
+        <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')">Calendario</button>
+    </div>
+    <% if (locals.planID) { %>
+     <input id='plan' type="hidden" value="<%=planID%>">
+  <%} else {%>
+    <input id='plan' type="hidden">
+  <%}%>
+    <% if (locals.submenu) { %>
+     <input id='submenu' type="hidden" value="<%=submenu%>">
+  <%} else {%>
+    <input id='submenu' type="hidden">
+  <%}%>
+  <% if (locals.departamentoID) { %>
+     <input id='departamento' type="hidden" value="<%=departamentoID%>">
+  <%} else {%>
+    <input id='departamento' type="hidden">
+  <%}%>
+   <%-include ./cumplimentarSubmenu.ejs%>
+</div>
+
+<script>
+let parseQueryString = <%-parseQueryString%>
+let parseStringQuery = <%-parseStringQuery%>
+let selectDepartamentoValue;
+let selectPlanValue;
+function cambiarSubmenu(evt, submenu) {
+    let pAcronimo = document.getElementById("selectPlan").value;
+    let departamento = document.getElementById('departamento');
+    if(departamento){
+        selectDepartamentoValue = departamento.value;
+        }
+    if(submenu === 'Profesores'){
+        let url = "<%=contextPath%>/respDoc/profesores?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        window.location.replace(url);
+    }
+    if (submenu === 'Tribunales'){
+        let url = "<%=contextPath%>/respDoc/tribunales?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        window.location.replace(url);
+    }
+    if (submenu === 'Horarios'){
+        let url = "<%=contextPath%>/coordinador/horarios?planID="+pAcronimo
+        window.location.replace(url);
+    }
+    if (submenu === 'Actividades'){
+        let url = "<%=contextPath%>/cumplimentar/actividades?planID="+pAcronimo
+        window.location.replace(url);
+    }
+    if (submenu === 'Examenes'){
+        let url = "<%=contextPath%>/coordinador/examenes?planID="+pAcronimo
+        window.location.replace(url);
+    }
+    if (submenu === 'Estado'){
+        let url = "<%=contextPath%>/estado?planID="+pAcronimo
+        window.location.replace(url);
+    }
+    if (submenu === 'Calendario'){
+        let url = "<%=contextPath%>/cumplimentar/calendario?planID="+pAcronimo
+        window.location.replace(url);
+    }
+    if (submenu === 'PDF'){
+        let url = "<%=contextPath%>/cumplimentar/PDF?planID="+pAcronimo
+        window.location.replace(url);
+    }
+
+
+
+}
+function cambiarPD(){
+    let pAcronimo = document.getElementById("selectPlan").value;
+    let search = parseQueryString();
+    delete search.pdID;
+    search.planID = pAcronimo;
+    let url = parseStringQuery(search);
+    window.location.replace(url);
+    
+}
+
+function cambiarDepart(){
+    let depart = document.getElementById("selectDepartamento").value;
+    let search = parseQueryString();
+    search.departamentoID = depart;
+    let url = parseStringQuery(search);
+    window.location.replace(url);
+}
+
+document.getElementsByTagName('body')[0].onload = actualizarSelectyBarra();
+function actualizarSelectyBarra() {
+    selectPlanValue = document.getElementById('plan').value
+    if(!selectPlanValue) {
+        selectPlanValue= "09TT"
+    }
+    document.getElementById('selectPlan') ? document.getElementById('selectPlan').value = selectPlanValue : null;
+
+    let departamento = document.getElementById('departamento');
+    let selectDepartamento = document.getElementById('selectDepartamento');
+    if(departamento && selectDepartamento){
+        selectDepartamentoValue = departamento.value;
+        if(!selectDepartamentoValue){
+            selectDepartamentoValue = "D520"
+        }
+        document.getElementById('selectDepartamento').value = selectDepartamentoValue;
+    }
+        
+    let submenu = document.getElementById('submenu').value
+    //para pintar profesores cuando este en asignacionProfesoresCumplimentar
+    if(submenu ==="Profesores2"){
+        submenu="Profesores"
+    }
+    if(!submenu) {
+        submenu= "Estado"
+    }
+    document.getElementById(submenu).style.display = "block";
+    document.getElementById(submenu).className += " active";
+}
+
+
+</script>
+     
+</body>
+
+
+
+
+
+   

@@ -1,0 +1,16 @@
+<%- include ../menus/consultar.ejs %>
+<div class="contenido">
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else{%>
+    <iframe id="pdfIframe" src="<%=contextPath%>/pdfs/<%=file%>" style="width:100%;" ></iframe>
+<% } %> 
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+        let height = $(window).height();
+        $('#pdfIframe').height(0.75*height);
+  });
+</script>
+

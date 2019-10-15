@@ -1,4 +1,7 @@
 const moment = require ('moment')
+const fs = require('fs')
+const path = require('path')
+
 exports.primerasMayusc = function (texto) {
     const re = /(^|[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ])(?:([a-záéíóúüñ])|([A-ZÁÉÍÓÚÜÑ]))|([A-ZÁÉÍÓÚÜÑ]+)/gu;
     return texto.replace(re,
@@ -118,7 +121,7 @@ exports.convertCommaToPointDecimal = function(n) {
 }
 
 //convierte de YYYY-MM-DD a DD/MM/YYYY
-formatFecha = function (fecha){
+function formatFecha (fecha){
     try{
         return (fecha.split("-")[2] + "/" + fecha.split("-")[1] + "/" + fecha.split("-")[0])
     }catch(error){
@@ -129,8 +132,35 @@ formatFecha = function (fecha){
 
 exports.formatFecha = formatFecha
 
+//convierte de DD/MM/YYYY a YYYY-MM-DD
+formatFecha2 = function (fecha) {
+    try {
+        return (fecha.split("/")[2] + "-" + fecha.split("/")[1] + "-" + fecha.split("/")[0])
+    } catch (error) {
+        return null
+    }
+}
+exports.formatFecha2 = formatFecha2
+
+
+
+//crea una fecha pasandola con formato dd/mm/yyyy
+exports.nuevaDateFormat = function (fecha) {
+    try{
+        let ano = fecha.split("/")[2]
+        let mes = fecha.split("/")[1]
+        let dia = fecha.split("/")[0]
+        return new Date(mes + "/" + dia + "/" + ano)
+    }catch(error){
+        return null
+    }
+}
+
+
+
 
 //le pasas una fecha y te devuelve el dia más proximo de dentro de un año que caiga
+//la fecha se pasa como YYYY-MM-DD
 //el mismo dia de la semana
 exports.addYear = function (fechaActual) {
     fechaActual = formatFecha(fechaActual)
@@ -148,7 +178,8 @@ exports.addYear = function (fechaActual) {
             }
         }
         siguiente = siguiente.add(temp[index], 'day')
-        return siguiente
+        let resp = siguiente.isValid() ? siguiente : null
+        return resp
     }catch(error){
         return null;
     }
@@ -192,5 +223,26 @@ exports.addYear2 = function (fechaActual, fechaAnterior, offset) {
         return [null,null];
     }
 
+}
+
+
+//devuelve el siguiente año al pasarle con formato 201920 y devolveria 202021
+exports.siguienteAnoAcademico = function (anoActual) {
+    let year = Number(anoActual.substr(0, 4));
+    let siguiente = year + 1;
+    let siguiente2 = year + 2;
+    return ("" + siguiente + "" + siguiente2.toString().substr(-2));
+}
+
+exports.ensureDirectoryExistence = function probar(filePath, notCreate) {
+    let dirname = path.dirname(filePath);
+    if (fs.existsSync(dirname)) {
+        return true;
+    }
+    if (notCreate) {
+        return false;
+    }
+    probar(dirname);
+    fs.mkdirSync(dirname);
 }
 

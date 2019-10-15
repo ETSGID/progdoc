@@ -1,0 +1,234 @@
+<div id="nuevaActividadModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">  
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title"></h4>
+        </div>
+        <div class="modal-body" id="modal_actividad_body">
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+</div>
+
+<script>
+
+//id de curso semestre grupo y actividadId sirve para saber si es editar (id) o añadir una nueva (false)
+function anadirActividad(id,actividadId,tipo,asignaturaId){
+  actividadId === false ?  actividadId = false : actividadId = Number(actividadId)
+  let div = document.createElement('div');
+  let calendarioId = Number(id.split("_")[1]);
+  let conjuntoActividadParcial = conjuntoActividadesParcial.find(function (obj) { return obj.identificador === calendarioId});
+  let fechaInicio = conjuntoActividadParcial.fechaInicio || "DD/MM/YYYY"
+  let asignaturasCoincidentes = asignaturas.filter(as => (as.curso == conjuntoActividadParcial.curso));
+  let options=`<option value="grupo">-</option>`
+  for (let i = 0; i<asignaturasCoincidentes.length; i++){ 
+     let s1 = conjuntoActividadParcial.semestre === '1S' && (asignaturasCoincidentes[i].semestre === '1S' || asignaturasCoincidentes[i].semestre === '1S-2S' || asignaturasCoincidentes[i].semestre === 'A' || asignaturasCoincidentes[i].semestre === 'I')
+     let s2 = conjuntoActividadParcial.semestre === '2S' && (asignaturasCoincidentes[i].semestre === '2S' || asignaturasCoincidentes[i].semestre === '1S-2S' || asignaturasCoincidentes[i].semestre === 'A' || asignaturasCoincidentes[i].semestre === 'I')    
+     if(s1 || s2){
+        let n = "";
+        asignaturasCoincidentes[i].acronimo !== null ? n=asignaturasCoincidentes[i].acronimo : n=asignaturasCoincidentes[i].nombre;
+        options+=`<option value="${asignaturasCoincidentes[i].identificador}" title="${asignaturasCoincidentes[i].nombre} (${asignaturasCoincidentes[i].codigo})">${n}</option>`    
+     }
+    }
+  let optionsTipo= `<option value="act">Actividad programada</option>
+  <option value="eval">Actividad evalucación</option>`
+  div.innerHTML =`<form method="post" class="form-inline"><p id="">
+  <div class="form-group"><select  class="form-control" id="select_${actividadId}">${options}</select></div> 
+  <div class="form-group"><select  class="form-control" id="selectTipo_${actividadId}">${optionsTipo}</select></div>
+  <input class="form-control dateActividad" id="fecha_${actividadId}" value="${fechaInicio}" name="fecha"  placeholder="${fechaInicio}" type="text" readonly="readonly"/>
+  <br>
+  <br>
+  <em>Hora Inicio</em>
+  <input class="form-control" type="number" min='0' max='23' id='hora_${actividadId}' placeholder="hh" value="" name="hora" onChange="formatHora(this);"><b>:</b>
+  <input class="form-control" type="number" min='0' max='23' id='minutos_${actividadId}' placeholder="mm" value="" name="minutos" onChange="formatHora(this);">
+  <em>Duración</em>
+  <input class="form-control" type="number" min='0' max='500' id='duracion_${actividadId}' placeholder="mm" value="" name="duracion">
+  <br>
+  <br>
+  
+  <textarea class="form-control rounded-0" name="textarea" id="descripcion_${actividadId}" rows="3" placeholder="Introducir descripción" maxlength="300"></textarea>
+  </p>    
+  <button type="button" class="btn btn-default" onclick = "guardarActividad('actividad_${conjuntoActividadParcial.identificador}_${actividadId}')">
+  <span class="glyphicon glyphicon-ok"></span>
+  </button> 
+  <button type="button" class="btn btn-default" onclick = "eliminarActividad('actividad_${conjuntoActividadParcial.identificador}_${actividadId}',${actividadId})">
+  <span class="glyphicon glyphicon-trash"></span>
+  </button>  
+  </form>`
+  let node = div.firstChild;
+  let contenedor = document.getElementById("modal_actividad_body")
+  while (contenedor.firstChild) {
+    contenedor.removeChild(contenedor.firstChild);
+}
+    //se debe borrar porque se pueden interferir por coincidir el mismo id
+  let contenedor2 = document.getElementById("modal_conjuntoActividad_body")
+  while (contenedor2 && contenedor2.firstChild) {
+    contenedor2.removeChild(contenedor2.firstChild);
+}
+  contenedor.appendChild(node)
+  //actualizo el tipo de evaluacion o actividad programada
+  $("#selectTipo_"+actividadId).val(tipo);
+  //si la actividad ya existia se debe actualizar solo por lo que se debe cargar su contenido
+   if(actividadId !== false){
+       //sino es un numero es una asignacion de grupo
+      asignaturaId = isNaN (asignaturaId) ? "grupo" : Number(asignaturaId);
+      $("#select_"+actividadId).val(asignaturaId);
+      $("#descripcion_"+actividadId).val(conjuntoActividadParcial.actividades.find(function(act){return act.identificador === actividadId}).descripcion);
+      $("#duracion_"+actividadId).val(conjuntoActividadParcial.actividades.find(function(act){return act.identificador === actividadId}).duracion);
+      if(conjuntoActividadParcial.actividades.find(function(act){return act.identificador === actividadId}).fecha){
+      $("#fecha_"+actividadId).val(conjuntoActividadParcial.actividades.find(function(act){return act.identificador === actividadId}).fecha);
+      }
+      if(conjuntoActividadParcial.actividades.find(function(act){return act.identificador === actividadId}).horaInicio){
+        $("#hora_"+actividadId).val(conjuntoActividadParcial.actividades.find(function(act){return act.identificador === actividadId}).horaInicio.split(":")[0]);
+        $("#minutos_"+actividadId).val(conjuntoActividadParcial.actividades.find(function(act){return act.identificador === actividadId}).horaInicio.split(":")[1]);
+      } 
+  }
+  $("#nuevaActividadModal").modal();
+   if (conjuntoActividadParcial.fechaInicio !== null && conjuntoActividadParcial.fechaFin !== null 
+    && (nuevaDateFormat(conjuntoActividadParcial.fechaInicio) < nuevaDateFormat(conjuntoActividadParcial.fechaFin))){
+        $('.dateActividad').datepicker({
+        language: "es",
+        keyboardNavigation: false,
+        todayHighlight: true,
+        autoclose: true,
+        format: "dd/mm/yyyy",
+        clearBtn: true,
+        startDate: conjuntoActividadParcial.fechaInicio,
+        endDate: conjuntoActividadParcial.fechaFin,
+        daysOfWeekDisabled:[0]
+        });
+    }else{
+        $("#fecha_"+actividadId).val("DD/MM/YYYY");
+        $("#fecha_"+actividadId).attr('placeholder',"DD/MM/YYYY");
+        $("#fecha_"+actividadId).attr("disabled", true);
+    }
+
+}
+function guardarActividad(id){    
+ let conjuntoActividadParcialId = Number(id.split("_")[1]);
+ let conjuntoActividadParcial = conjuntoActividadesParcial.find(function (obj) { return obj.identificador === conjuntoActividadParcialId});
+ let actividadId = id.split("_")[2];
+ //si no hay un id quiere decir que es una nota nueva sino que es una actualización de una existente
+ actividadId === "false" ?  actividadId = false : actividadId = Number(actividadId)
+ let actividad = conjuntoActividadParcial.actividades.find(function (obj){ return obj.identificador === actividadId}) || {}
+ let asignaturaIdentificador = isNaN(document.getElementById("select_"+ actividadId).value) ? "grupo" : Number(document.getElementById("select_"+ actividadId).value)
+ let asignatura = asignaturas.find(function (obj) { return (obj.identificador === asignaturaIdentificador )});
+ let tipo = document.getElementById("selectTipo_"+ actividadId).value
+ let fecha = document.getElementById("fecha_"+ actividadId).value
+ let hora = document.getElementById("hora_"+ actividadId).value
+ let minutos = document.getElementById("minutos_"+ actividadId).value
+ let duracion = document.getElementById("duracion_"+ actividadId).value
+ let descripcion = document.getElementById("descripcion_"+ actividadId).value
+ 
+ //sino hay asignatura es porque es una asignatura de grupo
+ if(!asignatura){
+    asignatura={}
+    asignaturaIdentificador = null
+    asignatura.acronimo = ""
+    asignatura.nombre = ""
+    asignatura.codigo = ""
+        
+ }
+ let asignaturaNombreOAcronimo = asignatura.acronimo !== null ? asignatura.acronimo : asignatura.nombre;
+ let path = actividadId === false ? '/crearActividad' : '/actualizarActividad'
+ if(!moment(fecha, "DD/MM/YYYY").isValid()){
+     alert("La actividad debe tener una fecha asociada")
+ }else{
+   $.ajax({
+        url: contextPath+'/coordinador'+path,
+        method: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify({ conjuntoActividadParcialId: conjuntoActividadParcialId, actividadId: actividadId,
+         asignaturaId: asignaturaIdentificador, tipo: tipo, descripcion: descripcion, fecha: fecha,
+         hora: hora, minutos: minutos, duracion: duracion })
+        }).done(function(res) {
+    if(!res.success){
+        alert(res.msg)
+    }else{
+        actividad.asignaturaId = asignaturaIdentificador
+        actividad.tipo = res.actividadUpdate.tipo
+        actividad.fecha = fecha
+        actividad.descripcion = res.actividadUpdate.descripcion
+        actividad.duracion = res.actividadUpdate.duracion
+        actividad.horaInicio = res.actividadUpdate.horaInicio
+        let fechaString =  ""
+        if (actividad.fecha){
+          fechaString = "("+getDia(actividad.fecha)[4]+" "+getDia(actividad.fecha)[3].getDate()+")"
+        }
+        let horaInicio = ""
+        if (actividad.horaInicio){
+          horaInicio = "["+moment(actividad.horaInicio,"hh:mm:ss").format("hh:mm")
+          if (actividad.duracion || actividad.duracion === 0){
+          horaInicio += "-" + moment(actividad.horaInicio,"hh:mm:ss").add(actividad.duracion, "m").format("hh:mm")
+          }
+          horaInicio += "]"
+        }
+        switch (res.accion){
+            case "create":
+                actividad.identificador = res.actividadUpdate.identificador
+                conjuntoActividadParcial.actividades.push(actividad)
+                break;
+            case "update":
+                let li = document.getElementById(actividadId)
+                let parent = li.parentNode;
+                parent.removeChild(li);
+                break;
+        }
+        let div = document.createElement('div');
+        //se usa getLunesAnteriorPara pq es el que se usa para el identificador de esa fila
+        div.innerHTML = `<li id="${actividad.identificador}">${asignaturaNombreOAcronimo}
+        <span style="font-size:80%">${fechaString}</span><span style="font-size:80%">${horaInicio}</span> ${actividad.descripcion}
+        <button type="button" class="btn btn-default" onclick = "anadirActividad('actividad_${conjuntoActividadParcial.identificador}_${getLunesAnterior(actividad.fecha)}',${actividad.identificador},'${actividad.tipo}',${actividad.asignaturaId})">
+        <span class="glyphicon glyphicon-pencil"></span>
+        </button>
+        <button type="button" class="btn btn-default" onclick = "eliminarActividad('actividad_${conjuntoActividadParcial.identificador}_${actividad.identificador}',${actividad.identificador})">
+        <span class="glyphicon glyphicon-trash"></span>
+        </button> 
+        </li>`
+        //podria ser otro parent, si cambia el tipo
+        //se usa getLunesAnteriorPara pq es el que se usa para el identificador de esa fila
+        let parent2 = document.getElementById(conjuntoActividadParcialId + "_" + getLunesAnterior(actividad.fecha) + "_" + actividad.tipo)
+        parent2.appendChild(div.firstChild)
+    }
+    
+    Cancel()            
+}).fail( function( jqXHR, textStatus, errorThrown ) {
+        alert("Ha habido un error:" + jqXHR.status + " " + textStatus)
+    })    
+ }
+  
+}
+
+function eliminarActividad(id, actividadId){
+    actividadId = Number(actividadId)
+    $.ajax({
+    url: contextPath+'/coordinador/eliminarActividad',
+    method: 'POST',
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify({actividadId: actividadId})
+    }).done(function(res) {
+        if(!res.success){
+            alert(res.msg)
+        }else{
+            let li = document.getElementById(actividadId)
+            let parent = li.parentNode;
+            parent.removeChild(li);
+        }
+        Cancel()
+    }).fail( function( jqXHR, textStatus, errorThrown ) {
+        alert("Ha habido un error:" + jqXHR.status + " " + textStatus)
+    })            
+}
+
+function Cancel(){
+    $("#nuevaActividadModal").modal('hide');
+}
+</script>

@@ -11,7 +11,7 @@ module.exports = function (sequelize, DataTypes) {
             nombre: {
                 type: DataTypes.STRING
             },
-            capacidad:{
+            capacidad: {
                 type: DataTypes.INTEGER
             },
             curso: {

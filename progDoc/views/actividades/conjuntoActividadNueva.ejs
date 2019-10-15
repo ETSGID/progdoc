@@ -1,0 +1,172 @@
+<div id="nuevoConjuntoActividadModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">  
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Calendario de Actividades</h4>
+        </div>
+        <div class="modal-body" id="modal_conjuntoActividad_body">
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+</div>
+
+<script>
+
+//conjuntoActividadParcialId sirve para saber si es editar (id) o añadir una nueva (false)
+function anadirConjuntoActividad(id,conjuntoActividadParcialId){
+    /*
+    si es false quiere decir que es crear una nueva sino es editar la existente
+    si es crear no se deja asignar grupo
+    si es editar no se deja cambiar el semestre o el curso
+    */
+  conjuntoActividadParcialId === false ?  conjuntoActividadParcialId = false : conjuntoActividadParcialId = Number(conjuntoActividadParcialId)
+  let div = document.createElement('div');
+  let cursoCoincidente
+  let semestreCoincidente
+  let gruposCoincidentes
+  let gruposSeleccionables
+
+  let conjuntoActividadParcial = conjuntoActividadesParcial.find(function (obj) { return obj.identificador === conjuntoActividadParcialId});
+  if(conjuntoActividadParcialId){
+      cursoCoincidente = conjuntoActividadParcial.curso
+      semestreCoincidente = conjuntoActividadParcial.semestre
+      gruposCoincidentes = []
+      conjuntoActividadParcial.grupos.forEach(function(g){gruposCoincidentes.push(g.identificador)})
+      gruposSeleccionables = grupos.filter(function( element ) {return Number(cursoCoincidente) === element.curso && Number(semestreCoincidente.split("S")[0]) === Number(element.nombre.split(".")[1]);});
+      let optionsGrupos= ``
+    for (let i = 0; i<gruposSeleccionables.length; i++){
+        optionsGrupos+=`<option value=${gruposSeleccionables[i].grupoId}>${gruposSeleccionables[i].nombre}</option>`
+    }
+    let fInicio = "DD/MM/YYYY"
+    let fFin = "DD/MM/YYYY"
+    if (conjuntoActividadParcial.fechaInicio){
+        fInicio= conjuntoActividadParcial.fechaInicio
+    }
+    if (conjuntoActividadParcial.fechaFin){ 
+        fFin= conjuntoActividadParcial.fechaFin
+    }
+    div.innerHTML =`<form id="formConjuntoActividadParcial" method="post"><p id="">
+    <input type="hidden" name="conjuntoActividadParcialId" value="${conjuntoActividadParcialId}">
+  <span><b>${cursoCoincidente}º curso ${semestreCoincidente}</b></span>
+  <div class="form-group">
+    <label>Nota Inicial</label> 
+    <textarea class="form-control rounded-0" name="notaInicial" id="notaInicial_${conjuntoActividadParcialId}" rows="3" placeholder="Introducir nota" maxlength="300"></textarea>
+  </div>
+  <div class="form-group">
+    <label>Selección de grupos (opcional)</label> 
+    <select name="selectGrupos" id="selectGrupos_${conjuntoActividadParcialId}" class="selectpicker" title="-" multiple>${optionsGrupos}</select>
+  </div>
+  <div class="form-group">
+      <label>Fecha Incial</label>
+      <input class="form-group form-control dateActividad" value="${fInicio}" name="date_fInicio" id="date_fInicio" placeholder="${fInicio}" type="text"/>
+    </div>
+    <div class="form-group">
+     <label>Fecha final</label>
+     <input class="form-group form-control dateActividad" value="${fFin}" name="date_fFin" id="date_fFin placeholder="${fFin}" type="text"/>
+    </div>
+  </p>
+  <button type="button" class="btn btn-default" onclick = "guardarConjuntoActividad('${actualizarConjuntoActividadParcialPath}')">
+  <span class="glyphicon glyphicon-ok"></span>
+  </button> 
+  <button type="button" class="btn btn-default" onclick = "eliminarConjuntoActividad('${eliminarConjuntoActividadParcialPath}', '${conjuntoActividadParcialId}')">
+  <span class="glyphicon glyphicon-trash"></span>
+  </button>  
+  </form>`      
+  }else{
+    let optionsCurso=``
+    for (let i = 0; i<cursos.length; i++){ 
+    optionsCurso+=`<option value="${cursos[i]}">${cursos[i]}º</option>`    
+    }
+    let optionsSemestre=`<option value="1S">Primer semestre</option>
+    <option value="2S">Segundo Semestre</option>`
+    let fInicio = "DD/MM/YYYY"
+    let fFin = "DD/MM/YYYY"
+    div.innerHTML =`<form id="formConjuntoActividadParcial" method="post"><p id="">
+    <input type="hidden" name="conjuntoActividadParcialId" value="${conjuntoActividadParcialId}">
+   <div class="form-group"><label>Curso</label><select  name="curso" class="form-control" id="selectCurso_${conjuntoActividadParcialId}">${optionsCurso}</select></div> 
+   <div class="form-group"><label>Semestre</label><select  name="semestre" class="form-control" id="selectSemestre_${conjuntoActividadParcialId}">${optionsSemestre}</select></div>
+   <div class="form-group">
+    <label>Nota Inicial</label>
+    <textarea class="form-control rounded-0" name="notaInicial" id="notaInicial_${conjuntoActividadParcialId}" rows="3" placeholder="Introducir nota" maxlength="300"></textarea>
+  </div>
+   <div class="form-group">
+      <label>Fecha Incial</label>
+      <input class="form-group form-control dateActividad" value="${fInicio}" name="date_fInicio" id="date_fInicio" placeholder="${fInicio}" type="text"/>
+    </div>
+    <div class="form-group">
+     <label>Fecha final</label>
+     <input class="form-group form-control dateActividad" value="${fFin}" name="date_fFin" id="date_fFin placeholder="${fFin}" type="text"/>
+    </div>
+  </p>
+  <button type="button" class="btn btn-default" onclick = "guardarConjuntoActividad('${crearConjuntoActividadParcialPath}')">
+  <span class="glyphicon glyphicon-ok"></span>
+  </button> 
+  </form>`
+  }
+
+  let node = div.firstChild;
+  let contenedor = document.getElementById("modal_conjuntoActividad_body")
+  while (contenedor.firstChild) {
+    contenedor.removeChild(contenedor.firstChild);
+}
+  //se debe borrar porque se pueden interferir por coincidir el mismo id
+  let contenedor2 = document.getElementById("modal_actividad_body")
+  while (contenedor2 && contenedor2.firstChild) {
+    contenedor2.removeChild(contenedor2.firstChild);
+}
+  contenedor.appendChild(node)  
+  //inicializo las fechaInicio y fechaFin
+   $('.dateActividad').datepicker({
+            language: "es",
+            keyboardNavigation: false,
+            todayHighlight: true,
+            autoclose: true,
+            format: "dd/mm/yyyy",
+            clearBtn: false,
+            startDate: fechasLimite[0],
+            endDate: fechasLimite[1]
+    });
+  //si la actividad ya existia se debe actualizar solo por lo que se debe cargar su contenido
+   if(conjuntoActividadParcialId !== false){
+       //inicio el multiselect
+    $("#selectGrupos_" + conjuntoActividadParcialId).selectpicker('render');
+    $("#selectGrupos_" + conjuntoActividadParcialId).selectpicker('val', gruposCoincidentes);
+    //inicio la nota Inicial
+    $("#notaInicial_"+conjuntoActividadParcialId).val(conjuntoActividadParcial.notaInicial);
+  }
+  $("#nuevoConjuntoActividadModal").modal();
+
+}
+function guardarConjuntoActividad(guardarPath){
+    let form = document.getElementById("formConjuntoActividadParcial");
+    form.setAttribute('action', guardarPath)
+    form.submit();    
+}
+
+function eliminarConjuntoActividad(eliminarPath, conjuntoActividadParcialId){
+  conjuntoActividadParcialId = Number(conjuntoActividadParcialId)
+  if(confirm("Una vez que borra el calendario ya no se podrá recupera ¿Seguro que quiere borrarlo?")){
+    $.ajax({
+    url: eliminarPath,
+    method: 'POST',
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify({conjuntoActividadParcialId: conjuntoActividadParcialId})
+    }).done(function(res) {
+        if(!res.success){
+            alert(res.msg)
+        }else{
+            location.reload();
+        }
+    }).fail( function( jqXHR, textStatus, errorThrown ) {
+        alert("Ha habido un error:" + jqXHR.status + " " + textStatus + " " + errorThrown)
+    })      
+  }
+}
+</script>

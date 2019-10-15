@@ -1,21 +1,21 @@
 let models = require('../models');
 let Sequelize = require('sequelize');
-let menuProgDocController = require('../controllers/menuProgDoc_controller')
+let progDocController = require('../controllers/progDoc_controller')
+let personaYProfesorController = require('../controllers/personaYProfesor_controller')
 const op = Sequelize.Op;
 
 // GET /profesor/docencia/:profesorCorreo/:anoAcademico(\\d+)/:semestre
 //profesorCorreo es el correo del profesor
 //anoAcademico 201819
 //semestre 1S 2S no permite I
-exports.getProfesorAsignaturas = function (req, res, next) {
-    let semestreGrupo = '%%'
+exports.getProfesorAsignaturas = async function (req, res, next) {
     let planes = [];
     let planesCompletos = []
     let profesor = null;
-    let pds=[]
+    let pds = []
     let resp = {};
-    let respError 
-    let semestreAsignatura=["I","A","1S-2S"];
+    let respError
+    let semestreAsignatura = ["I", "A", "1S-2S"];
     switch (req.params.semestre) {
         case "1S":
             semestreAsignatura.push("1S");
@@ -27,82 +27,72 @@ exports.getProfesorAsignaturas = function (req, res, next) {
             respError = { error: "Semestre incorrecto" }
             break;
     }
-    return menuProgDocController.getProfesorCorreo(req.params.profesorCorreo)
-        .then((prof) => {
-            profesor = prof
-            if(!profesor){
-                respError = { error: "Profesor no encontrado"}
-            }
-            if (!respError){
-                return models.PlanEstudio.findAll({
-                    attributes: ["codigo",'nombreCompleto','nombre'],
-                    raw: true
+    try {
+        profesor = await personaYProfesorController.getProfesorCorreo(req.params.profesorCorreo)
+        if (!profesor) {
+            respError = { error: "Profesor no encontrado" }
+        }
+        if (!respError) {
+            let plans = await models.PlanEstudio.findAll({
+                attributes: ["codigo", 'nombreCompleto', 'nombre'],
+                raw: true
+            })
+            plans.forEach(function (p, index) {
+                planes.push(p['codigo'])
+                planesCompletos.push(p)
+            })
+            let progDocentes = await progDocController.getAllProgramacionDocentes(planes, req.params.semestre, req.params.anoAcademico)
+            for (plan in progDocentes) {
+                progDocentes[plan].forEach(function (pd, index) {
+                    pds.push(pd["identificador"])
                 })
-                    .then((plans) => {
-                        plans.forEach(function (p, index) {
-                            planes.push(p['codigo'])
-                            planesCompletos.push(p)
-                        })
-                        return menuProgDocController.getAllProgramacionDocentes(planes, req.params.semestre, req.params.anoAcademico)
-                    }).then((progDocentes) => {
-                        for (plan in progDocentes) {
-                            progDocentes[plan].forEach(function (pd, index) {
-                                pds.push(pd["identificador"])
-                            })
-                        }
-                        return models.Asignatura.findAll({
-                            where: {
-                                ProgramacionDocenteIdentificador: {
-                                    [op.or]: pds
-                                },
-                                semestre: {
-                                    [op.or]: semestreAsignatura
-                                },
-                                anoAcademico: req.params.anoAcademico
-
-                            },
-                            attributes: ['codigo', 'acronimo', 'nombre','ProgramacionDocenteIdentificador'],
-                            include: [{
-                                //incluye las asignaciones de profesores y los horarios.
-                                attributes: [],
-                                model: models.AsignacionProfesor,
-                                where: {
-                                    ProfesorId: profesor.identificador
-                                },//inner join
-                                required: true
-                            }],
-                            raw: true
-
-                        })
-                    }).then((asignaciones) => {
-                        asignaciones.forEach(function(asign,index){
-                            let planId=asign['ProgramacionDocenteIdentificador'].split("_")[1]
-                            if (!resp[planId]){
-                                resp[planId]={}
-                                let infoPlan = planesCompletos.find(function(obj){ return obj.codigo === planId})
-                                resp[planId]['codigo'] = infoPlan['codigo']
-                                resp[planId]['nombre'] = infoPlan['nombreCompleto']
-                                resp[planId]['acronimo'] = infoPlan['nombre']
-                                resp[planId]['asignaturas'] = []
-                            }
-                            let asignatura= resp[planId]['asignaturas'].find(function(obj){return obj.codigo === asign.codigo})
-                            if(!asignatura){
-                                delete asign['ProgramacionDocenteIdentificador']
-                                resp[planId]['asignaturas'].push(asign)
-                                
-                            }
-                        })
-                        res.json(resp)
-                    })
-                    
-            }else{
-                res.json(respError);
             }
+            let asignaciones = await models.Asignatura.findAll({
+                where: {
+                    ProgramacionDocenteIdentificador: {
+                        [op.or]: pds
+                    },
+                    semestre: {
+                        [op.or]: semestreAsignatura
+                    },
+                    anoAcademico: req.params.anoAcademico
+                },
+                attributes: ['codigo', 'acronimo', 'nombre', 'ProgramacionDocenteIdentificador'],
+                include: [{
+                    //incluye las asignaciones de profesores y los horarios.
+                    attributes: [],
+                    model: models.AsignacionProfesor,
+                    where: {
+                        ProfesorId: profesor.identificador
+                    },//inner join
+                    required: true
+                }],
+                raw: true
 
-        })
-       
-        .catch(function (error) {
-            console.log('API error: ' + error.message);
-            next(error);
-        });
+            })
+            asignaciones.forEach(function (asign) {
+                let planId = asign['ProgramacionDocenteIdentificador'].split("_")[1]
+                if (!resp[planId]) {
+                    resp[planId] = {}
+                    let infoPlan = planesCompletos.find(function (obj) { return obj.codigo === planId })
+                    resp[planId]['codigo'] = infoPlan['codigo']
+                    resp[planId]['nombre'] = infoPlan['nombreCompleto']
+                    resp[planId]['acronimo'] = infoPlan['nombre']
+                    resp[planId]['asignaturas'] = []
+                }
+                let asignatura = resp[planId]['asignaturas'].find(function (obj) { return obj.codigo === asign.codigo })
+                if (!asignatura) {
+                    delete asign['ProgramacionDocenteIdentificador']
+                    resp[planId]['asignaturas'].push(asign)
+                }
+            })
+            res.json(resp)
+        } else {
+            res.json(respError);
+        }
+    }
+    catch (error) {
+        console.log('API error: ' + error.message);
+        next(error);
+    }
 }

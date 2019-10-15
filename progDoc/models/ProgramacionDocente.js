@@ -23,10 +23,11 @@ module.exports = function (sequelize, DataTypes) {
             fechaProgDoc: {
                 type: DataTypes.DATE
             },
+            // estado actualización de las actividades parciales
             estadoGrupos: {
                 type: DataTypes.INTEGER
             },
-            //fecha actualización de grupos
+            //fecha actualización de las actividades parciales
             fechaGrupos: {
                 type: DataTypes.DATE
             },

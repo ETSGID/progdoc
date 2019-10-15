@@ -1,0 +1,917 @@
+<%- include ../menus/cumplimentar.ejs %>
+<div class="contenido">
+        <script src="<%=contextPath%>/js/datepicker.js"></script>
+        <link rel='stylesheet' type="text/css" href='<%=contextPath%>/stylesheets/datepicker.css' />
+        <input type="hidden" value="<%=ano%>" id="anoSeleccionado">
+    <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+        <p style="margin-top: 30px"><%=permisoDenegado%></p>
+    <%}else if(estado === 0){ %>
+        <p style="margin-top: 30px">El calendario general de este año no ha sido todavía aprobado por el jefe de estudios.</p>
+    <%}else if(ano === null){ %>
+        <p style="margin-top: 30px">Programación docente cerrada</p>
+    <%}else{%>
+        
+        <div class="">       
+            <h2>Calendario <%=ano%>/<%=parseInt(ano)+1%>
+                
+                <button type="button" class="btn btn-default" data-toggle="popover" title="Leyenda de colores" data-content="">Leyenda de colores</button>
+                
+                
+            </h2> 
+
+            
+        </div>
+        
+        <div id="myPopoverContent" style="display: none;">
+            <table border="1" style="width:100%;  font-size: 17px;">
+                <tr>
+                    <th style="text-align: center">Evento</th>
+                    <th style="text-align: center">Color</th>
+                </tr>
+                <tr>
+                    <td>Días no lectivos o de ajuste</td>
+                    <td style="background-color: SpringGreen"></td>
+                </tr>
+                <tr>
+                    <td>Días especiales</td>
+                    <td style="background-color: red"></td>
+                </tr>
+                <tr>
+                    <td>Exámenes</td>
+                    <td style="background-color: yellow"></td>
+                </tr>
+                <tr>
+                    <td>Defensas de TFTs</td>
+                    <td style="background-color: LightSkyBlue"></td>
+                </tr>
+                <tr>
+                    <td>Días festivos o no lectivos oficiales UPM</td>
+                    <td style="background-color: grey"></td>
+                </tr>
+                <tr>
+                    <td>Fechas importantes</td>
+                    <td style="background-color: Orange"></td>
+                </tr>
+                    
+                    
+                    
+                    
+               
+            </table>
+        </div>
+        <script>
+            $('[data-toggle=popover]').popover({
+
+                content: $('#myPopoverContent').html(),
+                html: true
+
+            }).click(function() {
+                $(this).popover('show');
+            });
+        </script>
+        <div  id="calendario_comun" style=" margin-top: 35px;">
+            
+            <table>
+                <tr >
+                    <th style="text-align: center;">
+                        Semana
+                    </th>
+                    <th style="text-align: center;">
+                        Mes
+                    </th>
+                    <th style="text-align: center;">
+                        L
+                    </th>
+                    <th style="text-align: center;">
+                        M
+                    </th>
+                    <th style="text-align: center;">
+                        X
+                    </th>
+                    <th style="text-align: center;">
+                        J
+                    </th>
+                    <th style="text-align: center;">
+                        V
+                    </th>
+                    <th style="text-align: center;">
+                        S
+                    </th>
+                    <th style="text-align: center;">
+                        D
+                    </th>
+                    <th style="text-align: center;">
+                        Eventos
+                    </th>
+                </tr>
+
+                <% meses = ["Septiembre", "Octubre", "Noviembre", "Diciembre","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto"] %>
+                <% contador_de_meses = 0; contador_de_semanas = 0 %>
+                <% array_eventos = [] %>
+                <% for(var i = 0 ; i<(calendario.length/7); i++){ %>
+
+                    <% array_eventos = [] %>
+                    <tr>
+                        <td style="text-align: center; margin-right:1px;">
+                            
+                                <span style="margin-right: 1em;">
+                                    <%=contador_de_semanas %>
+                                </span>
+                                <% contador_de_semanas += 1 %>   
+                            
+                        </td>
+                        <td style="text-align: center; margin-right:1px;">
+                            <% if(calendario.slice(i*7, i*7+7).includes(1)){ %>
+                                <span style="margin-right: 1em;">
+                                    <%= meses[contador_de_meses] %>
+                                </span>
+                                <% contador_de_meses += 1 %>   
+                            <% } %>
+                        </td>
+
+                        <% for(var j = 0 ; j<(7); j++){ %>
+                            
+                            <% if(calendario[i*7 + (j)] === undefined) { %>
+                                <td></td>
+
+                            <%}else{ %>
+                                <% array_eventos.push.apply(array_eventos, array_dias[i*7 + (j)].eventos);%>
+                                <td>
+                                    <%if(j== 6 || j==5) {%>
+                                        <button style="background-color: white; color: red;" type="button" class="btn calendario-boton" data-toggle="modal" data-target="#eventoModal" data-dia="<%= array_dias[i*7 + (j)].codigo %>" >   <%= calendario[i*7 + (j)] %></button>
+                                    
+                                        
+                                    <% }else{ %>
+                                        <button style="background-color: <%= array_dias[i*7 + (j)].color %>" type="button" class="btn calendario-boton" data-toggle="modal" data-target="#eventoModal" data-dia="<%= array_dias[i*7 + (j)].codigo %>" >   <%= calendario[i*7 + (j)] %></button>
+                                        
+                                    <% } %>
+                                    <input type="hidden" id="eventos<%= array_dias[i*7 + (j)].codigo %>" value="<%= array_dias[i*7 + (j)].eventos%>" >
+                                    
+                                </td>
+                            <% } %>
+
+                        <% } %>
+                                
+                        <td>
+                            <span style="margin-left: 1em;">
+                                
+                                <% for( var j=0 ; j < array_eventos.length ; j++){ %>
+                                    <% var json_stringify = JSON.stringify(array_eventos[j]) %>
+                                    <input type="hidden" value="<%= json_stringify%>" id="data-<%= array_eventos[j].mensaje %>">
+                                    <% if(array_eventos[j].editable === 1){ %>
+                                        <button  id="button-<%= array_eventos[j].mensaje %>" onclick="eventoAntiguoBoton(<%=json_stringify%>)"><%= array_eventos[j].mensaje %></button>
+                                    <% }else{%>
+                                        <span><%= array_eventos[j].mensaje %></span>
+                                    <% } %>
+                                <% }%>
+                            </span>
+                        </td>
+
+                    </tr>
+
+                <% } %>
+                
+            </table>
+        </div>
+        <div class="modal fade" id="eventoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"></span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="fechaInicio">
+                        <input type="hidden" id="eventoAntiguo">
+                        <div id="div-selectEvento">
+                            <label for="eventoTipo">Elegir evento</label>
+                            <select class="form-control form-control-lg" id="eventoTipo" onchange="eventoTipoChange()">
+                                    <option disabled selected>Escoja un evento</option>
+                                    <option>Comienzo del curso</option>
+                                    <option>Final del primer cuatrimestre</option>
+                                    <option>Comienzo del segundo cuatrimestre</option>
+                                    <option>Final del curso</option>
+                                    <option>Días no lectivos o de ajuste</option>
+                                    <option>Exámenes</option>
+                                    <option>Periodo TFT</option>
+                                    <option>Días especiales</option>
+                                    <option>Otro</option>
+                                    
+                            </select>
+                            <small id="eventoHelp" class="form-text text-muted">En este desplegable se muestran los eventos predeterminados que se deben definir. Para crear uno distinto escoger la opción "Otro".</small>
+                        </div>
+                        <div style="display: none;" id="formularioEventoPersonalizado">
+                            <input type="hidden" id="tipoDeEvento">
+                            
+                            <b><span id="text-formularioEvento"></span></b>
+                            
+                            <div id="div-eventoNombre">
+                                <label style="font-weight: normal;" for="eventoNombreInput" >Nombre del evento: </label>
+                                <input type="text" class="form-control" id="eventoNombreInput"  placeholder="Nombre del evento">
+                            </div>
+                            <span style="font-weight: normal;" id="text-fechaInicio">Fecha de comienzo es: </span>
+
+                            <div id="div-inicioEvento">
+                                <label for="inicioEvento" id="inicioEventoLabel" style="font-weight: normal;">Editar fecha de inicio del evento:</label>
+                                <input class="form-control datePickerInicio" id="inicioEvento" name="inicioEvento" placeholder="Fecha del evento">
+                            </div>
+                            <div id="div-selectDiade" style="display: none">
+                                <label for="diaDe" id="label-diaDe" style="font-weight: normal;">Tipo de día:</label>
+                                <select class="form-control form-control-lg" id="diaDe" >
+                                        <option disabled selected>Escoja un día</option>
+                                        <option>Lunes</option>
+                                        <option>Martes</option>
+                                        <option>Miércoles</option>
+                                        <option>Jueves</option>
+                                        <option>Viernes</option>
+                                </select>
+                            </div>
+                            <div id="div-diarioCheck">
+                                <input type="checkbox" class="form-check-input" id="diarioCheck" onchange="diarioChange()">
+                                <label class="form-check-label" for="diarioCheck" style="font-weight: normal;" >Evento diario</label>
+                            </div>
+                            <div id="div-finEvento">
+                                <label for="finEvento" id="finEventoLabel" style="font-weight: normal;">Fecha de fin del evento:</label>
+                                <input class="form-control datePickerFin" id="finEvento" name="finEvento" placeholder="Fecha final del evento">
+                            </div>
+                            
+                            <div id="div-selectTipoExamen" style="display: none">
+                                <label for="tipoDeExamen" style="font-weight: normal;">Tipo de periodo:</label>
+                                <select class="form-control form-control-lg" id="tipoDeExamen" >
+                                        <option selected>Ordinario</option>
+                                        <option>Extraordinario</option>
+                                </select>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <span style="display: none; color: red; text-align: left;" id="mensajeErrorEvento">Debe escoger la opción de evento diario o poner una fecha final.</span>
+                        <div id="divBotones">
+                            <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cerrar</button>
+                            <button type="button" class="btn btn-danger" id="botonEliminarEvento" onclick="eliminarEvento()">Eliminar</button>
+                            <button type="button" class="btn btn-primary" onclick="guardarEvento()">Guardar</button>
+                        </div>  
+                    </div>
+                  </div>
+                </div>
+              </div>
+</div>
+
+
+
+        
+    <%}%>
+
+</div>
+
+<style>
+        .calendario-boton{
+            border-color: black;
+            height: 3em;
+            width: 3em;
+            border-radius: 0px;
+        }    
+    </style>
+<script>
+    $(function() {
+        $('.datePickerFin').datepicker({
+            language: "es",
+            keyboardNavigation: false,
+            todayHighlight: false,
+            autoclose: true,
+            format: "yyyy-mm-dd",
+            clearBtn: true,
+            startDate: "<%-ano%>-09-01",
+            endDate: "<%-String(parseInt(ano) + 1)%>-08-30",
+            toggleActive: true,
+            defaultViewDate: {year: 2019, month: 11, day:03}, 
+            orientation: "top"  
+            
+        });
+    
+    });
+
+        //el multiselect del layout funciona con jquery
+    $('#eventoModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var dia = button.data('dia'); // Extract info from data-* attributes
+        var tipo = button.data('tipo');
+        var modal = $(this);
+        document.getElementById("mensajeErrorEvento").style.display = "none";
+
+        
+
+        
+        
+
+        if(dia !== undefined){
+            //document.getElementById("eventoTipo").value = "Escoja un evento";
+            document.getElementById("formularioEventoPersonalizado").style.display = "none";
+            let eventos = document.getElementById("eventos" + dia).value;
+            modal.find('.modal-title').text('Día: ' + dia);
+            document.getElementById("fechaInicio").value = dia;
+            document.getElementById("text-fechaInicio").style.display = "block";
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha de comienzo: " + dia;
+            
+            document.getElementById("div-selectEvento").style.display = "block";
+            document.getElementById("botonEliminarEvento").style.display = "none";
+            document.getElementById("div-selectDiade").style.display = "none";
+                            
+            document.getElementById("eventoAntiguo").value = 0;
+
+            document.getElementById("div-inicioEvento").style.display = "none";
+
+            document.getElementById("inicioEvento").value = "";
+
+            document.getElementById("finEvento").remove();
+            document.getElementById("finEventoLabel").remove();
+            document.getElementById("div-finEvento").innerHTML = "<label for=\"finEvento\" id=\"finEventoLabel\" style=\"font-weight: normal;\">Fecha de fin del evento:</label>" + "\n<input class=\"form-control datePickerFin\" value=\"" + dia +  "\" id=\"finEvento\" name=\"finEvento\" >"
+            
+            $('.datePickerFin').datepicker({
+                language: "es",
+                keyboardNavigation: false,
+                todayHighlight: true,
+                autoclose: true,
+                format: "yyyy-mm-dd",
+                clearBtn: true,
+                startDate: "<%-ano%>-09-01",
+                endDate: "<%-String(parseInt(ano) + 1)%>-08-30", 
+                orientation: "top"  
+                
+            });
+
+            document.getElementById("diarioCheck").checked = false;
+        }else{
+            modal.find('.modal-title').text("Evento");
+        }
+        
+
+        
+    });
+        
+                                        
+                                        
+                                        
+        /** FUNCION QUE SALTA CUANDO CAMBIA EL DESPLEGABLE DE SELECCION DE EVENTO
+         * 
+         * La funcion analiza en cada if los 5 casos de eventos. Se podría haber hecho quizas con menos ifs dado que 
+         * hay eventos que comparten parecidos, pero me parecia razonable de esta forma por que se ve de forma
+         * mas clara los distintos tipos. 
+         * 
+         * Dentro de cada if, la estructura es siempre la misma (ver primer if)
+         *      1. Tipo de evento
+         *      2. Nombre del evento
+         *      3. Diario
+         *      4. Editable
+         *      5. Fecha fin
+         *      6. Todo el formualrio
+         * 
+         */
+    function eventoTipoChange(){
+        var fechaInicioMensaje = document.getElementById("text-fechaInicio").innerHTML;
+        var dia = fechaInicioMensaje.substring(fechaInicioMensaje.length - 11, fechaInicioMensaje.length)
+        document.getElementById("mensajeErrorEvento").style.display = "none";
+
+        if(document.getElementById("eventoTipo").value !== "Días especiales"){
+            document.getElementById("div-selectDiade").style.display = "none";
+        }
+        if(document.getElementById("eventoTipo").value !== "Exámenes"){
+            document.getElementById("div-selectTipoExamen").style.display = "none";
+        }
+
+
+        //SI EL EVENTO SELECCIONADO ES OTRO SE DEBE PRESENTAR UN FOMRULARIO CON TODO VACIO
+        if(document.getElementById("eventoTipo").value === "Otro"){
+
+            //TIPO DE EVENTO
+            document.getElementById("tipoDeEvento").value = "otro"
+            document.getElementById("text-formularioEvento").innerHTML = "Evento personalizado:";
+            
+            //NOMBRE DEL EVENTO
+            document.getElementById("eventoNombreInput").value = "";
+            document.getElementById("div-eventoNombre").style.display = "block";
+            
+            //DIARIO
+            document.getElementById("div-diarioCheck").style.display = "block";
+            document.getElementById("diarioCheck").checked = false;
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha de comienzo: " + dia;
+            
+            
+            
+            
+            //FECHA FIN
+            document.getElementById("div-finEvento").style.display = "block";
+            
+            //TODO EL FORMULARIO
+            document.getElementById("formularioEventoPersonalizado").style.display = "block";
+        
+        //SI SE SELECCIONA EL EVENTO "SEGUNDO CUATRIMESTRE", SE PRESENTA UN FORMULARIO PARA ESTE EVENTO (NO EDITABLE, DIARIO)
+        }else if(document.getElementById("eventoTipo").value === "Final del primer cuatrimestre"){
+            document.getElementById("tipoDeEvento").value = "curso";
+            document.getElementById("text-formularioEvento").innerHTML = "Final del periodo lectivo en el primer cuatrimestre:";
+            
+            document.getElementById("eventoNombreInput").value = "Final del primer cuatrimestre";
+            document.getElementById("div-eventoNombre").style.display = "none";
+
+            document.getElementById("diarioCheck").checked = true;
+            document.getElementById("div-diarioCheck").style.display = "none";
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha de final del primer cuatrimestre: " + dia;
+
+            document.getElementById("div-finEvento").style.display = "none"; 
+
+            document.getElementById("formularioEventoPersonalizado").style.display = "block"
+
+        //SI SE SELECCIONA EL EVENTO "SEGUNDO CUATRIMESTRE", SE PRESENTA UN FORMULARIO PARA ESTE EVENTO (NO EDITABLE, DIARIO)
+        }else if(document.getElementById("eventoTipo").value === "Comienzo del segundo cuatrimestre"){
+            document.getElementById("tipoDeEvento").value = "curso";
+            document.getElementById("text-formularioEvento").innerHTML = "Comienzo del periodo lectivo en el segundo cuatrimestre:";
+            
+            document.getElementById("eventoNombreInput").value = "Comienzo del segundo cuatrimestre";
+            document.getElementById("div-eventoNombre").style.display = "none";
+
+            document.getElementById("diarioCheck").checked = true;
+            document.getElementById("div-diarioCheck").style.display = "none";
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha de comienzo del segundo cuatrimestre: " + dia;
+
+            document.getElementById("div-finEvento").style.display = "none"; 
+
+            document.getElementById("formularioEventoPersonalizado").style.display = "block"
+        
+        //SI SE SELECCIONA EL EVENTO "NAVIDADES", SE PRESENTA UN FORMULARIO PARA ESTE EVENTO (NO EDITABLE, DIARIO)
+        }else if(document.getElementById("eventoTipo").value === "Navidades"){
+            document.getElementById("tipoDeEvento").value = "navidades";
+            document.getElementById("text-formularioEvento").innerHTML = "Periodo festivo de navidades:";
+            
+            document.getElementById("eventoNombreInput").value = "Navidades";
+            document.getElementById("div-eventoNombre").style.display = "none";
+
+            document.getElementById("diarioCheck").checked = false;
+            document.getElementById("div-diarioCheck").style.display = "none";
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha de comienzo: " + dia;
+
+            document.getElementById("div-finEvento").style.display = "block"; 
+
+            document.getElementById("formularioEventoPersonalizado").style.display = "block"
+        
+        }else if(document.getElementById("eventoTipo").value === "Comienzo del curso"){
+            document.getElementById("tipoDeEvento").value = "curso";
+            document.getElementById("text-formularioEvento").innerHTML = "Comienzo del curso:";
+            
+            document.getElementById("eventoNombreInput").value = "Inicio de las clases";
+            document.getElementById("div-eventoNombre").style.display = "none";
+
+            document.getElementById("diarioCheck").checked = true;
+            document.getElementById("div-diarioCheck").style.display = "none";
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha de inicio del curso: " + dia;
+
+            document.getElementById("div-finEvento").style.display = "none"; 
+
+            document.getElementById("formularioEventoPersonalizado").style.display = "block"
+
+        //SI SE SELECCIONA EL EVENTO "CURSO", SE PRESENTA UN FORMULARIO PARA ESTE EVENTO (NO EDITABLE, DIARIO)
+        }else if(document.getElementById("eventoTipo").value === "Final del curso"){
+            document.getElementById("tipoDeEvento").value = "curso";
+            document.getElementById("text-formularioEvento").innerHTML = "Final del curso:";
+            
+            document.getElementById("eventoNombreInput").value = "Fin del periodo lectivo";
+            document.getElementById("div-eventoNombre").style.display = "none";
+
+            document.getElementById("diarioCheck").checked = true;
+            document.getElementById("div-diarioCheck").style.display = "none";
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha de final del curso: " + dia;
+
+            document.getElementById("div-finEvento").style.display = "none"; 
+
+            document.getElementById("formularioEventoPersonalizado").style.display = "block"
+
+        //SI SE SELECCIONA EL EVENTO "DÍAS NO LECTIVOS O DE AJUSTE", SE PRESENTA UN FORMULARIO PARA ESTE EVENTO (NO EDITABLE, DIARIO)
+        }else if(document.getElementById("eventoTipo").value === "Días no lectivos o de ajuste"){
+            document.getElementById("tipoDeEvento").value = "ajuste";
+            document.getElementById("text-formularioEvento").innerHTML = "Día no lectivo o de ajuste:";
+            
+            document.getElementById("eventoNombreInput").value = "";
+            document.getElementById("div-eventoNombre").style.display = "block";
+
+            document.getElementById("diarioCheck").checked = false;
+            document.getElementById("div-diarioCheck").style.display = "block";
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha de comienzo: " + dia;
+
+            document.getElementById("div-finEvento").style.display = "block"; 
+
+            document.getElementById("formularioEventoPersonalizado").style.display = "block";
+
+        //SI SE SELECCIONA EL EVENTO "DÍAS ESPECIALES", SE PRESENTA UN FORMULARIO PARA ESTE EVENTO (NO EDITABLE, DIARIO)
+        }else if(document.getElementById("eventoTipo").value === "Días especiales"){
+            document.getElementById("tipoDeEvento").value = "especial";
+            document.getElementById("text-formularioEvento").innerHTML = "Día especial:";
+            
+            document.getElementById("eventoNombreInput").value = "Dia especial";
+            document.getElementById("div-eventoNombre").style.display = "none";
+
+            document.getElementById("div-selectDiade").style.display = "block"
+
+            document.getElementById("diarioCheck").checked = true;
+            document.getElementById("div-diarioCheck").style.display = "none";
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha: " + dia;
+
+            document.getElementById("div-finEvento").style.display = "none"; 
+
+            document.getElementById("formularioEventoPersonalizado").style.display = "block";
+
+        //SI SE SELECCIONA EL EVENTO "PERIODO TFT", SE PRESENTA UN FORMULARIO PARA ESTE EVENTO (NO EDITABLE, NO DIARIO)
+        }else if(document.getElementById("eventoTipo").value === "Periodo TFT"){
+            document.getElementById("tipoDeEvento").value = "tft";
+            document.getElementById("text-formularioEvento").innerHTML = "Evento defensa de TFT:";
+            
+            document.getElementById("eventoNombreInput").value = "Defensa del TFT";
+            document.getElementById("div-eventoNombre").style.display = "none";
+
+            document.getElementById("diarioCheck").checked = false;
+            document.getElementById("div-diarioCheck").style.display = "none";
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha de comienzo: " + dia;
+
+            document.getElementById("div-finEvento").style.display = "block"; 
+
+            document.getElementById("formularioEventoPersonalizado").style.display = "block";
+        
+        //SI SE SELECCIONA EL EVENTO "EXÁMENES", SE PRESENTA UN FORMULARIO PARA ESTE EVENTO (NO EDITABLE, NO DIARIO)
+        }else if(document.getElementById("eventoTipo").value === "Exámenes"){
+            document.getElementById("tipoDeEvento").value = "examenes";
+            document.getElementById("text-formularioEvento").innerHTML = "Evento de comienzo y fin de examenes:";
+
+            document.getElementById("eventoNombreInput").value = "Exámenes";
+            document.getElementById("div-eventoNombre").style.display = "none";
+
+            document.getElementById("diarioCheck").checked = false;
+            document.getElementById("div-diarioCheck").style.display = "none";
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha de comienzo: " + dia;
+
+            document.getElementById("div-finEvento").style.display = "block"; 
+
+            document.getElementById("div-selectTipoExamen").style.display = "block";
+
+            document.getElementById("formularioEventoPersonalizado").style.display = "block";
+        }else if(document.getElementById("eventoTipo").value === "Día/periodo festivo"){
+            document.getElementById("tipoDeEvento").value = "festivo"
+
+            document.getElementById("text-formularioEvento").innerHTML = "Evento de tipo Día/periodo festivo:";
+
+            document.getElementById("eventoNombreInput").value = "";
+            document.getElementById("div-eventoNombre").style.display = "block";
+
+            document.getElementById("div-diarioCheck").style.display = "block";
+            document.getElementById("formularioEventoPersonalizado").style.display = "block";
+            document.getElementById("text-fechaInicio").innerHTML = "Fecha de comienzo: " + dia;
+
+            document.getElementById("div-finEvento").style.display = "block"; 
+                
+        }else{
+            document.getElementById("tipoDeEvento").value = ""
+            //PONER CODIGO PARA QUE SE MARQUE O DESMARQUE EL CHECKBOX DE EVENTO DIARIO
+            
+            document.getElementById("formularioEventoPersonalizado").style.display = "none";
+        }
+    }
+
+    function cerrarModal(){
+            $('#eventoModal').modal('hide');
+            document.getElementById("eventoTipo").selectedIndex = "0";
+            
+            
+
+        }
+
+    function guardarEvento(){
+        let diarioCheck = document.getElementById("diarioCheck");
+        let finEvento = document.getElementById("finEvento");
+        
+        let nombre = document.getElementById("eventoNombreInput");
+        let eventoAntiguo = JSON.parse(document.getElementById("eventoAntiguo").value);
+        let identificador = 0;
+        if(eventoAntiguo !== 0){
+            identificador = eventoAntiguo.identificador;
+        }
+        
+        if(diarioCheck.checked === false && finEvento.value === ""){
+            document.getElementById("mensajeErrorEvento").innerHTML = "Debe escoger la opción de evento diario o poner una fecha final."
+            document.getElementById("mensajeErrorEvento").style.display = "flex";
+        }else if(nombre.value == ""){
+            document.getElementById("mensajeErrorEvento").innerHTML = "Debe poner un nombre al evento."
+            document.getElementById("mensajeErrorEvento").style.display = "flex";
+        
+        }else{
+            if(diarioCheck.checked){
+                let evento = nombre.value;
+                let fechaInicio = document.getElementById("fechaInicio").value;
+                if(document.getElementById("inicioEvento").value !== ""){
+                    fechaInicio = document.getElementById("inicioEvento").value;
+                }
+                if(document.getElementById("tipoDeEvento").value == "festivo"){
+                    evento = "festivo//" + evento;
+                }else if(document.getElementById("tipoDeEvento").value == "ajuste"){
+                    evento = "ajuste//" + evento;
+                }else if(document.getElementById("tipoDeEvento").value == "curso"){
+                    evento = "curso//" + evento;
+                }else if(document.getElementById("tipoDeEvento").value == "especial"){
+                    if(document.getElementById("diaDe").value === "Escoja un día"){
+                        document.getElementById("mensajeErrorEvento").innerHTML = "Debe escojer el tipo de día que será"
+                        document.getElementById("mensajeErrorEvento").style.display = "flex";
+                        return;
+                    }else{
+                       let aux = {
+                           "Lunes": 1,
+                           "Martes": 2,
+                           "Miércoles": 3,
+                           "Jueves": 4,
+                           "Viernes": 5
+                       }
+                       if((new Date(fechaInicio)).getDay() == aux[document.getElementById("diaDe").value]){
+                            document.getElementById("mensajeErrorEvento").innerHTML = "No puede cambiar un día de la semana por si mismo"
+                            document.getElementById("mensajeErrorEvento").style.display = "flex";
+                            return;
+                       }
+                        evento = "especial//Día de " + document.getElementById("diaDe").value;
+                        
+                    }
+                    
+                    
+
+                }
+                
+
+                
+                
+                let fechaFin = null
+                let url = "<%= contextPath %>/cumplimentar/calendario/eventoGeneral"
+                url += "?evento=" + evento + "&fechaInicio=" + fechaInicio  + "&identificador=" + identificador + "&identificadorPlan=" + eventoAntiguo.identificadorPlan;
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: url,
+                    success: function(json) {
+                        location.reload();
+                    },
+                    error: function(e){
+                    }
+                });
+            }else{
+                let evento = document.getElementById("eventoNombreInput").value;
+                let fechaInicio = document.getElementById("fechaInicio").value;
+
+                if(document.getElementById("inicioEvento").value !== ""){
+                    fechaInicio = document.getElementById("inicioEvento").value;
+                }
+                let fechaFin = document.getElementById("finEvento").value;
+                if(new Date(fechaFin) - new Date(fechaInicio) < 0){
+                    document.getElementById("mensajeErrorEvento").innerHTML = "La fecha final debe ser posterior a la de inicio."
+                    document.getElementById("mensajeErrorEvento").style.display = "flex";
+                    return;
+                }
+                if(document.getElementById("tipoDeEvento").value == "festivo"){
+                    evento = "festivo//" + evento;
+                }else if (document.getElementById("tipoDeEvento").value == "examenes"){
+                    //COMPROBAR SI LA DURACON DE LA FRANJA ES MAS DE 30 DIAS
+                    if(new Date(fechaFin) - new Date(fechaInicio) > 2592000000){
+                        if(document.getElementById("mensajeErrorEvento").innerHTML !== "La franja de examenes es mayor de 30 días, ¿está seguro?"){
+                            document.getElementById("mensajeErrorEvento").innerHTML = "La franja de examenes es mayor de 30 días, ¿está seguro?"
+                            document.getElementById("mensajeErrorEvento").style.display = "flex";
+                            return;
+                        }
+                    }
+                    if(document.getElementById("tipoDeExamen").value.toLowerCase() == "ordinario"){
+                        evento += " ordinarios";
+                    }else{
+                        evento += " extraordinarios";
+                    }
+                    evento = "examenes//" + evento;
+                }else if(document.getElementById("tipoDeEvento").value == "tft"){
+                    evento = "tft//" + evento;
+                }else if(document.getElementById("tipoDeEvento").value == "ajuste"){
+                    evento = "ajuste//" + evento;
+                }else if(document.getElementById("tipoDeEvento").value == "navidades"){
+                    evento = "festivo//Periodo festivo de navidades"
+                }
+
+                
+                let url = "<%= contextPath %>/cumplimentar/calendario/eventoGeneral"
+                url += "?evento=" + evento + "&fechaInicio=" + fechaInicio + "&fechaFin=" + fechaFin +  "&identificador=" + identificador + "&identificadorPlan=" + eventoAntiguo.identificadorPlan;
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: url,
+                    success: function(json) {
+                        location.reload();
+                    },
+                    error: function(e){
+                    }
+                });
+            }
+            $('#eventoModal').modal('hide');
+        }
+    }
+    
+        
+
+    function eventoAntiguoBoton(evento){
+        
+        var dia = evento.fechaInicio;
+        var modal = $(this);
+        document.getElementById("tipoDeEvento").value = evento.tipo;
+        document.getElementById("eventoAntiguo").value = JSON.stringify(evento);
+        document.getElementById("botonEliminarEvento").style.display = "inline";
+        
+        modal.find('.modal-title').text('Día: ' + dia);
+        document.getElementById("fechaInicio").value = dia;
+
+        if(evento.tipo == "especial"){
+           
+            document.getElementById("div-selectDiade").style.display = "block";
+            let diccionarioAyuda = {
+                unes: "Lunes",
+                rtes: "Martes",
+                oles: "Miércoles",
+                eves: "Jueves",
+                rnes: "Viernes"
+            }
+            document.getElementById("diaDe").value = diccionarioAyuda[evento.nombre.substring(evento.nombre.length - 4)];
+        }else{
+            document.getElementById("div-selectDiade").style.display = "none";
+        }
+
+        document.getElementById("div-selectEvento").style.display = "none";
+
+        document.getElementById("text-fechaInicio").innerHTML = "Fecha de comienzo: " + dia;
+        document.getElementById("text-formularioEvento").innerHTML = evento.nombre;
+
+        document.getElementById("eventoNombreInput").value = evento.nombre;
+        document.getElementById("div-eventoNombre").style.display = "none";
+        if(evento.editable === 0){
+            document.getElementById("divBotones").style.display = "none";
+            
+            
+        }else{
+            document.getElementById("divBotones").style.display = "block";
+            
+        }
+        document.getElementById("formularioEventoPersonalizado").style.display = "block";
+        document.getElementById("div-inicioEvento").style.display = "block";    
+        document.getElementById("inicioEvento").remove();
+        document.getElementById("inicioEventoLabel").remove();
+        document.getElementById("div-inicioEvento").innerHTML = "<label for=\"inicioEvento\" id=\"inicioEventoLabel\" style=\"font-weight: normal;\">Editar fecha de inicio del evento:</label>" + "\n<input class=\"form-control datePickerInicio\" value=\"" + evento.fechaInicio +  "\" id=\"inicioEvento\" name=\"inicioEvento\" >"
+        
+        $('.datePickerInicio').datepicker({
+            language: "es",
+            keyboardNavigation: false,
+            todayHighlight: true,
+            autoclose: true,
+            format: "yyyy-mm-dd",
+            clearBtn: true,
+            startDate: "<%-ano%>-09-01",
+            endDate: "<%-String(parseInt(ano) + 1)%>-08-30", 
+            orientation: "top"       
+        });        document.getElementById("inicioEvento").value = evento.fechaInicio; 
+        
+        if(evento.fechaFin === "Evento de dia"){
+            document.getElementById("diarioCheck").checked = true;
+            document.getElementById("div-finEvento").style.display = "none";  
+            document.getElementById("inicioEventoLabel").innerHTML = "Editar fecha del evento:"
+        }else{
+            document.getElementById("diarioCheck").checked = false;
+            document.getElementById("div-finEvento").style.display = "block"; 
+            document.getElementById("finEvento").remove();
+            document.getElementById("finEventoLabel").remove();
+            document.getElementById("div-finEvento").innerHTML = "<label for=\"finEvento\" id=\"finEventoLabel\" style=\"font-weight: normal;\">Fecha de fin del evento:</label>" + "\n<input class=\"form-control datePickerFin\" value=\"" + evento.fechaFin +  "\" id=\"finEvento\" name=\"finEvento\" >"
+            
+            $('.datePickerFin').datepicker({
+                language: "es",
+                keyboardNavigation: false,
+                todayHighlight: true,
+                autoclose: true,
+                format: "yyyy-mm-dd",
+                clearBtn: true,
+                startDate: "<%-ano%>-09-01",
+                endDate: "<%-String(parseInt(ano) + 1)%>-08-30",
+                orientation: "top"    
+                
+            });
+            document.getElementById("inicioEventoLabel").innerHTML = "Editar fecha de inicio del evento:"
+        }
+
+        document.getElementById("div-diarioCheck").style.display = "none";
+        
+
+        
+        document.getElementById("text-fechaInicio").style.display = "none";
+        $('#eventoModal').modal('show');
+        
+    }
+
+    function eliminarEvento(){
+        let evento = JSON.parse(document.getElementById("eventoAntiguo").value);
+
+        
+        if(evento.fechaFin === "Evento de dia"){
+            let nombre = evento.nombre;
+            if(evento.tipo == "festivo"){
+                evento.nombre = "festivo//" + evento.nombre;
+            }else if(evento.tipo == "ajuste"){
+                evento.nombre = "ajuste//" + evento.nombre;
+            }else if(evento.tipo == "especial"){
+                evento.nombre = "especial//" + evento.nombre;
+            }else if(evento.nombre === "Inicio de clases" || evento.nombre === "Fin del periodo lectivo"){
+                nombre = "Curso//"
+            }
+            
+            let color = evento.color;
+            let fechaInicio = evento.fechaInicio;
+            
+            
+
+            let url = "<%= contextPath %>/cumplimentar/calendario/eventoGeneral"
+            url += "?evento=" + nombre + "&identificador=" + evento.identificador + "&fechaInicio=" + fechaInicio + "&identificadorPlan=" + evento.identificadorPlan;
+            $.ajax({
+                type: "DELETE",
+                dataType: "json",
+                url: url,
+                success: function(json) {
+                    location.reload();
+                },
+                error: function(e){
+                }
+            });
+
+        }else{
+            
+            if(evento.tipo == "festivo"){
+                evento.nombre = "festivo//" + evento.nombre;
+            }else if (evento.tipo == "examenes"){
+                evento.nombre = "examenes//" + evento.nombre;
+            }else if(evento.tipo == "tft"){
+                evento.nombre = "tft//" + evento.nombre;
+            }else if(evento.tipo == "ajuste"){
+                evento.nombre = "ajuste//" + evento.nombre;
+            }
+            let nombre = evento.nombre;
+            let color = evento.color;
+            let fechaInicio = evento.fechaInicio;
+            
+            let fechaFin = evento.fechaFin;
+
+            let url = "<%= contextPath %>/cumplimentar/calendario/eventoGeneral"
+            url += "?evento=" + nombre + "&identificador=" + evento.identificador + "&fechaInicio=" + fechaInicio + "&identificadorPlan=" + evento.identificadorPlan;
+            
+            $.ajax({
+                type: "DELETE",
+                dataType: "json",
+                url: url,
+                success: function(json) {
+                    location.reload();
+                },
+                error: function(e){
+                }
+            });
+        }
+        $('#eventoModal').modal('hide');
+    }
+
+    function diarioChange(){
+        if(document.getElementById("diarioCheck").checked === true){
+            document.getElementById("div-finEvento").style.display = "none";
+        }else{
+            document.getElementById("div-finEvento").style.display = "block";
+        }
+    }
+    
+    function aprobar(ano){
+        let url = "<%= contextPath %>/gestion/calendario/aprobarGeneral"
+        url += "?ano=" + ano;
+        if(confirm("Una vez aprobado el calendario, los coordinadores de las titulaciones podrán comenzar a adaptarlo. ¿Estás seguro de querer aprobarlo?")){
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: url,
+                success: function(json) {
+                    location.reload();
+                },
+                error: function(e){
+                }
+            });
+        }
+    }
+
+    function cambiarano(){
+        let ano = document.getElementById("selectano").value;
+        let search = parseQueryString();
+        delete search.ano;
+        search.ano = ano;
+        let url = parseStringQuery(search);
+        window.location.replace(url);
+    }
+    
+    function Enviar(){
+        return confirm("Una vez aprobado el calendario, los coordinadores de las titulaciones podrán comenzar a adaptarlo. ¿Estás seguro de querer aprobarlo?");
+    }
+
+    
+</script>

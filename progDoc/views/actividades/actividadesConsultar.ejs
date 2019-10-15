@@ -1,0 +1,176 @@
+<%- include ../menus/consultar.ejs %>
+<%- include ../../public/js/funciones.ejs %>
+<div class ="contenido2">
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+    <% switch(estadoCalendario){
+      case estadosCalendario.abierto : %>
+        <p>Las actividades están siendo cubiertas por el coordinador del plan de estudios</p>
+        <% break;
+      case estadosCalendario.aprobadoCoordinador : %>
+        <p>Las actividades han sido aprobadas por el coordinador del plan de estudios</p>
+        <% break;
+      default:  %>
+        <p>Las actividades están siendo cubiertas por el coordinador del plan de estudios</p>
+        <% break;
+    }%> 
+  <p><%=permisoDenegado%></p>
+  </br>
+  <p>Permisos en función del estado</p>
+  <ul>
+    <li>Abierto: el coordinador del plan de estudios </li>
+    <li>Aprobado: nadie tiene permiso </li>
+    <li>Incidencia: el jefe de estudios</li>
+  </ul>
+<%}else{
+  if (conjuntoActividadesParcial.length === 0){%><p>No hay actividades definidas</p>
+  <%}
+  conjuntoActividadesParcial.forEach(function (conjuntoActividadParcial){%>
+    <p><b>Actividades comunes curso <%=conjuntoActividadParcial.curso%>º <%=conjuntoActividadParcial.semestre%> </b>
+    <button type="button" class="btn btn-default" onclick = "MostrarOcultar('div_<%=conjuntoActividadParcial.identificador%>')">
+    <span id ='button_div_<%=conjuntoActividadParcial.identificador%>'  class="glyphicon glyphicon-chevron-down"></span> 
+    </button></p>
+    <%
+    let text2=""
+    switch(conjuntoActividadParcial.grupos.length){
+      case 0:
+      break;
+      case 1:
+      text2 += "Grupo "
+      break;
+      default:
+      text2 += "Grupos "
+      break;
+    }
+    conjuntoActividadParcial.grupos.forEach(function (g){
+      let gr = grupos.find(function (obj){return obj.grupoId === g.identificador})
+      text2 += gr.nombre + " "
+    }) 
+      %>
+    <p><b><%=text2%></b></p>
+    <div class="hidden" id="div_<%=conjuntoActividadParcial.identificador%>">
+    <p><%=conjuntoActividadParcial.notaInicial%></p>
+    <table class="table" id="table_<%=conjuntoActividadParcial.identificador%>">
+    <thead>
+      <tr>
+      <th scope="col">Semana</th>
+      <th scope="col">Lunes</th>
+      <th scope="col">Actividad Programada</th>
+      <th scope="col">Actividad Evaluación</th>
+      </tr>
+    </thead>
+    <%
+    if (conjuntoActividadParcial.fechaInicio !== null && conjuntoActividadParcial.fechaFin !== null 
+    && (nuevaDateFormat(conjuntoActividadParcial.fechaInicio) < nuevaDateFormat(conjuntoActividadParcial.fechaFin))){%>
+    <tbody> 
+    <%let semana = 1
+    let f1= conjuntoActividadParcial.fechaInicio
+    let f2= conjuntoActividadParcial.fechaFin
+    f1 = getLunesAnterior(f1)
+    f2 = getLunesAnterior(f2)
+    let diaActual = f1;
+    let contador = 0;
+    let coincidenciasProgramadas = []
+    let coincidenciasEval = []
+    while(nuevaDateFormat(diaActual) <= nuevaDateFormat(f2)){
+      if(contador === 0){%>
+        <tr>
+        <td><%=semana%></td>
+        <td><%=getDia(diaActual)[2]%>-<%=getDia(diaActual)[1].substring(0,3).toLowerCase()%></td>
+      <%
+       coincidenciasProgramadas = []
+       coincidenciasEval = []
+      }
+      coincidenciasProgramadas = coincidenciasProgramadas.concat(conjuntoActividadParcial.actividades.filter(
+      act => (act.tipo === 'act' && act.fecha === diaActual)
+      ));
+      coincidenciasEval = coincidenciasEval.concat(conjuntoActividadParcial.actividades.filter(
+      act => (act.tipo === 'eval' && act.fecha === diaActual)
+      ));
+      diaActual = aumentarDia(diaActual,1)
+      //llego a lunes y debo reiniciar sino aumento un dia
+      if(contador === 6 || (nuevaDateFormat(diaActual) >= nuevaDateFormat(f2))){
+      contador = 0;
+      semana ++;
+      %>
+      <td><ul class="noEtiquetaLista">
+      <%
+      coincidenciasProgramadas.forEach(function(act){
+        let asignat = getAcronimoONombreAsignatura(asignaturas.find(function(as){return as.identificador === act.asignaturaId}))
+        asignat = asignat !== null ? asignat : ""
+        let descripcion = act.descripcion || ""
+        let fecha =  ""
+        if (act.fecha){
+          fecha = "("+getDia(act.fecha)[4]+" "+getDia(act.fecha)[3].getDate()+")"
+        }
+        let horaInicio = ""
+        if (act.horaInicio){
+          horaInicio = "["+moment(act.horaInicio,"hh:mm:ss").format("hh:mm")
+          if (act.duracion || act.duracion === 0){
+          horaInicio += "-" + moment(act.horaInicio,"hh:mm:ss").add(act.duracion, "m").format("hh:mm")
+          }
+          horaInicio += "]"
+        }
+      %>
+      <li><%=asignat%> <span style="font-size:80%"><%=fecha%></span><span style="font-size:80%"><%=horaInicio%></span> <%=descripcion%></li>
+      <%})%>
+      </ul></td>
+      <td><ul class="noEtiquetaLista">
+      <%
+      coincidenciasEval.forEach(function(act){
+        let asignat = getAcronimoONombreAsignatura(asignaturas.find(function(as){return as.identificador === act.asignaturaId}))
+        asignat = asignat !== null ? asignat : ""
+        let descripcion = act.descripcion || ""
+        let fecha =  ""
+        if (act.fecha){
+          fecha = "("+getDia(act.fecha)[4]+" "+getDia(act.fecha)[3].getDate()+")"
+        }
+        let horaInicio = ""
+        if (act.horaInicio){
+          horaInicio = "["+moment(act.horaInicio,"hh:mm:ss").format("hh:mm")
+          if (act.duracion || act.duracion === 0){
+          horaInicio += "-" + moment(act.horaInicio,"hh:mm:ss").add(act.duracion, "m").format("hh:mm")
+          }
+          horaInicio += "]"
+        }
+      %>
+      <li><%=asignat%> <span style="font-size:80%"><%=fecha%></span><span style="font-size:80%"><%=horaInicio%></span> <%=descripcion%></li>
+      <%})%>
+      </ul></td>
+      </tr>
+      <%}else{
+        contador ++;
+      }
+    }%>
+    </tbody>
+    <%}%>
+    </table>
+    </div>
+    <hr>
+  <%})%>
+<%}%>
+</div>
+<script>
+function MostrarOcultar(id){
+    let div = document.getElementById(id);
+    let buttonSpan = document.getElementById('button_'+id)
+    let clases = div.className.split(" ");
+    let oculto = clases.find(function (obj) { return obj === 'hidden'});
+    //si estaba oculto debo quitarlo
+    if (oculto){
+        div.className = "";
+        for (let i =0; i<clases.length; i++){
+            if (clases[i] !== 'hidden'){
+                div.className += " " +clases[i]
+            }    
+        }      
+        buttonSpan.className = "glyphicon glyphicon-chevron-up"
+    }
+    //debo ocultarlo
+    else{
+        div.className += " hidden"
+        buttonSpan.className = "glyphicon glyphicon-chevron-down"
+    }
+}
+</script>

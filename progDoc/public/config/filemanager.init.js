@@ -5,8 +5,8 @@ $('.fm-container').richFilemanager({
     baseUrl: '.',
     callbacks: {
         beforeSendRequest: function (requestMethod, requestParams) {
-            let permisos = ["readfolder","initiate","download","readfile"]
-            if (!permisos.includes(requestParams.mode))return false;
+            let permisos = ["readfolder", "initiate", "download", "readfile"]
+            if (!permisos.includes(requestParams.mode)) return false;
             return true;
         }
     }

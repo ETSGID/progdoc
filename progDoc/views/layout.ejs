@@ -24,9 +24,9 @@
 </head>
 <body>
   <div class="sidenav">
-  <h2> Progdoc </h2>
+  <h2><a style="padding:0" href="<%=contextPath%>">Progdoc</a></h2>
   <button id='drop_ProgDoc' class="dropdown-btn">Programación Docente 
-     <i class="glyphicon glyphicon-plus fa fa-caret-down" aria-hidden="true"></i>
+     <i class="glyphicon glyphicon-chevron-down fa fa-caret-down" aria-hidden="true"></i>
   </button>
   <div class="dropdown-container">
     <a id='element_ProgDocConsultar' href="<%=contextPath%>/Consultar">Consultar</a>
@@ -58,7 +58,7 @@ let contextPath = '<%-contextPath%>';
 for (i = 0; i < dropdown.length; i++) {
   dropdown[i].addEventListener("click", function() {
     this.classList.toggle("active");
-    $(this).find('i').toggleClass('glyphicon-plus').toggleClass('glyphicon-minus');
+    $(this).find('i').toggleClass('glyphicon-chevron-down').toggleClass('glyphicon-chevron-up');
     let dropdownContent = this.nextElementSibling;
     if (dropdownContent.style.display === "block") {
       dropdownContent.style.display = "none";
@@ -78,7 +78,7 @@ menu.forEach(function(element,index){
     if (element.value.split("_")[0] === "drop"){
       let el = document.getElementById(element.value)
       el.className += " active";
-      $(el).find('i').toggleClass('glyphicon-plus').toggleClass('glyphicon-minus');
+      $(el).find('i').toggleClass('glyphicon-chevron-down').toggleClass('glyphicon-chevron-up');
       let dropdownContent = el.nextElementSibling;
       if (dropdownContent.style.display === "block") {
         dropdownContent.style.display = "none";

@@ -1,0 +1,237 @@
+
+<%- include ../menus/gestion.ejs %>
+<%- include ../../public/js/funciones.ejs %>
+<div class ="contenido2">
+<%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+  <p><%=permisoDenegado%></p>
+<%}else{%>
+        <form id="formulario" autocomplete="off" action="<%= nuevopath %>" method="post">
+            <h2>Departamentos
+            <button type="button" class="btn btn-default" onclick = "MostrarOcultar('table_departamentos')">
+            <span id ='button_table_departamentos'  class="glyphicon glyphicon-chevron-down"></span> 
+            </button></h2>
+            <div class="hidden" id="table_departamentos">
+                <table class="table" id="tb_departamentos">
+                    <thead>
+                        <tr>
+                        <th scope="col">Código</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Acrónimo</th>
+                        </tr>
+                    </thead>
+                    <tbody id='body_tb_departamentos'>
+                    <% for (departamento of departamentos){%>
+                        <input type="hidden" name='momentaneo' id='departamento_<%=departamento.codigo%>' value ='departamento_<%=departamento.codigo%>'>
+                            <tr>
+                            <td>
+                            <%=departamento["codigo"]%>
+                            </td>
+                            <td>
+                            <%=departamento["nombre"]%>
+                            </td>
+                            <td>
+                            <% let acronimo = "-"
+                            if (departamento["acronimo"] !== null && departamento["acronimo"].trim() !== "") {
+                            acronimo = departamento["acronimo"]
+                            }%>
+                            <input type="text" maxlength="5" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='departamento_<%=departamento.codigo%>' onchange="MarcarChangeDep('departamento_<%=departamento.codigo%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
+                            </td>
+                            </tr>
+                        <%}%>
+                    </tbody>
+                </table>
+            </div>
+            <h2 style="display:inline;">Plan</h2>
+            <select id="selectPlan" onchange="cambiarPD()">
+                <% for(planEstudio of planEstudios) { 
+                    if (planEstudio.nombre !== null && (planID !== planEstudio.codigo)){ %>
+                        <option id="<%=planEstudio.codigo%>" value="<%=planEstudio.codigo%>" title="<%=planEstudio.nombreCompleto%> (<%=planEstudio.codigo%>)"><%=planEstudio.nombre%></option>
+                    <% }else if (planEstudio.nombre !== null && (planID === planEstudio.codigo)){ %>
+                        <option id="<%=planEstudio.codigo%>" value="<%=planEstudio.codigo%>" title="<%=planEstudio.nombreCompleto%> (<%=planEstudio.codigo%>)" selected><%=planEstudio.nombre%></option>  
+                    <%}else if (planEstudio.nombre === null && (planID !== planEstudio.codigo)) {%>
+                        <option  id="<%=planEstudio.codigo%>" value="<%=planEstudio.codigo%>" title="<%=planEstudio.nombreCompleto%> (<%=planEstudio.codigo%>)"><%=planEstudio.codigo%></option>
+                    <%}else{%>
+                        <option  id="<%=planEstudio.codigo%>" value="<%=planEstudio.codigo%>"  title="<%=planEstudio.nombreCompleto%> (<%=planEstudio.codigo%>)"selected><%=planEstudio.codigo%></option>
+                    <%}             
+                }%>
+            </select>
+            <% if ( session && session.pdID){ %>
+            <span><%= session.pdID %></span>
+            <%}%>
+                <input type="hidden" name='momentaneo' id='plan_<%=planID%>' value ='plan_<%=planID%>'>
+                <table class="table" id="tb_<%=planID%>">
+                    <thead>
+                        <tr>
+                        <th scope="col">Código</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Acrónimo</th>
+                        </tr>
+                    </thead>
+                    <tbody id='body_tb_<%planID%>'>
+                        <%let plan = planEstudios.find(function (obj) { return obj.codigo === planID; });
+                        if(plan){ %>
+                            <tr>
+                                <td>
+                                <%=plan["codigo"]%>
+                                </td>
+                                <td>
+                                <%=plan["nombreCompleto"]%>
+                                </td>
+                                <td>
+                                <% let acronimo = "-"
+                                if (plan["nombre"] !== null && plan["nombre"].trim() !== "") {
+                                acronimo = plan["nombre"]
+                                }%>
+                                <input type="text" maxlength="8" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='plan_<%=planID%>' onchange="MarcarChangePlan('plan_<%=planID%>%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
+                                </td>
+                            </tr>
+
+                        <% } %>     
+                    </tbody>
+                </table>
+            <% if (locals.estado && locals.estado !== null) { %>
+                <p><%=estado%></p>
+            <%}else{%>
+                <h2>Asignaturas</h2>
+                <% for (let curso in asignaturas ){%>
+                    <div>
+                        <h3>Curso <%= curso %>
+                        <button type="button" class="btn btn-default" onclick = "MostrarOcultar('table_<%= curso %>')">
+                        <span id ='button_table_<%=curso%>'  class="glyphicon glyphicon-chevron-down"></span> 
+                        </button>
+                        </h3>
+                            <div class="hidden" id="table_<%= curso %>">
+                                <table class="table" id="tb_<%= curso %>">
+                                    <thead>
+                                        <tr>
+                                        <th scope="col">Código</th>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Acrónimo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='body_tb_<%= curso %>'>
+                                    <% for (asignaturaCurso of asignaturas[curso]){%>
+                                        <input type="hidden" name='momentaneo' id='asignatura_<%=curso%>_<%=asignaturaCurso["identificador"]%>' value ='asignatura_<%=curso%>_<%=asignaturaCurso["identificador"]%>'>
+                                            <tr>
+                                            <td>
+                                            <%=asignaturaCurso["codigo"]%>
+                                            </td>
+                                            <td>
+                                            <%=asignaturaCurso["nombre"]%>
+                                            </td>
+                                            <td>
+                                            <% let acronimo = "-"
+                                            if (asignaturaCurso["acronimo"] !== null && asignaturaCurso["acronimo"].trim() !== "") {
+                                            acronimo = asignaturaCurso["acronimo"]
+                                            }%>
+                                            <input type="text" maxlength="5" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='asignatura_<%=curso%>_<%=asignaturaCurso["identificador"]%>' onchange="MarcarChangeAsignatura('asignatura_<%=curso%>_<%=asignaturaCurso.identificador%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
+                                            </td>
+                                            </tr>
+                                        <%}%>
+                                    </tbody>
+                                </table>
+                            </div>
+                    </div>
+                <%}%> 
+            <%}%>
+        </form>
+    <%}%>
+</div>
+
+<script>
+
+//el multiselect del layout funciona con jquery
+let asignaturas = <%-JSON.stringify(asignaturas)%>;
+let planEstudios = <%-JSON.stringify(planEstudios)%>;
+let departamentos = <%-JSON.stringify(departamentos)%>;
+let confirmarSalirSinGuardar = <%-confirmarSalirSinGuardar%>;
+//se utiliza para disparar el evento de onbeforeunload
+let activado = true;
+
+function MostrarOcultar(id){
+    let divCurso = document.getElementById(id);
+    let buttonSpan = document.getElementById('button_'+id)
+    let clases = divCurso.className.split(" ");
+    let oculto = clases.find(function (obj) { return obj === 'hidden'});
+    //si estaba oculto debo quitarlo
+    if (oculto){
+        divCurso.className = "";        
+        buttonSpan.className = "glyphicon glyphicon-chevron-up"
+    }
+    //debo ocultarlo
+    else{
+        divCurso.className += " hidden"
+        buttonSpan.className = "glyphicon glyphicon-chevron-down"
+
+    }
+
+}
+
+//marcar los cambios si vuelve a la situacion inicial no lo marca
+function MarcarChangeAsignatura(id){
+    let identificador = id.split("_")[2]
+    let curso = Number(id.split("_")[1])
+    let asignatura = asignaturas[curso].find(function (obj) { return obj.identificador === Number(identificador)});
+    let acronimoNuevo = document.getElementsByName("asignatura_"+curso+"_"+identificador)[0].value;
+    let inputElement = document.getElementById(id);
+    if(acronimoNuevo.trim() === ""){
+        acronimoNuevo = document.getElementsByName("asignatura_"+curso+"_"+identificador)[0].placeholder === '-' ? null : document.getElementsByName("asignatura_"+curso+"_"+identificador)[0].placeholder;
+    }
+    if(asignatura && acronimoNuevo !== asignatura.acronimo){
+        inputElement.name = 'actualizar'
+    }else{
+        inputElement.name = 'momentaneo'
+    }
+}
+//funcion para indicar que ha cambiado el departamento
+function MarcarChangePlan(id){
+    let codigo = id.split("_")[1]
+    let plan = planEstudios.find(function (obj) { return obj.codigo === codigo});
+    let acronimoNuevo = document.getElementsByName("plan_"+codigo)[0].value;
+    let inputElement = document.getElementById(id);
+    if(acronimoNuevo.trim() === ""){
+        acronimoNuevo = document.getElementsByName("plan_"+codigo)[0].placeholder === '-' ? null : document.getElementsByName("plan_"+codigo)[0].placeholder;
+    }
+    if(plan && acronimoNuevo !== plan.nombre){
+        inputElement.name = 'actualizar'
+    }else{
+        inputElement.name = 'momentaneo'
+    }
+}
+//funcion para indicar que ha cambiado el departamento
+function MarcarChangeDep(id){
+    let codigo = id.split("_")[1]
+    let dep = departamentos.find(function (obj) { return obj.codigo === codigo});
+    let acronimoNuevo = document.getElementsByName("departamento_"+codigo)[0].value;
+    let inputElement = document.getElementById(id);
+    if(acronimoNuevo.trim() === ""){
+        acronimoNuevo = document.getElementsByName("departamento_"+codigo)[0].placeholder === '-' ? null : document.getElementsByName("departamento_"+codigo)[0].placeholder;
+    }
+    if(dep && acronimoNuevo !== dep.acronimo){
+        inputElement.name = 'actualizar'
+    }else{
+        inputElement.name = 'momentaneo'
+    }
+}
+
+function Guardar(nuevopath){
+    activado = false;
+    let form2 = document.getElementById("formulario");
+    form2.setAttribute('action', nuevopath);
+    form2.submit();
+}
+function Volver(cancelarpath){
+  window.location.replace(cancelarpath);
+}
+
+window.onbeforeunload = function(){
+  //primero debes mirar que activado sea true o false (en confirmarSalirSinGuarar y despues marcarlo como true) 
+  let confirma = confirmarSalirSinGuardar(["actualizar"], activado)
+  activado = true
+  //debo reinicializar esto por si le da a seguir en la página
+  document.getElementById('selectPlan') ? document.getElementById('selectPlan').value = selectPlanValue : null;
+  document.getElementById('selectDepartamento') ? document.getElementById('selectDepartamento').value = selectDepartamentoValue : null;
+  return confirma;
+}
+
+</script>

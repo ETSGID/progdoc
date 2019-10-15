@@ -1,0 +1,237 @@
+<%- include ../menus/gestion.ejs %>
+<div class="contenido">
+    <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+        <p><%=permisoDenegado%></p>
+    <%}else{%>
+        <input type="hidden" value="<%= anoSeleccionado %>" id="anoSeleccionado" />
+        <h2>Aulas</h2>
+        <select id="anoSelector" onchange="changeAno()" style="margin-bottom: 1em;">
+                <option value="<%=ano2%>" selected><%=ano2.substring(2,5)%>/<%= parseInt(ano2.substring(2,5)) + 1%></option> 
+                <option value="<%=ano1%>" ><%=ano1.substring(2,5)%>/<%= parseInt(ano1.substring(2,5)) + 1%></option> 
+        </select>
+        
+        <select id="cuatrimestreSelector" onchange="changeCuatrimestre()" style="margin-bottom: 1em;">
+            <option selected>Primer cuatrimestre</option>
+            <option>Segundo cuatrimestre</option>
+        </select>
+        <button type="button"  class="btn btn-default" onclick="generarPdf('<%= generarPdfpath %>')">Descargar Pdf</button>
+        <div class="autocomplete" style="width:500px;">
+        <input type="text" id="buscador" onkeypress="buscadorOnKeyPress(event)" placeholder="buscar..."/>
+        </div>
+        <div>
+            <iframe  id="pdfIframe" src="" style="display:none; height:100%; width:100%;" ></iframe>
+        </div>
+        <div id="aulas1">
+            <%for (let i=0 ; i<aulas1.length; i++){%>
+                <div id="div-1-<%=aulas1[i].aula %>">
+                    <h3><%= aulas1[i].aula %>
+                        <button type="button" class="btn btn-default" onclick = "MostrarOcultar('table_1_<%=aulas1[i].aula%>')">
+                        <span id ='button_table_1_<%=aulas1[i].aula%>'  class="glyphicon glyphicon-chevron-down"></span> 
+                        </button>
+                    </h3>
+                    <p>
+                    <span>Planes:</span>
+                    <%for([index, plan] of aulas1[i].planes.entries()){%>
+                        <%if (index > 0 ){%> <span>|</span><%}%>
+                        <span style="color:<%=plan.color%>"><%=plan.nombre%></span>
+                        <%for(grupo of plan.grupos){%>
+                            <span style="font-size:80%; color:<%=plan.color%>"><%=grupo%></span> 
+                        <%}%>
+                        
+                    <%}%>
+                    </p>
+                    <div class="hidden" id="table_1_<%=aulas1[i].aula%>">
+                        <table class="table_aulas" border="1" style="text-aling: center;">
+                            <tr>
+                                <th>Hora</th>
+                                <th>Lunes</th>
+                                <th>Martes</th>
+                                <th>Miércoles</th>
+                                <th>Jueves</th>
+                                <th>Viernes</th>
+                                <th>Sábado</th>
+                            </tr>
+                            <% for( let j=0 ; j<13 ; j++){%>
+                                <tr>
+                                    <td>
+                                        <%=j+8%>:00
+                                    </td>
+                                    <% for( let z=0 ; z<6; z++){%>
+                                        <td>
+                                        <%if(gruposPorAula1[aulas1[i].aula][j+z*13]){%>
+                                            <%for(let w=0; w < gruposPorAula1[aulas1[i].aula][j+z*13].asignaturas.length; w++) { %>
+                                                <%if (w > 0){%><span>/</span><%}%>
+                                                <span style="color: <%=gruposPorAula1[aulas1[i].aula][j+z*13].color[w]%> ">
+                                                    <%=gruposPorAula1[aulas1[i].aula][j+z*13].asignaturas[w]%>
+                                                </span>
+                                            <%}%>
+                                        <%}%>
+                                        </td>
+                                    <%}%>
+                                </tr>
+                            <%}%>
+                        </table>
+                    </div>
+                </div>
+            <%}%>
+        </div>
+        <div id="aulas2">
+            <%for (let i=0 ; i<aulas2.length; i++){%>
+                <div id="div-2-<%=aulas2[i].aula %>">
+                    <h3><%= aulas2[i].aula %>
+                        <button type="button" class="btn btn-default" onclick = "MostrarOcultar('table_2_<%=aulas2[i].aula%>')">
+                        <span id ='button_table_2_<%=aulas2[i].aula%>'  class="glyphicon glyphicon-chevron-down"></span> 
+                        </button>
+                    </h3>
+                    <p>
+                    <span>Planes:</span>
+                    <%for([index, plan] of aulas2[i].planes.entries()){%>
+                        <%if (index > 0 ){%> <span>|</span><%}%>
+                        <span style="color:<%=plan.color%>"><%=plan.nombre%></span>
+                        <%for(grupo of plan.grupos){%>
+                            <span style="font-size:80%; color:<%=plan.color%>"><%=grupo%></span> 
+                        <%}%>
+                        
+                    <%}%>
+                    </p>
+                    <div class="hidden" id="table_2_<%=aulas2[i].aula%>">
+                        <table class="table_aulas" border="1" style="text-aling: center;">
+                            <tr>
+                                <th>Hora</th>
+                                <th>Lunes</th>
+                                <th>Martes</th>
+                                <th>Miércoles</th>
+                                <th>Jueves</th>
+                                <th>Viernes</th>
+                                <th>Sábado</th>
+                            </tr>
+                            <% for( let j=0 ; j<13 ; j++){%>
+                                <tr>
+                                    <td>
+                                        <%=j+8%>:00
+                                    </td>
+                                    <% for( let z=0 ; z<6; z++){%>
+                                        <td>
+                                        <%if(gruposPorAula2[aulas2[i].aula][j+z*13]){%>
+                                            <%for(let w=0; w < gruposPorAula2[aulas2[i].aula][j+z*13].asignaturas.length; w++) { %>
+                                                <%if (w > 0){%><span>/</span><%}%>
+                                                <span style="color: <%=gruposPorAula2[aulas2[i].aula][j+z*13].color[w]%> ">
+                                                    <%=gruposPorAula2[aulas2[i].aula][j+z*13].asignaturas[w]%>
+                                                </span>
+                                            <%}%>
+                                        <%}%>
+                                        </td>
+                                    <%}%>
+                                </tr>
+                            <%}%>
+                        </table>
+                    </div>
+                </div>
+            <%}%>
+        </div>
+    <%}%>
+</div>
+<script>
+    document.getElementsByTagName('body')[0].onload = changeCuatrimestre();
+    function MostrarOcultar(id){
+        let divSemestre = document.getElementById(id);
+        let buttonSpan = document.getElementById('button_'+id)
+        let clases = divSemestre.className.split(" ");
+        let oculto = clases.find(function (obj) { return obj === 'hidden'});
+        //si estaba oculto debo quitarlo
+        if (oculto){
+            divSemestre.className = "";
+            for (let i =0; i<clases.length; i++){
+                if (clases[i] !== 'hidden'){
+                    divSemestre.className += " " +clases[i]
+                }    
+            }
+            
+            buttonSpan.className = "glyphicon glyphicon-chevron-up"
+        }
+        //debo ocultarlo
+        else{
+            divSemestre.className += " hidden"
+            buttonSpan.className = "glyphicon glyphicon-chevron-down"
+
+        }
+
+    }
+
+    function buscadorOnKeyPress(key){
+        if(key.keyCode == 13){
+            $('#aulas1').children('div').each(function () {
+                let aBuscar = document.getElementById("buscador").value.toLowerCase()
+                if(this.id.includes(aBuscar)){
+                    document.getElementById(this.id).style.display = "block"
+                }else{
+                    document.getElementById(this.id).style.display = "none"
+                }
+            });
+            $('#aulas2').children('div').each(function () {
+                let aBuscar = document.getElementById("buscador").value.toLowerCase()
+                if(this.id.includes(aBuscar)){
+                    document.getElementById(this.id).style.display = "block"
+                }else{
+                    document.getElementById(this.id).style.display = "none"
+                }
+            });
+        }
+    }
+
+    function changeCuatrimestre(){
+        document.getElementById("pdfIframe").style.display = "none";
+        if(document.getElementById("cuatrimestreSelector").value === "Primer cuatrimestre"){
+            document.getElementById("aulas1").style.display = "block";
+            document.getElementById("aulas2").style.display = "none";
+        }else{
+            document.getElementById("aulas2").style.display = "block";
+            document.getElementById("aulas1").style.display = "none";
+        }
+    }
+    function changeAno(){
+        let ano = document.getElementById("anoSelector").value;
+        let search = parseQueryString();
+        delete search.ano;
+        search.ano = ano;
+        let url = parseStringQuery(search);
+        window.location.replace(url);
+    }
+    function generarPdf(path){
+        let cuatrimestre = document.getElementById("cuatrimestreSelector").value === "Primer cuatrimestre" ? "1S" : "2S";
+        let ano =  document.getElementById("anoSelector").value;
+        $.ajax({
+        url: path,
+        method: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify({cuatrimestre: cuatrimestre, ano: ano, generarPdf:true})
+        }).done(function(res) {
+            document.getElementById("pdfIframe").src = res.path
+            let height = window.innerHeight;
+            document.getElementById("pdfIframe").style.height = 0.75*height +"px";
+            document.getElementById("pdfIframe").style.display = "block";
+            if(!res.success){
+                alert(res.msg)
+            }
+        })
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        let element3 = document.getElementById('anoSelector');
+        if (element3){
+            document.getElementById('anoSelector').value = document.getElementById("anoSeleccionado").value;
+        }else{
+            document.getElementById('anoSelector').value = "<%=ano2%>";
+        }
+    });
+</script>
+<style>
+    th{
+        text-align: center;
+    }
+
+    td{
+        text-align: center;
+    }
+</style>

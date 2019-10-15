@@ -713,7 +713,7 @@
             titleFormat: "MM yyyy", /* Leverages same syntax as 'format' */
             weekStart: 1
         }
-        
+
     },
         q = {
             modes: [{

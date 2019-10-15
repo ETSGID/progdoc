@@ -1,0 +1,169 @@
+<%
+/*si no existen elementos con campo name alguno de los que se pasa en el primer array
+y si activado es true 
+no se saca el mensaje, sino sí.
+*/
+//names debe ser un array
+confirmarSalirSinGuardar = function(names, activado) { 
+    let contador = 0;
+    names.forEach(function (name) {
+       let elements = document.getElementsByName(name);
+       /**miro si hay algun elemento que case con eso, en caso afirmativo
+        es que existe algo nuevo que no se ha guardado
+        **/
+       contador += elements.length;
+    })
+    if (contador > 0 && activado){
+        return "Es posible que los cambios aplicados no se guarden"
+    }else{
+        return null;
+    }
+};
+
+
+//le añade un 0 a la hora y a los minutos si solo tienen un digito
+formatHora = function(input) {
+    if (input.value.length === 1) {
+        input.value = "0" + input.value;
+    }
+}
+
+//devuelve el acronimo si existe sino el nombre de la asignatura pasada
+getAcronimoONombreAsignatura = function(asignatura){
+    if(asignatura){
+        return asignatura.acronimo || asignatura.nombre
+    }else{
+        return null;
+    }
+};
+
+//crea una fecha pasandola con formato dd/mm/yyyy
+nuevaDateFormat = function (fecha) {
+    try{
+        let ano = fecha.split("/")[2]
+        let mes = fecha.split("/")[1]
+        let dia = fecha.split("/")[0]
+        return new Date(mes + "/" + dia + "/" + ano)
+    }catch(error){
+        return null
+    }
+}
+
+//convierte de YYYY-MM-DD a DD/MM/YYYY
+formatFecha = function (fecha){
+    try{
+        return (fecha.split("-")[2] + "/" + fecha.split("-")[1] + "/" + fecha.split("-")[0])
+    }catch(error){
+        return null
+    }
+        
+}
+//aumenta dias dias a la fecha (pudede ser negativo)
+aumentarDia = function(fecha, dias) {
+    try{
+    let ano = fecha.split("/")[2]
+    let mes = fecha.split("/")[1]
+    let dia = fecha.split("/")[0]
+    let d = new Date(mes + "/" + dia + "/" + ano)
+    let nextDay = new Date(d);
+    nextDay.setDate(d.getDate() + dias);
+    //Devuelve la fecha en formato dd/mm/yyyy
+    return (("0" + nextDay.getDate()).slice(-2) + "/" + ("0" + (nextDay.getMonth() + 1)).slice(-2) + "/" + nextDay.getFullYear())
+    }catch(error){
+        return null
+    } 
+}
+//la fecha la paso como dd/mm/yyyy (puedo pasarla como 5/8/2018)
+getDia = function(fecha) {
+    try{
+        let ano = fecha.split("/")[2]
+        let mes = fecha.split("/")[1]
+        let dia = fecha.split("/")[0]
+        //debo darle la vuelta al formato ingles
+        let d = new Date(mes + "/" + dia + "/" + ano);
+        let weekday = new Array(7);
+        weekday[0] = "D";
+        weekday[1] = "L";
+        weekday[2] = "M";
+        weekday[3] = "X";
+        weekday[4] = "J";
+        weekday[5] = "V";
+        weekday[6] = "S";
+        let weekdayCompleto = new Array(7);
+        weekdayCompleto[0] = "Domingo";
+        weekdayCompleto[1] = "Lunes";
+        weekdayCompleto[2] = "Martes";
+        weekdayCompleto[3] = "Miércoles";
+        weekdayCompleto[4] = "Jueves";
+        weekdayCompleto[5] = "Viernes";
+        weekdayCompleto[6] = "Sábado";
+        let month = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+        return [weekday[d.getDay()], month[d.getMonth()], d.getDate(), d, weekdayCompleto[d.getDay()]];
+    }catch(error){
+        return null
+    }
+}
+/**
+ * devuelve el lunes anterior o el propio dia si ya es lunes
+ *la fecha la paso como dd/mm/yyyy (puedo pasarla como 5/8/2018)
+ */
+
+getLunesAnterior = function(fecha){
+    let offset = 0;
+    switch (getDia(fecha)[0]){
+    case "D":
+    offset = -6;
+    break;
+    case "L":
+    offset = 0;
+    break;
+    case "M":
+    offset = -1;
+    break;
+    case "X":
+    offset = -2;
+    break;
+    case "J":
+    offset = -3;
+    break;
+    case "V":
+    offset = -4;
+    break;
+    case "S":
+    offset = -5;
+    break;
+    default:
+    break;
+    }
+    return aumentarDia(fecha, offset)
+}
+getLunesSiguiente = function(fecha) {
+    let offset = 0;
+    switch (getDia(fecha)[0]) {
+        case "D":
+            offset = 1;
+            break;
+        case "L":
+            offset = 0;
+            break;
+        case "M":
+            offset = 6;
+            break;
+        case "X":
+            offset = 5;
+            break;
+        case "J":
+            offset = 4;
+            break;
+        case "V":
+            offset = 3;
+            break;
+        case "S":
+            offset = 2;
+            break;
+        default:
+            break;
+    }
+    return aumentarDia(fecha, offset)
+}
+%>

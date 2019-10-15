@@ -22,7 +22,7 @@ exports.deleteExpiredUserSession = function (req, res, next) {
     if (req.session.user.expires < Date.now()) { // Caduco
         //la sesión la elimina el cas
         req.session.save(function () {
-        res.redirect(app.contextPath + "/logout")
+            res.redirect(app.contextPath + "/logout")
         })
     } else { // No caduco. Restaurar la hora de expiracion.
         req.session.user.expires = Date.now() + maxSesionTime;

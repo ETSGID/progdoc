@@ -16,7 +16,7 @@ module.exports = function (sequelize, DataTypes) {
             },
             data: {
                 type: DataTypes.JSONB
-            }  
+            }
         }
     );
     return Session;

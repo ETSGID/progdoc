@@ -1,0 +1,92 @@
+<%if(!locals.estado && !locals.permisoDenegado){%>
+    <%switch (session.submenu){
+        case "Profesores":%>
+            <div>
+                <% if(estadoProfesores[departamentoID] === estadosProfesor.abierto && estadoProgDoc === estadosProgDoc.abierto ) { %>
+                    <form action="<%= aprobarpath %>" method="post" onsubmit="return Enviar()">
+                    <input type='submit'  class="btn btn-default" value='Aprobar Responsable Docente'>
+                    </form>
+                <% } %>
+                    <% if(estadoProfesores[departamentoID] === estadosProfesor.aprobadoResponsable && estadoProgDoc === estadosProgDoc.abierto) { %>
+                        <form id="formDecision" action="<%= aprobarpath %>" method="post">
+                        <input id="decision" type="hidden" name="decision" value='aceptar'>
+                        <button type='submit'  class="btn btn-default" onclick="Decidir('aceptar')">Aprobar Director Departamento</button>
+                        <button type="button"  class="btn btn-default" onclick="Decidir('rechazar')">No aprobar</button>
+                        </form>
+                    <% }
+                    if(estadoProfesores[departamentoID] === estadosProfesor.aprobadoDirector && estadoProgDoc === estadosProgDoc.abierto){%>
+                        <p>La asignación de profesores ya ha sido aprobada por el director del departamento</p>
+                    <%}%>
+            </div>
+    <%        break;
+        case "Profesores2":%>
+            <div>
+                <button type='button'  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
+                <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+            </div>
+    <%        break;
+        case "Tribunales":%>
+            <div>
+                <%if(estadoTribunales[departamentoID] === estadosTribunal.abierto || estadoProgDoc === estadosProgDoc.incidencia) {
+                    if(estadoTribunales[departamentoID] === estadosTribunal.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
+                    <button type='submit'  class="btn btn-default" onclick="Enviar('<%= aprobarpath %>')" >Aprobar Responsable Docente</button>
+                    <%}%>
+                    <button type='button'  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
+                    <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+                <%}else{
+                        if(estadoTribunales[departamentoID] === estadosTribunal.aprobadoResponsable && estadoProgDoc === estadosProgDoc.abierto) { %>
+                            <form id="formDecision" action="<%= aprobarpath %>" method="post">
+                            <input id="decision" type="hidden" name="decision" value='aceptar'>
+                            <button type='submit'  class="btn btn-default" onclick="Decidir('aceptar')">Aprobar Director Departamento</button>
+                            <button type="button"  class="btn btn-default" onclick="Decidir('rechazar')">No aprobar</button>
+                            </form>
+                        <%} if(estadoTribunales[departamentoID] === estadosTribunal.aprobadoDirector && estadoProgDoc === estadosProgDoc.abierto){%>
+                            <p>La asignación de tribunales ya ha sido aprobada por el director del departamento</p>
+                            <%}
+                    }%>
+            </div>
+    <%        break;
+        case "Horarios":%>
+            <div>
+                <%if(estadoHorarios === estadosHorario.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
+                    <button type='submit'  class="btn btn-default" onclick="Enviar('<%= aprobarpath %>')" >Aprobar Coordinador Titulación</button>
+                <%}%>
+                <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
+                <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+                </div>
+        <%        break;
+        case "Actividades":%>
+            <div>
+                <form id="formulario" role="form" data-toggle="validator" autocomplete="off" action="<%=aprobarpath%>" method="post" onsubmit="return Enviar()" >
+                <%if(estadoCalendario === estadosCalendario.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
+                    <input type="submit"  class="btn btn-default" value='Aprobar Coordinador titulación'>
+                <%}%>
+                <button type="button"  class="btn btn-default" onclick="anadirConjuntoActividad('conjuntoActividad',false)">Nuevo conjunto de actividades</button>
+            </form>
+            </div>
+    <%        break;
+        case "Examenes":%>
+            <div>
+            <select id="selectExamenes"  onchange="cambiarSelectExamen('<%=selectExamenespath%>')">
+                <option value="Examenes" title="Examenes" selected>Exámenes</option>
+                <option value="FranjaExamenes" title="FranjaExamenes">Franja Exámenes</option>      
+            </select>
+                <%if(estadoExamenes === estadosExamen.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
+                    <button type='submit'  class="btn btn-default" onclick="Enviar('<%= aprobarpath %>')" >Aprobar Coordinador Titulación</button>
+                <%}%>
+                <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
+                <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+            </div>
+    <%        break;
+        case "Examenes2":%>
+            <div>
+                <select id="selectExamenes"  onchange="cambiarSelectExamen('<%=selectExamenespath%>')">
+                <option value="Examenes" title="Examenes">Exámenes</option>
+                <option value="FranjaExamenes" title="FranjaExamenes" selected>Franja Exámenes</option>      
+                </select>
+                    <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
+                    <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+            </div>
+    <%        break;
+    }
+}%>

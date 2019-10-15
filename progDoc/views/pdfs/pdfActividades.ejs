@@ -1,0 +1,129 @@
+<div style="page-break-after:always;"></div>
+<div>
+<%- include ../../public/js/funciones.ejs %>
+<h2>5.Actividades parciales</h2>
+  <%conjuntoActividadesParcial.forEach(function (conjuntoActividadParcial){%>
+    <p><b>Actividades comunes curso <%=conjuntoActividadParcial.curso%>º <%=conjuntoActividadParcial.semestre%> </b></p>
+    <%
+    let text2=""
+    switch(conjuntoActividadParcial.grupos.length){
+      case 0:
+      break;
+      case 1:
+      text2 += "Grupo "
+      break;
+      default:
+      text2 += "Grupos "
+      break;
+    }
+    conjuntoActividadParcial.grupos.forEach(function (g){
+      let gr = grupos.find(function (obj){return obj.grupoId === g.identificador})
+      text2 += gr.nombre + " "
+    }) 
+      %>
+    <p><b><%=text2%></b></p>
+    <div>
+    <p><%=conjuntoActividadParcial.notaInicial%></p>
+    <table class="table">
+    <thead>
+      <tr>
+      <th scope="col">Semana</th>
+      <th scope="col">Lunes</th>
+      <th scope="col">Actividad Programada</th>
+      <th scope="col">Actividad Evaluación</th>
+      </tr>
+    </thead>
+    <%
+    if (conjuntoActividadParcial.fechaInicio !== null && conjuntoActividadParcial.fechaFin !== null 
+    && (nuevaDateFormat(conjuntoActividadParcial.fechaInicio) < nuevaDateFormat(conjuntoActividadParcial.fechaFin))){%>
+    <tbody> 
+    <%let semana = 1
+    let f1= conjuntoActividadParcial.fechaInicio
+    let f2= conjuntoActividadParcial.fechaFin
+    f1 = getLunesAnterior(f1)
+    f2 = getLunesAnterior(f2)
+    let diaActual = f1;
+    let contador = 0;
+    let coincidenciasProgramadas = []
+    let coincidenciasEval = []
+    while(nuevaDateFormat(diaActual) <= nuevaDateFormat(f2)){
+      if(contador === 0){%>
+        <tr>
+        <td><%=semana%></td>
+        <td><%=getDia(diaActual)[2]%>-<%=getDia(diaActual)[1].substring(0,3).toLowerCase()%></td>
+      <%
+       coincidenciasProgramadas = []
+       coincidenciasEval = []
+      }
+      coincidenciasProgramadas = coincidenciasProgramadas.concat(conjuntoActividadParcial.actividades.filter(
+      act => (act.tipo === 'act' && act.fecha === diaActual)
+      ));
+      coincidenciasEval = coincidenciasEval.concat(conjuntoActividadParcial.actividades.filter(
+      act => (act.tipo === 'eval' && act.fecha === diaActual)
+      ));
+      diaActual = aumentarDia(diaActual,1)
+      //llego a lunes y debo reiniciar sino aumento un dia
+      if(contador === 6 || (nuevaDateFormat(diaActual) >= nuevaDateFormat(f2))){
+      contador = 0;
+      semana ++;
+      %>
+      <td>
+      <%
+      coincidenciasProgramadas.forEach(function(act,index){
+        let asignat = getAcronimoONombreAsignatura(asignaturas.find(function(as){return as.identificador === act.asignaturaId}))
+        asignat = asignat !== null ? asignat : ""
+        let descripcion = act.descripcion || ""
+        descripcion = index === coincidenciasProgramadas.length -1 ? descripcion : descripcion + "; "
+        let fecha =  ""
+        if (act.fecha){
+          fecha = "("+getDia(act.fecha)[4]+" "+getDia(act.fecha)[3].getDate()+")"
+        }
+        let horaInicio = ""
+        if (act.horaInicio){
+          horaInicio = "["+moment(act.horaInicio,"hh:mm:ss").format("hh:mm")
+          if (act.duracion || act.duracion === 0){
+          horaInicio += "-" + moment(act.horaInicio,"hh:mm:ss").add(act.duracion, "m").format("hh:mm")
+          }
+          horaInicio += "]"
+        }
+
+      %>
+      <%=asignat%> <span style="font-size:90%"><%=fecha%></span><span style="font-size:90%"><%=horaInicio%></span> <%=descripcion%>
+      <%})%>
+      </td>
+      <td>
+      <%
+      coincidenciasEval.forEach(function(act,index){
+        let asignat = getAcronimoONombreAsignatura(asignaturas.find(function(as){return as.identificador === act.asignaturaId}))
+        asignat = asignat !== null ? asignat : ""
+        let descripcion = act.descripcion || ""
+        descripcion = index === coincidenciasEval.length -1 ? descripcion : descripcion + "; "
+        let fecha =  ""
+        if (act.fecha){
+          fecha = "("+getDia(act.fecha)[4]+" "+getDia(act.fecha)[3].getDate()+")"
+        }
+        let horaInicio = ""
+        if (act.horaInicio){
+          horaInicio = "["+moment(act.horaInicio,"hh:mm:ss").format("hh:mm")
+          if (act.duracion || act.duracion === 0){
+          horaInicio += "-" + moment(act.horaInicio,"hh:mm:ss").add(act.duracion, "m").format("hh:mm")
+          }
+          horaInicio += "]"
+        }
+      %>
+      <%=asignat%> <span style="font-size:90%"><%=fecha%></span><span style="font-size:90%"><%=horaInicio%></span> <%=descripcion%>
+      <%})%>
+      </td>
+      </tr>
+      <%}else{
+        contador ++;
+      }
+    }%>
+    </tbody>
+    <%}%>
+    </table>
+    </div>
+    <div style="page-break-after:always;"></div>
+  <%})%>
+
+</div>

@@ -5,10 +5,7 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let partials = require('express-partials');
 let morgan = require('morgan');
-const filemanager = require('rich-filemanager-node'); 
-
-
-
+const filemanager = require('rich-filemanager-node');
 
 //context path para la aplicacion en el servidor
 let session = require('express-session');
@@ -37,7 +34,7 @@ let cas = new CASAuthentication({
   service_url: service,
   cas_version: '3.0',
   session_info: 'user',
-  destroy_session : true//me borra la sesión al hacer el logout
+  destroy_session: true//me borra la sesión al hacer el logout
 });
 
 
@@ -49,8 +46,9 @@ let router = require('./routes/index')
 let routerApi = require('./routes/api')
 let models = require('./models');
 let Sequelize = require('sequelize');
-let permisosControllerProgDoc = require('./controllers/permisos_controllerProgDoc');
-let menuProgDocController = require('./controllers/menuProgDoc_controller')
+let rolController = require('./controllers/rol_controller');
+let progDocController = require('./controllers/progDoc_controller')
+let funciones = require('./funciones')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -58,7 +56,7 @@ app.set('view engine', 'ejs');
 
 //solo te imprime las peticiones incorrectas
 app.use(morgan('combined', {
-  skip: function (req, res) {return res.statusCode < 400 }
+  skip: function (req, res) { return res.statusCode < 400 }
 }))
 app.use(partials());
 
@@ -92,85 +90,80 @@ app.use(session({
 
 // autologout
 
-  // Rutas que no empiezan por /api/
-  app.use(path.join(contextPath, 'api'), routerApi);
-  //exit del cas el primero para que no entre en bucle. El cas es el encargado de eliminar la sesión
-  app.get(path.join(contextPath, 'logout'), cas.logout);
-  
+// Rutas que no empiezan por /api/
+app.use(path.join(contextPath, 'api'), routerApi);
+//exit del cas el primero para que no entre en bucle. El cas es el encargado de eliminar la sesión
+app.get(path.join(contextPath, 'logout'), cas.logout);
 
 
 
-  // Helper dinamico:
-  app.use(cas.bounce, function (req, res, next) {
-    // Hacer visible req.session en las vistas
-    res.locals.session = req.session;
-    res.locals.contextPath = contextPath;
-    //solo la primera vez
-    if (!req.session.user.noFirst) {
-      return models.Persona.findOne({
+
+// Helper dinamico:
+app.use(cas.bounce, async function (req, res, next) {
+  // Hacer visible req.session en las vistas
+  res.locals.session = req.session;
+  res.locals.contextPath = contextPath;
+  //solo la primera vez
+  if (!req.session.user.noFirst) {
+    try {
+      let pers = await models.Persona.findOne({
         attributes: ["identificador"],
         where: {
           email: req.session.user.mail
         }
       })
-        .then((pers) => {
-          if(pers){
-            req.session.user.PersonaId = pers.identificador;
-          }else{
-            req.session.user.PersonaId = null;
-          }
-          
-          req.session.user.noFirst = true;
-          //para que no haya problemas de que cosas no se han iniciado en la sesión
-          req.session.save(function () {
-            res.redirect(contextPath);
-          })
-        })
-        .catch(function (error) {
-          console.log("Error:", error);
-          next(error);
-        });
+      if (pers) {
+        req.session.user.PersonaId = pers.identificador;
+      } else {
+        req.session.user.PersonaId = null;
+      }
+      req.session.user.noFirst = true;
+      //para que no haya problemas de que cosas no se han iniciado en la sesión
+      req.session.save(function () {
+        res.redirect(contextPath);
+      })
     }
-    if (!req.session.user.rols) {
-      //probar roles de otras personas
-      // req.session.user.mail = "correo@upm.es"
-
-      req.session.user.rols = [];
-      return models.Rol.findAll({
+    catch (error) {
+      console.log("Error:", error);
+      next(error);
+    }
+  }
+  else if (!req.session.user.rols) {
+    //probar roles de otras personas
+    // req.session.user.mail = "correo@upm.es"
+    try {
+      req.session.user.rols = await models.Rol.findAll({
         attributes: ["rol", "PlanEstudioCodigo", "DepartamentoCodigo"],
         where: {
           PersonaId: req.session.user.PersonaId
         },
         raw: true
-      }).each((rol) => {
-        req.session.user.rols.push(rol)
       })
-        .then((rols) => {
-          next();
-        })
-        .catch(function (error) {
-          console.log("Error:", error);
-          next(error);
-        });
-    } else{
       next();
     }
-  });
-  //gestor de archivos, puede acceder todo el mundo que esté en progdoc o sea profesor
-  //debe existir esa carpeta sino dara error
+    catch (error) {
+      console.log("Error:", error);
+      next(error);
+    }
+  } else {
+    next();
+  }
+});
+//gestor de archivos, puede acceder todo el mundo que esté en progdoc o sea profesor
+//debe existir esa carpeta sino dara error
 
-app.use(path.join(contextPath, 'archivos/filemanager'), function(req,res,next){
-  menuProgDocController.ensureDirectoryExistence(filePathPDF)
-  if(!req.query.path) req.query.path ='/'
-  let pathExiste = path.join(pathPDF, 'pdfs', req.query.path,'file')
-  let existe = menuProgDocController.ensureDirectoryExistence(pathExiste,true)
+app.use(path.join(contextPath, 'archivos/filemanager'), function (req, res, next) {
+  funciones.ensureDirectoryExistence(filePathPDF)
+  if (!req.query.path) req.query.path = '/'
+  let pathExiste = path.join(pathPDF, 'pdfs', req.query.path, 'file')
+  let existe = funciones.ensureDirectoryExistence(pathExiste, true)
   if (!existe) req.query.path = '/';
   next()
 });
 app.use(path.join(contextPath, 'archivos/filemanager'), filemanager((path.join(pathPDF, 'pdfs')), config));
-  app.use(path.join(contextPath, 'archivos'), express.static('node_modules/rich-filemanager'));
-  //router para contexto
-  app.use(contextPath, router);
+app.use(path.join(contextPath, 'archivos'), express.static('node_modules/rich-filemanager'));
+//router para contexto
+app.use(contextPath, router);
 
 
 // catch 404 and forward to error handler
@@ -182,16 +175,17 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = process.env.DEV === 'true' ? err : {};
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error', { 
+  res.render('error', {
     contextPath: contextPath,
-    layout: false });
+    layout: false
+  });
 });
 
 module.exports = app;

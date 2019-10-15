@@ -9,13 +9,13 @@ let Sequelize = require('sequelize');
 let logs = process.env.DEV === 'true' ? false : false
 let sequelize;
 let sequelizeSession;
-if (process.env.DOCKER === 'true'){
-    sequelize = new Sequelize('postgres://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + ':5432/' + process.env.POSTGRES_DB,{logging:logs});
-    sequelizeSession = new Sequelize('postgres://' + process.env.DBSESSION_USERNAME + ':' + process.env.DBSESSION_PASSWORD + '@dbsession:5432/' + process.env.POSTGRESSESION_DB,{logging:logs});
+if (process.env.DOCKER === 'true') {
+    sequelize = new Sequelize('postgres://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + ':5432/' + process.env.POSTGRES_DB, { logging: logs });
+    sequelizeSession = new Sequelize('postgres://' + process.env.DBSESSION_USERNAME + ':' + process.env.DBSESSION_PASSWORD + '@dbsession:5432/' + process.env.POSTGRESSESION_DB, { logging: logs });
 }
-else{
-    sequelize = new Sequelize('postgres://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST +':5432/' + process.env.POSTGRES_DB,{logging:logs});
-    sequelizeSession = new Sequelize('postgres://' + process.env.DBSESSION_USERNAME + ':' + process.env.DBSESSION_PASSWORD + '@localhost:5432/' + process.env.POSTGRESSESION_DB,{logging:logs})
+else {
+    sequelize = new Sequelize('postgres://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + ':5432/' + process.env.POSTGRES_DB, { logging: logs });
+    sequelizeSession = new Sequelize('postgres://' + process.env.DBSESSION_USERNAME + ':' + process.env.DBSESSION_PASSWORD + '@localhost:5432/' + process.env.POSTGRESSESION_DB, { logging: logs })
 }
 
 
@@ -23,7 +23,7 @@ else{
 // Importar la definicion de las tablas 
 let Departamento = sequelize.import(path.join(__dirname, 'Departamento'));
 let Asignatura = sequelize.import(path.join(__dirname, 'Asignatura'));
-let Examen  = sequelize.import(path.join(__dirname,'Examen'));
+let Examen = sequelize.import(path.join(__dirname, 'Examen'));
 let Grupo = sequelize.import(path.join(__dirname, 'Grupo'));
 let Persona = sequelize.import(path.join(__dirname, 'Persona'));
 let PlanEstudio = sequelize.import(path.join(__dirname, 'PlanEstudio'));
@@ -38,19 +38,27 @@ let EventoGeneral = sequelize.import(path.join(__dirname, 'EventoGeneral'));
 let EventoPlan = sequelize.import(path.join(__dirname, 'EventoPlan'));
 let Calendario = sequelize.import(path.join(__dirname, 'Calendario'));
 
+let ConjuntoActividadParcial = sequelize.import(path.join(__dirname, 'ConjuntoActividadParcial'));
+let ConjuntoActividadParcialGrupo = sequelize.import(path.join(__dirname, 'ConjuntoActividadParcialGrupo'));
+let ActividadParcial = sequelize.import(path.join(__dirname, 'ActividadParcial'));
+
 let Session = sequelizeSession.import(path.join(__dirname, 'Session'));
 
+//----- PERSONAL-----//
+
 // Relacion 1 a 1 entre Profesor y Persona:
-Persona.hasOne(Profesor, {foreignKey: 'ProfesorId'});
+Persona.hasOne(Profesor, { foreignKey: 'ProfesorId' });
 
 //Relacion 1 a N entre Departamento y Profesor:
-Departamento.hasMany(Profesor, {foreignKey:'DepartamentoCodigo'})
-Profesor.belongsTo(Departamento, {foreignKey:'DepartamentoCodigo'})
+Departamento.hasMany(Profesor, { foreignKey: 'DepartamentoCodigo' })
+Profesor.belongsTo(Departamento, { foreignKey: 'DepartamentoCodigo' })
 
+
+//-----PROGRAMACION DOCENTE-----//
 
 //Relacion 1 a N entre Departamento y Asignatura:
-Departamento.hasMany(Asignatura, {foreignKey:'DepartamentoResponsable'})
-Asignatura.belongsTo(Departamento,{foreignKey:'DepartamentoResponsable'})
+Departamento.hasMany(Asignatura, { foreignKey: 'DepartamentoResponsable' })
+Asignatura.belongsTo(Departamento, { foreignKey: 'DepartamentoResponsable' })
 
 
 //Relacion 1 a N entre Asignatura y Examen
@@ -62,8 +70,8 @@ ProgramacionDocente.hasMany(Grupo, { foreignKey: 'ProgramacionDocenteId' })
 Grupo.belongsTo(ProgramacionDocente, { foreignKey: 'ProgramacionDocenteId' })
 
 //Relacion 1 a N entre Profesor y Asignatura:
-Profesor.hasMany(Asignatura, { foreignKey: 'CoordinadorAsignatura'})
-Asignatura.belongsTo(Profesor, { as: 'Coordinador',foreignKey: 'CoordinadorAsignatura'})
+Profesor.hasMany(Asignatura, { foreignKey: 'CoordinadorAsignatura' })
+Asignatura.belongsTo(Profesor, { as: 'Coordinador', foreignKey: 'CoordinadorAsignatura' })
 
 //Relacion N a N a N entre Profesor,Asignatura y Grupo a través de AsignacionProfesor:
 Profesor.hasMany(AsignacionProfesor, { foreignKey: 'ProfesorId' })
@@ -80,10 +88,11 @@ AsignacionProfesor.belongsTo(Grupo, { foreignKey: 'GrupoId' })
 PlanEstudio.hasMany(ProgramacionDocente, { foreignKey: 'PlanEstudioId' });
 ProgramacionDocente.belongsTo(PlanEstudio, { foreignKey: 'PlanEstudioId' });
 
-//Relacion 1 a N Programacion Docente y Asignatura si hay varias prog doc en un año se repetiran las asignaturas en labbdd
+//Relacion 1 a N Programacion Docente y Asignatura
 ProgramacionDocente.hasMany(Asignatura);
 Asignatura.belongsTo(ProgramacionDocente);
 
+//-----ROLES-----//
 
 //Relación 1 a N entre PlanEstudio y rol
 PlanEstudio.hasMany(Rol)
@@ -94,12 +103,14 @@ Departamento.hasMany(Rol)
 Rol.belongsTo(Departamento)
 
 //Relación 1 a N entre persona y rol
-Persona.hasMany(Rol,{ foreignKey: 'PersonaId' })
-Rol.belongsTo(Persona,{ foreignKey: 'PersonaId' })
+Persona.hasMany(Rol, { foreignKey: 'PersonaId' })
+Rol.belongsTo(Persona, { foreignKey: 'PersonaId' })
 
 //Relación 1 a N entre Plan e Itinerario -> ojo si se elimina un plan de estudio en la bbdd debe quedar para ver los de los años anteriores
 PlanEstudio.hasMany(Itinerario);
 Itinerario.belongsTo(PlanEstudio);
+
+//-----ITINEARIOS-----//
 
 //Relación 1 a N entre Itinerario y Asignatura
 Itinerario.hasMany(Asignatura);
@@ -108,6 +119,8 @@ Asignatura.belongsTo(Itinerario);
 //Relación 1 a N entre Itineario y Grupo
 Itinerario.hasMany(Grupo);
 Grupo.belongsTo(Itinerario);
+
+//-----TRIBUNALES-----//
 
 //Relacion 1 a N  entre profesor Asignatura (para Presidente, Secretario, Vocal y suplente)
 Profesor.hasMany(Asignatura, { foreignKey: 'PresidenteTribunalAsignatura' });
@@ -124,7 +137,9 @@ Asignatura.belongsTo(Profesor, { as: 'Suplente', foreignKey: 'SuplenteTribunalAs
 
 //Relacion 1 a N entre ProgramacionDocente y FranjaExamen
 ProgramacionDocente.hasMany(FranjaExamen, { foreignKey: 'ProgramacionDocenteId' });
-FranjaExamen.belongsTo(ProgramacionDocente, {foreignKey: 'ProgramacionDocenteId'});
+FranjaExamen.belongsTo(ProgramacionDocente, { foreignKey: 'ProgramacionDocenteId' });
+
+//-----CALENDADRIO-----//
 
 //Relacion 1 a N entre PlanEstudio y EventoPlan
 PlanEstudio.hasMany(EventoPlan, { foreignKey: 'PlanEstudioId' });
@@ -134,8 +149,26 @@ EventoPlan.belongsTo(PlanEstudio, { foreignKey: 'PlanEstudioId' });
 EventoGeneral.hasMany(EventoPlan, { foreignKey: 'EventoGeneralId' });
 EventoPlan.belongsTo(EventoGeneral, { foreignKey: 'EventoGeneralId' });
 
+//-----ACTIVIDADES PARCIALES-----//
 
- 
+//Relacion 1 a N entre ProgramacionDocente y ConjuntoActividadParcial
+ProgramacionDocente.hasMany(ConjuntoActividadParcial, { foreignKey: 'ProgramacionDocenteId' });
+ConjuntoActividadParcial.belongsTo(ProgramacionDocente, { foreignKey: 'ProgramacionDocenteId' });
+
+//Relacion 1 a N entre ConjuntoActividadParcial y ActividadParcial
+ConjuntoActividadParcial.hasMany(ActividadParcial, { foreignKey: 'ConjuntoActividadParcialId' });
+ActividadParcial.belongsTo(ConjuntoActividadParcial, { foreignKey: 'ConjuntoActividadParcialId' });
+
+//Relacion 1 a N entre Asignatura y ActividadParcial
+Asignatura.hasMany(ActividadParcial, { foreignKey: 'AsignaturaId' })
+ActividadParcial.belongsTo(Asignatura, { foreignKey: 'AsignaturaId' })
+
+//Relacion N a N entre Grupo y ConjuntoActividadParcial
+ConjuntoActividadParcial.belongsToMany(Grupo, { through: { model: ConjuntoActividadParcialGrupo }, foreignKey: 'ConjuntoParcialId' })
+Grupo.belongsToMany(ConjuntoActividadParcial, { through: { model: ConjuntoActividadParcialGrupo }, foreignKey: 'GrupoId' })
+
+
+
 
 
 sequelize.sync();
@@ -158,5 +191,8 @@ exports.FranjaExamen = FranjaExamen; //exportar definición de tabla Franja Exam
 exports.EventoGeneral = EventoGeneral; //exportar definición de tabla EventoGeneral
 exports.EventoPlan = EventoPlan; //exportar definición de tabla EventoPlan
 exports.Calendario = Calendario; //exportar definición de tabla Calendario
+exports.ConjuntoActividadParcial = ConjuntoActividadParcial; //exportar definicion de tabla ConjuntoActividadParcial
+exports.ConjuntoActividadParcialGrupo = ConjuntoActividadParcialGrupo; //exportar definicion de tabla ConjuntoActividadParcial
+exports.ActividadParcial = ActividadParcial; //exportar definicion de tabla ActividadParcial
 exports.sequelize = sequelize;
 exports.sequelizeSession = sequelizeSession;

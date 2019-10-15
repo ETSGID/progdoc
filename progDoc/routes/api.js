@@ -3,9 +3,9 @@ let router = express.Router();
 let asignaturasApi = require('../api/asignaturas');
 let profesorApi = require('../api/profesor');
 let planesApi = require('../api/planes');
-let menuProgDocController = require('../controllers/menuProgDoc_controller')
+let progDocController = require('../controllers/progDoc_controller')
 
-router.all('*', function (req,res,next){
+router.all('*', function (req, res, next) {
     next();
 })
 
@@ -31,6 +31,6 @@ router.get('/profesor/docencia/:profesorCorreo/:anoAcademico(\\d+)/:semestre',
     profesorApi.getProfesorAsignaturas)
 
 router.all('*', function (req, res, next) {
-    res.json({"error":"Ruta no disponible en la api"})
+    res.json({ "error": "Ruta no disponible en la api" })
 })
 module.exports = router;

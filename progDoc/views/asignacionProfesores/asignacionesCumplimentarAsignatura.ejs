@@ -1,0 +1,129 @@
+<script src="<%=contextPath%>/js/autocomplete.js"></script>
+<%- include ../menus/cumplimentar.ejs %>
+<div id="hermanoNuevoProfesorForm" class="contenido2">
+<form id="formulario" autocomplete="off" action="<%= nuevopath %>" method="post" >
+<input  type="hidden" id="plan" value="<%=session.planID%>">
+<input type="hidden" id="selectPlan" value="<%=session.planID%>">
+<input type="hidden" name="asignaturaId" value="<%= asign.identificador %>">
+<% if (asign.acronimo !== null){ %>
+  <h1><span title="<%=asign.nombre%> (<%=asign.codigo%>)"><%= asign.acronimo %></span></h1>
+  <% }else{%>
+  <h1><span title="<%=asign.nombre%> (<%=asign.codigo%>)"><%= asign.nombre %></span></h1>
+  <% }%>
+
+<ul style="list-style-type:none">
+    <li>Coordinador:
+    <div class="autocomplete" style="width:500px;">
+    <input id="coordinadorInput" type="text" name="coordinadorInput" value="<%= asign.coordinador.nombreCorregido %>" placeholder="<%= asign.coordinador.nombreCorregido %>" onclick= 'LimpiaCoordinador()'>
+    <input id="coordinador" type="hidden" name="coordinador" value="<%=asign.coordinador.identificador%>">
+    </div>
+    <span><button type="button"  class="btn btn-default" onclick="EliminarCoordinador()">Eliminar</button></span>
+    </li>
+    <!-- Si el estado es N la asignacion se hace por grupo comun -->
+    <%if(asign.estado === "N") {
+        if(asign.grupos.length > 1){ %>
+          <li>
+          <h2> <span> Grupo Común: </span></h2>
+        <ul style="list-style-type:none">
+        <%for(profesor of asign.grupos[0].profesors){ %>
+        <li id="asignacion_<%= profesor.asignacion %>">
+        <%= profesor.nombreCorregido %> <button type="button"  class="btn btn-default" onclick="Eliminar('asignacion_<%= profesor.asignacion %>')">Eliminar</button>
+        </li>
+      <% } %>
+      <div id = 'anadir_profesor_<%= asign.grupos[0].GrupoId %>'></div>
+      <button type="button"  class="btn btn-default" onclick="AnadirProfesor('anadir_profesor_<%= asign.grupos[0].GrupoId %>')">Añadir Profesor</button>
+          </ul>
+          </li>
+        <%}%>
+    <%} else {%>
+      <% for(grupo of  asign.grupos){ %>
+          <li>
+        <% if (grupo.grupoPerteneciente === true){%>
+          <h2> <span> Grupo <%= grupo.GrupoNombre %>  <%= grupo.nombreItinerario %>: </span></h2>
+        <%} else{%>
+            <h2> <span class="cuidado"> Grupo <%= grupo.GrupoNombre %>  <%= grupo.nombreItinerario %>: </span></h2>
+        <%}%>
+        <ul style="list-style-type:none">
+        <%for(profesor of grupo.profesors){ %>
+        <li id="asignacion_<%= profesor.asignacion %>">
+        <%= profesor.nombreCorregido %> <button type="button"  class="btn btn-default" onclick="Eliminar('asignacion_<%= profesor.asignacion %>')">Eliminar</button>
+        </li>
+      <% } %>
+      <div id = 'anadir_profesor_<%= grupo.GrupoId %>'></div>
+      <button type="button"  class="btn btn-default" onclick="AnadirProfesor('anadir_profesor_<%= grupo.GrupoId %>')">Añadir Profesor</button>
+          </ul>
+          </li>
+    <% }
+  } %>
+
+    </ul>
+</form> 
+</div>
+<%- include ./nuevoProfesor.ejs %>
+
+<script>
+let form = document.getElementById("formulario")
+let numeroIncrementable = 0;
+let profesores = <%- JSON.stringify(profesores) %>
+let profesores2 = quitAcents(profesores)
+
+autocomplete(document.getElementById("coordinadorInput"), profesores, profesores2,'coordinador');
+
+function Eliminar(id) {
+   document.getElementById(id).innerHTML = '<input name="eliminar" id="momentaneo" type="hidden" value="">'
+   let memomentaneo = document.getElementById(momentaneo)
+   momentaneo.setAttribute('value', "eliminar_"+id) 
+   momentaneo.setAttribute('id', "") 
+}
+
+function Eliminar2(id){
+  let input = document.getElementById(id);
+  let liste = document.getElementById("list_"+id);
+  input.parentNode.removeChild(input);
+  liste.parentNode.removeChild(liste);
+  
+}
+
+function EliminarCoordinador(){
+ document.getElementById('coordinadorInput').value = "NO ASIGNADO";
+ document.getElementById('coordinadorInput').placeholder = "NO ASIGNADO";
+ document.getElementById('coordinador').value = null;
+}
+
+function AnadirProfesor(id){
+ let div = document.createElement('div');
+  div.innerHTML = '<div id="'+id+'_vacio" class="autocomplete" style="width:500px;"><input id="momentaneo" type="text" name="vacio" value="" placeholder="Seleccionar Profesor"></div>'
+  let node = div.firstChild;
+  /*No se puede usar innerHtml directamente pq si añades varios buscadores en un mismo grupo desaparece la funcionalidad de los primeros
+  buscadores. Con javascript debes crear primero un elemento, la forma más sencislla para hacerlo con un string es esa
+  Alternativaemtne se podría hacer con jquery así
+  */
+  //$( "#"+id ).append('<div class="autocomplete" style="width:500px;"><input id="momentaneo" type="text" name="anadir" value="" placeholder="Seleccionar Profesor"></div> ' ); 
+  let contenedor = document.getElementById(id)
+  //solo permite un input por grupo hasta que se rellene
+  if(!document.getElementById(id+"_vacio")){
+   contenedor.appendChild(node)
+   let memomentaneo = document.getElementById(momentaneo)
+   momentaneo.setAttribute('id', numeroIncrementable)
+   document.getElementById(numeroIncrementable).focus();
+   autocomplete(document.getElementById(numeroIncrementable), profesores, profesores2, 'asignacionProfesores');
+   numeroIncrementable++; 
+  }
+     
+}
+
+function Guardar(nuevopath){
+  let form2 = document.getElementById("formulario");
+  form2.setAttribute('action', nuevopath);
+  form2.submit();
+}
+
+function Volver(cancelarpath){
+  window.location.replace(cancelarpath);
+}
+
+function LimpiaCoordinador(){
+  document.getElementById('coordinadorInput').value = '';
+}
+
+</script>

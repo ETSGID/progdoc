@@ -6,7 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "body-parser": "^1.18.2",
     "bootstrap-select": "^1.13.1",
     "cas-authentication": "git+https://github.com/javicond3/cas-authentication.git",
@@ -25,14 +25,14 @@
     "json2csv": "^4.3.5",
     "method-override": "^2.3.10",
     "moment": "^2.22.2",
-    "morgan": "~1.9.0",
+    "morgan": "^1.9.1",
     "node-rest-client": "^3.1.0",
     "normalize-path": "^3.0.0",
     "pg": "^6",
     "pg-hstore": "^2.3.2",
     "rich-filemanager": "^2.7.6",
     "rich-filemanager-node": "^0.1.5",
-    "sequelize": "^4.37.6",
+    "sequelize": "^4.44.3",
     "sequelize-cli": "^4.0.0",
     "serve-favicon": "^2.5.0"
   }

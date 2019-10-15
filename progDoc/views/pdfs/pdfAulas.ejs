@@ -1,0 +1,74 @@
+
+<div>
+    <%for (let i=0 ; i<aulas.length; i++){%>
+        <div>
+            <p>
+            </p>
+            <span><b>Aula </b> <%= aulas[i].aula.toUpperCase() %></span>
+            </h3>
+            <p>
+            <span><b>Planes</b></span>
+            <%for([index, plan] of aulas[i].planes.entries()){%>
+                <%if (index > 0 ){%> <span>|</span><%}%>
+                <span style="color:<%=plan.color%>"><%=plan.nombre%></span>
+                <%for(grupo of plan.grupos){%>
+                    <span style="font-size:80%; color:<%=plan.color%>"><%=grupo%></span> 
+                <%}%>
+                
+            <%}%>
+            </p>
+            <div class="hidden">
+                <table class="table_aulas" border="1" style="text-aling: center;">
+                    <tr>
+                        <th scope="col" width="10%">Hora</th>
+                        <th scope="col" width="90/5%">Lunes</th>
+                        <th scope="col" width="90/5%">Martes</th>
+                        <th scope="col" width="90/5%">Miércoles</th>
+                        <th scope="col" width="90/5%">Jueves</th>
+                        <th scope="col" width="90/5%">Viernes</th>
+                        <th scope="col" width="90/5%">Sábado</th>
+                    </tr>
+                    <% for( let j=0 ; j<13 ; j++){%>
+                        <tr>
+                            <td scope="col" width="10%">
+                                <%=j+8%>:00
+                            </td>
+                            <% for( let z=0 ; z<6; z++){%>
+                                <%if(gruposPorAula[aulas[i].aula][j+z*13] && gruposPorAula[aulas[i].aula][j+z*13].asignaturas.length>0){%>
+                                    <td scope="col" width="90/5%">
+                                <%}else{%>
+                                    <td class="tdSombreado"  width="90/5%">
+                                <%}%>
+                                <%if(gruposPorAula[aulas[i].aula][j+z*13]){%>
+                                    <%for(let w=0; w < gruposPorAula[aulas[i].aula][j+z*13].asignaturas.length; w++) { %>
+                                        <%if (w > 0){%><span>/</span><%}%>
+                                        <span style="color: <%=gruposPorAula[aulas[i].aula][j+z*13].color[w]%> ">
+                                            <%=gruposPorAula[aulas[i].aula][j+z*13].asignaturas[w]%>
+                                        </span>
+                                    <%}%>
+                                <%}%>
+                                </td>
+                            <%}%>
+                        </tr>
+                    <%}%>
+                </table>
+            </div>
+        </div>
+        <div style="page-break-after:always;"></div>
+    <%}%>
+</div>
+<style>
+    th{
+        text-align: center;
+        padding: 10px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    td{
+        text-align: center;
+        padding: 10px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+</style>

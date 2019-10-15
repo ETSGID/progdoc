@@ -23,7 +23,6 @@ module.exports = function (sequelize, DataTypes) {
             periodo: {
                 type: DataTypes.ENUM(enumsPD.periodoPD.S1_O, enumsPD.periodoPD.S1_E, enumsPD.periodoPD.S2_O, enumsPD.periodoPD.S2_E),
             }
-
         },
         {
             timestamps: false

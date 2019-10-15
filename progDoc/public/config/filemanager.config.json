@@ -45,7 +45,6 @@
             "MIXED": {}
         }
     },
-
     "security": {
         "readOnly": true,
         "extensions": {
@@ -63,7 +62,7 @@
         "enabled": false
     },
     "filter": {
-	"enabled": false
+        "enabled": false
     },
     "search": {
         "enabled": false
@@ -155,7 +154,7 @@
         "enabled": false
     },
     "customScrollbar": {
-    	"enabled": false
+        "enabled": false
     },
     "extras": {
         "extra_js": [],
