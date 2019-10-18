@@ -232,7 +232,6 @@ exports.getAulas = async function (req, res, next) {
             //save file
             pdf.create(html, configPdfOptions).toFile(ruta, function (err, resp) {
                 if (err) {console.log(err); res.json({ success: false, msg: "Ha habido un error la acción no se ha podido completar" })}
-                console.log(`${app.contextPath}/pdfs/${file}`)
                 res.json({ success: true, path: `${app.contextPath}/pdfs/${file}`  })
             })
         }

@@ -914,32 +914,13 @@ exports.abrirCopiaProgDoc = async function (req, res, next) {
         )
         //hay que añadir las actividades parciales
         conjuntoActividadesParcial = await actividadParcialController.getAllActividadParcial([pdIDanterior])
-        switch (tipoPD) {
-            case "1S":
-                conjuntoActividadesParcial = conjuntoActividadesParcial.filter(function (element) {
-                    return element.semestre === '1S';
-                });
-                break;
-            case "2S":
-                conjuntoActividadesParcial = conjuntoActividadesParcial.filter(function (element) {
-                    return element.semestre === '2S';
-                });
-                break;
-            case "I":
-                conjuntoActividadesParcial = conjuntoActividadesParcial.filter(function (element) {
-                    return element.semestre === '1S' || element.semestre === '2S';
-                });
-                break;
-            default:
-                break;
-        }
         conjuntoActividadesParcial.forEach(function (c) {
             let newConjuntoActividadParcial = {};
             newConjuntoActividadParcial.notaInicial = c.notaInicial;
             newConjuntoActividadParcial.curso = c.curso;
             newConjuntoActividadParcial.semestre = c.semestre;
-            newConjuntoActividadParcial.fechaInicio = funciones.addYear(funciones.formatFecha2(c.fechaInicio))
-            newConjuntoActividadParcial.fechaFin = funciones.addYear(funciones.formatFecha2(c.fechaFin))
+            newConjuntoActividadParcial.fechaInicio = funciones.formatFecha2(c.fechaInicio);
+            newConjuntoActividadParcial.fechaFin = funciones.formatFecha2(c.fechaFin);
             newConjuntoActividadParcial.ProgramacionDocenteId = nuevaPd.identificador;
             newConjuntoActividadParcial.ActividadParcials = [];
             c.actividades.forEach(function (actParcial) {
@@ -951,7 +932,7 @@ exports.abrirCopiaProgDoc = async function (req, res, next) {
                     newActividad.horaInicio = actParcial.horaInicio
                     newActividad.duracion = actParcial.duracion
                     newActividad.descripcion = actParcial.descripcion
-                    newActividad.fecha = funciones.addYear(funciones.formatFecha2(actParcial.fecha))
+                    newActividad.fecha = funciones.formatFecha2(actParcial.fecha);
                     newActividad.tipo = actParcial.tipo
                     newActividad.AsignaturaId = asignaturaConActividad ? asignaturaConActividad.idNuevo : null
                     newConjuntoActividadParcial.ActividadParcials.push(newActividad);
