@@ -16,9 +16,6 @@ exports.local = local;
 const pathPDF = normalize(process.env.PATH_PDF);
 exports.pathPDF = pathPDF;
 
-//TODO repetida en bin www solo en un sitio
-const filePathPDF = path.join(pathPDF, 'pdfs', 'files')
-
 
 //cas autentication
 let CASAuthentication = require('cas-authentication');
@@ -98,6 +95,7 @@ app.use(cas.bounce, async function (req, res, next) {
   // Hacer visible req.session en las vistas
   res.locals.session = req.session;
   res.locals.contextPath = contextPath;
+  res.locals.pruebas = process.env.PRUEBAS === 'true' ? "pruebas" : "portal";
   //solo la primera vez
   if (!req.session.user.noFirst) {
     try {
@@ -152,7 +150,6 @@ app.use(contextPath, router);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-
   let err = new Error('Not Found');
   err.status = 404;
   next(err);

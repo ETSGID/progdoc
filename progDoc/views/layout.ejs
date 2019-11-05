@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script src="https://portal.etsit.upm.es/<%=session.portal%>/static-button"></script>
+  <script src="https://<%=pruebas%>.etsit.upm.es/<%=session.portal%>/static-button"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
   <title>Portal del Profesor</title>
@@ -24,7 +24,9 @@
 </head>
 <body>
   <div class="sidenav">
-  <h2><a style="padding:0" href="<%=contextPath%>">Progdoc</a></h2>
+  <div>
+  <h2 <%if (pruebas == "pruebas"){%>style="background-color:red"<%}%>><a style="padding:0" href="<%=contextPath%>">Progdoc</a></h2>
+  </div>
   <button id='drop_ProgDoc' class="dropdown-btn">Programación Docente 
      <i class="glyphicon glyphicon-chevron-down fa fa-caret-down" aria-hidden="true"></i>
   </button>

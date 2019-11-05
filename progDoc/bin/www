@@ -9,7 +9,6 @@ require('dotenv').config({ path: './file.env' })
 let app = require('../app');
 const normalize = require('normalize-path');
 let path = require('path');
-let progDocController = require('../controllers/progDoc_controller')
 let funciones = require('../funciones');
 let debug = require('debug')('portalalumno:server');
 let http = require('http');
