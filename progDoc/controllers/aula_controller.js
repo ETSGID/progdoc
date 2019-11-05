@@ -84,14 +84,15 @@ exports.getAulas = async function (req, res, next) {
                         return;
                     }
                     let aula = g.aula.split(".").join("").toLowerCase();
+                    let aulaOrder = aula;
                     if (aula.length === 2) {
-                        aula = aula[0] + "00" + aula[1];
+                        aulaOrder = aula[0] + "00" + aula[1];
                     } else if (aula.length === 3) {
-                        aula = aula[0] + "0" + aula[1] + aula[2];
+                        aulaOrder = aula[0] + "0" + aula[1] + aula[2];
                     }
                     if (g.nombre.split(".")[1] === "1") {
                         if (!aulas1.find(obj => { return obj.aula === aula })) {
-                            aulas1.push({ aula: aula, planes: [] })
+                            aulas1.push({ aula: aula, aulaOrder: aulaOrder, planes: [] })
                             gruposPorAula1[aula] = new Array(78)
                         }
                         let aulai = aulas1.find(obj => { return obj.aula === aula })
@@ -109,7 +110,7 @@ exports.getAulas = async function (req, res, next) {
                         if (!gruposPlanAula.includes(g.nombre)) gruposPlanAula.push(g.nombre)
                     } else {
                         if (!aulas2.find(obj => { return obj.aula === aula })) {
-                            aulas2.push({ aula: aula, planes: [] })
+                            aulas2.push({ aula: aula, aulaOrder:aulaOrder, planes: [] })
                             gruposPorAula2[aula] = new Array(78)
                         }
                         let aulai = aulas2.find(obj => { return obj.aula === aula })
@@ -180,8 +181,8 @@ exports.getAulas = async function (req, res, next) {
                 }
             }
         }
-        aulas1.sort((a, b) => (a.aula > b.aula) ? 1 : -1)
-        aulas2.sort((a, b) => (a.aula > b.aula) ? 1 : -1)
+        aulas1.sort((a, b) => (a.aulaOrder > b.aulaOrder) ? 1 : -1)
+        aulas2.sort((a, b) => (a.aulaOrder > b.aulaOrder) ? 1 : -1)
         if (!req.body.generarPdf) {
             req.session.submenu = "Aulas";
             res.render('aulas/aulas', {
