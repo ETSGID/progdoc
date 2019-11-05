@@ -43,6 +43,7 @@ SESSION_SECRET=Secreto_para_las_sesiones
 CONTEXT=/progdoc/ debe empezar con barra y terminar con barra
 PATH_PDF=/storage/progdoc/ debe terminar con barra
 DEV=false
+PRUEBAS=false
 DOCKER=true
 PORT=3000
 
@@ -99,6 +100,7 @@ SESSION_SECRET=Secreto_para_las_sesiones
 CONTEXT=/progdoc/ debe empezar con barra y terminar con barra
 PATH_PDF=/storage/progdoc/ debe terminar con barra
 DEV=false
+PRUEBAS=true
 DOCKER=true
 PORT=3000
 
