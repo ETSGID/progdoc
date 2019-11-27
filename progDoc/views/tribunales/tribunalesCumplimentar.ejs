@@ -4,6 +4,8 @@
 <div id="hermanoNuevoProfesorForm" class="contenido2">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
+<%}else if(locals.existe && locals.existe !== null){%>
+  <p><%=existe%></p>
 <%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
   <% switch(estadoTribunales[departamentoID]){
       case estadosTribunal.abierto : %>
@@ -152,14 +154,13 @@
 <script>
 let form = document.getElementById("formulario");
 let estado = <%-JSON.stringify(estado)%>
+let existe = <%-JSON.stringify(existe)%>
 let profesores = <%-JSON.stringify(profesores)%>
 let profesores2 ="";
 let confirmarSalirSinGuardar = <%-confirmarSalirSinGuardar%>
 //se utiliza para disparar el evento de onbeforeunload
 let activado = true;
-if(estado === null){
-  
-  
+if(estado === null && existe === null){
   profesores2 = quitAcents(profesores)
   //document.getElementsByTagName('body')[0].onload = changeSelect();
 }

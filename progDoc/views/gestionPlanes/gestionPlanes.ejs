@@ -7,6 +7,8 @@
     <% if (locals.estado && locals.estado !== null) { %>
     <!--ocultar plan -->
     <p><%=estado%></p>
+    <%}else if(locals.existe && locals.existe !== null){%>
+    <p><%=existe%></p>
     <%}else{%>
     <!--asignacion por grupo -->
     <div>

@@ -2,6 +2,7 @@ let models = require('../models');
 let Sequelize = require('sequelize');
 const op = Sequelize.Op;
 let estados = require('../estados');
+let progDocController = require('./progDoc_controller');
 let funciones = require('../funciones');
 
 //devuelve el tipo de la PD a partir del id
@@ -77,6 +78,7 @@ exports.getProgramacionDocente = async function (req, res, next) {
         wherePD.push(estados.estadoProgDoc.abierto);
         wherePD.push(estados.estadoProgDoc.listo);
         wherePD.push(estados.estadoProgDoc.incidencia);
+        wherePD.push(estados.estadoProgDoc.cerrado);
         //el planID si no existe acronimo sera el código, por eso el or
         let params = await models.PlanEstudio.findAll({
             attributes: ['nombre', 'codigo', 'nombreCompleto'],
@@ -93,8 +95,14 @@ exports.getProgramacionDocente = async function (req, res, next) {
                     }
                 },
             }],
+            order: [
+                //el orden es muy importante para llamar a addYear2 y debe ser ascendente
+                [Sequelize.literal('"ProgramacionDocentes"."anoAcademico"'), 'DESC'],
+                [Sequelize.literal('"ProgramacionDocentes"."semestre"'), 'DESC'],
+                [Sequelize.literal('"ProgramacionDocentes"."version"'), 'DESC']
+            ],
             raw: true
-        })
+        }) 
         let progDocIncidencia = null;
         let progDocAbierta = null;
         params.forEach(function (param) {
@@ -119,7 +127,10 @@ exports.getProgramacionDocente = async function (req, res, next) {
             res.locals.progDoc = progDocAbierta;
             req.session.pdID = progDocAbierta['ProgramacionDocentes.identificador']
         } else {
-            req.session.pdID = null
+            //como estan ordenadas sino se coge la ultima
+            res.locals.estado = "Programación docente no abierta"
+            res.locals.progDoc = params.length > 0 ?  params[0]: null; 
+            req.session.pdID = params.length > 0 ?  params[0]['ProgramacionDocentes.identificador'] : null; 
         }
         if (res.locals.progDoc) {
             let query = 'SELECT distinct  "DepartamentoResponsable", public."Departamentos".nombre, public."Departamentos".acronimo FROM public."Asignaturas" p  inner join public."Departamentos" on p."DepartamentoResponsable" = public."Departamentos".codigo WHERE p."ProgramacionDocenteIdentificador" = :pdId ';

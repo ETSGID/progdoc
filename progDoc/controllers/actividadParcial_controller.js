@@ -19,7 +19,7 @@ exports.getActividadParcial = async function (req, res, next) {
     let view = req.originalUrl.toLowerCase().includes("consultar") ? "actividades/actividadesConsultar" : "actividades/actividadesCumplimentar"
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         res.render(view, {
-            estado: "Programación docente no abierta",
+            existe: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -79,7 +79,6 @@ exports.getActividadParcial = async function (req, res, next) {
             let conjuntoActividadesParcial = await getAllActividadParcial([pdID])
             //res.json({calendarios: conjuntoActividadesParcial, asignaturas:asignaturas, grupos:grupos, cursos: cursos})
             res.render(view, {
-                estado: null,
                 permisoDenegado: res.locals.permisoDenegado,
                 menu: req.session.menu,
                 submenu: req.session.submenu,

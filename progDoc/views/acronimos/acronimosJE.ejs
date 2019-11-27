@@ -91,6 +91,8 @@
                 </table>
             <% if (locals.estado && locals.estado !== null) { %>
                 <p><%=estado%></p>
+            <%}else if(locals.existe && locals.existe !== null){%>
+                <p><%=existe%></p>
             <%}else{%>
                 <h2>Asignaturas</h2>
                 <% for (let curso in asignaturas ){%>
@@ -190,7 +192,7 @@ function MarcarChangePlan(id){
     let acronimoNuevo = document.getElementsByName("plan_"+codigo)[0].value;
     let inputElement = document.getElementById(id);
     if(acronimoNuevo.trim() === ""){
-        acronimoNuevo = document.getElementsByName("plan_"+codigo)[0].placeholder === '-' ? null : document.getElementsByName("plan_"+codigo)[0].placeholder;
+        acronimoNuevo = null;
     }
     if(plan && acronimoNuevo !== plan.nombre){
         inputElement.name = 'actualizar'

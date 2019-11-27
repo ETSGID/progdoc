@@ -235,7 +235,7 @@ exports.getExamenesView = function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         let view = req.originalUrl.toLowerCase().includes("consultar") ? "examenes/examenesConsultar" : "examenes/examenesCumplimentar"
         res.render(view, {
-            estado: "Programación docente no abierta",
+            existe: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -291,7 +291,6 @@ exports.getExamenesView = function (req, res, next) {
                 cursos: res.locals.cursos,
                 menu: req.session.menu,
                 submenu: req.session.submenu,
-                estado: null,
                 permisoDenegado: res.locals.permisoDenegado,
                 estadosExamen: estados.estadoExamen,
                 estadosProgDoc: estados.estadoProgDoc,
@@ -315,7 +314,7 @@ exports.getFranjasView = function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
 
         res.render(view, {
-            estado: "Programación docente no abierta",
+            existe: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -359,7 +358,6 @@ exports.getFranjasView = function (req, res, next) {
                 pdID: req.session.pdID,
                 menu: req.session.menu,
                 submenu: req.session.submenu,
-                estado: null,
                 permisoDenegado: res.locals.permisoDenegado,
                 estadosExamen: estados.estadoExamen,
                 estadosProgDoc: estados.estadoProgDoc,

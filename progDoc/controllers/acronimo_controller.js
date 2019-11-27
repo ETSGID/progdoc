@@ -2,12 +2,16 @@ let app = require('../app');
 let models = require('../models');
 let funciones = require('../funciones');
 let estados = require('../estados');
-let progDocController = require('./progDoc_controller')
-let asignaturaController = require('./asignatura_controller')
-let departamentoController = require('./departamento_controller')
+let progDocController = require('./progDoc_controller');
+let asignaturaController = require('./asignatura_controller');
+let departamentoController = require('./departamento_controller');
+let planController = require('./plan_controller');
 
 exports.getAcronimos = async function (req, res, next) {
     req.session.submenu = "Acronimos"
+    //se obtienen todos los planes, incluidos los que no se muestran
+    //no se muestran normalmente los planes sin acronimo
+    res.locals.planEstudios = await planController.getPlanesFunction(false);
     try {
         let departs = await departamentoController.getAllDepartamentos();
         let nuevopath = "" + req.baseUrl + "/gestionAcronimos/guardarAcronimosJE"
@@ -17,7 +21,7 @@ exports.getAcronimos = async function (req, res, next) {
             (estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'])
             && estados.estadoProgDoc.incidencia !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']) {
             res.render("acronimos/acronimosJE", {
-                estado: "Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada",
+                existe: "Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada",
                 permisoDenegado: res.locals.permisoDenegado,
                 menu: req.session.menu,
                 submenu: req.session.submenu,
@@ -38,7 +42,6 @@ exports.getAcronimos = async function (req, res, next) {
                 asignaturasPorCursos[as.curso].push(as);
             });
             res.render("acronimos/acronimosJE", {
-                estado: null,
                 permisoDenegado: res.locals.permisoDenegado,
                 menu: req.session.menu,
                 submenu: req.session.submenu,
@@ -81,6 +84,7 @@ exports.actualizarAcronimos = async function (req, res, next) {
                     break;
                 case "plan":
                     elementToActualizar.nombre = acronimo;
+                    if(acronimo == 'null' || acronimo.trim("").trim() == "") elementToActualizar.nombre = null;
                     promises.push(models.PlanEstudio.update(
                         elementToActualizar, /* set attributes' value */
                         { where: { codigo: codigo } } /* where criteria */

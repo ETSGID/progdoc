@@ -83,8 +83,8 @@ exports.getAulas = async function (req, res, next) {
                     if (g.aula === null) {
                         return;
                     }
-                    let aula = g.aula.split(".").join("").toLowerCase();
-                    let aulaOrder = aula;
+                    let aula = g.aula
+                    let aulaOrder = g.aula.split(".").join("").toLowerCase();;
                     if (aula.length === 2) {
                         aulaOrder = aula[0] + "00" + aula[1];
                     } else if (aula.length === 3) {

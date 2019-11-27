@@ -8,7 +8,7 @@ exports.getEstado = async function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         let view = req.originalUrl.toLowerCase().includes("consultar") ? "estados/estadoConsultar" : "estados/estadoCumplimentar"
         res.render(view, {
-            estado: "Programación docente no abierta",
+            existe: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -32,7 +32,6 @@ exports.getEstado = async function (req, res, next) {
             let view = req.originalUrl.toLowerCase().includes("consultar") ? "estados/estadoConsultar" : "estados/estadoCumplimentar"
             let departamentos = await departamentoController.getAllDepartamentos();
             res.render(view, {
-                estado: null,
                 permisoDenegado: res.locals.permisoDenegado,
                 menu: req.session.menu,
                 submenu: req.session.submenu,

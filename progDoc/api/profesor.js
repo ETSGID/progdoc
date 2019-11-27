@@ -1,6 +1,7 @@
 let models = require('../models');
 let Sequelize = require('sequelize');
 let progDocController = require('../controllers/progDoc_controller')
+let planController = require('../controllers/plan_controller') 
 let personaYProfesorController = require('../controllers/personaYProfesor_controller')
 const op = Sequelize.Op;
 
@@ -33,10 +34,7 @@ exports.getProfesorAsignaturas = async function (req, res, next) {
             respError = { error: "Profesor no encontrado" }
         }
         if (!respError) {
-            let plans = await models.PlanEstudio.findAll({
-                attributes: ["codigo", 'nombreCompleto', 'nombre'],
-                raw: true
-            })
+            let plans = await planController.getPlanesFunction(true);
             plans.forEach(function (p, index) {
                 planes.push(p['codigo'])
                 planesCompletos.push(p)

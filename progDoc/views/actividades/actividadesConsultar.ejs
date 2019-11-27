@@ -1,8 +1,8 @@
 <%- include ../menus/consultar.ejs %>
 <%- include ../../public/js/funciones.ejs %>
 <div class ="contenido2">
-<% if (locals.estado && locals.estado !== null) { %>
-  <p><%=estado%></p>
+<% if (locals.existe && locals.existe !== null) { %>
+  <p><%=existe%></p>
 <%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
     <% switch(estadoCalendario){
       case estadosCalendario.abierto : %>

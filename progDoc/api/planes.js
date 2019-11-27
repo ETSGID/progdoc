@@ -1,14 +1,11 @@
-let models = require('../models');
+let planController = require('../controllers/plan_controller') 
 
 // GET planes de una PD
 exports.getPlanesPD = async function (req, res, next) {
     let resp = {}
     let respError
     try {
-        let plans = await models.PlanEstudio.findAll({
-            attributes: ["codigo", 'nombreCompleto', 'nombre'],
-            raw: true
-        })
+        let plans = await planController.getPlanesFunction(true);
         plans.forEach(function (p, index) {
             resp[p['codigo']] = p
         })

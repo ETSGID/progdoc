@@ -79,9 +79,9 @@ exports.abrirNuevaProgDoc = async function (req, res, next) {
         nuevaPd.estadoProGDoc = -1;
         nuevaPd.fechaProgDoc = new Date();
         nuevaPd.PlanEstudioId = plan;
-        if (nuevaPd.version > 1 && pd[0]) {
+        if (nuevaPd.version > 1 && pds[0]) {
             //si la version es mayor que 1 debe haber una progdoc en la bbdd pero lo compruebo de todas formas
-            nuevaPd.reabierto = pd[0].reabierto
+            nuevaPd.reabierto = pds[0].reabierto
         } else {
             nuevaPd.reabierto = 0;
         }

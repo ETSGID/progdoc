@@ -17,7 +17,7 @@ exports.getAsignaciones = async function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionProfesores/asignacionesConsultar" : "asignacionProfesores/asignacionesCumplimentar"
         res.render(view, {
-            estado: "Programación docente no abierta",
+            existe: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             profesores: null,
             menu: req.session.menu,
@@ -59,7 +59,7 @@ exports.getAsignaciones = async function (req, res, next) {
         if (!departamentoExisteEnElPlan) {
             let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionProfesores/asignacionesConsultar" : "asignacionProfesores/asignacionesCumplimentar"
             res.render(view, {
-                estado: "El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior",
+                existe: "El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior",
                 permisoDenegado: res.locals.permisoDenegado,
                 profesores: null,
                 menu: req.session.menu,
@@ -77,7 +77,6 @@ exports.getAsignaciones = async function (req, res, next) {
             if (res.locals.permisoDenegado) {
                 let view = req.originalUrl.toLowerCase().includes("consultar") ? "asignacionProfesores/asignacionesConsultar" : "asignacionProfesores/asignacionesCumplimentar"
                 res.render(view, {
-                    estado: null,
                     permisoDenegado: res.locals.permisoDenegado,
                     asignacion: null,
                     profesores: null,
@@ -114,7 +113,6 @@ exports.getAsignaciones = async function (req, res, next) {
                             pdID: pdID,
                             menu: req.session.menu,
                             submenu: req.session.submenu,
-                            estado: null,
                             permisoDenegado: res.locals.permisoDenegado,
                             departamentoID: req.session.departamentoID,
                             departamentosResponsables: res.locals.departamentosResponsables,
@@ -538,7 +536,7 @@ exports.getTribunales = async function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunales/tribunalesConsultar" : "tribunales/tribunalesCumplimentar"
         res.render(view, {
-            estado: "Programación docente no abierta",
+            existe: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             profesores: null,
             menu: req.session.menu,
@@ -592,7 +590,7 @@ exports.getTribunales = async function (req, res, next) {
             if (!departamentoExisteEnElPlan) {
                 let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunales/tribunalesConsultar" : "tribunales/tribunalesCumplimentar";
                 res.render(view, {
-                    estado: "El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior",
+                    existe: "El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior",
                     permisoDenegado: res.locals.permisoDenegado,
                     profesores: null,
                     menu: req.session.menu,
@@ -611,7 +609,6 @@ exports.getTribunales = async function (req, res, next) {
                 if (res.locals.permisoDenegado) {
                     let view = req.originalUrl.toLowerCase().includes("consultar") ? "tribunales/tribunalesConsultar" : "tribunales/tribunalesCumplimentar"
                     res.render(view, {
-                        estado: null,
                         permisoDenegado: res.locals.permisoDenegado,
                         profesores: null,
                         menu: req.session.menu,
@@ -699,7 +696,6 @@ exports.getTribunales = async function (req, res, next) {
                             pdID: pdID,
                             submenu: req.session.submenu,
                             menu: req.session.menu,
-                            estado: null,
                             permisoDenegado: res.locals.permisoDenegado,
                             departamentoID: req.session.departamentoID,
                             departamentosResponsables: res.locals.departamentosResponsables,

@@ -40,6 +40,7 @@ let app = express();
 let router = require('./routes/index')
 let routerApi = require('./routes/api')
 let models = require('./models');
+let cronFunciones = require('./controllers/cron_controller')
 let funciones = require('./funciones')
 
 // view engine setup
@@ -96,6 +97,9 @@ app.use(cas.bounce, async function (req, res, next) {
   res.locals.session = req.session;
   res.locals.contextPath = contextPath;
   res.locals.pruebas = process.env.PRUEBAS === 'true' ? "pruebas" : "portal";
+  //estado y existe se usan para temas de permisos al renderizar las vistas. Antes de comprobar nada se ponen a null
+  res.locals.estado = null;
+  res.locals.existe = null;
   //solo la primera vez
   if (!req.session.user.noFirst) {
     try {
@@ -168,5 +172,6 @@ app.use(function (err, req, res, next) {
     layout: false
   });
 });
+
 
 module.exports = app;

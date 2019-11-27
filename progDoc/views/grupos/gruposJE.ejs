@@ -3,6 +3,8 @@
 <div class ="contenido2">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
+<%}else if(locals.existe && locals.existe !== null){%>
+  <p><%=existe%></p>
 <%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%> 
   <p><%=permisoDenegado%></p>
 <%}else{%>

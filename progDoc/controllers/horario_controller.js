@@ -51,7 +51,7 @@ exports.getHorario = async function (req, res, next) {
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         let view = req.originalUrl.toLowerCase().includes("consultar") ? "horarios/horariosConsultar" : "horarios/horariosCumplimentar"
         res.render(view, {
-            estado: "Programación docente no abierta",
+            existe: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -265,7 +265,6 @@ exports.getHorario = async function (req, res, next) {
                         pdID: pdID,
                         menu: req.session.menu,
                         submenu: req.session.submenu,
-                        estado: null,
                         permisoDenegado: res.locals.permisoDenegado,
                         estadosHorario: estados.estadoHorario,
                         estadosProgDoc: estados.estadoProgDoc,

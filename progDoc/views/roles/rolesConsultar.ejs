@@ -1,7 +1,7 @@
 <%- include ../menus/consultar.ejs %>
 <div class="contenido">
-<% if (locals.estado && locals.estado !== null) { %>
-  <p><%=estado%></p>
+<% if (locals.existe && locals.existe !== null) { %>
+  <p><%=existe%></p>
 <%}else{ %>
 <h3>Gestión Roles Aplicacion</h3>
 <% let filterByRol = function (roles, rol, plan, departamento){

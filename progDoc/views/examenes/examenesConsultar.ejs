@@ -2,8 +2,8 @@
 <%- include ../menus/consultar.ejs %>
 <%- include ../../public/js/funciones.ejs %>
 <div class="contenido">
-<% if (locals.estado && locals.estado !== null) { %>
-  <p><%=estado%></p>
+<% if (locals.existe && locals.existe !== null) { %>
+  <p><%=existe%></p>
 <%}else{%>
         <div>
             <% for (let i=0 ; i<asignacionsExamen.length; i++){%>

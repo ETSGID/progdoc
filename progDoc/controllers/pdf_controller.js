@@ -456,7 +456,7 @@ exports.generarPDF = async function (req, res, next) {
     //si no hay progDoc o no hay departamentosResponsables de dicha progDoc
     if (view === "pdfs/pdfDraftGenerado" && (!res.locals.progDoc || !res.locals.departamentosResponsables)) {
         res.render(view, {
-            estado: "Programación docente no abierta",
+            existe: "Programación docente no abierta",
             menu: req.session.menu,
             submenu: req.session.submenu,
             planID: req.session.planID,
@@ -480,7 +480,6 @@ exports.generarPDF = async function (req, res, next) {
                                 pdID: pdID,
                                 menu: req.session.menu,
                                 submenu: req.session.submenu,
-                                estado: null,
                             });
                         break;
 

@@ -3,92 +3,21 @@ let Sequelize = require('sequelize');
 let estados = require('../estados');
 const axios = require('axios');
 let progDocController = require('./progDoc_controller');
+let planController = require('./plan_controller')
 let apiUpmController = require('./apiUpm_controller');
 let funciones = require('../funciones');
 
 
 exports.gestionProgDoc = async function (req, res, next) {
     req.session.submenu = "AbrirCerrar"
-    let nuevosPlanes = [];
-    let planes = [];
     let pds = [];
     //las susceptibles a incidencia son las anteriores. Lo importante es el orden. La unica excepcion es si la pd está cerrada o en incidencia que esta es la anterior
     let pdsAnteriores = [];
-    let promises = [];
     let promises2 = [];
     let anos = [];
-    let apiDepartamentos;
-    let nuevosDepartamentos;
-    let apiPlanes;
     try {
-        let promise1 = apiUpmController.getDepartamentosApiUpm();
-        //borra todos las programaciones docentes con errores que no deberia haberlas y lo vacio que no deberia estar
-        let promise2 = models.sequelize.query(query = `DELETE FROM public."ProgramacionDocentes" p  WHERE p."estadoProGDoc" = -1; 
-                DELETE FROM public."Grupos" g WHERE g."ProgramacionDocenteId" is null; 
-                DELETE FROM public."Asignaturas" asign WHERE asign."ProgramacionDocenteIdentificador" is null; 
-                DELETE FROM public."AsignacionProfesors" a WHERE a."GrupoId" is null;
-                DELETE FROM public."Examens" e WHERE e."AsignaturaIdentificador" is null;
-                DELETE FROM public."FranjaExamens" f WHERE f."ProgramacionDocenteId" is null;
-                DELETE FROM public."ConjuntoActividadParcials" c WHERE c."ProgramacionDocenteId" is null;
-                DELETE FROM public."ActividadParcials" act WHERE act."ConjuntoActividadParcialId" is null;`)
-        //veo si hay algún 
-        //compruebo que no hay ningún plan nuevo
-        //los planes viejos no desaparecen se debería hacer manualmente pq el año actual igual si que se necesita
-        let promise3 = apiUpmController.getPlanesApiUpm();
-        promises.push(promise1);
-        promises.push(promise2);
-        promises.push(promise3);
-        let [response, response2 , response3] = await Promise.all(promises);
-        //response
-        try {
-            apiDepartamentos = response.data;
-            nuevosDepartamentos = [];
-            let departamentosBBDD = await models.Departamento.findAll({
-                attributes: ["codigo", "nombre", "acronimo"],
-                raw: true
-            })
-            apiDepartamentos.forEach(function (apiDepartamento) {
-                let departamentoBBDD = departamentosBBDD.find(function (obj) { return obj.codigo === apiDepartamento.codigo });
-                if (!departamentoBBDD) {
-                    let nuevoDepartamento = {};
-                    nuevoDepartamento.codigo = apiDepartamento.codigo;
-                    //TODO: descomentar
-                    nuevoDepartamento.nombre = apiDepartamento.nombre;
-                    nuevosDepartamentos.push(nuevoDepartamento);
-                }
-            })
-            await models.Departamento.bulkCreate(
-                nuevosDepartamentos
-            )
-        }
-        catch (error) {
-            //no haces un next(error) pq quieres que siga funcionando aunque api upm falle en este punto
-            console.log("Error:", error);
-        }
-        //response2
-        //response3
-        //obtengo las pd abiertas o con incidencias
-        apiPlanes = response3.data;
-        let planesBBDD = await models.PlanEstudio.findAll({
-            attributes: ["codigo", "nombre", "nombreCompleto"],
-            raw: true
-        })
-        apiPlanes.forEach(function (apiPlan) {
-            let planBBDD = planesBBDD.find(function (obj) { return obj.codigo === apiPlan.codigo });
-            if (!planBBDD) {
-                let nuevoPlan = {};
-                nuevoPlan.codigo = apiPlan.codigo;
-                nuevoPlan.nombreCompleto = apiPlan.nombre;
-                // falta el acronimo del plan
-                nuevoPlan.nombre = null;
-                nuevosPlanes.push(nuevoPlan);
-            }
-        })
-        planes = planes.concat(planesBBDD);
-        planes = planes.concat(nuevosPlanes);
-        await models.PlanEstudio.bulkCreate(
-            nuevosPlanes
-        )
+        //borras si hay algun error las pds que puedan tenerlos
+        borrarPdsWithErrores();
         //la incidencia se marca sobre la pd anterior (no la versión anterior)
         let pdsBBDD = await models.ProgramacionDocente.findAll({
             order: [
@@ -134,7 +63,7 @@ exports.gestionProgDoc = async function (req, res, next) {
             }
         })
         // puede haber planes sin pd, como los nuevos planes u otras cosas
-        planes.forEach(function (plan) {
+        res.locals.planEstudios.forEach(function (plan) {
             let existentePD = pds.find(function (obj) { return obj.PlanEstudioId === plan.codigo });
             if (existentePD) {
                 existentePD.nombre = plan.nombre;
@@ -147,6 +76,8 @@ exports.gestionProgDoc = async function (req, res, next) {
                 }) //estado cerrado en caso de que no haya ninguan pd en el sistema
             }
         })
+        //solo se van a mostrar los planes con acronimo
+        pds = pds.filter(pd => pd.nombre && pd.nombre.trim() !== "");
         let year = new Date().getFullYear();
         let siguiente = year + 1;
         let siguiente2 = year + 2;
@@ -160,7 +91,7 @@ exports.gestionProgDoc = async function (req, res, next) {
             })
         } else {
             res.render("gestionPlanes/abrirCerrarPds", {
-                planes: planes,
+                planes: res.locals.planEstudios,
                 pds: pds,
                 permisoDenegado: res.locals.permisoDenegado,
                 pdsAnteriores: pdsAnteriores,
@@ -396,4 +327,18 @@ exports.cerrarProgDoc2 = async function (req, res, next) {
         next(error);
     }
 }
+
+borrarPdsWithErrores = async function() {
+    //borra todos las programaciones docentes con errores que no deberia haberlas y lo vacio que no deberia estar
+    await models.sequelize.query(query = `DELETE FROM public."ProgramacionDocentes" p  WHERE p."estadoProGDoc" = -1; 
+        DELETE FROM public."Grupos" g WHERE g."ProgramacionDocenteId" is null; 
+        DELETE FROM public."Asignaturas" asign WHERE asign."ProgramacionDocenteIdentificador" is null; 
+        DELETE FROM public."AsignacionProfesors" a WHERE a."GrupoId" is null;
+        DELETE FROM public."Examens" e WHERE e."AsignaturaIdentificador" is null;
+        DELETE FROM public."FranjaExamens" f WHERE f."ProgramacionDocenteId" is null;
+        DELETE FROM public."ConjuntoActividadParcials" c WHERE c."ProgramacionDocenteId" is null;
+        DELETE FROM public."ActividadParcials" act WHERE act."ConjuntoActividadParcialId" is null;`)
+}
+
+exports.borrarPdsWithErrores = borrarPdsWithErrores
 

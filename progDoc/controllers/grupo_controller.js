@@ -9,7 +9,7 @@ exports.getGrupos = async function (req, res, next) {
     //si no hay progDoc o no hay departamentosResponsables de dicha progDoc
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
         res.render(view, {
-            estado: "Programación docente no abierta",
+            existe: "Programación docente no abierta",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -24,7 +24,7 @@ exports.getGrupos = async function (req, res, next) {
         && estados.estadoProgDoc.incidencia !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']
         && !req.originalUrl.toLowerCase().includes("consultar")) {
         res.render("grupos/gruposJE", {
-            estado: "Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada",
+            existe: "Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada",
             permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
@@ -79,7 +79,6 @@ exports.getGrupos = async function (req, res, next) {
             let nuevopath = "" + req.baseUrl + "/gestionGrupos/guardarGruposJE"
             let cancelarpath = "" + req.baseUrl + "/gestionGrupos/getGrupos?planID=" + req.session.planID
             res.render(view, {
-                estado: null,
                 permisoDenegado: res.locals.permisoDenegado,
                 menu: req.session.menu,
                 submenu: req.session.submenu,
