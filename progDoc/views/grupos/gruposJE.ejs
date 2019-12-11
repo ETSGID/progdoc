@@ -234,26 +234,28 @@ function Eliminar(id){
     let semestreArray = cursoArray.semestres.find(function (obj) { return obj.semestre === semestre})
     let table = document.getElementById(id);
     let rowsLength = table.rows.length
-    //como minimo 2 filas la que tiene los nombres de las columnas, y un grupo
-    if (rowsLength >= 2){
-        //el ultimo grupo es el de optativas
-        let lastRow = table.rows[rowsLength-1];
-    let lastGrupo = curso+"0."+semestre //grupo 10.1 por ejemplo que no existe el primero es el siguiente el 11.1
-    if (lastRow){
-        lastGrupo = lastRow.cells[0].innerHTML.trim();
-        table.deleteRow(rowsLength-1);
-    }
-    let grupoExistente = semestreArray.grupos.find(function (obj) { return obj.nombre === lastGrupo})
-    if (grupoExistente){
-        //lo marco para eliminar
-        let grupoInput = document.getElementById("grupo_"+grupoExistente.grupoId+"_"+grupoExistente.nombre+"_"+curso);
-        grupoInput.name = 'eliminar'
-    }else{
-        //simplemente lo borro
-        let grupoInput = document.getElementById("grupo_noID_"+lastGrupo+"_"+curso);
-        let parent = grupoInput.parentNode;
-        parent.removeChild(grupoInput);
+    if (confirm("¿Está seguro de eliminar el grupo? Perderá toda la información que afecta al grupo. Debe guardar su decisión pulsando en el botón de guardar.")){
+        //como minimo 2 filas la que tiene los nombres de las columnas, y un grupo
+        if (rowsLength >= 2){
+            //el ultimo grupo es el de optativas
+            let lastRow = table.rows[rowsLength-1];
+        let lastGrupo = curso+"0."+semestre //grupo 10.1 por ejemplo que no existe el primero es el siguiente el 11.1
+        if (lastRow){
+            lastGrupo = lastRow.cells[0].innerHTML.trim();
+            table.deleteRow(rowsLength-1);
+        }
+        let grupoExistente = semestreArray.grupos.find(function (obj) { return obj.nombre === lastGrupo})
+        if (grupoExistente){
+            //lo marco para eliminar
+            let grupoInput = document.getElementById("grupo_"+grupoExistente.grupoId+"_"+grupoExistente.nombre+"_"+curso);
+            grupoInput.name = 'eliminar'
+        }else{
+            //simplemente lo borro
+            let grupoInput = document.getElementById("grupo_noID_"+lastGrupo+"_"+curso);
+            let parent = grupoInput.parentNode;
+            parent.removeChild(grupoInput);
 
+            }
         }
     }
 }

@@ -103,8 +103,8 @@ exports.comprobarRolYPersona = async function (req, res, next) {
         next();
     }
     if (id === null) {
-        //profesor que no está en el sistema pero puede ver las cosas
-        if (role && typeof role === "string" && (role.includes("D") || role.includes("F") || role.includes("L"))) {
+        //persona que no está en el sistema pero puede ver las cosas
+        if (role && typeof role === "string") {
             next();
         }
         else {

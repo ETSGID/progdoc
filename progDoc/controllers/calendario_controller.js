@@ -1,6 +1,7 @@
 let app = require('../app');
 let models = require('../models');
 let enumsPD = require('../enumsPD');
+let moment = require('moment');
 
 function comprobarColor(buffer_eventos, eventos, dia) {
     var code = -1;
@@ -81,13 +82,24 @@ function generarArrayDias(dic_eventos, ano) {
         5: 0,
         6: 0
     }
-    let dic_dias_1 = {};
+    //se inicializa
+    let dic_dias_1 = {
+        0: 0,
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0
+    };
+    //
     let contar = false;
     //En esta variable se guardan los eventos que nos diarios
     var buffer_eventos = [];
     let vacaciones_offset = 0;
     let semanas = []
     let contador_semanas = 1
+    //cuando vale 6 significa que el contador de semanas aumenta 1
     let contador_dias_semana = 0
     let in_periodo_lectivo = false;
     for (var i = 0; i < array_numeros.length; i++) {
@@ -117,7 +129,9 @@ function generarArrayDias(dic_eventos, ano) {
         mes_codigo = String(contador_meses + offset_mes).length === 1 ? "0" + String(contador_meses + offset_mes) : String(contador_meses + offset_mes);
         codigo = ano + "-" + mes_codigo + "-" + numero;
         eventos = dic_eventos[codigo] === undefined ? [] : dic_eventos[codigo];
+        //eventos de un dia
         if (contar) {
+            //noContar=true si ese dia no se cuenta como dia en el que se da clase normal. Se usa para dic_dias
             let noContar = false
             for (var j = 0; j < eventos.length; j++) {
                 let evento = eventos[j];
@@ -126,7 +140,6 @@ function generarArrayDias(dic_eventos, ano) {
                     noContar = true;
                     in_periodo_lectivo = false;
                     dic_dias[dia] += 1
-                    break;
                 }
                 if (evento.nombre === "Final del primer cuatrimestre") {
                     contar = false;
@@ -144,20 +157,20 @@ function generarArrayDias(dic_eventos, ano) {
                         6: 0
                     };
                     in_periodo_lectivo = false;
-                    break;
                 }
                 if (evento.tipo === "festivo") {
                     noContar = true;
                     if (evento.fechaFin !== "Evento de dia") {
+                        //periodos de vacaciones
                         contar = false;
                         if (evento.nombre === "Periodo festivo de navidades") {
                         } else {
                             vacaciones_offset = (Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio)) / 86400000;
                         }
                     }
-                    break;
                 }
                 try {
+                    //dias especiales (por ejemplo dia de Lunes un Martes)
                     if (evento.nombre.substring(0, 6) === "Día de") {
                         if (evento.nombre.length === 12) {
                             noContar = true
@@ -180,7 +193,6 @@ function generarArrayDias(dic_eventos, ano) {
                 } catch (error) {
                 }
                 if (noContar) {
-                    break;
                 }
             }
             if (noContar) {
@@ -188,6 +200,33 @@ function generarArrayDias(dic_eventos, ano) {
                 dic_dias[dia] += 1
             }
         } else {
+            //Podría ocurrir que el final de un semestre lectivo esté puesto en periodo de vacaciones. Por eso se debe comprobar aquí
+            for (var j = 0; j < eventos.length; j++) {
+                let evento = eventos[j];
+                if (evento.nombre === "Fin del periodo lectivo") {
+                    contar = false;
+                    noContar = true;
+                    in_periodo_lectivo = false;
+                    break;
+                }
+                if (evento.nombre === "Final del primer cuatrimestre") {
+                    contar = false;
+                    noContar = true;
+                    dic_dias_1 = dic_dias;
+                    contador_semanas = 1;
+                    dic_dias = {
+                        0: 0,
+                        1: 0,
+                        2: 0,
+                        3: 0,
+                        4: 0,
+                        5: 0,
+                        6: 0
+                    };
+                    in_periodo_lectivo = false;
+                    break;
+                }
+            }
             if (vacaciones_offset > 1) {
                 vacaciones_offset -= 1
             } else if (vacaciones_offset === 1) {
@@ -782,7 +821,7 @@ exports.postEventoGeneral = async function (req, res, next) {
     try {
         let fechaFin = req.query.fechaFin;
         if (fechaFin !== undefined) {
-            fechaFin = Date.parse(fechaFin);
+            fechaFin = moment(fechaFin, "YYYY-MM-DD")   
         }
         let fechaInicio = req.query.fechaInicio;
         let editable = req.query.editable === "true" ? enumsPD.eventoGeneral.Editable : enumsPD.eventoGeneral.NoEditable;
@@ -790,7 +829,7 @@ exports.postEventoGeneral = async function (req, res, next) {
         let evento = {
             evento: nombre,
             color: "",
-            fechaInicio: Date.parse(fechaInicio),
+            fechaInicio: moment(fechaInicio, "YYYY-MM-DD"),
             fechaFin: fechaFin,
             editable: editable
         }
@@ -857,7 +896,7 @@ exports.deleteEventoPlan = async function (req, res, next) {
             let eventoEliminadoPlan = {
                 evento: nombre,
                 color: undefined,
-                fechaInicio: Date.parse(fechaInicio),
+                fechaInicio: moment(fechaInicio, "YYYY-MM-DD"),
                 fechaFin: undefined,
                 PlanEstudioId: planID,
                 EventoGeneralId: eventoGeneralId
@@ -889,13 +928,13 @@ exports.postEventoPlan = async function (req, res, next) {
         let fechaFin = req.query.fechaFin;
         let meses = [" ", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         if (fechaFin !== undefined) {
-            fechaFin = Date.parse(fechaFin);
+            fechaFin = moment(fechaFin, "YYYY-MM-DD");
         }
         if (eventoGeneralId === "null") {
             let evento = {
                 evento: nombre,
                 color: undefined,
-                fechaInicio: Date.parse(fechaInicio),
+                fechaInicio: moment(fechaInicio, "YYYY-MM-DD"),
                 fechaFin: fechaFin,
                 PlanEstudioId: planID,
                 EventoGeneralId: null
@@ -912,7 +951,7 @@ exports.postEventoPlan = async function (req, res, next) {
                 let evento = {
                     evento: nombre,
                     color: undefined,
-                    fechaInicio: Date.parse(fechaInicio),
+                    fechaInicio: moment(fechaInicio, "YYYY-MM-DD"),
                     fechaFin: fechaFin,
                     PlanEstudioId: planID,
                     EventoGeneralId: eventoGeneralId
@@ -924,7 +963,7 @@ exports.postEventoPlan = async function (req, res, next) {
                 let evento = {
                     evento: nombre,
                     color: undefined,
-                    fechaInicio: Date.parse(fechaInicio),
+                    fechaInicio: moment(fechaInicio, "YYYY-MM-DD"),
                     fechaFin: fechaFin,
                     PlanEstudioId: planID,
                     EventoGeneralId: eventoGeneralId
