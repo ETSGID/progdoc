@@ -48,7 +48,7 @@
            if(asignacion[i].estado === "N"){ texto = "Cambiar a asignación por grupos"; modo = "S"}
            else{ texto = "Cambiar a asignación sin grupos"; modo="N"}
            %> 
-          <form id="editar_<%= asignacion[i].identificador %>" action="<%= nuevopath %>" method="get">
+          <form autocomplete="off" id="editar_<%= asignacion[i].identificador %>" action="<%= nuevopath %>" method="get">
           <input type="hidden", name = 'asignatura', value='<%= asignacion[i].identificador %>'>
           <!--modo se utiliza para informar del tipo de cambio entre asignación por grupos o comun-->
           <input type="hidden", name = 'modo', value='<%= modo %>'>

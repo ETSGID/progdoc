@@ -3,7 +3,7 @@
 <%=buscaDep(departamentos,departamento).nom%>
 </td>
 <td id="td_<%=rol%>_<%=index%>" onclick="mostrar('<%=rol%>_<%=index%>')">
-<form id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+<form autocomplete="off" id="<%=rol%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
 <input type="hidden" name="rol" value="<%=rol%>_<%=plan%>_<%=departamento%>">
 <% let prof = buscaPers(profesores, r.PersonaId) %>
 <p id="p_<%=rol%>_<%=index%>"><%=prof.nombreCorregido%></p>
@@ -28,7 +28,7 @@ else prof = buscaPers(profesores, delegado[0].PersonaId);
 <em>Delegado en<em>
 </td>
 <td id="td_<%=rol2%>_<%=index%>" onclick="mostrar('<%=rol2%>_<%=index%>')" >
-<form id="<%=rol2%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
+<form autocomplete="off" id="<%=rol2%>_<%=plan%>_<%=departamento%>" action="<%=nuevopath%>" method="post">
 <input type="hidden" name="rol" value="<%=rol2%>_<%=plan%>_<%=departamento%>">
 <p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
 <input id="<%=rol2%>_<%=index%>" type="hidden" name="personaRol" value="<%=prof.nombreCorregido%>" placeholder="<%=prof.nombreCorregido%>" onchange="cambioRol(this)">

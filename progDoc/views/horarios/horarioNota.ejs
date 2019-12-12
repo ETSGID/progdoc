@@ -39,7 +39,7 @@ function anadirNota(id,notaId,asignaturaId){
         options+=`<option value="${asignaturas[i].identificador}" title="${asignaturas[i].nombre} (${asignaturas[i].codigo})">${n}</option>`    
      }
     }
-  div.innerHTML =`<form method="post"><p id="nota_horario_${curso}_${semestre}_${grupo}_${notaId}">
+  div.innerHTML =`<form autocomplete="off" method="post"><p id="nota_horario_${curso}_${semestre}_${grupo}_${notaId}">
   <input type="hidden" name="momentaneo" id="horario_${curso}_${semestre}_${grupo}_${notaId}" value="">
   <div class="form-group"><select  class="form-control" id="select_${notaId}">${options}</select></div> 
   <textarea class="form-control rounded-0" name="textarea" id="text_horario_${curso}_${semestre}_${grupo}_${notaId}" rows="3" placeholder="Introducir nota" maxlength="300"></textarea>

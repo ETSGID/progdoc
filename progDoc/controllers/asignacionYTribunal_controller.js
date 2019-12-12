@@ -132,7 +132,7 @@ exports.getAsignaciones = async function (req, res, next) {
 
 }
 
-// GET respDoc/editAsignacion/:pdID/:departamentoID/:acronimo
+
 exports.editAsignacion = async function (req, res, next) {
     req.session.submenu = "Profesores2";
     let pdID = req.session.pdID;
@@ -743,7 +743,7 @@ exports.guardarTribunales = async function (req, res, next) {
                 if (!asig || !asig.DepartamentoResponsable || asig.DepartamentoResponsable !== departamentoID) {
                     console.log("Ha intentado cambiar una asignatura que no puede")
                 } else {
-                    let profesorIdentificador = element.split("_")[1]
+                    let profesorIdentificador = element.split("_")[1] ? element.split("_")[1] : null;
                     let puestoTribunal = element.split("_")[2] + "TribunalAsignatura"
                     tribunalToActualizar = tribunalesToActualizar.find(function (obj) { return obj.identificador === tribunalId; });
                     if (tribunalToActualizar) {

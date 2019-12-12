@@ -80,7 +80,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
         <% break; 
     }%>      
     <td>
-      <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
+      <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
       <input type="hidden" id="ocultoanoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="">
       <input type="hidden" id="ocultosemestre_<%=pds[i].PlanEstudioId%>" name="semestre" value="">        
@@ -90,7 +90,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
     
       <% if (pds[i].identificador !== null){ %>
       <td>
-        <form id="plan_<%=pds[i].PlanEstudioId%>_incidencia" action="/hola" method="post">
+        <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_incidencia" action="/hola" method="post">
         <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
         <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
         <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
@@ -102,7 +102,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
       </td>
         <% if (pds[i].semestre === 'I' && pds[i].reabierto !== 1){%>
       <td>
-        <form id="plan_<%=pds[i].PlanEstudioId%>_reabierto" action="/hola" method="post">
+        <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_reabierto" action="/hola" method="post">
         <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
         <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
         <input type="hidden" id="ocultoanoAcademicoReabierto_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
@@ -133,7 +133,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
     <td><%=pds[i].semestre%></td>
     <%}%> 
     <td>
-      <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
+      <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
       <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
       <input type="hidden" id="ocultoanoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">
@@ -147,7 +147,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
     </td>
     <td>
         <% if (pdAnterior){ %>
-          <form id="plan_<%=pdAnterior.PlanEstudioId%>_incidencia" action="/hola" method="post">
+          <form autocomplete="off" id="plan_<%=pdAnterior.PlanEstudioId%>_incidencia" action="/hola" method="post">
           <input type="hidden" name="plan" value="<%=pdAnterior.PlanEstudioId%>">
           <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pdAnterior.identificador%>">
           <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pdAnterior.PlanEstudioId%>" name="anoAcademico" value="<%=pdAnterior.anoAcademico%>">
@@ -177,7 +177,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
     <td><%=pds[i].semestre%></td>
     <%}%> 
     <td>
-      <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
+      <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
       <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>"> 
       <button type="button"  class="btn btn-default" disabled title="La programación docente aun no ha sido rellenada">Cerrar</button>
@@ -185,7 +185,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
     </td>
     <td>
       <%  if (pdAnterior){ %>
-          <form id="plan_<%=pdAnterior.PlanEstudioId%>_incidencia" action="/hola" method="post">
+          <form autocomplete="off" id="plan_<%=pdAnterior.PlanEstudioId%>_incidencia" action="/hola" method="post">
           <input type="hidden" name="plan" value="<%=pdAnterior.PlanEstudioId%>">
           <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pdAnterior.identificador%>">
           <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pdAnterior.PlanEstudioId%>" name="anoAcademico" value="<%=pdAnterior.anoAcademico%>">
@@ -208,7 +208,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
       <td><%=pds[i].anoAcademico%></td>
       <td><%=pds[i].semestre%></td>    
     <td>
-      <form id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
+      <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
       <input type="hidden" id="ocultoanoAcademico_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="">
       <input type="hidden" id="ocultosemestre_<%=pds[i].PlanEstudioId%>" name="semestre" value="">        
@@ -216,7 +216,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
       </form>
     </td>
     <td>
-      <form id="plan_<%=pds[i].PlanEstudioId%>_incidencia" action="/hola" method="post">
+      <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_incidencia" action="/hola" method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
       <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
       <input type="hidden" id="ocultoanoAcademicoIncidencia_<%=pds[i].PlanEstudioId%>" name="anoAcademico" value="<%=pds[i].anoAcademico%>">

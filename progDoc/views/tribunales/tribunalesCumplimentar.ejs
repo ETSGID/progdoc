@@ -55,37 +55,37 @@
       <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Presidente' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Presidente')">
       <% if(tribunales[i].presidenteNombre) { %>
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'><%= tribunales[i].presidenteNombre%></p>
-      <input id='tribunal_<%=tribunales[i].tribunalId%>_Presidente' type="hidden" name="noCambio" value="<%=tribunales[i].tribunalId%>_<%= tribunales[i].presidenteNombre %>_Presidente" placeholder="<%= tribunales[i].presidenteNombre %>" >
+      <input id='tribunal_<%=tribunales[i].tribunalId%>_Presidente' type="hidden" name="noCambio" placeholder="<%= tribunales[i].presidenteNombre %>" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].PresidenteTribunalAsignatura%>_Presidente">
       <% } else{ %>
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'>-</p>
-      <input id="tribunal_<%=tribunales[i].tribunalId%>_Presidente" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Presidente" type="hidden" name="noCambio" placeholder="-" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].PresidenteTribunalAsignatura%>_Presidente">
       <% } %> 
       </td>
       <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Vocal' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Vocal')">
       <% if(tribunales[i].vocalNombre) { %>
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'><%= tribunales[i].vocalNombre%></p>
-      <input id="tribunal_<%=tribunales[i].tribunalId%>_Vocal" type="hidden" name="noCambio" value="<%=tribunales[i].tribunalId%>_<%= tribunales[i].vocalNombre %>_Vocal" placeholder="<%= tribunales[i].vocalNombre %>" >
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Vocal" type="hidden" name="noCambio" placeholder="<%= tribunales[i].vocalNombre %>" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].VocalTribunalAsignatura%>_Vocal">
       <% } else{ %>
        <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'>-</p>
-        <input id="tribunal_<%=tribunales[i].tribunalId%>_Vocal" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
+        <input id="tribunal_<%=tribunales[i].tribunalId%>_Vocal" type="hidden" name="noCambio" placeholder="-" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].VocalTribunalAsignatura%>_Vocal">
       <% } %>
       </td>
       <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Secretario' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Secretario')">
       <% if(tribunales[i].secretarioNombre) { %>
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'><%= tribunales[i].secretarioNombre%></p>
-      <input id="tribunal_<%=tribunales[i].tribunalId%>_Secretario" type="hidden" name="noCambio" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].secretarioNombre %>_Secretario" placeholder="<%= tribunales[i].secretarioNombre %>" >
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Secretario" type="hidden" name="noCambio" placeholder="<%= tribunales[i].secretarioNombre %>" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].SecretarioTribunalAsignatura%>_Secretario">
       <% } else{ %>
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'>-</p>
-      <input id="tribunal_<%=tribunales[i].tribunalId%>_Secretario" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Secretario" type="hidden" name="noCambio" placeholder="-" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].SecretarioTribunalAsignatura%>_Secretario">
       <% } %>
       </td>
       <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Suplente' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Suplente')">
       <% if(tribunales[i].suplenteNombre) { %>
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Suplente'><%= tribunales[i].suplenteNombre%></p>
-      <input id="tribunal_<%=tribunales[i].tribunalId%>_Suplente" type="hidden" name="noCambio" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].suplenteNombre %>_Suplente" placeholder="<%= tribunales[i].suplenteNombre %>" >
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Suplente" type="hidden" name="noCambio" placeholder="<%= tribunales[i].suplenteNombre %>" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].SuplenteTribunalAsignatura%>_Suplente">
       <% } else{ %>
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Suplente'>-</p>
-      <input id="tribunal_<%=tribunales[i].tribunalId%>_Suplente" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Suplente" type="hidden" name="noCambio" placeholder="-" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].SuplenteTribunalAsignatura%>_Suplente" >
       <% } %>
       </td>
     </tr>
@@ -159,19 +159,40 @@ let profesores = <%-JSON.stringify(profesores)%>
 let profesores2 ="";
 let confirmarSalirSinGuardar = <%-confirmarSalirSinGuardar%>
 //se utiliza para disparar el evento de onbeforeunload
-let activado = true;
+//solo puede tener un input de profesor a la vez. 
+let inputActive = false;
+
 if(estado === null && existe === null){
   profesores2 = quitAcents(profesores)
   //document.getElementsByTagName('body')[0].onload = changeSelect();
 }
+
+//inputId example : tribunal_1234_Vocal
+function getTribunalId(inputId){
+  return inputId.split("_")[1]
+}
+function getMiembroId(inputId){
+  return inputId.split("_")[2]
+}
+
 function mostrar(id){
   let celda = document.getElementById("td_"+id);
-  //debo hacer lo de p y p2 pq al aceptar en el buscador me vuelve a entrar aqui uso el id de p como flag 
+  //debo hacer lo de p y p2 pq al aceptar en el buscador vuelve a entrar aqui ya que detecta la pulsación en la td usa el id de p como flag 
   let p = document.getElementById("p_"+id);
+  //p2 se crea en el modulo autocomplete.js
   let p2 = document.getElementById("p_"+id+"_provisional")
   let input = document.getElementById(id)
-  let nameInput = input.getAttribute('name');
-  if (p){
+  //let nameInput = input.getAttribute('name');
+  if (p && !inputActive){
+    //button cancell and delete
+    let buttonCancelandDelete = document.createElement('div');
+    buttonCancelandDelete.innerHTML = 
+    `<div id="buttonCancelandDelete">
+    <button type="button" class="btn btn-default" onclick = "deleteTribunal(event,'${id}');">
+    <span class="glyphicon glyphicon-trash"></span>
+    </button>
+    <button type="button"  class="btn btn-default" onclick="cancelTribunal(event,'${id}');">Cancelar</button>`
+    celda.appendChild(buttonCancelandDelete.firstChild)
     //creo el div para encapsular la busqueda
     let div = document.createElement('div');
     div.innerHTML = '<div class="autocomplete" style="width:500px;"></div>'
@@ -179,14 +200,18 @@ function mostrar(id){
     celda.appendChild(nuevo)
     nuevo.appendChild(input)
     celda.removeChild(p);
-    let nuevoValor = input.getAttribute('placeholder')
-    if (input.getAttribute('value')){
-      input.setAttribute('value', '' )
-    }
+    //let nuevoValor = input.getAttribute('placeholder')
+    //store lastvalue if cancels
+    input.setAttribute('lastvalue', input.getAttribute('value'))
+    input.setAttribute('value', '' )
     input.setAttribute('type', 'text')
+    //flag to one input active
+    inputActive = true;
     autocomplete(input, profesores, profesores2, 'tribunales');
-  }else if(p2){
+  }else if(p2 && inputActive){
     p2.setAttribute('id', "p_"+id);
+    //delete buttons cancel and delete
+    deleteButtonsCancelandDelete(id);
   }
   input.focus();
 }
@@ -199,6 +224,52 @@ function Guardar(nuevopath){
   let form2 = document.getElementById("formulario");
   form2.setAttribute('action', nuevopath);
   form2.submit();
+}
+//Cancel de input of a tribunal
+function cancelTribunal(event, inputId){
+  //to avoid the propagation to parent onClick (the td)
+  event.stopPropagation();
+  let p = document.createElement('div');
+  p.innerHTML = `<p id=p_${inputId}>${document.getElementById(inputId).placeholder}</p>`
+  let celda = document.getElementById("td_"+inputId);
+  celda.appendChild(p.firstChild);
+  //again the input because in mostrar is replaced its position to make the autocomplete input
+  let input = document.getElementById(inputId)
+  celda.removeChild(document.getElementById(inputId).parentNode);
+  input.setAttribute('type', 'hidden');
+  input.setAttribute('value', input.getAttribute('lastvalue'))
+  celda.appendChild(input);
+  deleteButtonsCancelandDelete(inputId);
+}
+
+//Delete member of a tribunal
+function deleteTribunal(event, inputId){
+  //to avoid the propagation to parent onClick (the td)
+  event.stopPropagation();
+  let p = document.createElement('div');
+  p.innerHTML = `<p id=p_${inputId}>-</p>`
+  let celda = document.getElementById("td_"+inputId);
+  celda.appendChild(p.firstChild);
+  //again the input because in mostrar is replaced its position to make the autocomplete input
+  let input = document.getElementById(inputId)
+  celda.removeChild(document.getElementById(inputId).parentNode);
+  input.setAttribute('type', 'hidden');
+  let newValue = `${getTribunalId(inputId)}__${getMiembroId(inputId)}`
+  input.setAttribute('value', newValue);
+  input.setAttribute('placeholder', '-');
+  input.setAttribute('name', 'actualizar');
+  celda.appendChild(input);
+  deleteButtonsCancelandDelete(inputId);
+
+}
+
+//delete buttons cancel and delete when (re)writing new teacher in input form
+function deleteButtonsCancelandDelete(inputId){
+  let buttonCancelandDelete = document.getElementById('buttonCancelandDelete');
+  let celda = document.getElementById("td_"+inputId);
+  celda.removeChild(buttonCancelandDelete)
+  //para que pueda escribirse otro tribunal
+  inputActive=false;
 }
 
 function Enviar(aprobarpath){
@@ -213,7 +284,6 @@ function Enviar(aprobarpath){
   }
 }
 
-
 function Decidir(decision){
   activado = false;
   let dec = document.getElementById('decision');
@@ -225,6 +295,9 @@ function Decidir(decision){
     return false;
   }
 }
+
+
+
 window.onbeforeunload = function(){
   //primero debes mirar que activado sea true o false (en confirmarSalirSinGuarar y despues marcarlo como true) 
   let confirma = confirmarSalirSinGuardar(["actualizar"], activado)

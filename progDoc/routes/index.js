@@ -48,7 +48,7 @@ router.all('*', function (req, res, next) {
   req.session.departamentoID = departamentoID
   //roles que pueden hacer todo son admin y subdirector de posgrado
   res.locals.rols = [];
-  if (process.env.DEV === 'true') {
+  if (process.env.DEV === 'true' || process.env.PRUEBAS === 'true') {
     res.locals.rols.push({ rol: enumsPD.rols.Admin, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
   }
   res.locals.rols.push({ rol: enumsPD.rols.SubdirectorPosgrado, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [] });
@@ -140,8 +140,8 @@ router.get("/respDoc/editAsignacion", progDocController.getProgramacionDocente, 
   }
   res.locals.rols.push({
     rol: enumsPD.rols.JefeEstudios, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones:
-      [{ condicion: 'estadoProfesores', resultado: estados.estadoProgDoc.incidencia }]
-  });
+      [{ condicion: 'estadoProGDoc', resultado: estados.estadoProgDoc.incidencia }]
+  })
   next();
 }, planController.getPlanes, rolController.comprobarRols, asignacionYTribunalController.editAsignacion);
 router.get("/respDoc/editAsignacion/cambioModo", progDocController.getProgramacionDocente, function (req, res, next) {
