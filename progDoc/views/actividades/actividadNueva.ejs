@@ -164,9 +164,9 @@ function guardarActividad(id){
         }
         let horaInicio = ""
         if (actividad.horaInicio){
-          horaInicio = "["+moment(actividad.horaInicio,"hh:mm:ss").format("hh:mm")
+          horaInicio = "["+moment(actividad.horaInicio,"HH:mm:ss").format("HH:mm")
           if (actividad.duracion || actividad.duracion === 0){
-          horaInicio += "-" + moment(actividad.horaInicio,"hh:mm:ss").add(actividad.duracion, "m").format("hh:mm")
+          horaInicio += "-" + moment(actividad.horaInicio,"HH:mm:ss").add(actividad.duracion, "m").format("HH:mm")
           }
           horaInicio += "]"
         }

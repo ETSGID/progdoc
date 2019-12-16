@@ -80,9 +80,9 @@
         }
         let horaInicio = ""
         if (act.horaInicio){
-          horaInicio = "["+moment(act.horaInicio,"hh:mm:ss").format("hh:mm")
+          horaInicio = "["+moment(act.horaInicio,"HH:mm:ss").format("HH:mm")
           if (act.duracion || act.duracion === 0){
-          horaInicio += "-" + moment(act.horaInicio,"hh:mm:ss").add(act.duracion, "m").format("hh:mm")
+          horaInicio += "-" + moment(act.horaInicio,"HH:mm:ss").add(act.duracion, "m").format("HH:mm")
           }
           horaInicio += "]"
         }
@@ -104,9 +104,9 @@
         }
         let horaInicio = ""
         if (act.horaInicio){
-          horaInicio = "["+moment(act.horaInicio,"hh:mm:ss").format("hh:mm")
+          horaInicio = "["+moment(act.horaInicio,"HH:mm:ss").format("HH:mm")
           if (act.duracion || act.duracion === 0){
-          horaInicio += "-" + moment(act.horaInicio,"hh:mm:ss").add(act.duracion, "m").format("hh:mm")
+          horaInicio += "-" + moment(act.horaInicio,"HH:mm:ss").add(act.duracion, "m").format("HH:mm")
           }
           horaInicio += "]"
         }
