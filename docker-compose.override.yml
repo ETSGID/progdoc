@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+
+  db:
+    container_name: gestiondoc_db
+    image: postgres:9.6
+    restart: always
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    env_file:
+      - ../config/gestionDoc/gestionDocDB.env
+  dbsession:
+    container_name: gestiondoc_dbsession
+    env_file:
+      - ../config/gestionDoc/gestionDocSession.env
+  progdoc:
+    build: 
+      context: .
+    depends_on:
+      - db
+    env_file:
+      - ../config/gestionDoc/gestionDocSession.env
+
+volumes:
+  dbdata:
+
+
+
+    

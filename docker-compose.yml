@@ -4,13 +4,10 @@ services:
 
   dbsession:
     image: postgres:9.6
-    volumes:
-      - dbdata2:/var/lib/postgres
     restart: always
     
   progdoc:
-    build: 
-      context: .
+    container_name: gestiondoc_progdoc
     restart: always
     volumes:
       - progdoc:/storage/progdoc/
@@ -20,5 +17,4 @@ services:
       - dbsession
 
 volumes:
-  dbdata2:
   progdoc:
