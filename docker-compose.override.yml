@@ -20,7 +20,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ../config/gestionDoc/gestionDocSession.env
+      - ../config/gestionDoc/gestionDoc.env
 
 volumes:
   dbdata:
