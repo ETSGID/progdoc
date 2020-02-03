@@ -11,20 +11,24 @@ Dentro de la carpeta  se encuentra todos los ficheros necesarios para el correct
 
 Son necesariuos tres archivos para configurar el entorno
 
-`progDoc.prod.yml`
+`docker-compose.override.yml`
 
 ```
 version: '3'
 
 services:
-
   dbsession:
+    container_name: gestiondoc_dbsession
     env_file:
-      - ../progDocSession.env
-      
+      - ../config/gestionDoc/gestionDocSession.env
   progdoc:
+    build: 
+      context: .
     env_file:
-      - ../progDoc.env
+      - ../config/gestionDoc/gestionDoc.env
+
+volumes:
+  dbdata:
 ```
 `progDoc.env`
 
@@ -64,7 +68,7 @@ Dentro de la carpeta `progDoc`, está el código de la aplicación.
 
 Son necesariuos cuatro archivos para configurar el entorno
 
-`progDoc.prod.yml`
+`docker-compose.override.yml`
 
 ```
 version: '3'
@@ -72,16 +76,27 @@ version: '3'
 services:
 
   db:
+    container_name: gestiondoc_db
+    image: postgres:9.6
+    restart: always
+    volumes:
+      - dbdata:/var/lib/postgresql/data
     env_file:
-      - ../progDocDB.env
-
+      - ../config/gestionDoc/gestionDocDB.env
   dbsession:
+    container_name: gestiondoc_dbsession
     env_file:
-      - ../progDocSession.env
-
+      - ../config/gestionDoc/gestionDocSession.env
   progdoc:
+    build: 
+      context: .
+    depends_on:
+      - db
     env_file:
-      - ../progDoc.env
+      - ../config/gestionDoc/gestionDoc.env
+
+volumes:
+  dbdata:
 ```
 `progDoc.env`
 
@@ -146,10 +161,10 @@ Una vez configuradas las variables de entorno y el puerto correctamente, para de
 
 ```
 # Construir el proyecto llamando a los ficheros de configuración creados en la carpeta externa al proyecto
-docker-compose -f docker-compose.yml -f ../progDoc.prod.yml build
+docker-compose build
 
 # Arrancar los contenedores llamando a los ficheros de configuracón creados en la carpeta externa al proyecto
-docker-compose -f docker-compose.yml -f ../progDoc.prod.yml up -d
+docker-compose up -d
 
 #para llenar la base de datos
 psql -U [userpostgres] -h localhost  [database] < [file.sql]
@@ -161,10 +176,10 @@ Una vez configuradas las variables de entorno y el puerto correctamente, para de
 
 ```
 # Construir el proyecto llamando a los ficheros de configuración creados en la carpeta externa al proyecto
-docker-compose -f docker-compose.yml -f ./docker-compose_dev.yml -f ../progDoc.prod.yml build
+docker-compose build
 
 # Arrancar los contenedores llamando a los ficheros de configuracón creados en la carpeta externa al proyecto
-docker-compose -f docker-compose.yml -f ./docker-compose_dev.yml -f ../progDoc.prod.yml up -d
+docker-compose up -d
 
 #para llenar la base de datos
 psql -U [userpostgres] -h localhost  [database] < [file.sql]
@@ -178,3 +193,4 @@ El fichero `progDoc/script.sh`, se ejecuta cuando termina de arrancar el contene
 [Variables de entorno desde `docer-compose.ym`](https://docs.docker.com/compose/environment-variables/)
 [Contenedor postgres](https://hub.docker.com/_/postgres/)
 [Problemas con variables de entorno en el contenedor postgres](https://github.com/docker-library/postgres/issues/203)
+
