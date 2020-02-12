@@ -95,7 +95,6 @@ exports.comprobarRolYPersona = async function (req, res, next) {
     req.session.user.employeetype = req.session.user.employeetype.split('');
   }
   const role = req.session.user.employeetype;
-  const id = req.session.user.PersonaId;
   if (role && Array.isArray(role) && (role.includes('F') || role.includes('L'))) {
     req.session.portal = 'pas';
   } else if (role && Array.isArray(role) && role.includes('D')) {
@@ -103,20 +102,7 @@ exports.comprobarRolYPersona = async function (req, res, next) {
   } else {
     req.session.portal = 'pdi';
   }
-  // comprobamos en la tabla de persona si esta o no esta
-  if (id !== null) {
-    next();
-  }
-  if (id === null) {
-    // persona que no está en el sistema pero puede ver las cosas
-    if (role && typeof role === 'string') {
-      next();
-    } else {
-      res.render('menus/noPermitido', {
-        layout: false,
-      });
-    }
-  }
+  next();
 };
 
 // funcion de getRoles para directores de departamentos jefe de estudios y subdirector de posgrado
