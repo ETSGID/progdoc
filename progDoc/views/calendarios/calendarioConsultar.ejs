@@ -1,6 +1,6 @@
 <%- include ../menus/consultar.ejs %>
 <div class="contenido">
-        <script src="<%=contextPath%>/js/datepicker.js"></script>
+        <script src="<%=contextPath%>/js/libraries/datepicker.js"></script>
         <input type="hidden" value="<%=ano%>" id="anoSeleccionado">
     <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
         <p><%=permisoDenegado%></p>

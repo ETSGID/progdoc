@@ -1,0 +1,25 @@
+{
+    "env": {
+        "commonjs": true,
+        "es6": true,
+        "node": true
+    },
+    "extends": [
+        "airbnb-base"
+    ],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
+    "ignorePatterns": ["public/js/libraries/", "node_modules/"],
+    "rules": {
+        "indent": ["error", 2],
+        "no-await-in-loop": 1,
+        "no-plusplus": 1,
+        "no-continue": 1,
+        "comma-dangle": 1
+    }
+}

@@ -1,10 +1,11 @@
 // Definicion del modelo ConjuntoActividadParcialGrupo:
 
+// eslint-disable-next-line no-unused-vars
 module.exports = function (sequelize, DataTypes) {
-    let ConjuntoActividadParcialGrupo = sequelize.define('ConjuntoActividadParcialGrupo',
-        {},
-        {
-            timestamps: false
-        });
-    return ConjuntoActividadParcialGrupo;
+  const ConjuntoActividadParcialGrupo = sequelize.define('ConjuntoActividadParcialGrupo',
+    {},
+    {
+      timestamps: false,
+    });
+  return ConjuntoActividadParcialGrupo;
 };

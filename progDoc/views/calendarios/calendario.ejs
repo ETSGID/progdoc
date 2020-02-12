@@ -1,6 +1,6 @@
 <%- include ../menus/gestion.ejs %>
 <div class="contenido">
-    <script src="<%=contextPath%>/js/datepicker.js"></script>
+    <script src="<%=contextPath%>/js/libraries/datepicker.js"></script>
     <link rel='stylesheet' type="text/css" href='<%=contextPath%>/stylesheets/datepicker.css' />
 
 
@@ -15,7 +15,7 @@
                 <button type="button" class="btn btn-default" data-toggle="popover" title="Leyenda de colores" data-content="">Leyenda de colores</button>
                 <% if(estado === 0){ %>
                     
-                    <button type='submit' class="btn btn-default"  title="Pulse para aprobar el calendario común"  onclick="aprobar(<%=ano%>)"  >Aprobar</button>
+                    <button type='button' class="btn btn-primary"  title="Pulse para aprobar el calendario común"  onclick="aprobar(<%=ano%>)"  >Aprobar</button>
                     
                 <% }else{ %>
                     <small>Este calendario <b>ya ha sido aprobado.</b> Aun así, puedes modificar, añadir o eliminar eventos puntuales.</small>
