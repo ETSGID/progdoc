@@ -94,7 +94,7 @@ function guardarNota(id){
  let text = document.getElementById("text_"+id).value;
  let path = notaId === false ? '/crearHorariosNota' : '/actualizarHorariosNota'
   $.ajax({
-        url: contextPath+'/coordinador'+path,
+        url: CONTEXT+'/coordinador'+path,
         method: 'POST',
         dataType: "json",
         contentType: "application/json",
@@ -140,7 +140,7 @@ function guardarNota(id){
 function eliminarNota(id, notaId){
     notaId = Number(notaId)
     $.ajax({
-    url: contextPath+'/coordinador/eliminarHorariosNota',
+    url: CONTEXT+'/coordinador/eliminarHorariosNota',
     method: 'POST',
     dataType: "json",
     contentType: "application/json",

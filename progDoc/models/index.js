@@ -1,3 +1,4 @@
+/* global DEV, DOCKER */
 const path = require('path');
 const Sequelize = require('sequelize');
 
@@ -6,15 +7,22 @@ const Sequelize = require('sequelize');
 
 //    DATABASE_URL = postgres://user:passwd@host:port/database
 // eslint-disable-next-line no-unneeded-ternary
-const logs = process.env.DEV === 'true' ? false : false;
+const logs = DEV === 'true' ? false : false;
 let sequelize;
 let sequelizeSession;
-if (process.env.DOCKER === 'true') {
-  sequelize = new Sequelize(`postgres://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:5432/${process.env.POSTGRES_DB}`, { logging: logs });
-  sequelizeSession = new Sequelize(`postgres://${process.env.DBSESSION_USERNAME}:${process.env.DBSESSION_PASSWORD}@dbsession:5432/${process.env.POSTGRESSESION_DB}`, { logging: logs });
+const DB_USERNAME = process.env.DB_USERNAME || 'progdoc';
+const DB_PASSWORD = process.env.DB_PASSWORD || 'progdoc';
+const DB_HOST = process.env.DB_HOST || 'db';
+const POSTGRES_DB = process.env.POSTGRES_DB || 'progdoc';
+const DBSESSION_USERNAME = process.env.DBSESSION_USERNAME || 'progdoc';
+const DBSESSION_PASSWORD = process.env.DBSESSION_PASSWORD || 'progdoc';
+const POSTGRESSESION_DB = process.env.POSTGRESSESION_DB || 'progdocsession';
+if (DOCKER === 'true') {
+  sequelize = new Sequelize(`postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:5432/${POSTGRES_DB}`, { logging: logs });
+  sequelizeSession = new Sequelize(`postgres://${DBSESSION_USERNAME}:${DBSESSION_PASSWORD}@dbsession:5432/${POSTGRESSESION_DB}`, { logging: logs });
 } else {
-  sequelize = new Sequelize(`postgres://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:5432/${process.env.POSTGRES_DB}`, { logging: logs });
-  sequelizeSession = new Sequelize(`postgres://${process.env.DBSESSION_USERNAME}:${process.env.DBSESSION_PASSWORD}@localhost:5432/${process.env.POSTGRESSESION_DB}`, { logging: logs });
+  sequelize = new Sequelize(`postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:5432/${POSTGRES_DB}`, { logging: logs });
+  sequelizeSession = new Sequelize(`postgres://${DBSESSION_USERNAME}:${DBSESSION_PASSWORD}@${DB_HOST}:5432/${POSTGRESSESION_DB}`, { logging: logs });
 }
 
 

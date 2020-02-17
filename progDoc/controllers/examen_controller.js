@@ -1,8 +1,8 @@
+/* global PATH_PDF */
 const Sequelize = require('sequelize');
 const moment = require('moment');
 const fs = require('fs');
 const json2csv = require('json2csv').parse;
-const app = require('../app');
 const models = require('../models');
 
 const op = Sequelize.Op;
@@ -10,6 +10,7 @@ const estados = require('../estados');
 const enumsPD = require('../enumsPD');
 const funciones = require('../funciones');
 const progDocController = require('./progDoc_controller');
+
 
 async function getFranjasExamenes(pdID) {
   // eslint-disable-next-line no-useless-catch
@@ -621,7 +622,7 @@ exports.generateCsvExamens = async function (req, res, next) {
             folder = '/borrador/';
             folder2 = '_borrador';
           }
-          const dir = `${app.pathPDF}/pdfs/${progDocController.getAnoPd(req.session.pdID)}/${progDocController.getTipoPd(req.session.pdID)}/${progDocController.getPlanPd(req.session.pdID)}/${progDocController.getVersionPd(req.session.pdID)}${folder}`;
+          const dir = `${PATH_PDF}/pdfs/${progDocController.getAnoPd(req.session.pdID)}/${progDocController.getTipoPd(req.session.pdID)}/${progDocController.getPlanPd(req.session.pdID)}/${progDocController.getVersionPd(req.session.pdID)}${folder}`;
           const ruta = `${dir + acronimoOIdPlan}_${ano}_${asignacions.periodo}_${progDocController.getVersionPd(req.session.pdID)}${folder2}.csv`;
           funciones.ensureDirectoryExistence(ruta);
           const csv = json2csv(data, opts);

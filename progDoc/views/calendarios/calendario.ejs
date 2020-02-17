@@ -1,7 +1,7 @@
 <%- include ../menus/gestion.ejs %>
 <div class="contenido">
-    <script src="<%=contextPath%>/js/libraries/datepicker.js"></script>
-    <link rel='stylesheet' type="text/css" href='<%=contextPath%>/stylesheets/datepicker.css' />
+    <script src="<%=CONTEXT%>/js/libraries/datepicker.js"></script>
+    <link rel='stylesheet' type="text/css" href='<%=CONTEXT%>/stylesheets/datepicker.css' />
 
 
 
@@ -731,7 +731,7 @@
                 
                 let fechaFin = null
                 let editable = editableCheck.checked;
-                let url = "<%= contextPath %>/gestion/calendario/eventoGeneral"
+                let url = "<%= CONTEXT %>/gestion/calendario/eventoGeneral"
                 url += "?evento=" + evento + "&fechaInicio=" + fechaInicio +  "&editable=" + editable + "&identificador=" + identificador;
                 $.ajax({
                     type: "POST",
@@ -782,7 +782,7 @@
                     evento = "festivo//Periodo festivo de navidades"
                 }
                 
-                let url = "<%= contextPath %>/gestion/calendario/eventoGeneral"
+                let url = "<%= CONTEXT %>/gestion/calendario/eventoGeneral"
                 url += "?evento=" + evento + "&fechaInicio=" + fechaInicio + "&fechaFin=" + fechaFin + "&editable=" + editable + "&identificador=" + identificador;
                 $.ajax({
                     type: "POST",
@@ -933,7 +933,7 @@
         let evento = JSON.parse(document.getElementById("eventoAntiguo").value);
         
 
-        let url = "<%= contextPath %>/gestion/calendario/eventoGeneral"
+        let url = "<%= CONTEXT %>/gestion/calendario/eventoGeneral"
         url += "?identificador=" + evento.identificador;
         $.ajax({
             type: "DELETE",
@@ -959,7 +959,7 @@
     }
     
     function aprobar(ano){
-        let url = "<%= contextPath %>/gestion/calendario/aprobarGeneral"
+        let url = "<%= CONTEXT %>/gestion/calendario/aprobarGeneral"
         url += "?ano=" + ano;
         if(confirm("Una vez aprobado el calendario, los coordinadores de las titulaciones podrán comenzar a adaptarlo. ¿Estás seguro de querer aprobarlo?")){
             $.ajax({
@@ -978,7 +978,7 @@
     function copiar(ano){
         if(confirm('Va a copiar los eventos del año pasado. \n'+
         'Esta acción no se podrá deshacer. ¿Está seguro de que quiere continuar?')){
-            let url = "<%= contextPath %>/gestion/calendario/copiarEventos"
+            let url = "<%= CONTEXT %>/gestion/calendario/copiarEventos"
             url += "?ano=" + ano;
             $.ajax({
                 type: "POST",

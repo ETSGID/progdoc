@@ -1,3 +1,4 @@
+/* global DEV, PRUEBAS */
 const express = require('express');
 
 const router = express.Router();
@@ -43,7 +44,7 @@ router.all('*', (req, res, next) => {
   req.session.departamentoID = departamentoID;
   // roles que pueden hacer todo son admin y subdirector de posgrado
   res.locals.rols = [];
-  if (process.env.DEV === 'true' || process.env.PRUEBAS === 'true') {
+  if (DEV === 'true' || PRUEBAS === 'true') {
     res.locals.rols.push({
       rol: enumsPD.rols.Admin, PlanEstudioCodigo: null, DepartamentoCodigo: null, condiciones: [],
     });

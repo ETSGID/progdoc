@@ -4,7 +4,7 @@
   <!-- Required meta tags -->
   <meta charset="utf-8"> 
   <!-- Despliegue -->
-  <link rel='stylesheet' type="text/css" href='<%=contextPath%>/stylesheets/style.css' />
+  <link rel='stylesheet' type="text/css" href='<%=CONTEXT%>/stylesheets/style.css' />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Bootstrap CSS -->
@@ -25,17 +25,17 @@
 <body>
   <div class="sidenav">
   <div>
-  <h2 <%if (pruebas == "pruebas"){%>style="background-color:red"<%}%>><a style="padding:0" href="<%=contextPath%>">Progdoc</a></h2>
+  <h2 <%if (pruebas == "pruebas"){%>style="background-color:red"<%}%>><a style="padding:0" href="<%=CONTEXT%>">Progdoc</a></h2>
   </div>
   <button id='drop_ProgDoc' class="dropdown-btn">Programación Docente 
      <i class="glyphicon glyphicon-chevron-down fa fa-caret-down" aria-hidden="true"></i>
   </button>
   <div class="dropdown-container">
-    <a id='element_ProgDocConsultar' href="<%=contextPath%>/Consultar">Consultar</a>
-    <a id='element_ProgDocCumplimentar' href="<%=contextPath%>/Cumplimentar">Cumplimentar</a>
-    <a id='element_ProgDocGestion' href="<%=contextPath%>/Gestion">Jefatura Estudios</a>
-    <a id='element_ProgDocHistorial' href="<%=contextPath%>/Historial">Historial</a>
-    <a href="<%=contextPath%>/ayuda.pdf" download>Ayuda</a>
+    <a id='element_ProgDocConsultar' href="<%=CONTEXT%>/Consultar">Consultar</a>
+    <a id='element_ProgDocCumplimentar' href="<%=CONTEXT%>/Cumplimentar">Cumplimentar</a>
+    <a id='element_ProgDocGestion' href="<%=CONTEXT%>/Gestion">Jefatura Estudios</a>
+    <a id='element_ProgDocHistorial' href="<%=CONTEXT%>/Historial">Historial</a>
+    <a href="<%=CONTEXT%>/ayuda.pdf" download>Ayuda</a>
   </div>
 </div>
 <% if (locals.menu) { %>
@@ -56,7 +56,7 @@
 /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
 let dropdown = document.getElementsByClassName("dropdown-btn");
 let i;
-let contextPath = '<%-contextPath%>';
+let CONTEXT = '<%-CONTEXT%>';
 for (i = 0; i < dropdown.length; i++) {
   dropdown[i].addEventListener("click", function() {
     this.classList.toggle("active");
@@ -97,7 +97,7 @@ menu.forEach(function(element,index){
 }
 
 $(document).ready(function(){  
-  dibujarmenulateral("buttonMenuPortales123", contextPath+"/logout", '<%=session.user.uid%>', '<%=session.user.givenname%>'); 
+  dibujarmenulateral("buttonMenuPortales123", CONTEXT+"/logout", '<%=session.user.uid%>', '<%=session.user.givenname%>'); 
 });
 </script>
 

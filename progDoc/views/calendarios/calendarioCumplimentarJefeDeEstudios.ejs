@@ -269,7 +269,7 @@
             let eventoAntiguo = JSON.parse(document.getElementById("eventoAntiguo").value);
             let identificador = eventoAntiguo.identificador;
             
-            let url = "<%= contextPath %>/cumplimentar/calendario/eventoEditablePlan"
+            let url = "<%= CONTEXT %>/cumplimentar/calendario/eventoEditablePlan"
             url += "?editable=" + editableCheck.checked + "&identificador=" + identificador;
             $.ajax({
                 type: "POST",

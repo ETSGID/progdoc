@@ -87,7 +87,7 @@ $('#formProfesor').submit(function(event) {
       alert("El profesor ya está en el sistema es:" +profesorExistente.nombre)
   }else{
   $.ajax({
-        url: contextPath+'/anadirProfesor',
+        url: CONTEXT+'/anadirProfesor',
         method: 'POST',
         dataType: "json",
         contentType: "application/json",

@@ -1,6 +1,6 @@
+/* global CONTEXT */
 /* eslint-disable camelcase */
 const moment = require('moment');
-const app = require('../app');
 const models = require('../models');
 const enumsPD = require('../enumsPD');
 
@@ -425,7 +425,7 @@ exports.getCalendarioPlanConsultar = async function (req, res, next) {
     if (ano === null) {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioConsultar', {
-        contextPath: app.contextPath,
+        CONTEXT,
         permisoDenegado: res.locals.permisoDenegado,
         menu: req.session.menu,
         submenu: req.session.submenu,
@@ -1005,7 +1005,7 @@ exports.getCalendarioPlan = async function (req, res, next) {
     if (ano === null) {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioCumplimentar', {
-        contextPath: app.contextPath,
+        CONTEXT,
         permisoDenegado: res.locals.permisoDenegado,
         menu: req.session.menu,
         submenu: req.session.submenu,

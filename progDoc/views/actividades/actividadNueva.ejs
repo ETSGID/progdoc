@@ -141,7 +141,7 @@ function guardarActividad(id){
      alert("La actividad debe tener una fecha asociada")
  }else{
    $.ajax({
-        url: contextPath+'/coordinador'+path,
+        url: CONTEXT+'/coordinador'+path,
         method: 'POST',
         dataType: "json",
         contentType: "application/json",
@@ -209,7 +209,7 @@ function guardarActividad(id){
 function eliminarActividad(id, actividadId){
     actividadId = Number(actividadId)
     $.ajax({
-    url: contextPath+'/coordinador/eliminarActividad',
+    url: CONTEXT+'/coordinador/eliminarActividad',
     method: 'POST',
     dataType: "json",
     contentType: "application/json",

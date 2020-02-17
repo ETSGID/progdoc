@@ -1,7 +1,7 @@
+/* global PATH_PDF, CONTEXT */
 const Sequelize = require('sequelize');
 const ejs = require('ejs');
 const pdf = require('html-pdf');
-const app = require('../app');
 const { configPdfCerrado } = require('./pdf_controller');
 const models = require('../models');
 
@@ -224,7 +224,7 @@ exports.getAulas = async function (req, res, next) {
     if (!req.body.generarPdf) {
       req.session.submenu = 'Aulas';
       res.render('aulas/aulas', {
-        contextPath: app.contextPath,
+        CONTEXT,
         permisoDenegado: res.locals.permisoDenegado,
         menu: req.session.menu,
         submenu: req.session.submenu,
@@ -265,13 +265,13 @@ exports.getAulas = async function (req, res, next) {
       let file = `aulas_${anoCodigo}_${cuatrimestreSeleccionado}.pdf`;
       file = `${anoCodigo}/aulas/${file}`;
       // console.log("the fileç: ", file);
-      const ruta = `${app.pathPDF}/pdfs/${file}`;
+      const ruta = `${PATH_PDF}/pdfs/${file}`;
       const configPdfOptions = configPdfCerrado;
       // save file
       // eslint-disable-next-line no-unused-vars
       pdf.create(html, configPdfOptions).toFile(ruta, (err, resp) => {
         if (err) { console.log(err); res.json({ success: false, msg: 'Ha habido un error la acción no se ha podido completar' }); }
-        res.json({ success: true, path: `${app.contextPath}/pdfs/${file}` });
+        res.json({ success: true, path: `${CONTEXT}/pdfs/${file}` });
       });
     }
   } catch (error) {

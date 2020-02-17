@@ -1,9 +1,9 @@
+/* global PATH_PDF */
 const path = require('path');
 const Sequelize = require('sequelize');
 const moment = require('moment');
 const pdf = require('html-pdf');
 const ejs = require('ejs');
-const app = require('../app');
 const funciones = require('../funciones');
 const enumsPD = require('../enumsPD');
 const models = require('../models');
@@ -11,6 +11,7 @@ const progDocController = require('./progDoc_controller');
 const examenController = require('./examen_controller');
 const actividadParcialController = require('./actividadParcial_controller');
 const cursoController = require('./curso_controller');
+
 
 const op = Sequelize.Op;
 // local
@@ -475,7 +476,7 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
     const borrador = tipoPDF.toLowerCase().includes('draft') ? 'borrador/' : '';
     file = `${progDocController.getAnoPd(pdID)}/${progDocController.getTipoPd(pdID)}/${progDocController.getPlanPd(pdID)}/${progDocController.getVersionPd(pdID)}/${borrador}${file}`;
     // console.log("the fileç: ", file);
-    const ruta = `${app.pathPDF}/pdfs/${file}`;
+    const ruta = `${PATH_PDF}/pdfs/${file}`;
     const configPdfOptions = tipoPDF.toLowerCase().includes('draft') ? configPdfDraft : configPdfCerrado;
     return {
       html, configPdfOptions, ruta, file,

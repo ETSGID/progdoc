@@ -1,6 +1,6 @@
 <%- include ../menus/consultar.ejs %>
 <div class="contenido">
-        <script src="<%=contextPath%>/js/libraries/datepicker.js"></script>
+        <script src="<%=CONTEXT%>/js/libraries/datepicker.js"></script>
         <input type="hidden" value="<%=ano%>" id="anoSeleccionado">
     <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
         <p><%=permisoDenegado%></p>
@@ -506,7 +506,7 @@
                     
                     let fechaFin = null
                     
-                    let url = "<%= contextPath %>/cumplimentar/calendario/eventoGeneral"
+                    let url = "<%= CONTEXT %>/cumplimentar/calendario/eventoGeneral"
                     url += "?evento=" + evento + "&fechaInicio=" + fechaInicio + "&identificador=" + objetoEvento.identificador;
                     $.ajax({
                         type: "POST",
@@ -551,7 +551,7 @@
                     }
 
                     
-                    let url = "<%= contextPath %>/cumplimentar/calendario/eventoGeneral"
+                    let url = "<%= CONTEXT %>/cumplimentar/calendario/eventoGeneral"
                     url += "?evento=" + evento + "&fechaInicio=" + fechaInicio + "&fechaFin=" + fechaFin + "&identificador=" + objetoEvento.identificador;
                     $.ajax({
                         type: "POST",
@@ -631,7 +631,7 @@
                 
                 
 
-                let url = "<%= contextPath %>/cumplimentar/calendario/eventoGeneral"
+                let url = "<%= CONTEXT %>/cumplimentar/calendario/eventoGeneral"
                 url += "?evento=" + nombre + "&identificador=" + evento.identificador + "&fechaInicio=" + fechaInicio;
                 $.ajax({
                     type: "DELETE",
@@ -661,7 +661,7 @@
                 
                 let fechaFin = evento.fechaFin;
 
-                let url = "<%= contextPath %>/cumplimentar/calendario/eventoGeneral"
+                let url = "<%= CONTEXT %>/cumplimentar/calendario/eventoGeneral"
                 url += "?evento=" + nombre + "&identificador=" + evento.identificador + "&fechaInicio=" + fechaInicio;
                 
                 $.ajax({
@@ -687,7 +687,7 @@
         }
         
         function aprobar(ano){
-            let url = "<%= contextPath %>/gestion/calendario/aprobarGeneral"
+            let url = "<%= CONTEXT %>/gestion/calendario/aprobarGeneral"
             url += "?ano=" + ano;
             if(confirm("Una vez aprobado el calendario, los coordinadores de las titulaciones podrán comenzar a adaptarlo. ¿Estás seguro de querer aprobarlo?")){
                 $.ajax({

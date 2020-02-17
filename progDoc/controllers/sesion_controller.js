@@ -1,6 +1,4 @@
-const app = require('../app');
-
-
+/* global CONTEXT */
 // Si se supera el tiempo de inactividad indicado por esta variable,
 // sin que el usuario solicite nuevas paginas, entonces se cerrara
 // la sesion del usuario.
@@ -18,7 +16,7 @@ exports.deleteExpiredUserSession = function (req, res, next) {
   if (req.session.user.expires < Date.now()) { // Caduco
     // la sesión la elimina el cas
     req.session.save(() => {
-      res.redirect(`${app.contextPath}/logout`);
+      res.redirect(`${CONTEXT}/logout`);
     });
   } else { // No caduco. Restaurar la hora de expiracion.
     req.session.user.expires = Date.now() + maxSesionTime;

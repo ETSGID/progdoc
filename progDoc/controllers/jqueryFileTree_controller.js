@@ -1,20 +1,21 @@
 /**
 *jQuery File Tree Node.js Connector
 *https://www.abeautifulsite.net/jquery-file-tree
-*modificado pro javier.conde.diaz@alumnos.upm.es
-*21 May 2014
+*modificado por javier.conde.diaz@alumnos.upm.es
+*17 Feb 2020
 */
+
+/* global PATH_PDF, CONTEXT */
 const fs = require('fs');
-const normalize = require('normalize-path');
 const path = require('path');
-const { pathPDF } = require('../app');
+
 
 // eslint-disable-next-line no-underscore-dangle
 const _getDirList = function (req, res) {
   let dir = path.resolve(req.body.dir); // lo convierte ruta absoluta
   // evito que me accedan a zona restringida, solo se puede entrar a la carpeta acordada
-  if (!dir.includes(normalize(pathPDF))) {
-    dir = path.join(normalize(pathPDF), 'pdfs/');
+  if (!dir.includes(PATH_PDF)) {
+    dir = path.join(PATH_PDF, 'pdfs/');
   } else {
     dir = req.body.dir;
   }
@@ -35,7 +36,7 @@ const _getDirList = function (req, res) {
         }
         r += `<li class="directory collapsed"><a href="#" rel="${ff}/">${f}</a></li>`;
       } else {
-        ff = ff.replace(normalize(pathPDF), normalize(res.locals.contextPath));
+        ff = ff.replace(PATH_PDF, CONTEXT);
         const e = f.split('.')[1];
         r += `<li class="file ext_${e}"><a href="${ff}" rel="${ff}">${f}</a></li>`;
       }

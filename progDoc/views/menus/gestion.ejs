@@ -82,33 +82,33 @@ if (elementPlan){
     pAcronimo = document.getElementById("plan").value
 }
 if(submenu === 'AbrirCerrar'){
-    let url = "<%=contextPath%>/AbrirCerrar"
+    let url = "<%=CONTEXT%>/AbrirCerrar"
     window.location.replace(url);
 }
 
 if (submenu === 'Grupos'){
-let url = "<%=contextPath%>/gestionGrupos/getGrupos?planID="+pAcronimo
+let url = "<%=CONTEXT%>/gestionGrupos/getGrupos?planID="+pAcronimo
 window.location.replace(url);
 } 
 if (submenu === 'Roles'){
-let url = "<%=contextPath%>/gestionRoles"
+let url = "<%=CONTEXT%>/gestionRoles"
 window.location.replace(url);
 }
 
 if (submenu === 'Acronimos'){
-let url = "<%=contextPath%>/gestion/acronimos"
+let url = "<%=CONTEXT%>/gestion/acronimos"
 window.location.replace(url);
 }
 if (submenu === 'Calendario'){
-let url = "<%=contextPath%>/gestion/calendario"
+let url = "<%=CONTEXT%>/gestion/calendario"
 window.location.replace(url);
 }
 if (submenu === 'Planes'){
-let url = "<%=contextPath%>/gestion/planes"
+let url = "<%=CONTEXT%>/gestion/planes"
 window.location.replace(url);
 }
 if (submenu === 'Aulas'){
-let url = "<%=contextPath%>/gestion/aulas"
+let url = "<%=CONTEXT%>/gestion/aulas"
 window.location.replace(url);
 }
 

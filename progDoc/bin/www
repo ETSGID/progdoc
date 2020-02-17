@@ -4,19 +4,25 @@
  * Module dependencies.
  */
 
-require('dotenv').config({ path: './file.env' });
+/* global PATH_PDF */
+require('dotenv').config();
 
 const normalize = require('normalize-path');
 const path = require('path');
 const debug = require('debug')('portalalumno:server');
 const http = require('http');
+// variables de contexto
+global.PATH_PDF = normalize(process.env.PATH_PDF || '/storage/progdoc/');
+// contexto de la aplicacion en el servidor. Lo usa el proxy inverso
+global.CONTEXT = normalize(process.env.CONTEXT || '/pdi/progdoc/');
+global.DEV = process.env.DEV || 'false';
+global.PRUEBAS = process.env.USER_PRUEBAS || 'ejemplo@upm.es';
+global.DOCKER = process.env.DOCKER || 'true';
+
 const app = require('../app');
 const funciones = require('../funciones');
 
-const { local } = app;
-
-
-const ruta = path.join(normalize(process.env.PATH_PDF), 'pdfs', 'files');
+const ruta = path.join(PATH_PDF, 'pdfs', 'files');
 funciones.ensureDirectoryExistence(ruta);
 /**
  * Get port from environment and store in Express.
@@ -24,7 +30,7 @@ funciones.ensureDirectoryExistence(ruta);
 
 
 // eslint-disable-next-line no-use-before-define
-const port = normalizePort(process.env.PORT);
+const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
@@ -33,16 +39,8 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
-// despliegue
-if (local === false) {
-  server.listen(port, '0.0.0.0');
-} else {
-  // local
-  server.listen(port);
-}
+
+server.listen(port);
 
 // eslint-disable-next-line no-use-before-define
 server.on('error', onError);
