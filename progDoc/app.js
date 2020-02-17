@@ -91,7 +91,7 @@ if (DEV === 'true') {
     if (!req.session.user) req.session.user = {};
     // employeetype puede ser un string o un array pq luego se convierte a array
     req.session.user.employeetype = process.env.USER_ROLS || ['F', 'A'];
-    req.session.user.mail = PRUEBAS;
+    req.session.user.mail = process.env.USER_PRUEBAS || 'ejemplo@upm.es';
     req.session.user.uid = 'ejemplo';
     req.session.user.cn = 'FERNANDO FERNANDEZ FERNANDEZ';
     req.session.user.givenname = 'FERNANDO';
@@ -142,8 +142,6 @@ app.use(async (req, res, next) => {
       next(error);
     }
   } else if (!req.session.user.rols) {
-    // probar roles de otras personas
-    // req.session.user.mail = "correo@upm.es"
     try {
       req.session.user.rols = await models.Rol.findAll({
         attributes: ['rol', 'PlanEstudioCodigo', 'DepartamentoCodigo'],

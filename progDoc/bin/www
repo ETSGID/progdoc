@@ -16,7 +16,7 @@ global.PATH_PDF = normalize(process.env.PATH_PDF || '/storage/progdoc/');
 // contexto de la aplicacion en el servidor. Lo usa el proxy inverso
 global.CONTEXT = normalize(process.env.CONTEXT || '/pdi/progdoc/');
 global.DEV = process.env.DEV || 'false';
-global.PRUEBAS = process.env.USER_PRUEBAS || 'ejemplo@upm.es';
+global.PRUEBAS = process.env.PRUEBAS || 'false';
 global.DOCKER = process.env.DOCKER || 'true';
 
 const app = require('../app');
