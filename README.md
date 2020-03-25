@@ -157,8 +157,9 @@ PORT=3000
 DEV=true
 PRUEBAS=false
 DOCKER=false
-USER_PRUEBAS=javier.conde.diaz@alumnos.upm.es
-USER_ROLS=FA
+USER_DEV=javier.conde.diaz@alumnos.upm.es
+USER_DEV_ROLS=FA
+DEBUG=
 ```
 En desarrollo no se utiliza **DOCKER** para la aplicación WEB. Es necesario tener una base de datos **POSTGRESQL** instalada en el entorno o puede usarse un contenedor DOCKER para las bases de datos **exportando** el puerto 5432
 

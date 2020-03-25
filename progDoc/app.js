@@ -91,8 +91,8 @@ if (DEV === 'true') {
   app.use((req, res, next) => {
     if (!req.session.user) req.session.user = {};
     // employeetype puede ser un string o un array pq luego se convierte a array
-    req.session.user.employeetype = process.env.USER_ROLS || ['F', 'A'];
-    req.session.user.mail = process.env.USER_PRUEBAS || 'ejemplo@upm.es';
+    req.session.user.employeetype = process.env.USER_DEV_ROLS || ['F', 'A'];
+    req.session.user.mail = process.env.USER_DEV || 'ejemplo@upm.es';
     req.session.user.uid = 'ejemplo';
     req.session.user.cn = 'FERNANDO FERNANDEZ FERNANDEZ';
     req.session.user.givenname = 'FERNANDO';
