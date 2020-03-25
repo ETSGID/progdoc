@@ -8,20 +8,25 @@ async function getPeople(onlyProfesor) {
   try {
     const profesores2 = await models.Persona.findAll({
       attributes: ['identificador', 'email', 'nombre', 'apellido'],
-      include: [{
-        model: models.Profesor,
-        required,
-      }],
-      raw: true,
+      include: [
+        {
+          model: models.Profesor,
+          required
+        }
+      ],
+      raw: true
     });
-    profesores2.forEach((profesor) => {
+    profesores2.forEach(profesor => {
       const nombre = `${profesor.apellido} ${profesor.nombre}`;
       let nombreCorregido = `${profesor.apellido}, ${profesor.nombre}`;
       nombreCorregido = funciones.primerasMayusc(nombreCorregido);
       const correo = profesor.email;
       const { identificador } = profesor;
       const prof = {
-        nombre, correo, nombreCorregido, identificador,
+        nombre,
+        correo,
+        nombreCorregido,
+        identificador
       };
       profesores.push(prof);
     });
@@ -39,14 +44,16 @@ async function getPersonCorreo(onlyProfesor, correo) {
     const pers = await models.Persona.findOne({
       attributes: ['identificador', 'email', 'nombre', 'apellido'],
       where: {
-        email: correo,
+        email: correo
       },
-      include: [{
-        model: models.Profesor,
-        required,
-      }],
+      include: [
+        {
+          model: models.Profesor,
+          required
+        }
+      ],
 
-      raw: true,
+      raw: true
     });
     if (pers) {
       const nombre = `${pers.apellido} ${pers.nombre}`;
@@ -56,7 +63,10 @@ async function getPersonCorreo(onlyProfesor, correo) {
       correo = pers.email;
       const { identificador } = pers;
       const persona = {
-        nombre, correo, nombreCorregido, identificador,
+        nombre,
+        correo,
+        nombreCorregido,
+        identificador
       };
       return persona;
     }
@@ -69,7 +79,7 @@ async function getPersonCorreo(onlyProfesor, correo) {
 
 // te da las ultimas pds existentes para el plan, tipoPD y ano
 // en caso de pasar la pdIDNoIncluir te obvia esa, se utiliza para el pdf
-exports.getPersonas = async function () {
+exports.getPersonas = async function() {
   // eslint-disable-next-line no-useless-catch
   try {
     const personas = await getPeople(false);
@@ -81,7 +91,7 @@ exports.getPersonas = async function () {
 };
 
 // get profesores
-exports.getProfesores = async function () {
+exports.getProfesores = async function() {
   // eslint-disable-next-line no-useless-catch
   try {
     const profesores = await getPeople(true);
@@ -92,7 +102,7 @@ exports.getProfesores = async function () {
   }
 };
 
-exports.getProfesorCorreo = async function (correo) {
+exports.getProfesorCorreo = async function(correo) {
   // eslint-disable-next-line no-useless-catch
   try {
     const prof = await getPersonCorreo(true, correo);
@@ -103,7 +113,7 @@ exports.getProfesorCorreo = async function (correo) {
   }
 };
 
-exports.getPersonaCorreo = async function (correo) {
+exports.getPersonaCorreo = async function(correo) {
   // eslint-disable-next-line no-useless-catch
   try {
     const person = await getPersonCorreo(false, correo);
@@ -115,7 +125,7 @@ exports.getPersonaCorreo = async function (correo) {
 };
 
 // anadir un profesor o persona
-exports.anadirProfesor = async function (req, res) {
+exports.anadirProfesor = async function(req, res) {
   try {
     let id = '';
     const nuevaPersona = await models.Persona.findOrCreate({
@@ -123,16 +133,14 @@ exports.anadirProfesor = async function (req, res) {
       defaults: {
         email: req.body.email,
         nombre: req.body.nombre.toUpperCase(),
-        apellido: req.body.apellido.toUpperCase(),
-      },
+        apellido: req.body.apellido.toUpperCase()
+      }
     });
     const prof = {};
     prof.ProfesorId = nuevaPersona[0].identificador;
     id = prof.ProfesorId;
     if (req.body.isProfesor === true) {
-      const profesorToAnadir = models.Profesor.build(
-        prof,
-      );
+      const profesorToAnadir = models.Profesor.build(prof);
       await profesorToAnadir.save();
     }
     res.json({ success: true, identificador: id });

@@ -1,33 +1,35 @@
 // Definicion del modelo ActividadParcial:
 
-module.exports = function (sequelize, DataTypes) {
-  const ActividadParcial = sequelize.define('ActividadParcial',
+module.exports = function(sequelize, DataTypes) {
+  const ActividadParcial = sequelize.define(
+    'ActividadParcial',
     {
       identificador: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       },
       horaInicio: {
-        type: DataTypes.TIME,
+        type: DataTypes.TIME
       },
       duracion: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.FLOAT
       },
       descripcion: {
-        type: DataTypes.TEXT,
+        type: DataTypes.TEXT
       },
       fecha: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.DATEONLY
       },
       tipo: {
         type: DataTypes.ENUM('act', 'eval', 'otro'), // tres tipos act: actividad; eval:evaluacion; otr: otro
-        validate: { notEmpty: { msg: 'Falta tipo' } },
-      },
+        validate: { notEmpty: { msg: 'Falta tipo' } }
+      }
     },
     {
-      timestamps: false,
-    });
+      timestamps: false
+    }
+  );
   ActividadParcial.removeAttribute('id');
   return ActividadParcial;
 };

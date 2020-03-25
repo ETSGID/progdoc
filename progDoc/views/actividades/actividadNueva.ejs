@@ -180,6 +180,8 @@ function guardarActividad(id){
                 let parent = li.parentNode;
                 parent.removeChild(li);
                 break;
+            default:
+                break;
         }
         let div = document.createElement('div');
         //se usa getLunesAnteriorPara pq es el que se usa para el identificador de esa fila

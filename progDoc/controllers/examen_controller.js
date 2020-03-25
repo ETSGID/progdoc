@@ -11,41 +11,72 @@ const enumsPD = require('../enumsPD');
 const funciones = require('../funciones');
 const progDocController = require('./progDoc_controller');
 
-
 async function getFranjasExamenes(pdID) {
   // eslint-disable-next-line no-useless-catch
   try {
     const franjasExamen = [];
     const tipo = progDocController.getTipoPd(pdID);
     switch (tipo) {
-    case '1S':
-      franjasExamen.push({ periodo: enumsPD.periodoPD.S1_O, periodoNombre: 'Periodo Ordinario 1º Semestre', franjas: [] });
-      franjasExamen.push({ periodo: enumsPD.periodoPD.S1_E, periodoNombre: 'Periodo Extraordinario 1º Semestre', franjas: [] });
-      break;
-    case '2S':
-      franjasExamen.push({ periodo: enumsPD.periodoPD.S2_O, periodoNombre: 'Periodo Ordinario 2º Semestre', franjas: [] });
-      franjasExamen.push({ periodo: enumsPD.periodoPD.S2_E, periodoNombre: 'Periodo Extraordinario 2º Semestre', franjas: [] });
-      break;
-    case 'I':
-      franjasExamen.push({ periodo: enumsPD.periodoPD.S1_O, periodoNombre: 'Periodo Ordinario 1º Semestre', franjas: [] });
-      franjasExamen.push({ periodo: enumsPD.periodoPD.S1_E, periodoNombre: 'Periodo Extraordinario 1º Semestre', franjas: [] });
-      franjasExamen.push({ periodo: enumsPD.periodoPD.S2_O, periodoNombre: 'Periodo Ordinario 2º Semestre', franjas: [] });
-      franjasExamen.push({ periodo: enumsPD.periodoPD.S2_E, periodoNombre: 'Periodo Extraordinario 2º Semestre', franjas: [] });
-      break;
-    default:
-      break;
+      case '1S':
+        franjasExamen.push({
+          periodo: enumsPD.periodoPD.S1_O,
+          periodoNombre: 'Periodo Ordinario 1º Semestre',
+          franjas: []
+        });
+        franjasExamen.push({
+          periodo: enumsPD.periodoPD.S1_E,
+          periodoNombre: 'Periodo Extraordinario 1º Semestre',
+          franjas: []
+        });
+        break;
+      case '2S':
+        franjasExamen.push({
+          periodo: enumsPD.periodoPD.S2_O,
+          periodoNombre: 'Periodo Ordinario 2º Semestre',
+          franjas: []
+        });
+        franjasExamen.push({
+          periodo: enumsPD.periodoPD.S2_E,
+          periodoNombre: 'Periodo Extraordinario 2º Semestre',
+          franjas: []
+        });
+        break;
+      case 'I':
+        franjasExamen.push({
+          periodo: enumsPD.periodoPD.S1_O,
+          periodoNombre: 'Periodo Ordinario 1º Semestre',
+          franjas: []
+        });
+        franjasExamen.push({
+          periodo: enumsPD.periodoPD.S1_E,
+          periodoNombre: 'Periodo Extraordinario 1º Semestre',
+          franjas: []
+        });
+        franjasExamen.push({
+          periodo: enumsPD.periodoPD.S2_O,
+          periodoNombre: 'Periodo Ordinario 2º Semestre',
+          franjas: []
+        });
+        franjasExamen.push({
+          periodo: enumsPD.periodoPD.S2_E,
+          periodoNombre: 'Periodo Extraordinario 2º Semestre',
+          franjas: []
+        });
+        break;
+      default:
+        break;
     }
     const franjas = await models.FranjaExamen.findAll({
       where: {
-        ProgramacionDocenteId: pdID,
+        ProgramacionDocenteId: pdID
       },
       order: [
         [Sequelize.literal('"FranjaExamen"."periodo"'), 'ASC'],
-        [Sequelize.literal('"FranjaExamen"."horaInicio"'), 'ASC'],
-      ],
+        [Sequelize.literal('"FranjaExamen"."horaInicio"'), 'ASC']
+      ]
     });
-    franjas.forEach((franja) => {
-      const f = franjasExamen.find((obj) => obj.periodo === franja.periodo);
+    franjas.forEach(franja => {
+      const f = franjasExamen.find(obj => obj.periodo === franja.periodo);
       // si la franja no está la añado
       if (f) {
         f.franjas.push(franja);
@@ -59,7 +90,7 @@ async function getFranjasExamenes(pdID) {
 }
 
 // funcion que devuelve las franjas de examenes pasandole la pdID
-exports.getFranjas = async function (req, res, next) {
+exports.getFranjas = async function(req, res, next) {
   if (req.session.pdID) {
     try {
       const franjasExamen = await getFranjasExamenes(req.session.pdID);
@@ -74,35 +105,63 @@ exports.getFranjas = async function (req, res, next) {
   }
 };
 
-
 // eslint-disable-next-line consistent-return
-exports.getExamenes = async function (req, res, next) {
+exports.getExamenes = async function(req, res, next) {
   const asignacionsExamen = []; // asignaciones existentes
   if (req.session.pdID) {
     try {
       const { pdID } = req.session;
-      const anoFinal = 2000 + Number(`${pdID.split('_')[2][4]}${pdID.split('_')[2][5]}`);
+      const anoFinal =
+        2000 + Number(`${pdID.split('_')[2][4]}${pdID.split('_')[2][5]}`);
       switch (progDocController.getTipoPd(req.session.pdID)) {
-      case 'I':
-        asignacionsExamen.push({ periodo: enumsPD.periodoPD.S1_O, periodoNombre: `Periodo Ordinario 1º Semestre (Enero ${anoFinal})`, asignaturas: [] });
-        asignacionsExamen.push({
-          periodo: enumsPD.periodoPD.S1_E, periodoNombre: `Periodo Extraordinario 1º Semestre (Julio ${anoFinal})`, asignaturas: [],
-        });
-        asignacionsExamen.push({ periodo: enumsPD.periodoPD.S2_O, periodoNombre: `Periodo Ordinario 2º Semestre  (Junio ${anoFinal})`, asignaturas: [] });
-        asignacionsExamen.push({ periodo: enumsPD.periodoPD.S2_E, periodoNombre: `Periodo Extraordinario 2º Semestre (Julio ${anoFinal})`, asignaturas: [] });
-        break;
-      case '1S':
-        asignacionsExamen.push({ periodo: enumsPD.periodoPD.S1_O, periodoNombre: `Periodo Ordinario 1º Semestre (Enero ${anoFinal})`, asignaturas: [] });
-        asignacionsExamen.push({
-          periodo: enumsPD.periodoPD.S1_E, periodoNombre: `Periodo Extraordinario 1º Semestre (Julio ${anoFinal})`, asignaturas: [],
-        });
-        break;
-      case '2S':
-        asignacionsExamen.push({ periodo: enumsPD.periodoPD.S2_O, periodoNombre: `Periodo Ordinario 2º Semestre  (Junio ${anoFinal})`, asignaturas: [] });
-        asignacionsExamen.push({ periodo: enumsPD.periodoPD.S2_E, periodoNombre: `Periodo Extraordinario 2º Semestre (Julio ${anoFinal})`, asignaturas: [] });
-        break;
-      default:
-        break;
+        case 'I':
+          asignacionsExamen.push({
+            periodo: enumsPD.periodoPD.S1_O,
+            periodoNombre: `Periodo Ordinario 1º Semestre (Enero ${anoFinal})`,
+            asignaturas: []
+          });
+          asignacionsExamen.push({
+            periodo: enumsPD.periodoPD.S1_E,
+            periodoNombre: `Periodo Extraordinario 1º Semestre (Julio ${anoFinal})`,
+            asignaturas: []
+          });
+          asignacionsExamen.push({
+            periodo: enumsPD.periodoPD.S2_O,
+            periodoNombre: `Periodo Ordinario 2º Semestre  (Junio ${anoFinal})`,
+            asignaturas: []
+          });
+          asignacionsExamen.push({
+            periodo: enumsPD.periodoPD.S2_E,
+            periodoNombre: `Periodo Extraordinario 2º Semestre (Julio ${anoFinal})`,
+            asignaturas: []
+          });
+          break;
+        case '1S':
+          asignacionsExamen.push({
+            periodo: enumsPD.periodoPD.S1_O,
+            periodoNombre: `Periodo Ordinario 1º Semestre (Enero ${anoFinal})`,
+            asignaturas: []
+          });
+          asignacionsExamen.push({
+            periodo: enumsPD.periodoPD.S1_E,
+            periodoNombre: `Periodo Extraordinario 1º Semestre (Julio ${anoFinal})`,
+            asignaturas: []
+          });
+          break;
+        case '2S':
+          asignacionsExamen.push({
+            periodo: enumsPD.periodoPD.S2_O,
+            periodoNombre: `Periodo Ordinario 2º Semestre  (Junio ${anoFinal})`,
+            asignaturas: []
+          });
+          asignacionsExamen.push({
+            periodo: enumsPD.periodoPD.S2_E,
+            periodoNombre: `Periodo Extraordinario 2º Semestre (Julio ${anoFinal})`,
+            asignaturas: []
+          });
+          break;
+        default:
+          break;
       }
       const cursos = []; // array con los cursos por separado
       /*
@@ -110,11 +169,17 @@ exports.getExamenes = async function (req, res, next) {
       Arriba comprobé que existe el departamento en la pos 0.
       */
       let departamentoID;
-      if (res.locals.departamentosResponsables && res.locals.departamentosResponsables.length > 0) {
+      if (
+        res.locals.departamentosResponsables &&
+        res.locals.departamentosResponsables.length > 0
+      ) {
         departamentoID = req.session.departamentoID
-          ? req.session.departamentoID : res.locals.departamentosResponsables[0].codigo;
+          ? req.session.departamentoID
+          : res.locals.departamentosResponsables[0].codigo;
       } else {
-        departamentoID = req.session.departamentoID ? req.session.departamentoID : null;
+        departamentoID = req.session.departamentoID
+          ? req.session.departamentoID
+          : null;
       }
       // si no estaba inicializada la inicializo.
       req.session.departamentoID = departamentoID;
@@ -129,33 +194,44 @@ exports.getExamenes = async function (req, res, next) {
           where: {
             ProgramacionDocenteIdentificador,
             DepartamentoResponsable: {
-              [op.ne]: null,
-            },
+              [op.ne]: null
+            }
           },
-          attributes: ['acronimo', 'curso', 'identificador', 'nombre', 'semestre', 'codigo', 'DepartamentoResponsable'],
+          attributes: [
+            'acronimo',
+            'curso',
+            'identificador',
+            'nombre',
+            'semestre',
+            'codigo',
+            'DepartamentoResponsable'
+          ],
           order: [
-
             [Sequelize.literal('"Asignatura"."curso"'), 'ASC'],
-            [Sequelize.literal('"Examens.periodo"'), 'ASC'],
+            [Sequelize.literal('"Examens.periodo"'), 'ASC']
           ],
           raw: true,
-          include: [{
-            // left join
-            model: models.Examen,
-            required: false,
-          }],
+          include: [
+            {
+              // left join
+              model: models.Examen,
+              required: false
+            }
+          ]
         });
-        asignaturaConExamens.forEach((asignaturaConExamen) => {
-          let c = cursos.find((obj) => obj === asignaturaConExamen.curso);
+        asignaturaConExamens.forEach(asignaturaConExamen => {
+          let c = cursos.find(obj => obj === asignaturaConExamen.curso);
           // si el curso no está lo añado
           if (!c) {
             cursos.push(asignaturaConExamen.curso);
-            c = cursos.find((obj) => obj === asignaturaConExamen.curso);
+            c = cursos.find(obj => obj === asignaturaConExamen.curso);
           }
           function buscarOCrear(asignatura, periodo) {
-            const p = asignacionsExamen.find((obj) => obj.periodo === periodo);
+            const p = asignacionsExamen.find(obj => obj.periodo === periodo);
             if (p) {
-              const asign = p.asignaturas.find((x) => x.identificador === asignatura.identificador);
+              const asign = p.asignaturas.find(
+                x => x.identificador === asignatura.identificador
+              );
               if (!asign) {
                 const a = {};
                 a.acronimo = asignatura.acronimo;
@@ -178,45 +254,49 @@ exports.getExamenes = async function (req, res, next) {
           }
           // busco si la asignatura está en los periodos que debería y si no está la añado.
           switch (asignaturaConExamen.semestre) {
-          case '1S':
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_O);
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_E);
-            break;
-          case '2S':
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_O);
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_E);
-            break;
-          case '1S-2S':
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_O);
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_E);
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_O);
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_E);
-            break;
-          case 'A':
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_O);
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_E);
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_O);
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_E);
-            break;
-          case 'I':
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_O);
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_E);
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_O);
-            buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_E);
-            break;
-          default:
-            break;
+            case '1S':
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_O);
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_E);
+              break;
+            case '2S':
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_O);
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_E);
+              break;
+            case '1S-2S':
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_O);
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_E);
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_O);
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_E);
+              break;
+            case 'A':
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_O);
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_E);
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_O);
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_E);
+              break;
+            case 'I':
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_O);
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S1_E);
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_O);
+              buscarOCrear(asignaturaConExamen, enumsPD.periodoPD.S2_E);
+              break;
+            default:
+              break;
           }
           const periodoExamen = asignaturaConExamen['Examens.periodo'];
-          const p = asignacionsExamen.find((obj) => obj.periodo === periodoExamen);
+          const p = asignacionsExamen.find(
+            obj => obj.periodo === periodoExamen
+          );
           if (p) {
             const asign = p.asignaturas.find(
-              (x) => x.identificador === asignaturaConExamen.identificador,
+              x => x.identificador === asignaturaConExamen.identificador
             );
             if (asign) {
-              asign.examen.identificador = asignaturaConExamen['Examens.identificador'];
+              asign.examen.identificador =
+                asignaturaConExamen['Examens.identificador'];
               asign.examen.fecha = asignaturaConExamen['Examens.fecha'];
-              asign.examen.horaInicio = asignaturaConExamen['Examens.horaInicio'];
+              asign.examen.horaInicio =
+                asignaturaConExamen['Examens.horaInicio'];
               asign.examen.duracion = asignaturaConExamen['Examens.duracion'];
               asign.examen.aulas = asignaturaConExamen['Examens.aulas'];
             }
@@ -235,14 +315,15 @@ exports.getExamenes = async function (req, res, next) {
   }
 };
 
-
-exports.getExamenesView = function (req, res) {
+exports.getExamenesView = function(req, res) {
   req.session.submenu = 'Examenes';
   /* si no hay progDoc o no hay departamentosResponsables de dicha progDoc.
   Ojo también comprueba que no esté en incidencia para el JE
   */
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.originalUrl.toLowerCase().includes('consultar') ? 'examenes/examenesConsultar' : 'examenes/examenesCumplimentar';
+    const view = req.originalUrl.toLowerCase().includes('consultar')
+      ? 'examenes/examenesConsultar'
+      : 'examenes/examenesCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado,
@@ -257,41 +338,41 @@ exports.getExamenesView = function (req, res) {
       cursos: null,
       pdID: null,
       estadosProgDoc: null,
-      estadoProgDoc: null,
+      estadoProgDoc: null
     });
   } else {
     const cancelarpath = `${req.baseUrl}/coordinador/examenes?planID=${req.session.planID}`;
     const selectExamenespath = `${req.baseUrl}/coordinador/franjasexamenes?planID=${req.session.planID}`;
     const nuevopath = `${req.baseUrl}/coordinador/guardarExamenes`;
-    const view = req.originalUrl.toLowerCase().includes('consultar') ? 'examenes/examenesConsultar' : 'examenes/examenesCumplimentar';
-    res.render(view,
-      {
-        asignacionsExamen: res.locals.asignacionsExamen,
-        franjasExamen: res.locals.franjasExamen,
-        periodosExamen: enumsPD.periodoPD,
-        nuevopath,
-        aprobarpath: `${req.baseUrl}/coordiandor/aprobarExamenes`,
-        selectExamenespath,
-        cancelarpath,
-        planID: req.session.planID,
-        pdID: req.session.pdID,
-        cursos: res.locals.cursos,
-        menu: req.session.menu,
-        submenu: req.session.submenu,
-        permisoDenegado: res.locals.permisoDenegado,
-        estadosExamen: estados.estadoExamen,
-        estadosProgDoc: estados.estadoProgDoc,
-        estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
-        estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
-        departamentoID: req.session.departamentoID,
-        planEstudios: res.locals.planEstudios,
-      });
+    const view = req.originalUrl.toLowerCase().includes('consultar')
+      ? 'examenes/examenesConsultar'
+      : 'examenes/examenesCumplimentar';
+    res.render(view, {
+      asignacionsExamen: res.locals.asignacionsExamen,
+      franjasExamen: res.locals.franjasExamen,
+      periodosExamen: enumsPD.periodoPD,
+      nuevopath,
+      aprobarpath: `${req.baseUrl}/coordiandor/aprobarExamenes`,
+      selectExamenespath,
+      cancelarpath,
+      planID: req.session.planID,
+      pdID: req.session.pdID,
+      cursos: res.locals.cursos,
+      menu: req.session.menu,
+      submenu: req.session.submenu,
+      permisoDenegado: res.locals.permisoDenegado,
+      estadosExamen: estados.estadoExamen,
+      estadosProgDoc: estados.estadoProgDoc,
+      estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
+      estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
+      departamentoID: req.session.departamentoID,
+      planEstudios: res.locals.planEstudios
+    });
   }
 };
 
-
 // GET /respDoc/:pdID/Examenes
-exports.getFranjasView = function (req, res) {
+exports.getFranjasView = function(req, res) {
   req.session.submenu = 'Examenes2';
   const view = 'examenes/franjasExamenesCumplimentar';
   /*
@@ -309,36 +390,34 @@ exports.getFranjasView = function (req, res) {
       planEstudios: res.locals.planEstudios,
       franjasExamen: null,
       periodosExamen: null,
-      pdID: null,
+      pdID: null
     });
   } else {
     const cancelarpath = `${req.baseUrl}/coordinador/franjasexamenes?planID=${req.session.planID}`;
     const nuevopath = `${req.baseUrl}/coordinador/guardarFranjasExamenes`;
     const selectExamenespath = `${req.baseUrl}/coordinador/examenes?planID=${req.session.planID}`;
-    res.render(view,
-      {
-        franjasExamen: res.locals.franjasExamen,
-        periodosExamen: enumsPD.periodoPD,
-        nuevopath,
-        selectExamenespath,
-        cancelarpath,
-        planID: req.session.planID,
-        pdID: req.session.pdID,
-        menu: req.session.menu,
-        submenu: req.session.submenu,
-        permisoDenegado: res.locals.permisoDenegado,
-        estadosExamen: estados.estadoExamen,
-        estadosProgDoc: estados.estadoProgDoc,
-        estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
-        estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
-        departamentoID: req.session.departamentoID,
-        planEstudios: res.locals.planEstudios,
-      });
+    res.render(view, {
+      franjasExamen: res.locals.franjasExamen,
+      periodosExamen: enumsPD.periodoPD,
+      nuevopath,
+      selectExamenespath,
+      cancelarpath,
+      planID: req.session.planID,
+      pdID: req.session.pdID,
+      menu: req.session.menu,
+      submenu: req.session.submenu,
+      permisoDenegado: res.locals.permisoDenegado,
+      estadosExamen: estados.estadoExamen,
+      estadosProgDoc: estados.estadoProgDoc,
+      estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
+      estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
+      departamentoID: req.session.departamentoID,
+      planEstudios: res.locals.planEstudios
+    });
   }
 };
 
-
-exports.guardarExamenes = async function (req, res, next) {
+exports.guardarExamenes = async function(req, res, next) {
   const whereEliminar = {};
   const { pdID } = req.session;
   const promises = [];
@@ -348,25 +427,25 @@ exports.guardarExamenes = async function (req, res, next) {
       let toActualizar = req.body.actualizar;
       let toEliminar = req.body.eliminar;
       const queryToAnadir = [];
-      const as = await models.Asignatura.findAll(
-        {
-          where: {
-            ProgramacionDocenteIdentificador: pdID,
-          },
-          attributes: ['identificador'],
-          include: [{
+      const as = await models.Asignatura.findAll({
+        where: {
+          ProgramacionDocenteIdentificador: pdID
+        },
+        attributes: ['identificador'],
+        include: [
+          {
             model: models.Examen,
             // left join
-            required: false,
-          }],
-          raw: true,
-        },
-      );
+            required: false
+          }
+        ],
+        raw: true
+      });
       if (toAnadir) {
         if (!Array.isArray(toAnadir)) {
           toAnadir = [toAnadir];
         }
-        toAnadir.forEach((element) => {
+        toAnadir.forEach(element => {
           const nuevaEntrada = {};
           const hora = req.body[`hora_${element}`];
           let minutos = req.body[`minutos_${element}`];
@@ -374,14 +453,18 @@ exports.guardarExamenes = async function (req, res, next) {
           nuevaEntrada.AsignaturaIdentificador = Number(element.split('_')[0]);
           // eslint-disable-next-line prefer-destructuring
           nuevaEntrada.periodo = element.split('_')[2];
-          nuevaEntrada.fecha = moment(req.body[`date_${element}`], 'DD/MM/YYYY');
+          nuevaEntrada.fecha = moment(
+            req.body[`date_${element}`],
+            'DD/MM/YYYY'
+          );
           if (hora && minutos) {
             nuevaEntrada.horaInicio = `${hora}:${minutos}`;
           }
           nuevaEntrada.duracion = Number(req.body[`duracion_${element}`]);
           const asig = as.find(
-            (obj) => (nuevaEntrada.AsignaturaIdentificador
-              && obj.identificador === nuevaEntrada.AsignaturaIdentificador),
+            obj =>
+              nuevaEntrada.AsignaturaIdentificador &&
+              obj.identificador === nuevaEntrada.AsignaturaIdentificador
           );
           if (!asig) {
             console.log('Quiere añadir un examen que no es suyo');
@@ -389,34 +472,40 @@ exports.guardarExamenes = async function (req, res, next) {
             queryToAnadir.push(nuevaEntrada);
           }
         });
-        const promise1 = models.Examen.bulkCreate(
-          queryToAnadir,
-        );
+        const promise1 = models.Examen.bulkCreate(queryToAnadir);
         promises.push(promise1);
       }
       if (toActualizar) {
         if (!Array.isArray(toActualizar)) {
           toActualizar = [toActualizar];
         }
-        toActualizar.forEach((element) => {
+        toActualizar.forEach(element => {
           const nuevaEntrada = {};
           const hora = req.body[`hora_${element}`];
           let minutos = req.body[`minutos_${element}`];
           if (!minutos) minutos = '00';
           const identificador = Number(element.split('_')[1]);
-          nuevaEntrada.fecha = moment(req.body[`date_${element}`], 'DD/MM/YYYY');
+          nuevaEntrada.fecha = moment(
+            req.body[`date_${element}`],
+            'DD/MM/YYYY'
+          );
           if (hora && minutos) {
             nuevaEntrada.horaInicio = `${hora}:${minutos}`;
           }
           nuevaEntrada.duracion = Number(req.body[`duracion_${element}`]);
-          const asig = as.find((obj) => (identificador && obj['Examens.identificador'] === identificador));
+          const asig = as.find(
+            obj =>
+              identificador && obj['Examens.identificador'] === identificador
+          );
           if (!asig) {
             console.log('Quiere actulaizar un examen que no es suyo');
           } else {
-            promises.push(models.Examen.update(
-              nuevaEntrada, /* set attributes' value */
-              { where: { identificador } }, /* where criteria */
-            ));
+            promises.push(
+              models.Examen.update(
+                nuevaEntrada /* set attributes' value */,
+                { where: { identificador } } /* where criteria */
+              )
+            );
           }
         });
       }
@@ -425,13 +514,15 @@ exports.guardarExamenes = async function (req, res, next) {
           toEliminar = [toEliminar];
         }
         whereEliminar.identificador = [];
-        toEliminar.forEach((element) => {
+        toEliminar.forEach(element => {
           const identificador = Number(element.split('_')[1]);
           whereEliminar.identificador.push(identificador);
         });
-        if (funciones.isEmpty(whereEliminar)) { whereEliminar.identificador = 'Identificador erróneo'; }
+        if (funciones.isEmpty(whereEliminar)) {
+          whereEliminar.identificador = 'Identificador erróneo';
+        }
         const promise1 = models.Examen.destroy({
-          where: whereEliminar,
+          where: whereEliminar
         });
         promises.push(promise1);
       }
@@ -446,7 +537,7 @@ exports.guardarExamenes = async function (req, res, next) {
   }
 };
 
-exports.guardarFranjasExamenes = async function (req, res, next) {
+exports.guardarFranjasExamenes = async function(req, res, next) {
   const whereEliminar = {};
   const { pdID } = req.session;
   const promises = [];
@@ -460,7 +551,7 @@ exports.guardarFranjasExamenes = async function (req, res, next) {
         if (!Array.isArray(toAnadir)) {
           toAnadir = [toAnadir];
         }
-        toAnadir.forEach((element) => {
+        toAnadir.forEach(element => {
           const nuevaEntrada = {};
           const identificador = element.split('_')[0];
           const hora = req.body[`${identificador}_hora`];
@@ -475,16 +566,14 @@ exports.guardarFranjasExamenes = async function (req, res, next) {
           nuevaEntrada.duracion = Number(req.body[`${identificador}_duracion`]);
           queryToAnadir.push(nuevaEntrada);
         });
-        const promise1 = models.FranjaExamen.bulkCreate(
-          queryToAnadir,
-        );
+        const promise1 = models.FranjaExamen.bulkCreate(queryToAnadir);
         promises.push(promise1);
       }
       if (toActualizar) {
         if (!Array.isArray(toActualizar)) {
           toActualizar = [toActualizar];
         }
-        toActualizar.forEach((element) => {
+        toActualizar.forEach(element => {
           const nuevaEntrada = {};
           const identificador = element.split('_')[0];
           const hora = req.body[`${identificador}_hora`];
@@ -497,10 +586,12 @@ exports.guardarFranjasExamenes = async function (req, res, next) {
             nuevaEntrada.horaInicio = `${hora}:${minutos}`;
           }
           nuevaEntrada.duracion = Number(req.body[`${identificador}_duracion`]);
-          promises.push(models.FranjaExamen.update(
-            nuevaEntrada, /* set attributes' value */
-            { where: { identificador } }, /* where criteria */
-          ));
+          promises.push(
+            models.FranjaExamen.update(
+              nuevaEntrada /* set attributes' value */,
+              { where: { identificador } } /* where criteria */
+            )
+          );
         });
       }
       if (toEliminar) {
@@ -508,13 +599,15 @@ exports.guardarFranjasExamenes = async function (req, res, next) {
           toEliminar = [toEliminar];
         }
         whereEliminar.identificador = [];
-        toEliminar.forEach((element) => {
+        toEliminar.forEach(element => {
           const identificador = Number(element.split('_')[0]);
           whereEliminar.identificador.push(identificador);
         });
-        if (funciones.isEmpty(whereEliminar)) { whereEliminar.identificador = 'Identificador erróneo'; }
+        if (funciones.isEmpty(whereEliminar)) {
+          whereEliminar.identificador = 'Identificador erróneo';
+        }
         const promise1 = models.FranjaExamen.destroy({
-          where: whereEliminar,
+          where: whereEliminar
         });
         promises.push(promise1);
       }
@@ -534,34 +627,39 @@ exports.guardarFranjasExamenes = async function (req, res, next) {
 };
 
 // get
-exports.reenviarExamenes = function (req, res) {
+exports.reenviarExamenes = function(req, res) {
   req.session.save(() => {
-    res.redirect(`${req.baseUrl}/coordinador/examenes?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`);
+    res.redirect(
+      `${req.baseUrl}/coordinador/examenes?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
+    );
   });
 };
 
 // post
-exports.aprobarExamenes = async function (req, res, next) {
+exports.aprobarExamenes = async function(req, res, next) {
   const { pdID } = req.session;
   const date = new Date();
   let estadoExamenes;
   try {
-    const pd = await models.ProgramacionDocente.findOne({ where: { identificador: pdID }, attributes: ['estadoExamenes'] });
+    const pd = await models.ProgramacionDocente.findOne({
+      where: { identificador: pdID },
+      attributes: ['estadoExamenes']
+    });
     estadoExamenes = pd.estadoExamenes;
     if (!res.locals.permisoDenegado) {
       switch (estadoExamenes) {
-      case (estados.estadoExamen.abierto):
-        estadoExamenes = estados.estadoExamen.aprobadoCoordinador;
-        break;
-      default:
-        break;
+        case estados.estadoExamen.abierto:
+          estadoExamenes = estados.estadoExamen.aprobadoCoordinador;
+          break;
+        default:
+          break;
       }
       await models.ProgramacionDocente.update(
         {
           estadoExamenes,
-          fechaHorarios: date,
-        }, /* set attributes' value */
-        { where: { identificador: pdID } }, /* where criteria */
+          fechaHorarios: date
+        } /* set attributes' value */,
+        { where: { identificador: pdID } } /* where criteria */
       );
 
       progDocController.isPDLista(pdID, next());
@@ -576,15 +674,26 @@ exports.aprobarExamenes = async function (req, res, next) {
   }
 };
 
-
-exports.generateCsvExamens = async function (req, res, next) {
+exports.generateCsvExamens = async function(req, res, next) {
   try {
-    const pd = await models.ProgramacionDocente.findOne({ where: { identificador: req.session.pdID }, attributes: ['estadoProGDoc', 'estadoExamenes'] });
+    const pd = await models.ProgramacionDocente.findOne({
+      where: { identificador: req.session.pdID },
+      attributes: ['estadoProGDoc', 'estadoExamenes']
+    });
     const { estadoExamenes } = pd;
     // solo se genera el pdf si se tiene permiso
     if (!res.locals.permisoDenegado) {
       let acronimoOIdPlan = progDocController.getPlanPd(req.session.pdID);
-      const fields = ['codigo', 'titulacion', 'curso', 'dia', 'hora de comienzo', 'hora finalizacion', 'asignatura', 'departamento responsable'];
+      const fields = [
+        'codigo',
+        'titulacion',
+        'curso',
+        'dia',
+        'hora de comienzo',
+        'hora finalizacion',
+        'asignatura',
+        'departamento responsable'
+      ];
       const opts = { fields };
       let data = [];
       const ano = progDocController.getAnoPd(req.session.pdID);
@@ -593,20 +702,29 @@ exports.generateCsvExamens = async function (req, res, next) {
         acronimoOIdPlan = progDocController.getPlanPd(req.session.pdID);
       }
       if (res.locals.asignacionsExamen) {
-        res.locals.asignacionsExamen.forEach((asignacions) => {
+        res.locals.asignacionsExamen.forEach(asignacions => {
           data = [];
-          asignacions.asignaturas.forEach((ex) => {
+          asignacions.asignaturas.forEach(ex => {
             // eslint-disable-next-line no-param-reassign
             ex.titulacion = acronimoOIdPlan;
             // eslint-disable-next-line no-param-reassign
             ex.dia = ex.examen.fecha;
             if (moment(ex.examen.horaInicio, 'HH:mm:ss').isValid()) {
               // eslint-disable-next-line no-param-reassign
-              ex['hora de comienzo'] = moment(ex.examen.horaInicio, 'HH:mm:ss').format('HH:mm');
+              ex['hora de comienzo'] = moment(
+                ex.examen.horaInicio,
+                'HH:mm:ss'
+              ).format('HH:mm');
             }
-            if (moment(ex.examen.horaInicio, 'HH:mm:ss').add(ex.examen.duracion).isValid()) {
+            if (
+              moment(ex.examen.horaInicio, 'HH:mm:ss')
+                .add(ex.examen.duracion)
+                .isValid()
+            ) {
               // eslint-disable-next-line no-param-reassign
-              ex['hora finalizacion'] = moment(ex.examen.horaInicio, 'HH:mm:ss').add(ex.examen.duracion, 'm').format('HH:mm');
+              ex['hora finalizacion'] = moment(ex.examen.horaInicio, 'HH:mm:ss')
+                .add(ex.examen.duracion, 'm')
+                .format('HH:mm');
             }
             // eslint-disable-next-line no-param-reassign
             ex.asignatura = ex.nombre;
@@ -622,12 +740,23 @@ exports.generateCsvExamens = async function (req, res, next) {
             folder = '/borrador/';
             folder2 = '_borrador';
           }
-          const dir = `${PATH_PDF}/pdfs/${progDocController.getAnoPd(req.session.pdID)}/${progDocController.getTipoPd(req.session.pdID)}/${progDocController.getPlanPd(req.session.pdID)}/${progDocController.getVersionPd(req.session.pdID)}${folder}`;
-          const ruta = `${dir + acronimoOIdPlan}_${ano}_${asignacions.periodo}_${progDocController.getVersionPd(req.session.pdID)}${folder2}.csv`;
+          const dir = `${PATH_PDF}/pdfs/${progDocController.getAnoPd(
+            req.session.pdID
+          )}/${progDocController.getTipoPd(
+            req.session.pdID
+          )}/${progDocController.getPlanPd(
+            req.session.pdID
+          )}/${progDocController.getVersionPd(req.session.pdID)}${folder}`;
+          const fileName = `${acronimoOIdPlan}_${ano}_${
+            asignacions.periodo
+          }_${progDocController.getVersionPd(req.session.pdID)}${folder2}.csv`;
+          const ruta = dir + fileName;
           funciones.ensureDirectoryExistence(ruta);
           const csv = json2csv(data, opts);
-          fs.writeFile(ruta, csv, (err) => {
-            if (err) throw err;
+          fs.writeFile(ruta, csv, err => {
+            if (err) {
+              console.log(err);
+            }
           });
         });
         next();
@@ -648,7 +777,7 @@ exports.generateCsvExamens = async function (req, res, next) {
 function isExamenInFranjas(examen, franjas) {
   const duracion = +examen.duracion;
   const horaInicial = moment.duration(examen.horaInicio);
-  const horaFinal = (moment.duration(horaInicial).add(duracion, 'm'));
+  const horaFinal = moment.duration(horaInicial).add(duracion, 'm');
   if (franjas.length === 0) {
     // en este caso no hay franjas
     return false;
@@ -656,8 +785,12 @@ function isExamenInFranjas(examen, franjas) {
   for (let i = 0; i < franjas.length; i++) {
     // encaja con un examen si la horaInicial es posterior o igual a la hora inicial de la period
     // y la hora final es anterior o igual a la hora de la period
-    if ((horaInicial - moment.duration(franjas[i].horaInicio) >= 0)
-            && (horaFinal - moment.duration(franjas[i].horaInicio).add(franjas[i].duracion, 'm') <= 0)) {
+    if (
+      horaInicial - moment.duration(franjas[i].horaInicio) >= 0 &&
+      horaFinal -
+        moment.duration(franjas[i].horaInicio).add(franjas[i].duracion, 'm') <=
+        0
+    ) {
       return i + 1;
     }
   }

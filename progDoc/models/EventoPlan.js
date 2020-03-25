@@ -1,29 +1,29 @@
-
-module.exports = function (sequelize, DataTypes) {
-  const EventoPlan = sequelize.define('EventoPlan',
+module.exports = function(sequelize, DataTypes) {
+  const EventoPlan = sequelize.define(
+    'EventoPlan',
     {
       identificador: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       },
       evento: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING
       },
       color: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING
       },
       fechaInicio: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.DATEONLY
       },
       fechaFin: {
-        type: DataTypes.DATEONLY,
-      },
-
+        type: DataTypes.DATEONLY
+      }
     },
     {
-      timestamps: false,
-    });
+      timestamps: false
+    }
+  );
   EventoPlan.removeAttribute('id');
   return EventoPlan;
 };

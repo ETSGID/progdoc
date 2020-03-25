@@ -9,8 +9,9 @@ const funciones = require('../funciones');
 borra todos las programaciones docentes con errores que no deberia haberlas
 y lo relacionado con las mismas
 */
-const borrarPdsWithErrores = async function () {
-  await models.sequelize.query(`DELETE FROM public."ProgramacionDocentes" p  WHERE p."estadoProGDoc" = -1; 
+const borrarPdsWithErrores = async function() {
+  await models.sequelize
+    .query(`DELETE FROM public."ProgramacionDocentes" p  WHERE p."estadoProGDoc" = -1; 
         DELETE FROM public."Grupos" g WHERE g."ProgramacionDocenteId" is null; 
         DELETE FROM public."Asignaturas" asign WHERE asign."ProgramacionDocenteIdentificador" is null; 
         DELETE FROM public."AsignacionProfesors" a WHERE a."GrupoId" is null;
@@ -20,7 +21,7 @@ const borrarPdsWithErrores = async function () {
         DELETE FROM public."ActividadParcials" act WHERE act."ConjuntoActividadParcialId" is null;`);
 };
 
-exports.gestionProgDoc = async function (req, res, next) {
+exports.gestionProgDoc = async function(req, res, next) {
   req.session.submenu = 'AbrirCerrar';
   let pds = [];
   /*
@@ -39,12 +40,14 @@ exports.gestionProgDoc = async function (req, res, next) {
         [Sequelize.literal('"PlanEstudioId"'), 'DESC'],
         [Sequelize.literal('"anoAcademico"'), 'DESC'],
         [Sequelize.literal('semestre'), 'DESC'],
-        [Sequelize.literal('version'), 'DESC'],
+        [Sequelize.literal('version'), 'DESC']
       ],
-      raw: true,
+      raw: true
     });
-    pdsBBDD.forEach((pdBBDD) => {
-      const existentePD = pds.find((obj) => obj.PlanEstudioId === pdBBDD.PlanEstudioId);
+    pdsBBDD.forEach(pdBBDD => {
+      const existentePD = pds.find(
+        obj => obj.PlanEstudioId === pdBBDD.PlanEstudioId
+      );
       if (!existentePD) {
         pds.push({
           PlanEstudioId: pdBBDD.PlanEstudioId,
@@ -52,52 +55,69 @@ exports.gestionProgDoc = async function (req, res, next) {
           estadoProGDoc: pdBBDD.estadoProGDoc,
           reabierto: pdBBDD.reabierto,
           anoAcademico: pdBBDD.anoAcademico,
-          siguienteAnoAcademico: funciones.siguienteAnoAcademico(pdBBDD.anoAcademico),
-          semestre: pdBBDD.semestre,
+          siguienteAnoAcademico: funciones.siguienteAnoAcademico(
+            pdBBDD.anoAcademico
+          ),
+          semestre: pdBBDD.semestre
         });
         // TODO: cuando se añadan las otras funciones hay que ponerlas aquí
         // para comprobar si la pd se puede marcar como lista para que el jefe de estudios la cierre
         // si manualmente cambia algo de las otras partes para que al acceder a gestión cambie
-        if (pdBBDD.estadoProGDoc === estados.estadoProgDoc.abierto
-          // eslint-disable-next-line max-len
-          && progDocController.CumpleTodos(estados.estadoProfesor.aprobadoDirector, pdBBDD.estadoProfesores)
-          // eslint-disable-next-line max-len
-          && progDocController.CumpleTodos(estados.estadoTribunal.aprobadoDirector, pdBBDD.estadoTribunales)
-          && pdBBDD.estadoHorarios === estados.estadoHorario.aprobadoCoordinador
-          && pdBBDD.estadoExamenes === estados.estadoExamen.aprobadoCoordinador
-          && pdBBDD.estadoCalendario === estados.estadoCalendario.aprobadoCoordinador
+        if (
+          pdBBDD.estadoProGDoc === estados.estadoProgDoc.abierto &&
+          progDocController.CumpleTodos(
+            estados.estadoProfesor.aprobadoDirector,
+            pdBBDD.estadoProfesores
+          ) &&
+          progDocController.CumpleTodos(
+            estados.estadoTribunal.aprobadoDirector,
+            pdBBDD.estadoTribunales
+          ) &&
+          pdBBDD.estadoHorarios === estados.estadoHorario.aprobadoCoordinador &&
+          pdBBDD.estadoExamenes === estados.estadoExamen.aprobadoCoordinador &&
+          pdBBDD.estadoCalendario ===
+            estados.estadoCalendario.aprobadoCoordinador
         ) {
-          promises2.push(models.ProgramacionDocente.update(
-            { estadoProGDoc: estados.estadoProgDoc.listo }, /* set attributes' value */
-            { where: { identificador: pdBBDD.identificador } }, /* where criteria */
-          ));
+          promises2.push(
+            models.ProgramacionDocente.update(
+              {
+                estadoProGDoc: estados.estadoProgDoc.listo
+              } /* set attributes' value */,
+              {
+                where: { identificador: pdBBDD.identificador }
+              } /* where criteria */
+            )
+          );
         }
       } else {
-        // eslint-disable-next-line max-len
-        const existentePDAnterior = pdsAnteriores.find((obj) => obj.PlanEstudioId === pdBBDD.PlanEstudioId);
+        const existentePDAnterior = pdsAnteriores.find(
+          obj => obj.PlanEstudioId === pdBBDD.PlanEstudioId
+        );
         /*
         solo habrá una pd susceptible de incidencia como mucho
         y no debe coincidir con el mismo año o semestre, esto es por si hay varias versiones.
         Además si la pdActual está cerrada o incidencia ya será la pdActual la de incidencia
         */
-        if (!existentePDAnterior
-          // eslint-disable-next-line max-len
-          && (pdBBDD.anoAcademico !== existentePD.anoAcademico || pdBBDD.semestre !== existentePD.semestre)
-          && existentePD.estadoProgDoc !== estados.estadoProgDoc.cerrado
-          && existentePD.estadoProgDoc !== estados.estadoProgDoc.incidencia) {
+        if (
+          !existentePDAnterior &&
+          (pdBBDD.anoAcademico !== existentePD.anoAcademico ||
+            pdBBDD.semestre !== existentePD.semestre) &&
+          existentePD.estadoProgDoc !== estados.estadoProgDoc.cerrado &&
+          existentePD.estadoProgDoc !== estados.estadoProgDoc.incidencia
+        ) {
           pdsAnteriores.push({
             PlanEstudioId: pdBBDD.PlanEstudioId,
             identificador: pdBBDD.identificador,
             estadoProGDoc: pdBBDD.estadoProGDoc,
             anoAcademico: pdBBDD.anoAcademico,
-            semestre: pdBBDD.semestre,
+            semestre: pdBBDD.semestre
           });
         }
       }
     });
     // puede haber planes sin pd, como los nuevos planes u otras cosas
-    res.locals.planEstudios.forEach((plan) => {
-      const existentePD = pds.find((obj) => obj.PlanEstudioId === plan.codigo);
+    res.locals.planEstudios.forEach(plan => {
+      const existentePD = pds.find(obj => obj.PlanEstudioId === plan.codigo);
       if (existentePD) {
         existentePD.nombre = plan.nombre;
         existentePD.nombreCompleto = plan.nombreCompleto;
@@ -110,12 +130,12 @@ exports.gestionProgDoc = async function (req, res, next) {
           nombreCompleto: plan.nombreCompleto,
           anoAcademico: null,
           siguienteAnoAcademico: null,
-          semestre: null,
+          semestre: null
         }); // estado cerrado en caso de que no haya ninguan pd en el sistema
       }
     });
     // solo se van a mostrar los planes con acronimo
-    pds = pds.filter((pd) => pd.nombre && pd.nombre.trim() !== '');
+    pds = pds.filter(pd => pd.nombre && pd.nombre.trim() !== '');
     const year = new Date().getFullYear();
     const siguiente = year + 1;
     const siguiente2 = year + 2;
@@ -143,7 +163,7 @@ exports.gestionProgDoc = async function (req, res, next) {
         reabrirpath: `${req.baseUrl}/reabrirProgDoc`,
         submenu: req.session.submenu,
         menu: req.session.menu,
-        planID: req.session.planID,
+        planID: req.session.planID
       });
     }
   } catch (error) {
@@ -152,16 +172,15 @@ exports.gestionProgDoc = async function (req, res, next) {
   }
 };
 
-
 // se completa con lo que hay en el controller de abrirProgDoc_controller
 // TODO a medida que aparezcan mas funciones hay que inicializar sus estados aquí
-exports.abrirProgDoc = async function (req, res, next) {
+exports.abrirProgDoc = async function(req, res, next) {
   const estadoProfesores = {};
   const estadoTribunales = {};
   const nuevaEntrada = {};
   try {
     if (!res.locals.permisoDenegado) {
-      res.locals.departamentosResponsables.forEach((element) => {
+      res.locals.departamentosResponsables.forEach(element => {
         estadoProfesores[element] = estados.estadoProfesor.abierto;
         estadoTribunales[element] = estados.estadoTribunal.abierto;
       });
@@ -179,8 +198,10 @@ exports.abrirProgDoc = async function (req, res, next) {
       nuevaEntrada.estadoCalendario = estados.estadoCalendario.abierto;
       nuevaEntrada.fechaCalendario = new Date();
       await models.ProgramacionDocente.update(
-        nuevaEntrada, /* set attributes' value */
-        { where: { identificador: res.locals.identificador } }, /* where criteria */
+        nuevaEntrada /* set attributes' value */,
+        {
+          where: { identificador: res.locals.identificador }
+        } /* where criteria */
       );
       req.session.save(() => {
         res.redirect(`${req.baseUrl}/AbrirCerrar`);
@@ -196,20 +217,20 @@ exports.abrirProgDoc = async function (req, res, next) {
   }
 };
 // obtener la pd que se va a cerrar
-exports.cerrarProgDoc = async function (req, res, next) {
+exports.cerrarProgDoc = async function(req, res, next) {
   try {
     if (!res.locals.permisoDenegado) {
       const pdID = req.body.pdIdentificador.split('-')[1];
-      const pd = await models.ProgramacionDocente.findOne(
-        {
-          where: { identificador: pdID },
-          include: [{
+      const pd = await models.ProgramacionDocente.findOne({
+        where: { identificador: pdID },
+        include: [
+          {
             model: models.PlanEstudio,
-            attributes: ['nombre', 'nombreCompleto'],
-          }],
-          raw: true,
-        },
-      );
+            attributes: ['nombre', 'nombreCompleto']
+          }
+        ],
+        raw: true
+      });
       res.locals.progDoc = pd;
       next();
     } else {
@@ -223,13 +244,13 @@ exports.cerrarProgDoc = async function (req, res, next) {
   }
 };
 // TODO a medida que aparezcan mas funciones hay que inicializar sus estados aquí
-exports.abrirIncidenciaProgDoc = async function (req, res, next) {
+exports.abrirIncidenciaProgDoc = async function(req, res, next) {
   try {
     if (!res.locals.permisoDenegado) {
       const estadoProfesores = {};
       const estadoTribunales = {};
       const nuevaEntrada = {};
-      res.locals.departamentosResponsables.forEach((element) => {
+      res.locals.departamentosResponsables.forEach(element => {
         estadoProfesores[element] = estados.estadoProfesor.aprobadoDirector;
         estadoTribunales[element] = estados.estadoProfesor.aprobadoDirector;
       });
@@ -237,7 +258,8 @@ exports.abrirIncidenciaProgDoc = async function (req, res, next) {
       nuevaEntrada.estadoTribunales = estadoTribunales;
       nuevaEntrada.estadoHorarios = estados.estadoHorario.aprobadoCoordinador;
       nuevaEntrada.estadoExamenes = estados.estadoExamen.aprobadoCoordinador;
-      nuevaEntrada.estadoCalendario = estados.estadoCalendario.aprobadoCoordinador;
+      nuevaEntrada.estadoCalendario =
+        estados.estadoCalendario.aprobadoCoordinador;
       nuevaEntrada.estadoProGDoc = estados.estadoProgDoc.incidencia;
       nuevaEntrada.fechaProgDoc = new Date();
       nuevaEntrada.fechaProfesores = new Date();
@@ -247,8 +269,10 @@ exports.abrirIncidenciaProgDoc = async function (req, res, next) {
       nuevaEntrada.fechaExamenes = new Date();
       nuevaEntrada.fechaCalendario = new Date();
       await models.ProgramacionDocente.update(
-        nuevaEntrada, /* set attributes' value */
-        { where: { identificador: res.locals.identificador } }, /* where criteria */
+        nuevaEntrada /* set attributes' value */,
+        {
+          where: { identificador: res.locals.identificador }
+        } /* where criteria */
       );
       req.session.save(() => {
         res.redirect(`${req.baseUrl}/AbrirCerrar`);
@@ -263,22 +287,22 @@ exports.abrirIncidenciaProgDoc = async function (req, res, next) {
     next(error);
   }
 };
-exports.cerrarIncidenciaProgDoc = async function (req, res, next) {
+exports.cerrarIncidenciaProgDoc = async function(req, res, next) {
   try {
     if (!res.locals.permisoDenegado) {
       const pdID = req.body.pdIdentificador.split('-')[1];
       // debo guardarla para generar los csv de los examenes
       req.session.pdID = pdID;
-      const pd = await models.ProgramacionDocente.findOne(
-        {
-          where: { identificador: pdID },
-          include: [{
+      const pd = await models.ProgramacionDocente.findOne({
+        where: { identificador: pdID },
+        include: [
+          {
             model: models.PlanEstudio,
-            attributes: ['nombre', 'nombreCompleto'],
-          }],
-          raw: true,
-        },
-      );
+            attributes: ['nombre', 'nombreCompleto']
+          }
+        ],
+        raw: true
+      });
       res.locals.progDoc = pd;
       next();
     } else {
@@ -292,7 +316,7 @@ exports.cerrarIncidenciaProgDoc = async function (req, res, next) {
   }
 };
 
-exports.reabrirProgDoc = async function (req, res, next) {
+exports.reabrirProgDoc = async function(req, res, next) {
   /*
   debe quitar de la sesión el pdID que puse antes para ver los permisos
   por si hay algun error y no se reabre.
@@ -303,7 +327,7 @@ exports.reabrirProgDoc = async function (req, res, next) {
   try {
     if (!res.locals.permisoDenegado) {
       const nuevaEntrada = {};
-      res.locals.departamentosResponsables.forEach((element) => {
+      res.locals.departamentosResponsables.forEach(element => {
         estadoProfesores[element] = estados.estadoProfesor.abierto;
         estadoTribunales[element] = estados.estadoProfesor.abierto;
       });
@@ -322,8 +346,10 @@ exports.reabrirProgDoc = async function (req, res, next) {
       nuevaEntrada.fechaCalendario = new Date();
       nuevaEntrada.reabierto = 1;
       await models.ProgramacionDocente.update(
-        nuevaEntrada, /* set attributes' value */
-        { where: { identificador: res.locals.identificador } }, /* where criteria */
+        nuevaEntrada /* set attributes' value */,
+        {
+          where: { identificador: res.locals.identificador }
+        } /* where criteria */
       );
       req.session.save(() => {
         res.redirect(`${req.baseUrl}/AbrirCerrar`);
@@ -340,16 +366,16 @@ exports.reabrirProgDoc = async function (req, res, next) {
 };
 
 // cerrar la progdoc
-exports.cerrarProgDoc2 = async function (req, res, next) {
+exports.cerrarProgDoc2 = async function(req, res, next) {
   try {
     const pdID = res.locals.progDoc.identificador;
     await models.ProgramacionDocente.update(
       {
         estadoProGDoc: estados.estadoProgDoc.cerrado,
         fechaProgDoc: new Date(),
-        HistorialID: `url_${pdID}`,
-      }, /* set attributes' value */
-      { where: { identificador: pdID } }, /* where criteria */
+        HistorialID: `url_${pdID}`
+      } /* set attributes' value */,
+      { where: { identificador: pdID } } /* where criteria */
     );
     req.session.save(() => {
       res.redirect(`${req.baseUrl}/AbrirCerrar`);
@@ -359,6 +385,5 @@ exports.cerrarProgDoc2 = async function (req, res, next) {
     next(error);
   }
 };
-
 
 exports.borrarPdsWithErrores = borrarPdsWithErrores;

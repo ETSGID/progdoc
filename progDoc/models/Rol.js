@@ -1,22 +1,23 @@
 // Definicion del modelo Rol:
 
-module.exports = function (sequelize, DataTypes) {
-  const Rol = sequelize.define('Rol',
+module.exports = function(sequelize, DataTypes) {
+  const Rol = sequelize.define(
+    'Rol',
     {
-
       identificador: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       },
       rol: {
         type: DataTypes.STRING,
-        allowNull: false,
-      },
+        allowNull: false
+      }
     },
     {
-      timestamps: false,
-    });
+      timestamps: false
+    }
+  );
   Rol.removeAttribute('id');
   return Rol;
 };

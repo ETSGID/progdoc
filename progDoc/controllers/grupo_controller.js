@@ -3,9 +3,11 @@ const models = require('../models');
 const estados = require('../estados');
 const funciones = require('../funciones');
 
-exports.getGrupos = async function (req, res, next) {
+exports.getGrupos = async function(req, res, next) {
   req.session.submenu = 'Grupos';
-  const view = req.originalUrl.toLowerCase().includes('consultar') ? 'grupos/gruposConsultar' : 'grupos/gruposJE';
+  const view = req.originalUrl.toLowerCase().includes('consultar')
+    ? 'grupos/gruposConsultar'
+    : 'grupos/gruposJE';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
     res.render(view, {
@@ -16,21 +18,26 @@ exports.getGrupos = async function (req, res, next) {
       planID: req.session.planID,
       departamentosResponsables: res.locals.departamentosResponsables,
       planEstudios: res.locals.planEstudios,
-      grupos: null,
+      grupos: null
     });
     // hay que comprobar que no sea una url de consultar.
-  } else if (estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']
-        && estados.estadoProgDoc.incidencia !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']
-        && !req.originalUrl.toLowerCase().includes('consultar')) {
+  } else if (
+    estados.estadoProgDoc.abierto !==
+      res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] &&
+    estados.estadoProgDoc.incidencia !==
+      res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] &&
+    !req.originalUrl.toLowerCase().includes('consultar')
+  ) {
     res.render('grupos/gruposJE', {
-      existe: 'Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada',
+      existe:
+        'Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada',
       permisoDenegado: res.locals.permisoDenegado,
       menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentosResponsables: res.locals.departamentosResponsables,
       planEstudios: res.locals.planEstudios,
-      grupos: null,
+      grupos: null
     });
   } else {
     try {
@@ -38,38 +45,43 @@ exports.getGrupos = async function (req, res, next) {
       const pdID = res.locals.progDoc['ProgramacionDocentes.identificador'];
       // obtengo los cursos que hay en el plan por las asignaturas que tiene el plan
       // eslint-disable-next-line no-undef
-      const cursos = await models.sequelize.query(query = 'SELECT distinct  "curso" FROM public."Asignaturas" a  WHERE (a."ProgramacionDocenteIdentificador" = :pdID) ORDER BY a."curso" ASC;',
-        { replacements: { pdID } });
-      cursos[0].forEach((c) => {
+      const cursos = await models.sequelize.query(
+        'SELECT distinct  "curso" FROM public."Asignaturas" a  WHERE (a."ProgramacionDocenteIdentificador" = :pdID) ORDER BY a."curso" ASC;',
+        { replacements: { pdID } }
+      );
+      cursos[0].forEach(c => {
         const nuevoCurso = {};
         nuevoCurso.curso = Number(c.curso);
         switch (pdID.split('_')[3]) {
-        case '1S':
-          nuevoCurso.semestres = [{ semestre: 1, grupos: [] }];
-          break;
-        case '2S':
-          nuevoCurso.semestres = [{ semestre: 2, grupos: [] }];
-          break;
-        default:
-          nuevoCurso.semestres = [{ semestre: 1, grupos: [] }, { semestre: 2, grupos: [] }];
-          break;
+          case '1S':
+            nuevoCurso.semestres = [{ semestre: 1, grupos: [] }];
+            break;
+          case '2S':
+            nuevoCurso.semestres = [{ semestre: 2, grupos: [] }];
+            break;
+          default:
+            nuevoCurso.semestres = [
+              { semestre: 1, grupos: [] },
+              { semestre: 2, grupos: [] }
+            ];
+            break;
         }
 
         cursosConGrupos.push(nuevoCurso);
       });
       const gs = await models.Grupo.findAll({
         where: {
-          ProgramacionDocenteId: pdID,
+          ProgramacionDocenteId: pdID
         },
-        order: [
-          [Sequelize.literal('"nombre"'), 'ASC'],
-        ],
-        raw: true,
+        order: [[Sequelize.literal('"nombre"'), 'ASC']],
+        raw: true
       });
-      gs.forEach((g) => {
-        const curso = cursosConGrupos.find((obj) => obj.curso === g.curso);
+      gs.forEach(g => {
+        const curso = cursosConGrupos.find(obj => obj.curso === g.curso);
         if (curso) {
-          const semestre = curso.semestres.find((obj) => obj.semestre === Number(g.nombre.split('.')[1]));
+          const semestre = curso.semestres.find(
+            obj => obj.semestre === Number(g.nombre.split('.')[1])
+          );
           if (semestre) {
             semestre.grupos.push(g);
           }
@@ -87,7 +99,7 @@ exports.getGrupos = async function (req, res, next) {
         departamentosResponsables: res.locals.departamentosResponsables,
         planEstudios: res.locals.planEstudios,
         grupos: cursosConGrupos,
-        pdID,
+        pdID
       });
     } catch (error) {
       console.log('Error:', error);
@@ -97,7 +109,7 @@ exports.getGrupos = async function (req, res, next) {
 };
 
 // migrar a getGruposNuevo
-exports.getGrupos2 = async function (pdID) {
+exports.getGrupos2 = async function(pdID) {
   if (pdID) {
     // eslint-disable-next-line no-useless-catch
     try {
@@ -105,11 +117,10 @@ exports.getGrupos2 = async function (pdID) {
         attributes: ['nombre', 'curso', 'grupoId', 'nombreItinerario', 'aula'],
         where: { ProgramacionDocenteId: pdID },
         order: [
-
           [Sequelize.literal('curso'), 'ASC'],
-          [Sequelize.literal('nombre'), 'ASC'],
+          [Sequelize.literal('nombre'), 'ASC']
         ],
-        raw: true,
+        raw: true
       });
       return grupos;
     } catch (error) {
@@ -121,7 +132,7 @@ exports.getGrupos2 = async function (pdID) {
   }
 };
 
-exports.EliminarGruposJE = async function (req, res, next) {
+exports.EliminarGruposJE = async function(req, res, next) {
   let toEliminar = req.body.eliminar;
   if (toEliminar && !res.locals.permisoDenegado) {
     try {
@@ -132,19 +143,23 @@ exports.EliminarGruposJE = async function (req, res, next) {
       }
       whereEliminar.grupoId = [];
       whereEliminar2.GrupoId = [];
-      toEliminar.forEach((element) => {
+      toEliminar.forEach(element => {
         const grupoId = Number(element.split('_')[1]);
         whereEliminar.grupoId.push(grupoId);
         whereEliminar2.GrupoId.push(grupoId);
       });
-      if (funciones.isEmpty(whereEliminar)) { whereEliminar.identificador = 'Identificador erróneo'; }
-      if (funciones.isEmpty(whereEliminar2)) { whereEliminar2.identificador = 'Identificador erróneo'; }
+      if (funciones.isEmpty(whereEliminar)) {
+        whereEliminar.identificador = 'Identificador erróneo';
+      }
+      if (funciones.isEmpty(whereEliminar2)) {
+        whereEliminar2.identificador = 'Identificador erróneo';
+      }
       // antes de borrarlo de grupos voy a borrarlo de las asignaciones
       await models.AsignacionProfesor.destroy({
-        where: whereEliminar2,
+        where: whereEliminar2
       });
       await models.Grupo.destroy({
-        where: whereEliminar,
+        where: whereEliminar
       });
       next();
     } catch (error) {
@@ -156,7 +171,7 @@ exports.EliminarGruposJE = async function (req, res, next) {
   }
 };
 
-exports.ActualizarGruposJE = async function (req, res, next) {
+exports.ActualizarGruposJE = async function(req, res, next) {
   let toActualizar = req.body.actualizar;
   const promises = [];
   try {
@@ -165,7 +180,7 @@ exports.ActualizarGruposJE = async function (req, res, next) {
         toActualizar = [toActualizar];
       }
       const gruposToActualizar = [];
-      toActualizar.forEach((element) => {
+      toActualizar.forEach(element => {
         const grupoToActualizar = {};
         const grupoId = Number(element.split('_')[1]);
         const curso = Number(element.split('_')[3]);
@@ -176,7 +191,8 @@ exports.ActualizarGruposJE = async function (req, res, next) {
           capacidad = null;
         }
         const aula = req.body[`grupo_${nombre}_aula_${curso}`];
-        const nombreItinerario = req.body[`grupo_${nombre}_nombreItinerario_${curso}`];
+        const nombreItinerario =
+          req.body[`grupo_${nombre}_nombreItinerario_${curso}`];
         grupoToActualizar.capacidad = capacidad;
         if (aula) {
           grupoToActualizar.aula = aula;
@@ -185,10 +201,9 @@ exports.ActualizarGruposJE = async function (req, res, next) {
           grupoToActualizar.nombreItinerario = nombreItinerario;
         }
         gruposToActualizar.push(grupoToActualizar);
-        promises.push(models.Grupo.update(
-          grupoToActualizar,
-          { where: { grupoId } },
-        ));
+        promises.push(
+          models.Grupo.update(grupoToActualizar, { where: { grupoId } })
+        );
       });
     }
     await Promise.all(promises);
@@ -199,8 +214,7 @@ exports.ActualizarGruposJE = async function (req, res, next) {
   }
 };
 
-
-exports.AnadirGruposJE = async function (req, res, next) {
+exports.AnadirGruposJE = async function(req, res, next) {
   const { planID } = req.session;
   const { pdID } = req.body;
   let toAnadir = req.body.anadir;
@@ -210,24 +224,25 @@ exports.AnadirGruposJE = async function (req, res, next) {
       if (!Array.isArray(toAnadir)) {
         toAnadir = [toAnadir];
       }
-      toAnadir.forEach((element) => {
+      toAnadir.forEach(element => {
         const nombre = element.split('_')[2];
         const newGrupo = {};
         newGrupo.curso = Number(element.split('_')[3]);
         newGrupo.nombre = nombre;
-        newGrupo.capacidad = Number(req.body[`grupo_${nombre}_capacidad_${newGrupo.curso}`]);
+        newGrupo.capacidad = Number(
+          req.body[`grupo_${nombre}_capacidad_${newGrupo.curso}`]
+        );
         // eslint-disable-next-line no-restricted-globals
         if (isNaN(newGrupo.capacidad)) {
           newGrupo.capacidad = null;
         }
         newGrupo.aula = req.body[`grupo_${nombre}_aula_${newGrupo.curso}`];
-        newGrupo.nombreItinerario = req.body[`grupo_${nombre}_nombreItinerario_${newGrupo.curso}`];
+        newGrupo.nombreItinerario =
+          req.body[`grupo_${nombre}_nombreItinerario_${newGrupo.curso}`];
         newGrupo.ProgramacionDocenteId = pdID;
         gruposToAnadir.push(newGrupo);
       });
-      await models.Grupo.bulkCreate(
-        gruposToAnadir,
-      );
+      await models.Grupo.bulkCreate(gruposToAnadir);
       req.session.save(() => {
         res.redirect(`${req.baseUrl}/gestionGrupos/getGrupos?planID=${planID}`);
       });

@@ -1,28 +1,30 @@
 // Definicion del modelo AsignacionProfesor:
 
-module.exports = function (sequelize, DataTypes) {
-  const AsignacionProfesor = sequelize.define('AsignacionProfesor',
+module.exports = function(sequelize, DataTypes) {
+  const AsignacionProfesor = sequelize.define(
+    'AsignacionProfesor',
     {
       identificador: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       },
       Dia: {
-        type: DataTypes.ENUM('L', 'M', 'X', 'J', 'V', 'S', 'D'),
+        type: DataTypes.ENUM('L', 'M', 'X', 'J', 'V', 'S', 'D')
       },
       HoraInicio: {
-        type: DataTypes.TIME,
+        type: DataTypes.TIME
       },
       Duracion: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.FLOAT
       },
       Nota: {
-        type: DataTypes.TEXT,
-      },
+        type: DataTypes.TEXT
+      }
     },
     {
-      timestamps: false,
-    });
+      timestamps: false
+    }
+  );
   return AsignacionProfesor;
 };

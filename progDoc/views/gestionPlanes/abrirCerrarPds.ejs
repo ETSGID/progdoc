@@ -77,7 +77,9 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
             <option value='2S'>2S</option>
          </select>
         </td>
-        <% break; 
+        <% break;
+      default:
+        break; 
     }%>      
     <td>
       <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_gestionar" action="/hola" method="post">

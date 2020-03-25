@@ -1,18 +1,20 @@
 // Definicion del modelo Itinerario:
 
-module.exports = function (sequelize, DataTypes) {
-  const Itinerario = sequelize.define('Itinerario',
+module.exports = function(sequelize, DataTypes) {
+  const Itinerario = sequelize.define(
+    'Itinerario',
     {
       identificador: {
         // ejemplo de nombre itineario GITST_Electrónica
         // (PLAN_Itinerario) para garantizar que es único
         type: DataTypes.STRING,
-        primaryKey: true,
-      },
+        primaryKey: true
+      }
     },
     {
-      timestamps: false,
-    });
+      timestamps: false
+    }
+  );
   Itinerario.removeAttribute('id');
   return Itinerario;
 };

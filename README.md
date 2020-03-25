@@ -7,7 +7,7 @@ Aplicación del portal de profesores para crear/ver/modificar las programaciones
 Dentro de la carpeta  se encuentra todos los ficheros necesarios para el correcto despliegue de la aplicación. Posteriormente se comentarán en detalle.
 
 
-## Variables de entorno en producción
+## Variables de entorno en producción (DEV=false,PRUEBAS=false, DOCKER=true)
 
 Son necesariuos tres archivos para configurar el entorno
 
@@ -64,7 +64,7 @@ POSTGRES_PASSWORD=xxxx
 Se proporciona un Dockerfile para la imagen que alojará el servidor, un script para la puesta en marcha de las bases de datos y el servidor, y un `docker-compose.yml` para el despliegue de toda la aplicación. 
 Dentro de la carpeta `progDoc`, está el código de la aplicación.
 
-## Variables de entorno en desarrollo
+## Variables de entorno en pruebas (DEV=false,PRUEBAS=true, DOCKER=true)
 
 Son necesariuos cuatro archivos para configurar el entorno
 
@@ -138,6 +138,29 @@ POSTGRES_PASSWORD=xxxx
 
 Se proporciona un Dockerfile para la imagen que alojará el servidor, un script para la puesta en marcha de las bases de datos y el servidor, y un `docker-compose.yml` para el despliegue de toda la aplicación. 
 Dentro de la carpeta `progDoc`, está el código de la aplicación. 
+## Variables de entorno en desarrollo (DEV=true, PRUEBAS=false, DOCKER=false)
+En `progDoc/file.env` se define el modelo a seguir para configurar el .env (incluído en el `.gitignore`)
+```shell
+POSTGRES_DB=progdoc
+POSTGRESSESION_DB=progdocsession
+DB_USERNAME=postgres
+DB_PASSWORD=1234
+DBSESSION_USERNAME=postgres
+DB_HOST=localhost
+DBSESSION_PASSWORD=1234
+SERVICE=http://localhost:3000
+CAS=https://repo.etsit.upm.es/cas-upm
+SESSION_SECRET=Secreto_para_las_sesiones
+PATH_PDF=/storage/progdoc/
+CONTEXT=/pdi/progdoc/
+PORT=3000
+DEV=true
+PRUEBAS=false
+DOCKER=false
+USER_PRUEBAS=javier.conde.diaz@alumnos.upm.es
+USER_ROLS=FA
+```
+En desarrollo no se utiliza **DOCKER** para la aplicación WEB. Es necesario tener una base de datos **POSTGRESQL** instalada en el entorno o puede usarse un contenedor DOCKER para las bases de datos **exportando** el puerto 5432
 
 ## Puertos
 El puerto en el que corre la aplicación dentro del contenedor es el `3000` (Ver fichero `progDoc/file.env`). Por defecto este puerto se mapea en el `docker-compose-yml` al puerto `3000` del host. Para cambiarlo, modificar el primero de los dos puertos, es decir `"HOST:CONTAINER"`. 
@@ -170,7 +193,7 @@ docker-compose up -d
 psql -U [userpostgres] -h localhost  [database] < [file.sql]
 ```
 
-## Ejecución en desarrollo
+## Ejecución en pruebas
 Una vez configuradas las variables de entorno y el puerto correctamente, para desplegar la aplicación, hay que ir al directorio `progDoc`, y desde ahí ejecutar el siguiente comando:
 
 
@@ -186,6 +209,24 @@ psql -U [userpostgres] -h localhost  [database] < [file.sql]
 
 ```
 
+## Ejecución en desarrollo
+Una vez configuradas las variables de entorno y el puerto correctamente, para desplegar la aplicación, hay que ir al directorio `progDoc`, y desde ahí ejecutar los siguientes comandos:
+
+
+```
+# Arrancar las bases de datos ya sea en un contenedor o en el propio host. Es necesario crear las bases de datos y los usuarios de las bbdd. No es necesario crear las tablas de las bases de datos. Al arrancar la aplicación se crean solas. 
+
+# Instalar paquetes necearios 
+npm install 
+
+# Arrancar la aplicación web
+npm start
+
+#para llenar la base de datos. Necesario entrar en el contenedor de la base de datos o tener un clinete de la bbdd en el host.
+psql -U [userpostgres] -h localhost  [database] < [file.sql]
+
+```
+
 ## Nota adicional
 El fichero `progDoc/script.sh`, se ejecuta cuando termina de arrancar el contenedor que aloja el servidor para migrar y rellenar la base de datos. Posteriormente arranca el servidor. En este proceso se hace un sleep de 30 segundos para esperar a que las bases de datos terminen de arrancar. En caso de fallo, alargar este sleep. 
 
@@ -193,4 +234,3 @@ El fichero `progDoc/script.sh`, se ejecuta cuando termina de arrancar el contene
 [Variables de entorno desde `docer-compose.ym`](https://docs.docker.com/compose/environment-variables/)
 [Contenedor postgres](https://hub.docker.com/_/postgres/)
 [Problemas con variables de entorno en el contenedor postgres](https://github.com/docker-library/postgres/issues/203)
-

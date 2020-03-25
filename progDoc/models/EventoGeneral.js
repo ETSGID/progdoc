@@ -1,32 +1,32 @@
-
-module.exports = function (sequelize, DataTypes) {
-  const EventoGeneral = sequelize.define('EventoGeneral',
+module.exports = function(sequelize, DataTypes) {
+  const EventoGeneral = sequelize.define(
+    'EventoGeneral',
     {
       identificador: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       },
       evento: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING
       },
       color: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING
       },
       fechaInicio: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.DATEONLY
       },
       fechaFin: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.DATEONLY
       },
       editable: {
-        type: DataTypes.INTEGER,
-      },
-
+        type: DataTypes.INTEGER
+      }
     },
     {
-      timestamps: false,
-    });
+      timestamps: false
+    }
+  );
   EventoGeneral.removeAttribute('id');
   return EventoGeneral;
 };

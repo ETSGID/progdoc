@@ -1,12 +1,12 @@
 const planController = require('../controllers/plan_controller');
 
 // GET planes de una PD
-exports.getPlanesPD = async function (req, res, next) {
+exports.getPlanesPD = async function(req, res, next) {
   const resp = {};
   let respError;
   try {
     const plans = await planController.getPlanesFunction(true);
-    plans.forEach((p) => {
+    plans.forEach(p => {
       resp[p.codigo] = p;
     });
     if (respError) {

@@ -2,7 +2,6 @@
 const path = require('path');
 const Sequelize = require('sequelize');
 
-
 // Cargar ORM
 
 //    DATABASE_URL = postgres://user:passwd@host:port/database
@@ -18,13 +17,24 @@ const DBSESSION_USERNAME = process.env.DBSESSION_USERNAME || 'progdoc';
 const DBSESSION_PASSWORD = process.env.DBSESSION_PASSWORD || 'progdoc';
 const POSTGRESSESION_DB = process.env.POSTGRESSESION_DB || 'progdocsession';
 if (DOCKER === 'true') {
-  sequelize = new Sequelize(`postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:5432/${POSTGRES_DB}`, { logging: logs });
-  sequelizeSession = new Sequelize(`postgres://${DBSESSION_USERNAME}:${DBSESSION_PASSWORD}@dbsession:5432/${POSTGRESSESION_DB}`, { logging: logs });
+  sequelize = new Sequelize(
+    `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:5432/${POSTGRES_DB}`,
+    { logging: logs }
+  );
+  sequelizeSession = new Sequelize(
+    `postgres://${DBSESSION_USERNAME}:${DBSESSION_PASSWORD}@dbsession:5432/${POSTGRESSESION_DB}`,
+    { logging: logs }
+  );
 } else {
-  sequelize = new Sequelize(`postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:5432/${POSTGRES_DB}`, { logging: logs });
-  sequelizeSession = new Sequelize(`postgres://${DBSESSION_USERNAME}:${DBSESSION_PASSWORD}@${DB_HOST}:5432/${POSTGRESSESION_DB}`, { logging: logs });
+  sequelize = new Sequelize(
+    `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:5432/${POSTGRES_DB}`,
+    { logging: logs }
+  );
+  sequelizeSession = new Sequelize(
+    `postgres://${DBSESSION_USERNAME}:${DBSESSION_PASSWORD}@${DB_HOST}:5432/${POSTGRESSESION_DB}`,
+    { logging: logs }
+  );
 }
-
 
 // Importar la definicion de las tablas
 const Departamento = sequelize.import(path.join(__dirname, 'Departamento'));
@@ -34,8 +44,12 @@ const Grupo = sequelize.import(path.join(__dirname, 'Grupo'));
 const Persona = sequelize.import(path.join(__dirname, 'Persona'));
 const PlanEstudio = sequelize.import(path.join(__dirname, 'PlanEstudio'));
 const Profesor = sequelize.import(path.join(__dirname, 'Profesor'));
-const AsignacionProfesor = sequelize.import(path.join(__dirname, 'AsignacionProfesor'));
-const ProgramacionDocente = sequelize.import(path.join(__dirname, 'ProgramacionDocente'));
+const AsignacionProfesor = sequelize.import(
+  path.join(__dirname, 'AsignacionProfesor')
+);
+const ProgramacionDocente = sequelize.import(
+  path.join(__dirname, 'ProgramacionDocente')
+);
 const Rol = sequelize.import(path.join(__dirname, 'Rol'));
 const Itinerario = sequelize.import(path.join(__dirname, 'Itinerario'));
 const FranjaExamen = sequelize.import(path.join(__dirname, 'FranjaExamen'));
@@ -44,9 +58,15 @@ const EventoGeneral = sequelize.import(path.join(__dirname, 'EventoGeneral'));
 const EventoPlan = sequelize.import(path.join(__dirname, 'EventoPlan'));
 const Calendario = sequelize.import(path.join(__dirname, 'Calendario'));
 
-const ConjuntoActividadParcial = sequelize.import(path.join(__dirname, 'ConjuntoActividadParcial'));
-const ConjuntoActividadParcialGrupo = sequelize.import(path.join(__dirname, 'ConjuntoActividadParcialGrupo'));
-const ActividadParcial = sequelize.import(path.join(__dirname, 'ActividadParcial'));
+const ConjuntoActividadParcial = sequelize.import(
+  path.join(__dirname, 'ConjuntoActividadParcial')
+);
+const ConjuntoActividadParcialGrupo = sequelize.import(
+  path.join(__dirname, 'ConjuntoActividadParcialGrupo')
+);
+const ActividadParcial = sequelize.import(
+  path.join(__dirname, 'ActividadParcial')
+);
 
 const Session = sequelizeSession.import(path.join(__dirname, 'Session'));
 
@@ -54,18 +74,17 @@ const Session = sequelizeSession.import(path.join(__dirname, 'Session'));
 
 // Relacion 1 a 1 entre Profesor y Persona:
 Persona.hasOne(Profesor, { foreignKey: 'ProfesorId' });
+Profesor.belongsTo(Persona, { foreignKey: 'ProfesorId' });
 
 // Relacion 1 a N entre Departamento y Profesor:
 Departamento.hasMany(Profesor, { foreignKey: 'DepartamentoCodigo' });
 Profesor.belongsTo(Departamento, { foreignKey: 'DepartamentoCodigo' });
-
 
 // -----PROGRAMACION DOCENTE-----//
 
 // Relacion 1 a N entre Departamento y Asignatura:
 Departamento.hasMany(Asignatura, { foreignKey: 'DepartamentoResponsable' });
 Asignatura.belongsTo(Departamento, { foreignKey: 'DepartamentoResponsable' });
-
 
 // Relacion 1 a N entre Asignatura y Examen
 Asignatura.hasMany(Examen);
@@ -77,7 +96,10 @@ Grupo.belongsTo(ProgramacionDocente, { foreignKey: 'ProgramacionDocenteId' });
 
 // Relacion 1 a N entre Profesor y Asignatura:
 Profesor.hasMany(Asignatura, { foreignKey: 'CoordinadorAsignatura' });
-Asignatura.belongsTo(Profesor, { as: 'Coordinador', foreignKey: 'CoordinadorAsignatura' });
+Asignatura.belongsTo(Profesor, {
+  as: 'Coordinador',
+  foreignKey: 'CoordinadorAsignatura'
+});
 
 // Relacion N a N a N entre Profesor,Asignatura y Grupo a través de AsignacionProfesor:
 Profesor.hasMany(AsignacionProfesor, { foreignKey: 'ProfesorId' });
@@ -88,7 +110,6 @@ AsignacionProfesor.belongsTo(Asignatura, { foreignKey: 'AsignaturaId' });
 
 Grupo.hasMany(AsignacionProfesor, { foreignKey: 'GrupoId' });
 AsignacionProfesor.belongsTo(Grupo, { foreignKey: 'GrupoId' });
-
 
 // Relacion 1 a N PlanEstudio y ProgramacionDocente
 PlanEstudio.hasMany(ProgramacionDocente, { foreignKey: 'PlanEstudioId' });
@@ -131,20 +152,36 @@ Grupo.belongsTo(Itinerario);
 
 // Relacion 1 a N  entre profesor Asignatura (para Presidente, Secretario, Vocal y suplente)
 Profesor.hasMany(Asignatura, { foreignKey: 'PresidenteTribunalAsignatura' });
-Asignatura.belongsTo(Profesor, { as: 'Presidente', foreignKey: 'PresidenteTribunalAsignatura' });
+Asignatura.belongsTo(Profesor, {
+  as: 'Presidente',
+  foreignKey: 'PresidenteTribunalAsignatura'
+});
 
 Profesor.hasMany(Asignatura, { foreignKey: 'VocalTribunalAsignatura' });
-Asignatura.belongsTo(Profesor, { as: 'Vocal', foreignKey: 'VocalTribunalAsignatura' });
+Asignatura.belongsTo(Profesor, {
+  as: 'Vocal',
+  foreignKey: 'VocalTribunalAsignatura'
+});
 
 Profesor.hasMany(Asignatura, { foreignKey: 'SecretarioTribunalAsignatura' });
-Asignatura.belongsTo(Profesor, { as: 'Secretario', foreignKey: 'SecretarioTribunalAsignatura' });
+Asignatura.belongsTo(Profesor, {
+  as: 'Secretario',
+  foreignKey: 'SecretarioTribunalAsignatura'
+});
 
 Profesor.hasMany(Asignatura, { foreignKey: 'SuplenteTribunalAsignatura' });
-Asignatura.belongsTo(Profesor, { as: 'Suplente', foreignKey: 'SuplenteTribunalAsignatura' });
+Asignatura.belongsTo(Profesor, {
+  as: 'Suplente',
+  foreignKey: 'SuplenteTribunalAsignatura'
+});
 
 // Relacion 1 a N entre ProgramacionDocente y FranjaExamen
-ProgramacionDocente.hasMany(FranjaExamen, { foreignKey: 'ProgramacionDocenteId' });
-FranjaExamen.belongsTo(ProgramacionDocente, { foreignKey: 'ProgramacionDocenteId' });
+ProgramacionDocente.hasMany(FranjaExamen, {
+  foreignKey: 'ProgramacionDocenteId'
+});
+FranjaExamen.belongsTo(ProgramacionDocente, {
+  foreignKey: 'ProgramacionDocenteId'
+});
 
 // -----CALENDADRIO-----//
 
@@ -159,21 +196,34 @@ EventoPlan.belongsTo(EventoGeneral, { foreignKey: 'EventoGeneralId' });
 // -----ACTIVIDADES PARCIALES-----//
 
 // Relacion 1 a N entre ProgramacionDocente y ConjuntoActividadParcial
-ProgramacionDocente.hasMany(ConjuntoActividadParcial, { foreignKey: 'ProgramacionDocenteId' });
-ConjuntoActividadParcial.belongsTo(ProgramacionDocente, { foreignKey: 'ProgramacionDocenteId' });
+ProgramacionDocente.hasMany(ConjuntoActividadParcial, {
+  foreignKey: 'ProgramacionDocenteId'
+});
+ConjuntoActividadParcial.belongsTo(ProgramacionDocente, {
+  foreignKey: 'ProgramacionDocenteId'
+});
 
 // Relacion 1 a N entre ConjuntoActividadParcial y ActividadParcial
-ConjuntoActividadParcial.hasMany(ActividadParcial, { foreignKey: 'ConjuntoActividadParcialId' });
-ActividadParcial.belongsTo(ConjuntoActividadParcial, { foreignKey: 'ConjuntoActividadParcialId' });
+ConjuntoActividadParcial.hasMany(ActividadParcial, {
+  foreignKey: 'ConjuntoActividadParcialId'
+});
+ActividadParcial.belongsTo(ConjuntoActividadParcial, {
+  foreignKey: 'ConjuntoActividadParcialId'
+});
 
 // Relacion 1 a N entre Asignatura y ActividadParcial
 Asignatura.hasMany(ActividadParcial, { foreignKey: 'AsignaturaId' });
 ActividadParcial.belongsTo(Asignatura, { foreignKey: 'AsignaturaId' });
 
 // Relacion N a N entre Grupo y ConjuntoActividadParcial
-ConjuntoActividadParcial.belongsToMany(Grupo, { through: { model: ConjuntoActividadParcialGrupo }, foreignKey: 'ConjuntoParcialId' });
-Grupo.belongsToMany(ConjuntoActividadParcial, { through: { model: ConjuntoActividadParcialGrupo }, foreignKey: 'GrupoId' });
-
+ConjuntoActividadParcial.belongsToMany(Grupo, {
+  through: { model: ConjuntoActividadParcialGrupo },
+  foreignKey: 'ConjuntoParcialId'
+});
+Grupo.belongsToMany(ConjuntoActividadParcial, {
+  through: { model: ConjuntoActividadParcialGrupo },
+  foreignKey: 'GrupoId'
+});
 
 sequelize.sync();
 sequelizeSession.sync();
@@ -196,7 +246,6 @@ exports.EventoGeneral = EventoGeneral; // exportar definición de tabla EventoGe
 exports.EventoPlan = EventoPlan; // exportar definición de tabla EventoPlan
 exports.Calendario = Calendario; // exportar definición de tabla Calendario
 exports.ConjuntoActividadParcial = ConjuntoActividadParcial; // ConjuntoActividadParcial
-// eslint-disable-next-line max-len
 exports.ConjuntoActividadParcialGrupo = ConjuntoActividadParcialGrupo; // ConjuntoActividadParcialGrupo
 exports.ActividadParcial = ActividadParcial; // exportar definicion de tabla ActividadParcial
 exports.sequelize = sequelize;

@@ -1,24 +1,24 @@
 // Definicion del modelo PlanEstudio:
 
-module.exports = function (sequelize, DataTypes) {
-  const PlanEstudio = sequelize.define('PlanEstudio',
+module.exports = function(sequelize, DataTypes) {
+  const PlanEstudio = sequelize.define(
+    'PlanEstudio',
     {
-
       codigo: {
         type: DataTypes.STRING,
-        primaryKey: true,
+        primaryKey: true
       },
       nombre: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING
       },
       nombreCompleto: {
-        type: DataTypes.STRING,
-      },
-
+        type: DataTypes.STRING
+      }
     },
     {
-      timestamps: false,
-    });
+      timestamps: false
+    }
+  );
   PlanEstudio.removeAttribute('id');
   return PlanEstudio;
 };

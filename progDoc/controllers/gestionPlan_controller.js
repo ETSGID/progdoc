@@ -9,18 +9,22 @@ const departamentoController = require('./departamento_controller');
 const grupoController = require('./grupo_controller');
 const apiUpmController = require('./apiUpm_controller');
 
-
-exports.getGestionPlanes = async function (req, res, next) {
+exports.getGestionPlanes = async function(req, res, next) {
   req.session.submenu = 'Planes';
   const actualizarpath = `${req.baseUrl}/gestion/actualizarPlanApi`;
   const cambioEstadopath = `${req.baseUrl}/gestion/cambiarEstadoProgDoc`;
   const path = `${req.baseUrl}/gestion/planes`;
   let estado = null;
   let pdID = null;
-  if (!res.locals.progDoc
-        || (estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']
-            && estados.estadoProgDoc.listo !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']
-            && estados.estadoProgDoc.incidencia !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'])) {
+  if (
+    !res.locals.progDoc ||
+    (estados.estadoProgDoc.abierto !==
+      res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] &&
+      estados.estadoProgDoc.listo !==
+        res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] &&
+      estados.estadoProgDoc.incidencia !==
+        res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'])
+  ) {
     estado = 'Programación docente no abierta. Debe abrir una nueva.';
   } else {
     pdID = res.locals.progDoc['ProgramacionDocentes.identificador'];
@@ -55,7 +59,7 @@ exports.getGestionPlanes = async function (req, res, next) {
       // se manda cuando ha pasado por actualizar
       actualizar: res.locals.actualizar,
       // para diferenciar entre pantalla mostrar el estado o poder cambiarlo en gestionPlanes
-      verEstado: false,
+      verEstado: false
     });
   } catch (error) {
     console.log('Error:', error);
@@ -63,8 +67,7 @@ exports.getGestionPlanes = async function (req, res, next) {
   }
 };
 
-
-exports.updateAsignaturasApiUpm = async function (req, res, next) {
+exports.updateAsignaturasApiUpm = async function(req, res, next) {
   await apiUpmController.updatePlanesAndDeparts();
   const { pdID } = req.session;
   let apiAsignaturas = [];
@@ -88,7 +91,7 @@ exports.updateAsignaturasApiUpm = async function (req, res, next) {
       const plan = progDocController.getPlanPd(pdID);
       const ano = progDocController.getAnoPd(pdID);
       const tipoPD = progDocController.getTipoPd(pdID);
-      const planBBDD = res.locals.planEstudios.find((obj) => obj.codigo === plan);
+      const planBBDD = res.locals.planEstudios.find(obj => obj.codigo === plan);
       const promisesUpdate = [];
       /*
       si aparece una asignatura de un departamento que no tenia asignado debo meterla y al reves,
@@ -111,27 +114,39 @@ exports.updateAsignaturasApiUpm = async function (req, res, next) {
 
       const asignaturasBBDD = await models.Asignatura.findAll({
         where: {
-          ProgramacionDocenteIdentificador: pdID,
+          ProgramacionDocenteIdentificador: pdID
         },
-        include: [{
-          // incluye las asignaciones de profesores y los horarios.
-          model: models.AsignacionProfesor,
-          // left join
-          required: false,
-        },
+        include: [
+          {
+            // incluye las asignaciones de profesores y los horarios.
+            model: models.AsignacionProfesor,
+            // left join
+            required: false
+          }
         ],
-        raw: true,
-
+        raw: true
       });
-      asignaturasBBDD.forEach((asignBBDD) => {
+      asignaturasBBDD.forEach(asignBBDD => {
         const { identificador } = asignBBDD;
-        const nuevaAsignatura = nuevasAsignaturas.find((obj) => obj.codigo === asignBBDD.codigo);
-        const viejaAsignatura = viejasAsignaturas.find((obj) => obj.codigo === asignBBDD.codigo);
-        let cambioAsignatura = cambioAsignaturas.find((obj) => obj.codigo === asignBBDD.codigo);
-        const desapareceAsignatura = desapareceAsignaturas
-          .find((obj) => obj.codigo === asignBBDD.codigo);
+        const nuevaAsignatura = nuevasAsignaturas.find(
+          obj => obj.codigo === asignBBDD.codigo
+        );
+        const viejaAsignatura = viejasAsignaturas.find(
+          obj => obj.codigo === asignBBDD.codigo
+        );
+        let cambioAsignatura = cambioAsignaturas.find(
+          obj => obj.codigo === asignBBDD.codigo
+        );
+        const desapareceAsignatura = desapareceAsignaturas.find(
+          obj => obj.codigo === asignBBDD.codigo
+        );
         // asignatura que no está catalogada debo catalogarla
-        if (!nuevaAsignatura && !viejaAsignatura && !cambioAsignatura && !desapareceAsignatura) {
+        if (
+          !nuevaAsignatura &&
+          !viejaAsignatura &&
+          !cambioAsignatura &&
+          !desapareceAsignatura
+        ) {
           // actualizo o eliminar las asignaturas que hayan cambiado o desaparecido
           if (apiAsignaturas[asignBBDD.codigo]) {
             const apiAsignatura = apiAsignaturas[asignBBDD.codigo];
@@ -144,50 +159,64 @@ exports.updateAsignaturasApiUpm = async function (req, res, next) {
             const nombreCambio = asignBBDD.nombre !== apiAsignatura.nombre;
             as.nombre = apiAsignatura.nombre;
             // eslint-disable-next-line no-param-reassign
-            if (apiAsignatura.nombre_ingles !== '') { asignBBDD.nombreIngles = apiAsignatura.nombre_ingles; }
-            const nombreInglesCambio = asignBBDD.nombreIngles !== apiAsignatura.nombre_ingles;
+            if (apiAsignatura.nombre_ingles !== '') {
+              // eslint-disable-next-line no-param-reassign
+              asignBBDD.nombreIngles = apiAsignatura.nombre_ingles;
+            }
+            const nombreInglesCambio =
+              asignBBDD.nombreIngles !== apiAsignatura.nombre_ingles;
             as.nombreIngles = apiAsignatura.nombre_ingles;
-            // eslint-disable-next-line max-len
-            const creditosCambio = asignBBDD.creditos !== funciones.convertCommaToPointDecimal(apiAsignatura.credects);
-            as.creditos = funciones.convertCommaToPointDecimal(apiAsignatura.credects);
+            const creditosCambio =
+              asignBBDD.creditos !==
+              funciones.convertCommaToPointDecimal(apiAsignatura.credects);
+            as.creditos = funciones.convertCommaToPointDecimal(
+              apiAsignatura.credects
+            );
             switch (apiAsignatura.codigo_tipo_asignatura) {
-            case 'T':
-              as.tipo = 'bas';
-              break;
-            case 'B':
-              as.tipo = 'obl';
-              break;
-            case 'O':
-              as.tipo = 'opt';
-              break;
-            case 'P':
-              as.tipo = 'obl';
-              break;
-            default:
-              // hay un tipo E que a veces se usa para prácticas
-              as.tipo = null;
-              break;
+              case 'T':
+                as.tipo = 'bas';
+                break;
+              case 'B':
+                as.tipo = 'obl';
+                break;
+              case 'O':
+                as.tipo = 'opt';
+                break;
+              case 'P':
+                as.tipo = 'obl';
+                break;
+              default:
+                // hay un tipo E que a veces se usa para prácticas
+                as.tipo = null;
+                break;
             }
             const tipoCambio = as.tipo !== asignBBDD.tipo;
 
             const apiDepartamentos = apiAsignatura.departamentos;
             if (apiDepartamentos.length === 0) {
-              if (apiAsignatura.codigo_tipo_asignatura === 'P' && (planBBDD.nombreCompleto.toUpperCase().includes('MASTER') || planBBDD.nombreCompleto.toUpperCase().includes('MÁSTER'))) {
+              if (
+                apiAsignatura.codigo_tipo_asignatura === 'P' &&
+                (planBBDD.nombreCompleto.toUpperCase().includes('MASTER') ||
+                  planBBDD.nombreCompleto.toUpperCase().includes('MÁSTER'))
+              ) {
                 as.DepartamentoResponsable = 'TFM';
-              } else if (apiAsignatura.codigo_tipo_asignatura === 'P' && planBBDD.nombreCompleto.toUpperCase().includes('GRADO')) {
+              } else if (
+                apiAsignatura.codigo_tipo_asignatura === 'P' &&
+                planBBDD.nombreCompleto.toUpperCase().includes('GRADO')
+              ) {
                 as.DepartamentoResponsable = 'TFG';
               } else {
                 as.DepartamentoResponsable = null;
                 // hasDepartamento = false;
               }
             }
-            apiDepartamentos.forEach((element) => {
+            apiDepartamentos.forEach(element => {
               if (element.responsable === 'S' || element.responsable === '') {
                 as.DepartamentoResponsable = element.codigo_departamento;
               }
             });
-            // eslint-disable-next-line max-len
-            const departamentoResponsableCambio = as.DepartamentoResponsable !== asignBBDD.DepartamentoResponsable;
+            const departamentoResponsableCambio =
+              as.DepartamentoResponsable !== asignBBDD.DepartamentoResponsable;
             if (apiAsignatura.curso === '') {
               hasCurso = false;
             } else {
@@ -219,14 +248,21 @@ exports.updateAsignaturasApiUpm = async function (req, res, next) {
               whereEliminarExamen.push(identificador);
               whereEliminarActividadParcial.push(identificador);
             } else if (
-              nombreCambio || nombreInglesCambio || creditosCambio
-               || tipoCambio || departamentoResponsableCambio
-               || cursoCambio || semestreCambio) {
+              nombreCambio ||
+              nombreInglesCambio ||
+              creditosCambio ||
+              tipoCambio ||
+              departamentoResponsableCambio ||
+              cursoCambio ||
+              semestreCambio
+            ) {
               /*
                añade el departamentoResponsable si no estaba.
                 Solo en las asignaturas nuevas que se añaden o las que permanecen
               */
-              const index = departamentosResponsables.indexOf(as.DepartamentoResponsable);
+              const index = departamentosResponsables.indexOf(
+                as.DepartamentoResponsable
+              );
               if (index < 0 && as.DepartamentoResponsable) {
                 departamentosResponsables.push(as.DepartamentoResponsable);
               }
@@ -252,10 +288,12 @@ exports.updateAsignaturasApiUpm = async function (req, res, next) {
               }
               */
               if (mostrar === 2) {
-                promisesUpdate.push(models.Asignatura.update(
-                  as, /* set attributes' value */
-                  { where: { identificador } }, /* where criteria */
-                ));
+                promisesUpdate.push(
+                  models.Asignatura.update(
+                    as /* set attributes' value */,
+                    { where: { identificador } } /* where criteria */
+                  )
+                );
               }
               as.identificador = asignBBDD.identificador;
             } else {
@@ -263,7 +301,9 @@ exports.updateAsignaturasApiUpm = async function (req, res, next) {
               añado el departamentoResponsable si no estaba.
               Solo en las asignaturas nuevas que se añaden o las que permanecen
               */
-              const index = departamentosResponsables.indexOf(as.DepartamentoResponsable);
+              const index = departamentosResponsables.indexOf(
+                as.DepartamentoResponsable
+              );
               if (index < 0 && as.DepartamentoResponsable) {
                 departamentosResponsables.push(as.DepartamentoResponsable);
               }
@@ -281,24 +321,30 @@ exports.updateAsignaturasApiUpm = async function (req, res, next) {
         /* ahora ya estará guardada en la bbdd actualizo
         para ver si es una cambioAsignatura
         */
-        cambioAsignatura = cambioAsignaturas.find((obj) => obj.codigo === asignBBDD.codigo);
+        cambioAsignatura = cambioAsignaturas.find(
+          obj => obj.codigo === asignBBDD.codigo
+        );
         // hay que copiar los profesores en todos los grupos
-        if (cambioAsignatura && copiarProfesores.has(cambioAsignatura.identificador)) {
+        if (
+          cambioAsignatura &&
+          copiarProfesores.has(cambioAsignatura.identificador)
+        ) {
           if (asignBBDD['AsignacionProfesors.ProfesorId']) {
             for (let i = 0; i < grupos.length; i++) {
               if (grupos[i].curso === Number(cambioAsignatura.curso)) {
                 const asignacion = {};
                 // el identificador de la asignatura es el mismo
                 asignacion.AsignaturaId = asignBBDD.identificador;
-                asignacion.ProfesorId = asignBBDD['AsignacionProfesors.ProfesorId'];
+                asignacion.ProfesorId =
+                  asignBBDD['AsignacionProfesors.ProfesorId'];
                 asignacion.GrupoId = grupos[i].grupoId;
                 // no meto profesores repetidos
-                const asigExistente = asignacions
-                  .find(
-                    (obj) => (obj.GrupoId === asignacion.GrupoId
-                       && obj.AsignaturaId === asignacion.AsignaturaId
-                        && obj.ProfesorId === asignacion.ProfesorId),
-                  );
+                const asigExistente = asignacions.find(
+                  obj =>
+                    obj.GrupoId === asignacion.GrupoId &&
+                    obj.AsignaturaId === asignacion.AsignaturaId &&
+                    obj.ProfesorId === asignacion.ProfesorId
+                );
                 if (!asigExistente) {
                   asignacions.push(asignacion);
                 }
@@ -308,86 +354,104 @@ exports.updateAsignaturasApiUpm = async function (req, res, next) {
         }
       });
       // buscar las asignaturas nuevas en API upm
-      // eslint-disable-next-line
       for (const apiCodigo in apiAsignaturas) {
-        const apiAsignEncontrada = apiAsignaturas[apiCodigo];
-        const asignExisteBBDD = asignaturasBBDD
-          .find((obj) => obj.codigo === apiAsignEncontrada.codigo);
-        let semestre = '';
-        const { imparticion } = apiAsignEncontrada;
-        if (imparticion['1S'] && imparticion['2S']) {
-          semestre = '1S-2S';
-        } else if (imparticion['1S']) {
-          semestre = '1S';
-        } else if (imparticion['2S']) {
-          semestre = '2S';
-        } else if (imparticion.I) {
-          semestre = 'I';
-        } else if (imparticion.A) {
-          semestre = 'A';
-        } else {
-          semestre = '';
-        }
-        const apiDepartamentos = apiAsignEncontrada.departamentos;
-        let depResponsable = null;
-        if (apiDepartamentos.length === 0) {
-          if (apiAsignEncontrada.codigo_tipo_asignatura === 'P' && (planBBDD.nombreCompleto.toUpperCase().includes('MASTER') || planBBDD.nombreCompleto.toUpperCase().includes('MÁSTER'))) {
-            depResponsable = 'TFM';
-          } else if (apiAsignEncontrada.codigo_tipo_asignatura === 'P' && planBBDD.nombreCompleto.toUpperCase().includes('GRADO')) {
-            depResponsable = 'TFG';
+        if (Object.prototype.hasOwnProperty.call(apiAsignaturas, apiCodigo)) {
+          const apiAsignEncontrada = apiAsignaturas[apiCodigo];
+          const asignExisteBBDD = asignaturasBBDD.find(
+            obj => obj.codigo === apiAsignEncontrada.codigo
+          );
+          let semestre = '';
+          const { imparticion } = apiAsignEncontrada;
+          if (imparticion['1S'] && imparticion['2S']) {
+            semestre = '1S-2S';
+          } else if (imparticion['1S']) {
+            semestre = '1S';
+          } else if (imparticion['2S']) {
+            semestre = '2S';
+          } else if (imparticion.I) {
+            semestre = 'I';
+          } else if (imparticion.A) {
+            semestre = 'A';
           } else {
-            depResponsable = null;
+            semestre = '';
           }
-        }
-        apiDepartamentos.forEach((element) => {
-          if (element.responsable === 'S' || element.responsable === '') {
-            depResponsable = element.codigo_departamento;
+          const apiDepartamentos = apiAsignEncontrada.departamentos;
+          let depResponsable = null;
+          if (apiDepartamentos.length === 0) {
+            if (
+              apiAsignEncontrada.codigo_tipo_asignatura === 'P' &&
+              (planBBDD.nombreCompleto.toUpperCase().includes('MASTER') ||
+                planBBDD.nombreCompleto.toUpperCase().includes('MÁSTER'))
+            ) {
+              depResponsable = 'TFM';
+            } else if (
+              apiAsignEncontrada.codigo_tipo_asignatura === 'P' &&
+              planBBDD.nombreCompleto.toUpperCase().includes('GRADO')
+            ) {
+              depResponsable = 'TFG';
+            } else {
+              depResponsable = null;
+            }
           }
-        });
-        /*
-        Nueva asignatura a anadir.
-        Es una asignatura si tiene curso, semestre y departamentoResponsable
-        */
-        if (!asignExisteBBDD && apiAsignEncontrada.curso !== '' && semestre !== '' && (tipoPD === 'I' || (tipoPD === '1S' && semestre !== '2S') || (tipoPD === '2S' && semestre !== '1S'))) {
-          const nuevaAsign = {};
-          nuevaAsign.anoAcademico = ano;
-          nuevaAsign.codigo = apiAsignEncontrada.codigo;
-          nuevaAsign.nombre = apiAsignEncontrada.nombre;
-          nuevaAsign.nombreIngles = apiAsignEncontrada.nombre_ingles;
-          nuevaAsign.curso = apiAsignEncontrada.curso;
-          nuevaAsign.semestre = semestre;
-          nuevaAsign.DepartamentoResponsable = depResponsable;
-          // por defecto los profesores se asignan por grupo comun
-          nuevaAsign.estado = 'N';
-          nuevaAsign.creditos = funciones.convertCommaToPointDecimal(apiAsignEncontrada.credects);
-          nuevaAsign.ProgramacionDocenteIdentificador = pdID;
-          switch (apiAsignEncontrada.codigo_tipo_asignatura) {
-          case 'T':
-            nuevaAsign.tipo = 'bas';
-            break;
-          case 'B':
-            nuevaAsign.tipo = 'obl';
-            break;
-          case 'O':
-            nuevaAsign.tipo = 'opt';
-            break;
-          case 'P':
-            nuevaAsign.tipo = 'obl';
-            break;
-          default:
-            // hay un tipo E que a veces se usa para prácticas
-            nuevaAsign.tipo = null;
-            break;
-          }
+          apiDepartamentos.forEach(element => {
+            if (element.responsable === 'S' || element.responsable === '') {
+              depResponsable = element.codigo_departamento;
+            }
+          });
           /*
-          Añade el departamentoResponsable si no estaba.
-          Solo en las asignaturas nuevas que se añaden o las que permanecen
+          Nueva asignatura a anadir.
+          Es una asignatura si tiene curso, semestre y departamentoResponsable
           */
-          const index = departamentosResponsables.indexOf(depResponsable);
-          if (index < 0 && depResponsable) {
-            departamentosResponsables.push(depResponsable);
+          if (
+            !asignExisteBBDD &&
+            apiAsignEncontrada.curso !== '' &&
+            semestre !== '' &&
+            (tipoPD === 'I' ||
+              (tipoPD === '1S' && semestre !== '2S') ||
+              (tipoPD === '2S' && semestre !== '1S'))
+          ) {
+            const nuevaAsign = {};
+            nuevaAsign.anoAcademico = ano;
+            nuevaAsign.codigo = apiAsignEncontrada.codigo;
+            nuevaAsign.nombre = apiAsignEncontrada.nombre;
+            nuevaAsign.nombreIngles = apiAsignEncontrada.nombre_ingles;
+            nuevaAsign.curso = apiAsignEncontrada.curso;
+            nuevaAsign.semestre = semestre;
+            nuevaAsign.DepartamentoResponsable = depResponsable;
+            // por defecto los profesores se asignan por grupo comun
+            nuevaAsign.estado = 'N';
+            nuevaAsign.creditos = funciones.convertCommaToPointDecimal(
+              apiAsignEncontrada.credects
+            );
+            nuevaAsign.ProgramacionDocenteIdentificador = pdID;
+            switch (apiAsignEncontrada.codigo_tipo_asignatura) {
+              case 'T':
+                nuevaAsign.tipo = 'bas';
+                break;
+              case 'B':
+                nuevaAsign.tipo = 'obl';
+                break;
+              case 'O':
+                nuevaAsign.tipo = 'opt';
+                break;
+              case 'P':
+                nuevaAsign.tipo = 'obl';
+                break;
+              default:
+                // hay un tipo E que a veces se usa para prácticas
+                nuevaAsign.tipo = null;
+                break;
+            }
+            /*
+            Añade el departamentoResponsable si no estaba.
+            Solo en las asignaturas nuevas que se añaden o las que permanecen
+            */
+            const index = departamentosResponsables.indexOf(depResponsable);
+            if (index < 0 && depResponsable) {
+              departamentosResponsables.push(depResponsable);
+            }
+            nuevasAsignaturas.push(nuevaAsign);
           }
-          nuevasAsignaturas.push(nuevaAsign);
         }
       }
       // modifico los estados de pd con los camibos que se han aplicado
@@ -410,58 +474,52 @@ exports.updateAsignaturasApiUpm = async function (req, res, next) {
         await models.AsignacionProfesor.destroy({
           where: {
             ProfesorId: {
-              [op.ne]: null,
+              [op.ne]: null
             },
             AsignaturaId: {
-              [op.in]: whereEliminarProfesor,
-            },
-          },
+              [op.in]: whereEliminarProfesor
+            }
+          }
         });
         // eliminar los horaios y notas
         await models.AsignacionProfesor.destroy({
           where: {
-            [op.or]: [
-              { Nota: { [op.ne]: null } }, { Dia: { [op.ne]: null } },
-            ],
+            [op.or]: [{ Nota: { [op.ne]: null } }, { Dia: { [op.ne]: null } }],
             AsignaturaId: {
-              [op.in]: whereEliminarHorario,
-            },
-          },
+              [op.in]: whereEliminarHorario
+            }
+          }
         });
         // eliminar los examenes
         await models.Examen.destroy({
           where: {
             AsignaturaIdentificador: {
-              [op.in]: whereEliminarExamen,
-            },
-          },
+              [op.in]: whereEliminarExamen
+            }
+          }
         });
         // eliminar las actividades parciales
         await models.ActividadParcial.destroy({
           where: {
             AsignaturaId: {
-              [op.in]: whereEliminarActividadParcial,
-            },
-          },
+              [op.in]: whereEliminarActividadParcial
+            }
+          }
         });
         // eliminar las asignaturas que desaparecen
         await models.Asignatura.destroy({
           where: {
             identificador: {
-              [op.in]: whereEliminarAsignatura,
-            },
-          },
+              [op.in]: whereEliminarAsignatura
+            }
+          }
         });
         // actualizo todas las asignaturas
         await Promise.all(promisesUpdate);
         // creo las nuevas asignaturas
-        await models.Asignatura.bulkCreate(
-          nuevasAsignaturas,
-        );
+        await models.Asignatura.bulkCreate(nuevasAsignaturas);
         // añado los profesores a los nuevos grupos una vez que ya borre los anteriores
-        await models.AsignacionProfesor.bulkCreate(
-          asignacions,
-        );
+        await models.AsignacionProfesor.bulkCreate(asignacions);
         /*
         añado los nuevos o quito los departamentos que desaparecen en el plan.
         Si aparece uno nuevo se pone en cerrado
@@ -471,17 +529,23 @@ exports.updateAsignaturasApiUpm = async function (req, res, next) {
         const estadoProfesores = {};
         const estadoTribunales = {};
         const nuevaEntrada = {};
-        departamentosResponsables.forEach((element) => {
-          estadoProfesores[element] = res.locals.progDoc['ProgramacionDocentes.estadoProfesores'][element] || estados.estadoProfesor.aprobadoDirector;
-          estadoTribunales[element] = res.locals.progDoc['ProgramacionDocentes.estadoTribunales'][element] || estados.estadoTribunal.aprobadoDirector;
+        departamentosResponsables.forEach(element => {
+          estadoProfesores[element] =
+            res.locals.progDoc['ProgramacionDocentes.estadoProfesores'][
+              element
+            ] || estados.estadoProfesor.aprobadoDirector;
+          estadoTribunales[element] =
+            res.locals.progDoc['ProgramacionDocentes.estadoTribunales'][
+              element
+            ] || estados.estadoTribunal.aprobadoDirector;
         });
         nuevaEntrada.estadoProfesores = estadoProfesores;
         nuevaEntrada.fechaProfesores = new Date();
         nuevaEntrada.estadoTribunales = estadoTribunales;
         nuevaEntrada.fechaTribunales = new Date();
         await models.ProgramacionDocente.update(
-          nuevaEntrada, /* set attributes' value */
-          { where: { identificador: pdID } }, /* where criteria */
+          nuevaEntrada /* set attributes' value */,
+          { where: { identificador: pdID } } /* where criteria */
         );
 
         next();
@@ -495,39 +559,48 @@ exports.updateAsignaturasApiUpm = async function (req, res, next) {
   }
 };
 
-exports.updateEstadoProgDoc = async function (req, res) {
+exports.updateEstadoProgDoc = async function(req, res) {
   if (!res.locals.permisoDenegado) {
     try {
       const nuevaEntrada = {};
       const { pdID } = req.session;
-      // eslint-disable-next-line default-case
       switch (req.body.estadoNombre) {
-      case 'estadoProfesores':
-        nuevaEntrada.estadoProfesores = res.locals.progDoc['ProgramacionDocentes.estadoProfesores'];
-        nuevaEntrada.estadoProfesores[req.body.departamentoId] = req.body.estadoNuevo;
-        break;
-      case 'estadoTribunales':
-        nuevaEntrada.estadoTribunales = res.locals.progDoc['ProgramacionDocentes.estadoTribunales'];
-        nuevaEntrada.estadoTribunales[req.body.departamentoId] = req.body.estadoNuevo;
-        break;
-      case 'estadoHorarios':
-        nuevaEntrada.estadoHorarios = req.body.estadoNuevo;
-        break;
-      case 'estadoExamenes':
-        nuevaEntrada.estadoExamenes = req.body.estadoNuevo;
-        break;
-      case 'estadoCalendario':
-        nuevaEntrada.estadoCalendario = req.body.estadoNuevo;
-        break;
+        case 'estadoProfesores':
+          nuevaEntrada.estadoProfesores =
+            res.locals.progDoc['ProgramacionDocentes.estadoProfesores'];
+          nuevaEntrada.estadoProfesores[req.body.departamentoId] =
+            req.body.estadoNuevo;
+          break;
+        case 'estadoTribunales':
+          nuevaEntrada.estadoTribunales =
+            res.locals.progDoc['ProgramacionDocentes.estadoTribunales'];
+          nuevaEntrada.estadoTribunales[req.body.departamentoId] =
+            req.body.estadoNuevo;
+          break;
+        case 'estadoHorarios':
+          nuevaEntrada.estadoHorarios = req.body.estadoNuevo;
+          break;
+        case 'estadoExamenes':
+          nuevaEntrada.estadoExamenes = req.body.estadoNuevo;
+          break;
+        case 'estadoCalendario':
+          nuevaEntrada.estadoCalendario = req.body.estadoNuevo;
+          break;
+        default:
+          break;
       }
       await models.ProgramacionDocente.update(
-        nuevaEntrada, /* set attributes' value */
-        { where: { identificador: pdID } },
+        nuevaEntrada /* set attributes' value */,
+        { where: { identificador: pdID } }
       );
       progDocController.isPDLista(pdID, res.json({ success: true }));
     } catch (error) {
       console.log('Error:', error);
-      res.json({ success: false, msg: 'Ha habido un error la acción no se ha podido completar recargue la página para ver el estado en el que se encuentra la programación docente' });
+      res.json({
+        success: false,
+        msg:
+          'Ha habido un error la acción no se ha podido completar recargue la página para ver el estado en el que se encuentra la programación docente'
+      });
     }
   } else {
     res.json({ success: false, msg: 'No tiene permiso' });

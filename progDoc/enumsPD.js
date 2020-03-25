@@ -4,7 +4,7 @@ exports.periodoPD = {
   S1_O: '1S-O',
   S1_E: '1S-E',
   S2_O: '2S-O',
-  S2_E: '2S-E',
+  S2_E: '2S-E'
 };
 
 const rols = {
@@ -17,7 +17,7 @@ const rols = {
   CoordinadorTitulacion: 'CoordinadorTitulacion',
   CoordinadorTitulacionX2: 'CoordinadorTitulacionDelegado',
   SecretarioTitulacion: 'SecretarioTitulacion',
-  SubdirectorPosgrado: 'SubdirectorPosgrado',
+  SubdirectorPosgrado: 'SubdirectorPosgrado'
 };
 
 exports.rols = rols;
@@ -29,12 +29,12 @@ exports.delegacion = {
   [rols.DirectorDepartamento]: [rols.DirectorDepartamentoX2],
   [rols.CoordinadorTitulacion]: [rols.CoordinadorTitulacionX2],
   [rols.ResponsableDocente]: [rols.ResponsableDocenteX2],
-  [rols.SubdirectorPosgrado]: [],
+  [rols.SubdirectorPosgrado]: []
 };
 
 exports.eventoGeneral = {
   NoEditable: 0,
-  Editable: 1,
+  Editable: 1
 };
 
 exports.eventosTipo = {
@@ -43,7 +43,7 @@ exports.eventosTipo = {
   especial: 3,
   tft: 4,
   festivo: 5,
-  otro: 6,
+  otro: 6
 };
 
 exports.coloresEvento = {
@@ -53,7 +53,7 @@ exports.coloresEvento = {
   3: 'red',
   4: 'LightSkyBlue',
   5: 'grey',
-  6: 'Orange',
+  6: 'Orange'
 };
 
 exports.diasDeSemana = {
@@ -61,5 +61,5 @@ exports.diasDeSemana = {
   Martes: 1,
   Miercoles: 2,
   Jueves: 3,
-  Viernes: 4,
+  Viernes: 4
 };

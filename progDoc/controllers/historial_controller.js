@@ -1,5 +1,4 @@
-
-exports.getHistorial = function (req, res) {
+exports.getHistorial = function(req, res) {
   res.render('menus/historial', {
     menu: req.session.menu,
     planID: req.session.planID,
@@ -7,6 +6,6 @@ exports.getHistorial = function (req, res) {
     planEstudios: res.locals.planEstudios,
     PDsWithPdf: res.locals.PDsWithPdf,
     anosExistentes: res.locals.anosExistentes,
-    pdSeleccionada: res.locals.pdSeleccionada,
+    pdSeleccionada: res.locals.pdSeleccionada
   });
 };

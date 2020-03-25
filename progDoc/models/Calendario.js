@@ -1,23 +1,23 @@
-
-module.exports = function (sequelize, DataTypes) {
-  const Calendario = sequelize.define('Calendario',
+module.exports = function(sequelize, DataTypes) {
+  const Calendario = sequelize.define(
+    'Calendario',
     {
       identificador: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       },
       ano: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER
       },
       estado: {
-        type: DataTypes.INTEGER,
-      },
-
+        type: DataTypes.INTEGER
+      }
     },
     {
-      timestamps: false,
-    });
+      timestamps: false
+    }
+  );
   Calendario.removeAttribute('id');
   return Calendario;
 };

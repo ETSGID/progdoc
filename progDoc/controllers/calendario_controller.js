@@ -8,7 +8,6 @@ function comprobarColor(buffer_eventos, eventos, dia) {
   let code = -1;
   const nuevo_buffer = [];
   const dia_objetoFecha = new Date(dia);
-  // eslint-disable-next-line no-restricted-syntax
   for (const i in buffer_eventos) {
     if (new Date(buffer_eventos[i].fechaFin) >= dia_objetoFecha) {
       nuevo_buffer.push(buffer_eventos[i]);
@@ -17,7 +16,6 @@ function comprobarColor(buffer_eventos, eventos, dia) {
       }
     }
   }
-  // eslint-disable-next-line
   for (const i in eventos) {
     if (eventos[i].fechaFin !== 'Evento de dia') {
       nuevo_buffer.push(eventos[i]);
@@ -30,7 +28,7 @@ function comprobarColor(buffer_eventos, eventos, dia) {
 }
 
 function bisiesto(year) {
-  return (year % 100 === 0) ? (year % 400 === 0) : (year % 4 === 0);
+  return year % 100 === 0 ? year % 400 === 0 : year % 4 === 0;
 }
 
 function generarArrayDias(dic_eventos, ano) {
@@ -58,7 +56,6 @@ function generarArrayDias(dic_eventos, ano) {
   } else {
     febrero = Array.from(new Array(28), (val, index) => index + 1);
   }
-  // eslint-disable-next-line no-restricted-syntax
   for (const i in [...Array(12).keys()]) {
     if (meses_30.includes(i)) {
       // eslint-disable-next-line prefer-spread
@@ -77,11 +74,25 @@ function generarArrayDias(dic_eventos, ano) {
   array_numeros.push.apply(array_numeros, array_resto);
   /** Una vez tenemos el array procedemos a transformarlo en un array de objetos tipo dia
    * (ver descripcion de este objeto mas abajo)
-  * */
+   * */
   const array_calendario = [];
   let contador_meses = 0;
   let offset_mes = 8;
-  const meses = ['', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto'];
+  const meses = [
+    '',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre',
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto'
+  ];
   // eslint-disable-next-line no-param-reassign
   ano = parseInt(ano, 10);
   let dic_dias = {
@@ -91,7 +102,7 @@ function generarArrayDias(dic_eventos, ano) {
     3: 0,
     4: 0,
     5: 0,
-    6: 0,
+    6: 0
   };
   // se inicializa
   let dic_dias_1 = {
@@ -101,9 +112,9 @@ function generarArrayDias(dic_eventos, ano) {
     3: 0,
     4: 0,
     5: 0,
-    6: 0,
+    6: 0
   };
-    //
+  //
   let contar = false;
   // En esta variable se guardan los eventos que nos diarios
   let buffer_eventos = [];
@@ -138,7 +149,10 @@ function generarArrayDias(dic_eventos, ano) {
     }
     numero = String(num).length === 1 ? `0${String(num)}` : String(num);
     mes = meses[contador_meses];
-    mes_codigo = String(contador_meses + offset_mes).length === 1 ? `0${String(contador_meses + offset_mes)}` : String(contador_meses + offset_mes);
+    mes_codigo =
+      String(contador_meses + offset_mes).length === 1
+        ? `0${String(contador_meses + offset_mes)}`
+        : String(contador_meses + offset_mes);
     codigo = `${ano}-${mes_codigo}-${numero}`;
     eventos = dic_eventos[codigo] === undefined ? [] : dic_eventos[codigo];
     // eventos de un dia
@@ -166,7 +180,7 @@ function generarArrayDias(dic_eventos, ano) {
             3: 0,
             4: 0,
             5: 0,
-            6: 0,
+            6: 0
           };
           in_periodo_lectivo = false;
         }
@@ -177,7 +191,9 @@ function generarArrayDias(dic_eventos, ano) {
             contar = false;
             if (evento.nombre === 'Periodo festivo de navidades') {
             } else {
-              vacaciones_offset = (Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio)) / 86400000;
+              vacaciones_offset =
+                (Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio)) /
+                86400000;
             }
           }
         }
@@ -202,8 +218,7 @@ function generarArrayDias(dic_eventos, ano) {
               dic_dias[enumsPD.diasDeSemana.Miercoles] += 1;
             }
           }
-        } catch (error) {
-        }
+        } catch (error) {}
         if (noContar) {
         }
       }
@@ -233,7 +248,7 @@ function generarArrayDias(dic_eventos, ano) {
             3: 0,
             4: 0,
             5: 0,
-            6: 0,
+            6: 0
           };
           in_periodo_lectivo = false;
           break;
@@ -248,7 +263,10 @@ function generarArrayDias(dic_eventos, ano) {
         for (var j = 0; j < eventos.length; j++) {
           const evento = eventos[j];
 
-          if (evento.nombre === 'Inicio de las clases' || evento.nombre === 'Comienzo del segundo cuatrimestre') {
+          if (
+            evento.nombre === 'Inicio de las clases' ||
+            evento.nombre === 'Comienzo del segundo cuatrimestre'
+          ) {
             in_periodo_lectivo = true;
             contar = true;
             dic_dias[dia] += 1;
@@ -270,13 +288,12 @@ function generarArrayDias(dic_eventos, ano) {
       codigo,
       ano,
       eventos,
-      color,
+      color
     };
     array_calendario.push(objeto);
   }
   return [array_calendario, array_numeros, dic_dias_1, dic_dias, semanas];
 }
-
 
 /**
  * Esta funcion se encarga de generar el calendario y renderizar la página con el calendario.
@@ -298,7 +315,7 @@ function generarArrayDias(dic_eventos, ano) {
  * @param {*} next
  */
 
-exports.getCalendario = async function (req, res, next) {
+exports.getCalendario = async function(req, res, next) {
   try {
     const { ano } = req;
     req.session.ano = req.ano_mostrar;
@@ -312,21 +329,21 @@ exports.getCalendario = async function (req, res, next) {
     if (req.query.planID === undefined) {
       general = 'true';
     }
-    let ano_actual = (new Date()).toString().split(' ')[3];
-    if ((new Date()).getMonth() < 8) {
+    let ano_actual = new Date().toString().split(' ')[3];
+    if (new Date().getMonth() < 8) {
       ano_actual = String(parseInt(ano_actual) - 1);
     }
     if (general === 'true') {
       const resultado = await models.Calendario.findAll({
         where: {
-          ano: parseInt(ano),
+          ano: parseInt(ano)
         },
-        raw: true,
+        raw: true
       });
       if (resultado.length === 0) {
         const objeto_ano = {
           ano,
-          estado: 0,
+          estado: 0
         };
         await models.Calendario.findCreateFind({ where: objeto_ano });
         req.session.submenu = 'Calendario';
@@ -345,7 +362,7 @@ exports.getCalendario = async function (req, res, next) {
           ano: req.ano_mostrar,
           estado: 0,
           semanas: array_datos[4],
-          vacio,
+          vacio
         });
       } else {
         req.session.submenu = 'Calendario';
@@ -364,20 +381,20 @@ exports.getCalendario = async function (req, res, next) {
           ano: req.ano_mostrar,
           estado: resultado[0].estado,
           semanas: array_datos[4],
-          vacio,
+          vacio
         });
       }
     } else {
       const resultado = await models.Calendario.findAll({
         where: {
-          ano: parseInt(ano),
+          ano: parseInt(ano)
         },
-        raw: true,
+        raw: true
       });
       if (resultado.length === 0) {
         const objeto_ano = {
           ano,
-          estado: 0,
+          estado: 0
         };
         await models.Calendario.findCreateFind({ where: objeto_ano });
         req.session.submenu = 'Calendario';
@@ -393,7 +410,7 @@ exports.getCalendario = async function (req, res, next) {
           ano2: String(parseInt(ano_actual) + 1),
           ano: req.ano_mostrar,
           estado: resultado[0].estado,
-          semanas: array_datos[4],
+          semanas: array_datos[4]
         });
       } else {
         req.session.submenu = 'Calendario';
@@ -409,7 +426,7 @@ exports.getCalendario = async function (req, res, next) {
           ano2: String(parseInt(ano_actual) + 1),
           ano: req.ano_mostrar,
           estado: resultado[0].estado,
-          semanas: array_datos[4],
+          semanas: array_datos[4]
         });
       }
     }
@@ -418,7 +435,7 @@ exports.getCalendario = async function (req, res, next) {
     next(error);
   }
 };
-exports.getCalendarioPlanConsultar = async function (req, res, next) {
+exports.getCalendarioPlanConsultar = async function(req, res, next) {
   try {
     req.calendario = {};
     const { ano } = req;
@@ -433,26 +450,26 @@ exports.getCalendarioPlanConsultar = async function (req, res, next) {
         calendario: null,
         array_dias: null,
         ano: null,
-        estado: 1,
+        estado: 1
       });
       return;
     }
     req.session.ano = req.ano_mostrar;
     array_datos = generarArrayDias(req.dic_eventos, ano);
-    let ano_actual = (new Date()).toString().split(' ')[3];
-    if ((new Date()).getMonth() < 8) {
+    let ano_actual = new Date().toString().split(' ')[3];
+    if (new Date().getMonth() < 8) {
       ano_actual = String(parseInt(ano_actual) - 1);
     }
     const resultado = await models.Calendario.findAll({
       where: {
-        ano: parseInt(ano),
+        ano: parseInt(ano)
       },
-      raw: true,
+      raw: true
     });
     if (resultado.length === 0) {
       const objeto_ano = {
         ano,
-        estado: 0,
+        estado: 0
       };
       await models.Calendario.findCreateFind({ where: objeto_ano });
       req.session.submenu = 'Calendario';
@@ -464,7 +481,7 @@ exports.getCalendarioPlanConsultar = async function (req, res, next) {
         calendario: array_datos[1],
         array_dias: array_datos[0],
         ano,
-        estado: 0,
+        estado: 0
       });
     } else if (resultado[0].estado === 0) {
       req.session.submenu = 'Calendario';
@@ -476,7 +493,7 @@ exports.getCalendarioPlanConsultar = async function (req, res, next) {
         calendario: array_datos[1],
         array_dias: array_datos[0],
         ano,
-        estado: 0,
+        estado: 0
       });
     } else {
       req.session.submenu = 'Calendario';
@@ -488,7 +505,7 @@ exports.getCalendarioPlanConsultar = async function (req, res, next) {
         calendario: array_datos[1],
         array_dias: array_datos[0],
         ano,
-        estado: 1,
+        estado: 1
       });
     }
   } catch (error) {
@@ -503,26 +520,26 @@ exports.getCalendarioPlanConsultar = async function (req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.getCalendarioPDF = async function (req, res, next) {
+exports.getCalendarioPDF = async function(req, res, next) {
   try {
     req.calendario = {};
     if (res.locals.progDoc) {
       const { ano } = req;
       array_datos = generarArrayDias(req.dic_eventos, ano);
-      let ano_actual = (new Date()).toString().split(' ')[3];
-      if ((new Date()).getMonth() < 8) {
+      let ano_actual = new Date().toString().split(' ')[3];
+      if (new Date().getMonth() < 8) {
         ano_actual = String(parseInt(ano_actual) - 1);
       }
       const resultado = await models.Calendario.findAll({
         where: {
-          ano: parseInt(ano),
+          ano: parseInt(ano)
         },
-        raw: true,
+        raw: true
       });
       if (resultado.length === 0) {
         const objeto_ano = {
           ano,
-          estado: 0,
+          estado: 0
         };
         await models.Calendario.findCreateFind({ where: objeto_ano });
         req.calendario.estado = 0;
@@ -531,9 +548,9 @@ exports.getCalendarioPDF = async function (req, res, next) {
         req.calendario.estado = 0;
         next();
       } else {
-        req.calendario.calendario = array_datos[1],
-        req.calendario.array_dias = array_datos[0],
-        req.calendario.estado = 1;
+        (req.calendario.calendario = array_datos[1]),
+          (req.calendario.array_dias = array_datos[0]),
+          (req.calendario.estado = 1);
         next();
       }
     } else {
@@ -544,7 +561,6 @@ exports.getCalendarioPDF = async function (req, res, next) {
     next(error);
   }
 };
-
 
 /**
  * Esta funcion se encarga perparar un diccionario con los eventos en formato JSON para enviarlos al front-end
@@ -561,7 +577,7 @@ exports.getCalendarioPDF = async function (req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.eventosDiccionario = async function (req, res, next) {
+exports.eventosDiccionario = async function(req, res, next) {
   try {
     let dic_eventos = {};
     if (req.dic_eventos !== undefined) {
@@ -576,17 +592,20 @@ exports.eventosDiccionario = async function (req, res, next) {
       fechaInicio: {
         // Solamente se coge los eventos de ese año
         gte: Date.parse(`${ano}-09-01`),
-        lt: Date.parse(`${String(parseInt(ano) + 1)}-09-01`),
-      },
+        lt: Date.parse(`${String(parseInt(ano) + 1)}-09-01`)
+      }
     };
-    if (req.query.planID !== undefined && req.originalUrl.includes('/gestion/calendario')) {
+    if (
+      req.query.planID !== undefined &&
+      req.originalUrl.includes('/gestion/calendario')
+    ) {
       condicionesDeBusqueda.editable = 0;
     }
     const events = await models.EventoGeneral.findAll({
       where: condicionesDeBusqueda,
-      raw: true,
+      raw: true
     });
-    events.forEach((e) => {
+    events.forEach(e => {
       let nombre = e.evento;
       if (editados.includes(e.identificador)) {
         return;
@@ -618,9 +637,13 @@ exports.eventosDiccionario = async function (req, res, next) {
         var fechaFin = 'Evento de dia';
       } else {
         if (e.fechaInicio.split('-')[1] === e.fechaFin.split('-')[1]) {
-          var mensaje = `${e.fechaInicio.split('-')[2]}-${e.fechaFin.split('-')[2]}: ${nombre}`;
+          var mensaje = `${e.fechaInicio.split('-')[2]}-${
+            e.fechaFin.split('-')[2]
+          }: ${nombre}`;
         } else {
-          var mensaje = `${e.fechaInicio.split('-')[2]}/${e.fechaInicio.split('-')[1]}-${e.fechaFin.split('-')[2]}/${e.fechaFin.split('-')[1]}: ${nombre}`;
+          var mensaje = `${e.fechaInicio.split('-')[2]}/${
+            e.fechaInicio.split('-')[1]
+          }-${e.fechaFin.split('-')[2]}/${e.fechaFin.split('-')[1]}: ${nombre}`;
         }
         var { fechaFin } = e;
       }
@@ -631,9 +654,9 @@ exports.eventosDiccionario = async function (req, res, next) {
         fechaFin,
         color: e.color,
         editable: e.editable,
-        mensaje: (` ${mensaje}`),
+        mensaje: ` ${mensaje}`,
         tipo,
-        identificadorPlan: '0',
+        identificadorPlan: '0'
       };
       try {
         dic_eventos[e.fechaInicio].push(objeto_evento);
@@ -664,7 +687,7 @@ exports.eventosDiccionario = async function (req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.eventosPlanDiccionario = async function (req, res, next) {
+exports.eventosPlanDiccionario = async function(req, res, next) {
   try {
     const dic_eventos = {};
     const editados = [];
@@ -678,13 +701,13 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
           fechaInicio: {
             // Solamente se coge los eventos de ese año
             gte: Date.parse(`${ano}-09-01`),
-            lt: Date.parse(`${String(parseInt(ano) + 1)}-09-01`),
+            lt: Date.parse(`${String(parseInt(ano) + 1)}-09-01`)
           },
-          PlanEstudioId: planID,
+          PlanEstudioId: planID
         },
-        raw: true,
+        raw: true
       });
-      events.forEach((e) => {
+      events.forEach(e => {
         if (req.isJefeDeEstudios && e.EventoGeneralId === null) {
           return;
         }
@@ -694,8 +717,7 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
           if (nombre.substring(0, 11) === 'eliminado//') {
             return;
           }
-        } catch (error) {
-        }
+        } catch (error) {}
         let tipo = '';
         if (nombre.includes('festivo//')) {
           tipo = 'festivo';
@@ -723,9 +745,15 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
           var fechaFin = 'Evento de dia';
         } else {
           if (e.fechaInicio.split('-')[1] === e.fechaFin.split('-')[1]) {
-            var mensaje = `${e.fechaInicio.split('-')[2]}-${e.fechaFin.split('-')[2]}: ${nombre}`;
+            var mensaje = `${e.fechaInicio.split('-')[2]}-${
+              e.fechaFin.split('-')[2]
+            }: ${nombre}`;
           } else {
-            var mensaje = `${e.fechaInicio.split('-')[2]}/${e.fechaInicio.split('-')[1]}-${e.fechaFin.split('-')[2]}/${e.fechaFin.split('-')[1]}: ${nombre}`;
+            var mensaje = `${e.fechaInicio.split('-')[2]}/${
+              e.fechaInicio.split('-')[1]
+            }-${e.fechaFin.split('-')[2]}/${
+              e.fechaFin.split('-')[1]
+            }: ${nombre}`;
           }
           var { fechaFin } = e;
         }
@@ -735,10 +763,10 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
           fechaFin,
           color: e.color,
           editable: enumsPD.eventoGeneral.Editable,
-          mensaje: (` ${mensaje}`),
+          mensaje: ` ${mensaje}`,
           tipo,
           identificador: e.EventoGeneralId,
-          identificadorPlan: e.identificador,
+          identificadorPlan: e.identificador
         };
         try {
           dic_eventos[e.fechaInicio].push(objeto_evento);
@@ -756,19 +784,21 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
   }
 };
 
-
 /**
  * Esta función se encarga de guardar en req.ano el año sobre el cual se ha realizado la petición
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-exports.anoDeTrabajo = function (req, res, next) {
+exports.anoDeTrabajo = function(req, res, next) {
   // Lo primero que hace el codigo es ver si se le ha metido el año como query
   let { ano } = req.query;
 
   if (ano === undefined) {
-    if (req.originalUrl.includes('/cumplimentar/calendario') || req.originalUrl.includes('/consultar/calendario')) {
+    if (
+      req.originalUrl.includes('/cumplimentar/calendario') ||
+      req.originalUrl.includes('/consultar/calendario')
+    ) {
       if (req.session.pdID === null) {
         ano = null;
       } else {
@@ -778,7 +808,7 @@ exports.anoDeTrabajo = function (req, res, next) {
 
     // En caso negativo, se obtiene el año actual (el de comienzo del curso, ej:19/20 --> 2019)
     else if (req.session.ano === undefined) {
-      ano = (new Date()).toString().split(' ')[3];
+      ano = new Date().toString().split(' ')[3];
       req.ano_mostrar = ano;
     } else {
       ano = req.session.ano;
@@ -797,36 +827,49 @@ exports.anoDeTrabajo = function (req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.anoDeTrabajoPDF = function (req, res, next) {
+exports.anoDeTrabajoPDF = function(req, res, next) {
   /*
     let planID = req.session.pdID;
     let ano = planID.split("_")[2].substring(0,4);
     req.ano = ano */
   if (res.locals.progDoc) {
     try {
-      req.ano = 2000 + Number(`${res.locals.progDoc['ProgramacionDocentes.anoAcademico'][4]}${res.locals.progDoc['ProgramacionDocentes.anoAcademico'][5]}`) - 1;
+      req.ano =
+        2000 +
+        Number(
+          `${res.locals.progDoc['ProgramacionDocentes.anoAcademico'][4]}${res.locals.progDoc['ProgramacionDocentes.anoAcademico'][5]}`
+        ) -
+        1;
     } catch (err) {
-      req.ano = 2000 + Number(`${res.locals.progDoc.anoAcademico[4]}${res.locals.progDoc.anoAcademico[5]}`) - 1;
+      req.ano =
+        2000 +
+        Number(
+          `${res.locals.progDoc.anoAcademico[4]}${res.locals.progDoc.anoAcademico[5]}`
+        ) -
+        1;
     }
   }
   next();
 };
 
-exports.postEventoGeneral = async function (req, res, next) {
+exports.postEventoGeneral = async function(req, res, next) {
   try {
     let { fechaFin } = req.query;
     if (fechaFin !== undefined) {
       fechaFin = moment(fechaFin, 'YYYY-MM-DD');
     }
     const { fechaInicio } = req.query;
-    const editable = req.query.editable === 'true' ? enumsPD.eventoGeneral.Editable : enumsPD.eventoGeneral.NoEditable;
+    const editable =
+      req.query.editable === 'true'
+        ? enumsPD.eventoGeneral.Editable
+        : enumsPD.eventoGeneral.NoEditable;
     const nombre = req.query.evento;
     const evento = {
       evento: nombre,
       color: '',
       fechaInicio: moment(fechaInicio, 'YYYY-MM-DD'),
       fechaFin,
-      editable,
+      editable
     };
     if (req.query.identificador === '0') {
       await models.EventoGeneral.findCreateFind({ where: evento });
@@ -835,13 +878,12 @@ exports.postEventoGeneral = async function (req, res, next) {
     } else {
       await models.EventoPlan.destroy({
         where: {
-          EventoGeneralId: req.query.identificador,
-        },
+          EventoGeneralId: req.query.identificador
+        }
       });
-      await models.EventoGeneral.update(
-        evento,
-        { where: { identificador: req.query.identificador } },
-      );
+      await models.EventoGeneral.update(evento, {
+        where: { identificador: req.query.identificador }
+      });
       // res.status(409);
       res.json({ estado: 'exito' });
     }
@@ -851,17 +893,17 @@ exports.postEventoGeneral = async function (req, res, next) {
   }
 };
 
-exports.deleteEventoGeneral = async function (req, res, next) {
+exports.deleteEventoGeneral = async function(req, res, next) {
   try {
     await models.EventoPlan.destroy({
       where: {
-        EventoGeneralId: req.query.identificador,
-      },
+        EventoGeneralId: req.query.identificador
+      }
     });
     await models.EventoGeneral.destroy({
       where: {
-        identificador: req.query.identificador,
-      },
+        identificador: req.query.identificador
+      }
     });
     res.json({ estado: 'exito' });
   } catch (error) {
@@ -871,7 +913,7 @@ exports.deleteEventoGeneral = async function (req, res, next) {
 };
 
 // EN REALIDAD SE GUARDA COMO ELIMINADO EN LA BBDD
-exports.deleteEventoPlan = async function (req, res, next) {
+exports.deleteEventoPlan = async function(req, res, next) {
   try {
     const { planID } = req.session;
     const eventoGeneralId = req.query.identificador;
@@ -880,8 +922,8 @@ exports.deleteEventoPlan = async function (req, res, next) {
     if (eventoGeneralId === 'null') {
       await models.EventoPlan.destroy({
         where: {
-          identificador: req.query.identificadorPlan,
-        },
+          identificador: req.query.identificadorPlan
+        }
       });
       // res.status(409);
       res.json({ estado: 'exito' });
@@ -893,13 +935,13 @@ exports.deleteEventoPlan = async function (req, res, next) {
         fechaInicio: moment(fechaInicio, 'YYYY-MM-DD'),
         fechaFin: undefined,
         PlanEstudioId: planID,
-        EventoGeneralId: eventoGeneralId,
+        EventoGeneralId: eventoGeneralId
       };
       await models.EventoPlan.destroy({
         where: {
           PlanEstudioId: planID,
-          EventoGeneralId: eventoGeneralId,
-        },
+          EventoGeneralId: eventoGeneralId
+        }
       });
       await models.EventoPlan.findCreateFind({ where: eventoEliminadoPlan });
       // res.status(409);
@@ -911,15 +953,28 @@ exports.deleteEventoPlan = async function (req, res, next) {
   }
 };
 
-
-exports.postEventoPlan = async function (req, res, next) {
+exports.postEventoPlan = async function(req, res, next) {
   try {
     const { planID } = req.session;
     let eventoGeneralId = req.query.identificador;
     const nombre = req.query.evento;
     const { fechaInicio } = req.query;
     let { fechaFin } = req.query;
-    const meses = [' ', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const meses = [
+      ' ',
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre'
+    ];
     if (fechaFin !== undefined) {
       fechaFin = moment(fechaFin, 'YYYY-MM-DD');
     }
@@ -930,12 +985,11 @@ exports.postEventoPlan = async function (req, res, next) {
         fechaInicio: moment(fechaInicio, 'YYYY-MM-DD'),
         fechaFin,
         PlanEstudioId: planID,
-        EventoGeneralId: null,
+        EventoGeneralId: null
       };
-      await models.EventoPlan.update(
-        evento,
-        { where: { identificador: parseInt(req.query.identificadorPlan) } },
-      );
+      await models.EventoPlan.update(evento, {
+        where: { identificador: parseInt(req.query.identificadorPlan) }
+      });
       // res.status(409);
       res.json({ estado: 'exito' });
     } else if (eventoGeneralId === '0') {
@@ -946,7 +1000,7 @@ exports.postEventoPlan = async function (req, res, next) {
         fechaInicio: moment(fechaInicio, 'YYYY-MM-DD'),
         fechaFin,
         PlanEstudioId: planID,
-        EventoGeneralId: eventoGeneralId,
+        EventoGeneralId: eventoGeneralId
       };
       await models.EventoPlan.findCreateFind({ where: evento });
       // res.status(409);
@@ -958,13 +1012,13 @@ exports.postEventoPlan = async function (req, res, next) {
         fechaInicio: moment(fechaInicio, 'YYYY-MM-DD'),
         fechaFin,
         PlanEstudioId: planID,
-        EventoGeneralId: eventoGeneralId,
+        EventoGeneralId: eventoGeneralId
       };
       await models.EventoPlan.destroy({
         where: {
           PlanEstudioId: planID,
-          EventoGeneralId: eventoGeneralId,
-        },
+          EventoGeneralId: eventoGeneralId
+        }
       });
       await models.EventoPlan.findCreateFind({ where: evento });
       // res.status(409);
@@ -976,21 +1030,21 @@ exports.postEventoPlan = async function (req, res, next) {
   }
 };
 
-exports.aprobarGeneral = async function (req, res, next) {
+exports.aprobarGeneral = async function(req, res, next) {
   try {
     const { ano } = req.query;
     if (ano === undefined) {
       res.status(400);
       res.json({
-        estado: 'falta año',
+        estado: 'falta año'
       });
     } else {
       await models.Calendario.update(
         { estado: 1 },
-        { where: { ano: parseInt(ano) } },
+        { where: { ano: parseInt(ano) } }
       );
       res.json({
-        estado: 'exito',
+        estado: 'exito'
       });
     }
   } catch (error) {
@@ -999,7 +1053,7 @@ exports.aprobarGeneral = async function (req, res, next) {
   }
 };
 
-exports.getCalendarioPlan = async function (req, res, next) {
+exports.getCalendarioPlan = async function(req, res, next) {
   try {
     const { ano } = req;
     if (ano === null) {
@@ -1013,25 +1067,25 @@ exports.getCalendarioPlan = async function (req, res, next) {
         calendario: null,
         array_dias: null,
         ano: null,
-        estado: 1,
+        estado: 1
       });
       return;
     }
     array_datos = generarArrayDias(req.dic_eventos, ano);
-    let ano_actual = (new Date()).toString().split(' ')[3];
-    if ((new Date()).getMonth() < 8) {
+    let ano_actual = new Date().toString().split(' ')[3];
+    if (new Date().getMonth() < 8) {
       ano_actual = String(parseInt(ano_actual) - 1);
     }
     const resultado = await models.Calendario.findAll({
       where: {
-        ano: parseInt(ano),
+        ano: parseInt(ano)
       },
-      raw: true,
+      raw: true
     });
     if (resultado.length === 0) {
       const objeto_ano = {
         ano,
-        estado: 0,
+        estado: 0
       };
       await models.Calendario.findCreateFind({ where: objeto_ano });
       req.session.submenu = 'Calendario';
@@ -1043,7 +1097,7 @@ exports.getCalendarioPlan = async function (req, res, next) {
         calendario: array_datos[1],
         array_dias: array_datos[0],
         ano,
-        estado: 0,
+        estado: 0
       });
     } else {
       req.session.submenu = 'Calendario';
@@ -1055,7 +1109,7 @@ exports.getCalendarioPlan = async function (req, res, next) {
         calendario: array_datos[1],
         array_dias: array_datos[0],
         ano,
-        estado: resultado[0].estado,
+        estado: resultado[0].estado
       });
     }
   } catch (error) {
@@ -1064,21 +1118,21 @@ exports.getCalendarioPlan = async function (req, res, next) {
   }
 };
 
-exports.editablePlan = async function (req, res, next) {
+exports.editablePlan = async function(req, res, next) {
   try {
     const { planID } = req.session;
     const { identificador } = req.query;
     const { editable } = req.query;
     if (editable === 'false') {
       await models.EventoPlan.destroy({
-        where: { EventoGeneralId: identificador },
+        where: { EventoGeneralId: identificador }
       });
       res.json({ estado: 'exito' });
     } else {
       const evento_general = await models.EventoGeneral.find({
         where: {
-          identificador,
-        },
+          identificador
+        }
       });
       const evento = {
         evento: evento_general.evento,
@@ -1086,7 +1140,7 @@ exports.editablePlan = async function (req, res, next) {
         fechaFin: evento_general.fechaFin,
         fechaInicio: evento_general.fechaInicio,
         PlanEstudioId: planID,
-        EventoGeneralId: identificador,
+        EventoGeneralId: identificador
       };
       await models.EventoPlan.findCreateFind({ where: evento });
       res.json({ estado: 'exito' });
@@ -1097,12 +1151,12 @@ exports.editablePlan = async function (req, res, next) {
   }
 };
 
-exports.copiarEventos = async function (req, res, next) {
+exports.copiarEventos = async function(req, res, next) {
   const { ano } = req.query;
   if (ano === undefined) {
     res.status(400);
     res.json({
-      estado: 'falta año',
+      estado: 'falta año'
     });
   } else {
     let transaction;
@@ -1112,51 +1166,70 @@ exports.copiarEventos = async function (req, res, next) {
         fechaInicio: {
           // Solamente se coge los eventos de ese año
           gte: Date.parse(`${String(parseInt(ano) - 1)}-09-01`),
-          lt: Date.parse(`${ano}-09-01`),
-        },
+          lt: Date.parse(`${ano}-09-01`)
+        }
       };
       transaction = await models.sequelize.transaction();
       const eventosGeneral = await models.EventoGeneral.findAll({
         where: condicionesDeBusqueda,
         transaction,
-        raw: true,
+        raw: true
       });
       // forEach no funciona con bucle de awaits por ser funcional
       for (let i = 0; i < eventosGeneral.length; i++) {
         const e = eventosGeneral[i];
         const nombre = e.evento;
         if (nombre.includes('festivo//')) {
-          e.fechaInicio = String(parseInt(e.fechaInicio.substring(0, 4), 10) + 1) + e.fechaInicio.substring(4, 10);
+          e.fechaInicio =
+            String(parseInt(e.fechaInicio.substring(0, 4), 10) + 1) +
+            e.fechaInicio.substring(4, 10);
 
           if (e.fechaFin !== null) {
-            e.fechaFin = String(parseInt(e.fechaFin.substring(0, 4), 10) + 1) + e.fechaFin.substring(4, 10);
+            e.fechaFin =
+              String(parseInt(e.fechaFin.substring(0, 4), 10) + 1) +
+              e.fechaFin.substring(4, 10);
           }
           delete e.identificador;
 
           await models.EventoGeneral.findCreateFind({ where: e, transaction });
         } else if (nombre.includes('especial//')) {
-
         } else {
           let { fechaInicio } = e;
           let { fechaFin } = e;
           if (e.fechaFin === null) {
-            const nuevaFecha = new Date(parseInt(fechaInicio.substring(0, 4)) + 1, parseInt(fechaInicio.substring(5, 7) - 1), parseInt(fechaInicio.substring(8, 10)));
+            const nuevaFecha = new Date(
+              parseInt(fechaInicio.substring(0, 4)) + 1,
+              parseInt(fechaInicio.substring(5, 7) - 1),
+              parseInt(fechaInicio.substring(8, 10))
+            );
             if (nuevaFecha.getDay() === 0) {
               nuevaFecha.setDate(nuevaFecha.getDate() + 1);
             } else if (nuevaFecha.getDay() === 6) {
               nuevaFecha.setDate(nuevaFecha.getDate() + 2);
             }
 
-            fechaInicio = `${String(nuevaFecha.getFullYear())}-${String(nuevaFecha.getMonth() + 1)}-${String(nuevaFecha.getDate())}`;
-
+            fechaInicio = `${String(nuevaFecha.getFullYear())}-${String(
+              nuevaFecha.getMonth() + 1
+            )}-${String(nuevaFecha.getDate())}`;
 
             e.fechaInicio = fechaInicio;
             delete e.identificador;
 
-            await models.EventoGeneral.findCreateFind({ where: e, transaction });
+            await models.EventoGeneral.findCreateFind({
+              where: e,
+              transaction
+            });
           } else {
-            const nuevaFecha = new Date(parseInt(fechaInicio.substring(0, 4)) + 1, parseInt(fechaInicio.substring(5, 7) - 1), parseInt(fechaInicio.substring(8, 10)));
-            const nuevaFechaFin = new Date(parseInt(fechaFin.substring(0, 4)) + 1, parseInt(fechaFin.substring(5, 7) - 1), parseInt(fechaFin.substring(8, 10)));
+            const nuevaFecha = new Date(
+              parseInt(fechaInicio.substring(0, 4)) + 1,
+              parseInt(fechaInicio.substring(5, 7) - 1),
+              parseInt(fechaInicio.substring(8, 10))
+            );
+            const nuevaFechaFin = new Date(
+              parseInt(fechaFin.substring(0, 4)) + 1,
+              parseInt(fechaFin.substring(5, 7) - 1),
+              parseInt(fechaFin.substring(8, 10))
+            );
 
             if (nuevaFecha.getDay() === 0) {
               nuevaFecha.setDate(nuevaFecha.getDate() + 1);
@@ -1166,14 +1239,21 @@ exports.copiarEventos = async function (req, res, next) {
               nuevaFechaFin.setDate(nuevaFechaFin.getDate() + 2);
             }
 
-            fechaInicio = `${String(nuevaFecha.getFullYear())}-${String(nuevaFecha.getMonth() + 1)}-${String(nuevaFecha.getDate())}`;
-            fechaFin = `${String(nuevaFechaFin.getFullYear())}-${String(nuevaFechaFin.getMonth() + 1)}-${String(nuevaFechaFin.getDate())}`;
+            fechaInicio = `${String(nuevaFecha.getFullYear())}-${String(
+              nuevaFecha.getMonth() + 1
+            )}-${String(nuevaFecha.getDate())}`;
+            fechaFin = `${String(nuevaFechaFin.getFullYear())}-${String(
+              nuevaFechaFin.getMonth() + 1
+            )}-${String(nuevaFechaFin.getDate())}`;
 
             e.fechaInicio = fechaInicio;
             e.fechaFin = fechaFin;
             delete e.identificador;
 
-            await models.EventoGeneral.findCreateFind({ where: e, transaction });
+            await models.EventoGeneral.findCreateFind({
+              where: e,
+              transaction
+            });
           }
         }
       }
@@ -1186,7 +1266,7 @@ exports.copiarEventos = async function (req, res, next) {
       console.log(error);
       res.status(500);
       res.json({
-        error: 'Ha ocurrido un error',
+        error: 'Ha ocurrido un error'
       });
     }
   }

@@ -1,17 +1,16 @@
 /**
-*jQuery File Tree Node.js Connector
-*https://www.abeautifulsite.net/jquery-file-tree
-*modificado por javier.conde.diaz@alumnos.upm.es
-*17 Feb 2020
-*/
+ *jQuery File Tree Node.js Connector
+ *https://www.abeautifulsite.net/jquery-file-tree
+ *modificado por javier.conde.diaz@alumnos.upm.es
+ *17 Feb 2020
+ */
 
 /* global PATH_PDF, CONTEXT */
 const fs = require('fs');
 const path = require('path');
 
-
 // eslint-disable-next-line no-underscore-dangle
-const _getDirList = function (req, res) {
+const _getDirList = function(req, res) {
   let dir = path.resolve(req.body.dir); // lo convierte ruta absoluta
   // evito que me accedan a zona restringida, solo se puede entrar a la carpeta acordada
   if (!dir.includes(PATH_PDF)) {
@@ -23,12 +22,12 @@ const _getDirList = function (req, res) {
   try {
     r = '<ul class="jqueryFileTree" style="display: none;">';
     const files = fs.readdirSync(dir);
-    files.forEach((f) => {
+    files.forEach(f => {
       let ff = dir + f;
 
       const stats = fs.statSync(ff);
       if (stats.isDirectory()) {
-        const plan = res.locals.planEstudios.find((obj) => obj.codigo === f);
+        const plan = res.locals.planEstudios.find(obj => obj.codigo === f);
         if (plan) {
           plan.nombre = plan.nombre || plan.nombreCompleto;
           // eslint-disable-next-line no-param-reassign

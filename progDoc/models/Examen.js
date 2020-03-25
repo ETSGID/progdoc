@@ -1,26 +1,27 @@
 // Definicion del modelo Examen:
 const enumsPD = require('../enumsPD');
 
-module.exports = function (sequelize, DataTypes) {
-  const Examen = sequelize.define('Examen',
+module.exports = function(sequelize, DataTypes) {
+  const Examen = sequelize.define(
+    'Examen',
     {
       identificador: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       },
       // si no hay fecha signfica que es una franja horaria
       fecha: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.DATEONLY
       },
       horaInicio: {
-        type: DataTypes.TIME,
+        type: DataTypes.TIME
       },
       duracion: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.FLOAT
       },
       aulas: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: DataTypes.ARRAY(DataTypes.STRING)
       },
       // los periodos pueden ser ordinario o extraordinario y se separan tambien por semestre
       // TODO cuando se defina el calendario se podrá acotar,
@@ -31,15 +32,15 @@ module.exports = function (sequelize, DataTypes) {
           enumsPD.periodoPD.S1_O,
           enumsPD.periodoPD.S1_E,
           enumsPD.periodoPD.S2_O,
-          enumsPD.periodoPD.S2_E,
+          enumsPD.periodoPD.S2_E
         ),
-        validate: { notEmpty: { msg: 'Falta periodo' } },
-      },
-
+        validate: { notEmpty: { msg: 'Falta periodo' } }
+      }
     },
     {
-      timestamps: false,
-    });
+      timestamps: false
+    }
+  );
   Examen.removeAttribute('id');
   return Examen;
 };

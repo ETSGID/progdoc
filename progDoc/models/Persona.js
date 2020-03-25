@@ -1,29 +1,30 @@
 // Definicion del modelo Persona:
 
-module.exports = function (sequelize, DataTypes) {
-  const Persona = sequelize.define('Persona',
+module.exports = function(sequelize, DataTypes) {
+  const Persona = sequelize.define(
+    'Persona',
     {
       identificador: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       },
       email: {
         type: DataTypes.STRING,
         unique: true,
-        allowNull: false,
+        allowNull: false
       },
       nombre: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING
       },
       apellido: {
-        type: DataTypes.STRING,
-      },
-
+        type: DataTypes.STRING
+      }
     },
     {
-      timestamps: false,
-    });
+      timestamps: false
+    }
+  );
   Persona.removeAttribute('id');
   return Persona;
 };

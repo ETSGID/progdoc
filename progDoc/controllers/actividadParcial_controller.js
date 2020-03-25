@@ -10,12 +10,14 @@ const asignaturaController = require('./asignatura_controller');
 const grupoController = require('./grupo_controller');
 const cursoController = require('./curso_controller');
 
-exports.getActividadParcial = async function (req, res, next) {
+exports.getActividadParcial = async function(req, res, next) {
   req.session.submenu = 'Actividades';
   const { pdID } = req.session;
   let grupos;
   let asignaturas;
-  const view = req.originalUrl.toLowerCase().includes('consultar') ? 'actividades/actividadesConsultar' : 'actividades/actividadesCumplimentar';
+  const view = req.originalUrl.toLowerCase().includes('consultar')
+    ? 'actividades/actividadesConsultar'
+    : 'actividades/actividadesCumplimentar';
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
     res.render(view, {
       existe: 'Programación docente no abierta',
@@ -37,14 +39,21 @@ exports.getActividadParcial = async function (req, res, next) {
       actualizarConjuntoActividadParcialPath: null,
       eliminarConjuntoActividadParcialPath: null,
       pdID: null,
-      moment: null,
+      moment: null
     });
     // hay que comprobar que no sea una url de consultar.
-  } else if (estados.estadoCalendario.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoCalendario']
-        && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
-        && !req.originalUrl.toLowerCase().includes('consultar')) {
+  } else if (
+    estados.estadoCalendario.abierto !==
+      res.locals.progDoc['ProgramacionDocentes.estadoCalendario'] &&
+    (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
+      estados.estadoProgDoc.abierto ||
+      res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
+        estados.estadoProgDoc.listo) &&
+    !req.originalUrl.toLowerCase().includes('consultar')
+  ) {
     res.render(view, {
-      estado: 'Asignación de actividades parciales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe',
+      estado:
+        'Asignación de actividades parciales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe',
       permisoDenegado: res.locals.permisoDenegado,
       menu: req.session.menu,
       submenu: req.session.submenu,
@@ -63,7 +72,7 @@ exports.getActividadParcial = async function (req, res, next) {
       actualizarConjuntoActividadParcialPath: null,
       eliminarConjuntoActividadParcialPath: null,
       pdID: null,
-      moment: null,
+      moment: null
     });
   } else {
     try {
@@ -87,7 +96,8 @@ exports.getActividadParcial = async function (req, res, next) {
         submenu: req.session.submenu,
         planID: req.session.planID,
         planEstudios: res.locals.planEstudios,
-        estadoCalendario: res.locals.progDoc['ProgramacionDocentes.estadoCalendario'],
+        estadoCalendario:
+          res.locals.progDoc['ProgramacionDocentes.estadoCalendario'],
         estadosCalendario: estados.estadoCalendario,
         estadosProgDoc: estados.estadoProgDoc,
         estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
@@ -100,7 +110,7 @@ exports.getActividadParcial = async function (req, res, next) {
         actualizarConjuntoActividadParcialPath: `${req.baseUrl}/coordiandor/actualizarConjuntoActividadParcial`,
         eliminarConjuntoActividadParcialPath: `${req.baseUrl}/coordiandor/eliminarConjuntoActividadParcial`,
         pdID,
-        moment,
+        moment
       });
     } catch (error) {
       console.log('Error:', error);
@@ -121,33 +131,38 @@ async function getAllActividadParcial(pdID) {
       const cs = await models.ConjuntoActividadParcial.findAll({
         where: {
           ProgramacionDocenteId: {
-            [op.in]: pdID,
-          },
+            [op.in]: pdID
+          }
         },
         order: [
           [Sequelize.literal('"curso"'), 'ASC'],
-          [Sequelize.literal('"semestre"'), 'ASC'],
+          [Sequelize.literal('"semestre"'), 'ASC']
         ],
-        include: [{
-          model: models.Grupo,
-          // left join
-          required: false,
-        }],
-        raw: true,
+        include: [
+          {
+            model: models.Grupo,
+            // left join
+            required: false
+          }
+        ],
+        raw: true
       });
-      // eslint-disable-next-line no-restricted-syntax
       for (const c of cs) {
-        // eslint-disable-next-line max-len
-        let conjuntoActividadParcial = conjuntoActividadesParcial.find((obj) => obj.identificador === c.identificador);
+        let conjuntoActividadParcial = conjuntoActividadesParcial.find(
+          obj => obj.identificador === c.identificador
+        );
         if (!conjuntoActividadParcial) {
           conjuntoActividadParcial = {};
           conjuntoActividadParcial.identificador = c.identificador;
           conjuntoActividadParcial.notaInicial = c.notaInicial;
           conjuntoActividadParcial.curso = c.curso;
           conjuntoActividadParcial.semestre = c.semestre;
-          conjuntoActividadParcial.fechaInicio = funciones.formatFecha(c.fechaInicio);
+          conjuntoActividadParcial.fechaInicio = funciones.formatFecha(
+            c.fechaInicio
+          );
           conjuntoActividadParcial.fechaFin = funciones.formatFecha(c.fechaFin);
-          conjuntoActividadParcial.ProgramacionDocenteId = c.ProgramacionDocenteId;
+          conjuntoActividadParcial.ProgramacionDocenteId =
+            c.ProgramacionDocenteId;
           conjuntoActividadParcial.grupos = [];
           conjuntoActividadParcial.actividades = [];
           conjuntoActividadesParcial.push(conjuntoActividadParcial);
@@ -161,24 +176,26 @@ async function getAllActividadParcial(pdID) {
       const acts = await models.ConjuntoActividadParcial.findAll({
         attributes: ['identificador'],
         where: {
-          ProgramacionDocenteId: pdID,
+          ProgramacionDocenteId: pdID
         },
-        include: [{
-          model: models.ActividadParcial,
-          // inner join
-          required: true,
-        }],
+        include: [
+          {
+            model: models.ActividadParcial,
+            // inner join
+            required: true
+          }
+        ],
         order: [
           [Sequelize.literal('"curso"'), 'ASC'],
           [Sequelize.literal('"semestre"'), 'ASC'],
-          [Sequelize.literal('"ActividadParcials.fecha"'), 'ASC'],
+          [Sequelize.literal('"ActividadParcials.fecha"'), 'ASC']
         ],
-        raw: true,
+        raw: true
       });
-      // eslint-disable-next-line no-restricted-syntax
       for (const act of acts) {
-        // eslint-disable-next-line max-len
-        const conjuntoActividadParcial = conjuntoActividadesParcial.find((obj) => obj.identificador === act.identificador);
+        const conjuntoActividadParcial = conjuntoActividadesParcial.find(
+          obj => obj.identificador === act.identificador
+        );
         const actividad = {};
         actividad.identificador = act['ActividadParcials.identificador'];
         actividad.horaInicio = act['ActividadParcials.horaInicio'];
@@ -201,36 +218,40 @@ async function getAllActividadParcial(pdID) {
 }
 
 // post
-exports.aprobarActividades = async function (req, res, next) {
+exports.aprobarActividades = async function(req, res, next) {
   const { pdID } = req.session;
   const date = new Date();
   let estadoCalendario;
   try {
-    const pd = await models.ProgramacionDocente.findOne(
-      { where: { identificador: pdID }, attributes: ['estadoCalendario'] },
-    );
+    const pd = await models.ProgramacionDocente.findOne({
+      where: { identificador: pdID },
+      attributes: ['estadoCalendario']
+    });
     estadoCalendario = pd.estadoCalendario;
     if (!res.locals.permisoDenegado) {
       switch (estadoCalendario) {
-      case (estados.estadoCalendario.abierto):
-        estadoCalendario = estados.estadoCalendario.aprobadoCoordinador;
-        break;
-      case (null):
-        estadoCalendario = estados.estadoCalendario.aprobadoCoordinador;
-        break;
-      default:
-        break;
+        case estados.estadoCalendario.abierto:
+          estadoCalendario = estados.estadoCalendario.aprobadoCoordinador;
+          break;
+        case null:
+          estadoCalendario = estados.estadoCalendario.aprobadoCoordinador;
+          break;
+        default:
+          break;
       }
 
       await models.ProgramacionDocente.update(
         {
           estadoCalendario,
-          fechaCalendario: date,
-        }, /* set attributes' value */
-        { where: { identificador: pdID } }, /* where criteria */
+          fechaCalendario: date
+        } /* set attributes' value */,
+        { where: { identificador: pdID } } /* where criteria */
       );
       req.session.save(() => {
-        progDocController.isPDLista(pdID, res.redirect(`${req.baseUrl}/cumplimentar/actividades`));
+        progDocController.isPDLista(
+          pdID,
+          res.redirect(`${req.baseUrl}/cumplimentar/actividades`)
+        );
       });
     } else {
       req.session.save(() => {
@@ -244,16 +265,19 @@ exports.aprobarActividades = async function (req, res, next) {
 };
 
 // recibe la info de una actividad nueva y la crea en la asignatura y grupo correspondiente
-exports.guardarActividad = async function (req, res) {
+exports.guardarActividad = async function(req, res) {
   if (!res.locals.permisoDenegado) {
     const actividadToAnadir = {};
     // sino tiene asignaturaId se trata de una actividad de grupo
     // eslint-disable-next-line no-restricted-globals
-    actividadToAnadir.AsignaturaId = isNaN(req.body.asignaturaId) ? null : req.body.asignaturaId;
+    actividadToAnadir.AsignaturaId = isNaN(req.body.asignaturaId)
+      ? null
+      : req.body.asignaturaId;
     actividadToAnadir.descripcion = req.body.descripcion;
     actividadToAnadir.tipo = req.body.tipo || 'act';
     actividadToAnadir.fecha = moment(req.body.fecha, 'DD/MM/YYYY');
-    actividadToAnadir.ConjuntoActividadParcialId = req.body.conjuntoActividadParcialId;
+    actividadToAnadir.ConjuntoActividadParcialId =
+      req.body.conjuntoActividadParcialId;
     const { hora } = req.body;
     let { minutos } = req.body;
     if (!minutos) minutos = '00';
@@ -264,15 +288,20 @@ exports.guardarActividad = async function (req, res) {
     }
     actividadToAnadir.duracion = Number(req.body.duracion) || null;
     try {
-      const nToAnadir = models.ActividadParcial.build(
-        actividadToAnadir,
-      );
+      const nToAnadir = models.ActividadParcial.build(actividadToAnadir);
       const n = await nToAnadir.save();
       actividadToAnadir.identificador = n.identificador;
-      res.json({ success: true, accion: 'create', actividadUpdate: actividadToAnadir });
+      res.json({
+        success: true,
+        accion: 'create',
+        actividadUpdate: actividadToAnadir
+      });
     } catch (error) {
       console.log('Error:', error);
-      res.json({ success: false, msg: 'Ha habido un error la acción no se ha podido completar' });
+      res.json({
+        success: false,
+        msg: 'Ha habido un error la acción no se ha podido completar'
+      });
     }
   } else {
     res.json({ success: false, msg: 'No tiene permiso' });
@@ -283,12 +312,14 @@ exports.guardarActividad = async function (req, res) {
 recibe la info de una actividad existente y la actualiza en la asignatura tipo
 y descripcion correspondiente.
 */
-exports.updateActividad = async function (req, res) {
+exports.updateActividad = async function(req, res) {
   if (!res.locals.permisoDenegado) {
     const actividadToUpdate = {};
     // sino tiene asignaturaId se trata de una actividad de grupo
     // eslint-disable-next-line no-restricted-globals
-    actividadToUpdate.AsignaturaId = isNaN(req.body.asignaturaId) ? null : req.body.asignaturaId;
+    actividadToUpdate.AsignaturaId = isNaN(req.body.asignaturaId)
+      ? null
+      : req.body.asignaturaId;
     actividadToUpdate.descripcion = req.body.descripcion;
     actividadToUpdate.tipo = req.body.tipo || 'act';
     actividadToUpdate.fecha = moment(req.body.fecha, 'DD/MM/YYYY');
@@ -302,16 +333,20 @@ exports.updateActividad = async function (req, res) {
     }
     actividadToUpdate.duracion = Number(req.body.duracion) || null;
     try {
-      await models.ActividadParcial.update(
-        actividadToUpdate,
-        {
-          where: { identificador: req.body.actividadId },
-        },
-      );
-      res.json({ success: true, accion: 'update', actividadUpdate: actividadToUpdate });
+      await models.ActividadParcial.update(actividadToUpdate, {
+        where: { identificador: req.body.actividadId }
+      });
+      res.json({
+        success: true,
+        accion: 'update',
+        actividadUpdate: actividadToUpdate
+      });
     } catch (error) {
       console.log('Error:', error);
-      res.json({ success: false, msg: 'Ha habido un error la acción no se ha podido completar' });
+      res.json({
+        success: false,
+        msg: 'Ha habido un error la acción no se ha podido completar'
+      });
     }
   } else {
     res.json({ success: false, msg: 'No tiene permiso' });
@@ -319,16 +354,19 @@ exports.updateActividad = async function (req, res) {
 };
 
 // recibe la info de una actividad existente y la elimina
-exports.eliminarActividad = async function (req, res) {
+exports.eliminarActividad = async function(req, res) {
   if (!res.locals.permisoDenegado) {
     try {
       await models.ActividadParcial.destroy({
-        where: { identificador: req.body.actividadId },
+        where: { identificador: req.body.actividadId }
       });
       res.json({ success: true });
     } catch (error) {
       console.log('Error:', error);
-      res.json({ success: false, msg: 'Ha habido un error la acción no se ha podido completar' });
+      res.json({
+        success: false,
+        msg: 'Ha habido un error la acción no se ha podido completar'
+      });
     }
   } else {
     res.json({ success: false, msg: 'No tiene permiso' });
@@ -336,18 +374,26 @@ exports.eliminarActividad = async function (req, res) {
 };
 
 // recibe la info de un conjuntoActividadParcial y la crea
-exports.crearConjuntoActividadParcial = async function (req, res, next) {
+exports.crearConjuntoActividadParcial = async function(req, res, next) {
   if (!res.locals.permisoDenegado) {
     const conjuntoActividadParcialToAnadir = {};
     conjuntoActividadParcialToAnadir.curso = Number(req.body.curso);
     conjuntoActividadParcialToAnadir.semestre = req.body.semestre;
     conjuntoActividadParcialToAnadir.notaInicial = req.body.notaInicial;
-    if (moment(req.body.date_fInicio, 'DD/MM/YYYY').isValid()) conjuntoActividadParcialToAnadir.fechaInicio = moment(req.body.date_fInicio, 'DD/MM/YYYY');
-    if (moment(req.body.date_fFin, 'DD/MM/YYYY').isValid()) conjuntoActividadParcialToAnadir.fechaFin = moment(req.body.date_fFin, 'DD/MM/YYYY');
+    if (moment(req.body.date_fInicio, 'DD/MM/YYYY').isValid())
+      conjuntoActividadParcialToAnadir.fechaInicio = moment(
+        req.body.date_fInicio,
+        'DD/MM/YYYY'
+      );
+    if (moment(req.body.date_fFin, 'DD/MM/YYYY').isValid())
+      conjuntoActividadParcialToAnadir.fechaFin = moment(
+        req.body.date_fFin,
+        'DD/MM/YYYY'
+      );
     conjuntoActividadParcialToAnadir.ProgramacionDocenteId = req.session.pdID;
     try {
       const nToAnadir = models.ConjuntoActividadParcial.build(
-        conjuntoActividadParcialToAnadir,
+        conjuntoActividadParcialToAnadir
       );
       await nToAnadir.save();
       req.session.save(() => {
@@ -365,35 +411,41 @@ exports.crearConjuntoActividadParcial = async function (req, res, next) {
 };
 
 // recibe la info de un conjuntoActividadParcial existente y la actualiza
-exports.actualizarConjuntoActividadParcial = async function (req, res, next) {
+exports.actualizarConjuntoActividadParcial = async function(req, res, next) {
   if (!res.locals.permisoDenegado) {
     const conjuntoActividadParcialToUpdate = {};
     conjuntoActividadParcialToUpdate.notaInicial = req.body.notaInicial;
-    if (moment(req.body.date_fInicio, 'DD/MM/YYYY').isValid()) conjuntoActividadParcialToUpdate.fechaInicio = moment(req.body.date_fInicio, 'DD/MM/YYYY');
-    if (moment(req.body.date_fFin, 'DD/MM/YYYY').isValid()) conjuntoActividadParcialToUpdate.fechaFin = moment(req.body.date_fFin, 'DD/MM/YYYY');
+    if (moment(req.body.date_fInicio, 'DD/MM/YYYY').isValid())
+      conjuntoActividadParcialToUpdate.fechaInicio = moment(
+        req.body.date_fInicio,
+        'DD/MM/YYYY'
+      );
+    if (moment(req.body.date_fFin, 'DD/MM/YYYY').isValid())
+      conjuntoActividadParcialToUpdate.fechaFin = moment(
+        req.body.date_fFin,
+        'DD/MM/YYYY'
+      );
     let grupos = [];
     const gruposToAnadir = [];
     grupos = grupos.concat(req.body.selectGrupos);
-    grupos.forEach((g) => {
+    grupos.forEach(g => {
       // eslint-disable-next-line no-restricted-globals
       if (!isNaN(g)) {
         gruposToAnadir.push({
           ConjuntoParcialId: req.body.conjuntoActividadParcialId,
-          GrupoId: Number(g),
+          GrupoId: Number(g)
         });
       }
     });
     try {
       await models.ConjuntoActividadParcialGrupo.destroy({
-        where: { ConjuntoParcialId: req.body.conjuntoActividadParcialId },
+        where: { ConjuntoParcialId: req.body.conjuntoActividadParcialId }
       });
       await models.ConjuntoActividadParcial.update(
         conjuntoActividadParcialToUpdate,
-        { where: { identificador: req.body.conjuntoActividadParcialId } },
+        { where: { identificador: req.body.conjuntoActividadParcialId } }
       );
-      await models.ConjuntoActividadParcialGrupo.bulkCreate(
-        gruposToAnadir,
-      );
+      await models.ConjuntoActividadParcialGrupo.bulkCreate(gruposToAnadir);
       req.session.save(() => {
         res.redirect(`${req.baseUrl}/cumplimentar/actividades`);
       });
@@ -409,19 +461,22 @@ exports.actualizarConjuntoActividadParcial = async function (req, res, next) {
 };
 
 // recibe la info de un conjuntoActividadParcial
-exports.eliminarConjuntoActividadParcial = async function (req, res) {
+exports.eliminarConjuntoActividadParcial = async function(req, res) {
   if (!res.locals.permisoDenegado) {
     try {
       await models.ConjuntoActividadParcial.destroy({
-        where: { identificador: req.body.conjuntoActividadParcialId },
+        where: { identificador: req.body.conjuntoActividadParcialId }
       });
       await models.ActividadParcial.destroy({
-        where: { ConjuntoActividadParcialId: null },
+        where: { ConjuntoActividadParcialId: null }
       });
       res.json({ success: true });
     } catch (error) {
       console.log('Error:', error);
-      res.json({ success: false, msg: 'Ha habido un error la acción no se ha podido completar' });
+      res.json({
+        success: false,
+        msg: 'Ha habido un error la acción no se ha podido completar'
+      });
     }
   } else {
     res.json({ success: false, msg: 'No tiene permiso' });

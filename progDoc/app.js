@@ -1,4 +1,3 @@
-
 /* global PATH_PDF, CONTEXT, DEV, PRUEBAS */
 const express = require('express');
 const path = require('path');
@@ -6,10 +5,8 @@ const cookieParser = require('cookie-parser');
 const partials = require('express-partials');
 const morgan = require('morgan');
 
-
 const session = require('express-session');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
-
 
 // cas autentication
 const CASAuthentication = require('cas-authentication');
@@ -23,13 +20,11 @@ const cas = new CASAuthentication({
   service_url: service,
   cas_version: '3.0',
   session_info: 'user',
-  destroy_session: true, // me borra la sesión al hacer el logout
+  destroy_session: true // me borra la sesión al hacer el logout
 });
-
 
 // instanciacion
 const app = express();
-
 
 // rutas requeridas
 const router = require('./routes/index');
@@ -43,15 +38,19 @@ require('./controllers/cron_controller');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-
 // body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(path.join(CONTEXT, 'pdfs'), express.static(path.join(PATH_PDF, 'pdfs')));
-app.use(path.join(CONTEXT, 'archivos'), express.static(path.join(__dirname, 'public')));
+app.use(
+  path.join(CONTEXT, 'pdfs'),
+  express.static(path.join(PATH_PDF, 'pdfs'))
+);
+app.use(
+  path.join(CONTEXT, 'archivos'),
+  express.static(path.join(__dirname, 'public'))
+);
 app.use(CONTEXT, express.static(path.join(__dirname, 'public')));
-
 
 // Configuracion de la session para almacenarla en BBDD usando Sequelize.
 const sessionStore = new SequelizeStore({
@@ -59,34 +58,36 @@ const sessionStore = new SequelizeStore({
   table: 'Session',
   // The interval at which to cleanup expired sessions in milliseconds. (15 minutes)
   checkExpirationInterval: 15 * 60 * 1000,
-  expiration: 1 * 60 * 60 * 1000, // The maximum age (in milliseconds) of a valid session. (6 hours)
+  expiration: 1 * 60 * 60 * 1000 // The maximum age (in milliseconds) of a valid session. (6 hours)
 });
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'Secreto_para_las_sesiones',
-  store: sessionStore,
-  resave: false,
-  saveUninitialized: true,
-}));
-
-
-// autologout
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'Secreto_para_las_sesiones',
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: true
+  })
+);
 
 // Rutas que no empiezan por /api/
 app.use(path.join(CONTEXT, 'api'), routerApi);
 // exit del cas el primero para que no entre en bucle. El cas es el encargado de eliminar la sesión
 app.get(path.join(CONTEXT, 'logout'), cas.logout);
-
+app.use(partials());
 
 if (DEV === 'true') {
   // solo imprime las peticiones incorrectas
-  app.use(morgan('dev', {
-    skip(req, res) { return res.statusCode < 400; },
-  }));
-  app.use(partials());
+  app.use(
+    morgan('dev', {
+      skip(req, res) {
+        return res.statusCode < 400;
+      }
+    })
+  );
   /**
    * modelo dev. No pasa por el cas
    * Está preparado para usar el servidor de desarrollo de react
-  */
+   */
   app.use((req, res, next) => {
     if (!req.session.user) req.session.user = {};
     // employeetype puede ser un string o un array pq luego se convierte a array
@@ -100,10 +101,13 @@ if (DEV === 'true') {
   });
 } else {
   // solo te imprime las peticiones incorrectas
-  app.use(morgan('combined', {
-    skip(req, res) { return res.statusCode < 400; },
-  }));
-  app.use(partials());
+  app.use(
+    morgan('combined', {
+      skip(req, res) {
+        return res.statusCode < 400;
+      }
+    })
+  );
   app.use(cas.bounce, (req, res, next) => {
     next();
   });
@@ -112,8 +116,17 @@ if (DEV === 'true') {
 app.use(async (req, res, next) => {
   // Hacer visible req.session en las vistas
   res.locals.session = req.session;
+  /*
+  convert mail and employeetype to array
+  because CAS sometimes returns array and other strings
+  */
+  req.session.user.mail = [].concat(req.session.user.mail);
+  if (typeof req.session.user.employeetype === 'string') {
+    req.session.user.employeetype = req.session.user.employeetype.split('');
+  }
   res.locals.CONTEXT = CONTEXT;
   res.locals.pruebas = PRUEBAS === 'true' ? 'pruebas' : 'portal';
+  res.locals.pruebasBoolean = PRUEBAS === 'true';
   // estado y existe se usan para temas de permisos al renderizar las vistas.
   // Antes de comprobar nada se ponen a null
   res.locals.estado = null;
@@ -121,11 +134,21 @@ app.use(async (req, res, next) => {
   // solo la primera vez
   if (!req.session.user.noFirst) {
     try {
+      /*
+      si una persona registrada con varios emails en el mismo CAS
+      solo devuelve uno
+      TODO igual se puede hacer que aquí le devuelva todos los que cumple
+      aunque solo debería estar registrado un @upm.es los otros serán de otro tipo
+      y hacer un merge de los permisos que tiene
+      los corporativos deben ir asociados al rol y no la persona
+      pantalla en jefe de estudios en el que puede borrar a personas por paginación
+      pantalla en las personas para ver su usuario: mail, roles, etc. Corregir nombre
+       */
       const pers = await models.Persona.findOne({
         attributes: ['identificador'],
         where: {
-          email: req.session.user.mail,
-        },
+          email: req.session.user.mail
+        }
       });
       if (pers) {
         req.session.user.PersonaId = pers.identificador;
@@ -146,9 +169,9 @@ app.use(async (req, res, next) => {
       req.session.user.rols = await models.Rol.findAll({
         attributes: ['rol', 'PlanEstudioCodigo', 'DepartamentoCodigo'],
         where: {
-          PersonaId: req.session.user.PersonaId,
+          PersonaId: req.session.user.PersonaId
         },
-        raw: true,
+        raw: true
       });
       next();
     } catch (error) {
@@ -160,10 +183,8 @@ app.use(async (req, res, next) => {
   }
 });
 
-
 // router para contexto
 app.use(CONTEXT, router);
-
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -182,9 +203,8 @@ app.use((err, req, res) => {
   res.status(err.status || 500);
   res.render('error', {
     CONTEXT,
-    layout: false,
+    layout: false
   });
 });
-
 
 module.exports = app;

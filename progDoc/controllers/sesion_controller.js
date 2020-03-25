@@ -7,18 +7,19 @@
 // Ahora se hace desde el store de la bbdd de sesiones
 const maxSesionTime = 60 * 60 * 1000;
 
-
 //
 // Middleware usado para destruir la sesion del usuario si se ha
 // excedido el tiempo de inactividad.
 //
-exports.deleteExpiredUserSession = function (req, res, next) {
-  if (req.session.user.expires < Date.now()) { // Caduco
+exports.deleteExpiredUserSession = function(req, res, next) {
+  if (req.session.user.expires < Date.now()) {
+    // Caduco
     // la sesión la elimina el cas
     req.session.save(() => {
       res.redirect(`${CONTEXT}/logout`);
     });
-  } else { // No caduco. Restaurar la hora de expiracion.
+  } else {
+    // No caduco. Restaurar la hora de expiracion.
     req.session.user.expires = Date.now() + maxSesionTime;
     next();
   }

@@ -1,4 +1,8 @@
+/* global PATH_PDF */
+
 const Sequelize = require('sequelize');
+const fs = require('fs');
+const json2csv = require('json2csv').parse;
 const models = require('../models');
 
 const op = Sequelize.Op;
@@ -6,13 +10,12 @@ const estados = require('../estados');
 const funciones = require('../funciones');
 const progDocController = require('./progDoc_controller');
 const asignaturaController = require('./asignatura_controller');
+const planController = require('./plan_controller');
 const personaYProfesorController = require('./personaYProfesor_controller');
 const grupoController = require('./grupo_controller');
 
-
 // funcion para ver el estado de profesores/tribunales si cumple uno el resto lo marca como cumplido
 function comprobarEstadoCumpleUno(estado, objeto) {
-  // eslint-disable-next-line no-restricted-syntax
   for (const variable in objeto) {
     if (Object.prototype.hasOwnProperty.call(objeto, variable)) {
       if (objeto[variable] === estado) {
@@ -24,7 +27,11 @@ function comprobarEstadoCumpleUno(estado, objeto) {
 }
 
 async function getAsignacion(
-  ProgramacionDocenteIdentificador, DepartamentoResponsable, profesores, pdID, gruposBBDD,
+  ProgramacionDocenteIdentificador,
+  DepartamentoResponsable,
+  profesores,
+  pdID,
+  gruposBBDD
 ) {
   const asignacions = [];
   // eslint-disable-next-line no-useless-catch
@@ -35,33 +42,47 @@ async function getAsignacion(
         ProgramacionDocenteIdentificador,
         DepartamentoResponsable,
         semestre: {
-          [op.ne]: null,
-        },
+          [op.ne]: null
+        }
       },
-      attributes: ['acronimo', 'curso', 'CoordinadorAsignatura', 'identificador', 'nombre', 'semestre', 'codigo', 'estado'],
+      attributes: [
+        'acronimo',
+        'curso',
+        'CoordinadorAsignatura',
+        'identificador',
+        'nombre',
+        'semestre',
+        'codigo',
+        'estado'
+      ],
       order: [
-
         [Sequelize.literal('"Asignatura"."curso"'), 'ASC'],
         [Sequelize.literal('"Asignatura"."semestre"'), 'ASC'],
-        [Sequelize.literal('"AsignacionProfesors.Grupo.nombre"'), 'ASC'],
+        [Sequelize.literal('"AsignacionProfesors.Grupo.nombre"'), 'ASC']
       ],
       raw: true,
-      include: [{
-        // left join
-        model: models.AsignacionProfesor,
-        required: false,
-        attributes: ['ProfesorId', 'GrupoId', 'identificador', 'Dia', 'Nota'],
-        include: [{
-          model: models.Grupo,
-          attributes: ['nombre', 'nombreItinerario'],
-        }],
-      }],
+      include: [
+        {
+          // left join
+          model: models.AsignacionProfesor,
+          required: false,
+          attributes: ['ProfesorId', 'GrupoId', 'identificador', 'Dia', 'Nota'],
+          include: [
+            {
+              model: models.Grupo,
+              attributes: ['nombre', 'nombreItinerario']
+            }
+          ]
+        }
+      ]
     });
-    asigns.forEach((asigni) => {
-      let asign = asignacions.find((obj) => obj.nombre === asigni.nombre);
+    asigns.forEach(asigni => {
+      let asign = asignacions.find(obj => obj.nombre === asigni.nombre);
       if (!asign) {
         asign = {};
-        let obj = profesores.find((obj2) => obj2.identificador === asigni.CoordinadorAsignatura);
+        let obj = profesores.find(
+          obj2 => obj2.identificador === asigni.CoordinadorAsignatura
+        );
         if (!obj) {
           obj = 'No hay coordinador';
         }
@@ -74,21 +95,29 @@ async function getAsignacion(
         asign.coordinador = obj;
         asign.grupos = [];
         const s1 = asignaturaController.getSemestresAsignaturainPD(
-          progDocController.getTipoPd(pdID), asigni.semestre,
+          progDocController.getTipoPd(pdID),
+          asigni.semestre
         )[0];
         const s2 = asignaturaController.getSemestresAsignaturainPD(
-          progDocController.getTipoPd(pdID), asigni.semestre,
+          progDocController.getTipoPd(pdID),
+          asigni.semestre
         )[1];
         let coincidenciasGrupos = [];
         if (s1) {
           coincidenciasGrupos = gruposBBDD.filter(
-            (gr) => (Number(gr.curso) === Number(asigni.curso) && Number(gr.nombre.split('.')[1]) === 1),
+            gr =>
+              Number(gr.curso) === Number(asigni.curso) &&
+              Number(gr.nombre.split('.')[1]) === 1
           );
         }
         if (s2) {
-          coincidenciasGrupos = coincidenciasGrupos.concat(gruposBBDD.filter(
-            (gr) => (Number(gr.curso) === Number(asigni.curso) && Number(gr.nombre.split('.')[1]) === 2),
-          ));
+          coincidenciasGrupos = coincidenciasGrupos.concat(
+            gruposBBDD.filter(
+              gr =>
+                Number(gr.curso) === Number(asigni.curso) &&
+                Number(gr.nombre.split('.')[1]) === 2
+            )
+          );
         }
         for (let i = 0; i < coincidenciasGrupos.length; i += 1) {
           const grupo = {};
@@ -100,14 +129,21 @@ async function getAsignacion(
           asign.grupos.push(grupo);
         }
         asignacions.push(asign);
-        asign = asignacions.find((obj2) => obj2.nombre === asigni.nombre);
+        asign = asignacions.find(obj2 => obj2.nombre === asigni.nombre);
       }
-      const grupo = asign.grupos.find((obj) => obj.GrupoId === asigni['AsignacionProfesors.GrupoId']);
+      const grupo = asign.grupos.find(
+        obj => obj.GrupoId === asigni['AsignacionProfesors.GrupoId']
+      );
       if (grupo) {
-        if (asigni['AsignacionProfesors.Dia'] || asigni['AsignacionProfesors.Nota']) {
+        if (
+          asigni['AsignacionProfesors.Dia'] ||
+          asigni['AsignacionProfesors.Nota']
+        ) {
           grupo.grupoPerteneciente = true;
         }
-        const profi = profesores.find((obj) => obj.identificador === asigni['AsignacionProfesors.ProfesorId']);
+        const profi = profesores.find(
+          obj => obj.identificador === asigni['AsignacionProfesors.ProfesorId']
+        );
         if (profi) {
           const p = {};
           p.identificador = profi.identificador;
@@ -127,11 +163,13 @@ async function getAsignacion(
 }
 
 // GET /respDoc/:pdID/:departamentoID
-exports.getAsignaciones = async function (req, res, next) {
+exports.getAsignaciones = async function(req, res, next) {
   req.session.submenu = 'Profesores';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.originalUrl.toLowerCase().includes('consultar') ? 'asignacionProfesores/asignacionesConsultar' : 'asignacionProfesores/asignacionesCumplimentar';
+    const view = req.originalUrl.toLowerCase().includes('consultar')
+      ? 'asignacionProfesores/asignacionesConsultar'
+      : 'asignacionProfesores/asignacionesCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado,
@@ -143,16 +181,28 @@ exports.getAsignaciones = async function (req, res, next) {
       departamentosResponsables: res.locals.departamentosResponsables,
       estadosProfesor: estados.estadoProfesor,
       estadosProgDoc: estados.estadoProgDoc,
-      planEstudios: res.locals.planEstudios,
+      planEstudios: res.locals.planEstudios
     });
     // hay que comprobar que no sea una url de consultar.
     // eslint-disable-next-line no-use-before-define
-  } else if (!comprobarEstadoCumpleUno(estados.estadoProfesor.abierto, res.locals.progDoc['ProgramacionDocentes.estadoProfesores'])
-    && !comprobarEstadoCumpleUno(estados.estadoProfesor.aprobadoResponsable, res.locals.progDoc['ProgramacionDocentes.estadoProfesores'])
-    && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
-    && !req.originalUrl.toLowerCase().includes('consultar')) {
+  } else if (
+    !comprobarEstadoCumpleUno(
+      estados.estadoProfesor.abierto,
+      res.locals.progDoc['ProgramacionDocentes.estadoProfesores']
+    ) &&
+    !comprobarEstadoCumpleUno(
+      estados.estadoProfesor.aprobadoResponsable,
+      res.locals.progDoc['ProgramacionDocentes.estadoProfesores']
+    ) &&
+    (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
+      estados.estadoProgDoc.abierto ||
+      res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
+        estados.estadoProgDoc.listo) &&
+    !req.originalUrl.toLowerCase().includes('consultar')
+  ) {
     res.render('asignacionProfesores/asignacionesCumplimentar', {
-      estado: 'Asignación de profesores ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe',
+      estado:
+        'Asignación de profesores ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe',
       permisoDenegado: res.locals.permisoDenegado,
       profesores: null,
       menu: req.session.menu,
@@ -162,21 +212,26 @@ exports.getAsignaciones = async function (req, res, next) {
       departamentosResponsables: res.locals.departamentosResponsables,
       estadosProfesor: estados.estadoProfesor,
       estadosProgDoc: estados.estadoProgDoc,
-      estadoProfesores: res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
-      planEstudios: res.locals.planEstudios,
+      estadoProfesores:
+        res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
+      planEstudios: res.locals.planEstudios
     });
   } else {
     let asignacions;
     let gruposBBDD;
     const { pdID } = req.session;
     const { departamentoID } = req.session;
-    // eslint-disable-next-line max-len
-    const departamentoExisteEnElPlan = res.locals.departamentosResponsables.find((obj) => obj.codigo === departamentoID);
+    const departamentoExisteEnElPlan = res.locals.departamentosResponsables.find(
+      obj => obj.codigo === departamentoID
+    );
     let profesores;
     if (!departamentoExisteEnElPlan) {
-      const view = req.originalUrl.toLowerCase().includes('consultar') ? 'asignacionProfesores/asignacionesConsultar' : 'asignacionProfesores/asignacionesCumplimentar';
+      const view = req.originalUrl.toLowerCase().includes('consultar')
+        ? 'asignacionProfesores/asignacionesConsultar'
+        : 'asignacionProfesores/asignacionesCumplimentar';
       res.render(view, {
-        existe: 'El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior',
+        existe:
+          'El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior',
         permisoDenegado: res.locals.permisoDenegado,
         profesores: null,
         menu: req.session.menu,
@@ -186,11 +241,14 @@ exports.getAsignaciones = async function (req, res, next) {
         departamentosResponsables: res.locals.departamentosResponsables,
         estadosProfesor: estados.estadoProfesor,
         estadosProgDoc: estados.estadoProgDoc,
-        estadoProfesores: res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
-        planEstudios: res.locals.planEstudios,
+        estadoProfesores:
+          res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
+        planEstudios: res.locals.planEstudios
       });
     } else if (res.locals.permisoDenegado) {
-      const view = req.originalUrl.toLowerCase().includes('consultar') ? 'asignacionProfesores/asignacionesConsultar' : 'asignacionProfesores/asignacionesCumplimentar';
+      const view = req.originalUrl.toLowerCase().includes('consultar')
+        ? 'asignacionProfesores/asignacionesConsultar'
+        : 'asignacionProfesores/asignacionesCumplimentar';
       res.render(view, {
         permisoDenegado: res.locals.permisoDenegado,
         asignacion: null,
@@ -202,38 +260,48 @@ exports.getAsignaciones = async function (req, res, next) {
         departamentosResponsables: res.locals.departamentosResponsables,
         estadosProfesor: estados.estadoProfesor,
         estadosProgDoc: estados.estadoProgDoc,
-        estadoProfesores: res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
-        planEstudios: res.locals.planEstudios,
+        estadoProfesores:
+          res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
+        planEstudios: res.locals.planEstudios
       });
     } else {
       try {
         gruposBBDD = await grupoController.getGrupos2(pdID);
         profesores = await personaYProfesorController.getProfesores();
-        asignacions = await getAsignacion(pdID, departamentoID, profesores, pdID, gruposBBDD);
+        asignacions = await getAsignacion(
+          pdID,
+          departamentoID,
+          profesores,
+          pdID,
+          gruposBBDD
+        );
         const nuevopath = `${req.baseUrl}/respdoc/editAsignacion`;
         // se usa cambiopath para cambiar a la asignacions de profesores por grupo o comun
         const cambiopath = `${req.baseUrl}/respdoc/editAsignacion/cambioModo`;
-        const view = req.originalUrl.toLowerCase().includes('consultar') ? 'asignacionProfesores/asignacionesConsultar' : 'asignacionProfesores/asignacionesCumplimentar';
-        res.render(view,
-          {
-            profesores,
-            asignacion: asignacions,
-            nuevopath,
-            cambiopath,
-            aprobarpath: `${req.baseUrl}/respDoc/aprobarAsignacion`,
-            planID: req.session.planID,
-            estadoProfesores: res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
-            estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
-            pdID,
-            menu: req.session.menu,
-            submenu: req.session.submenu,
-            permisoDenegado: res.locals.permisoDenegado,
-            departamentoID: req.session.departamentoID,
-            departamentosResponsables: res.locals.departamentosResponsables,
-            estadosProfesor: estados.estadoProfesor,
-            estadosProgDoc: estados.estadoProgDoc,
-            planEstudios: res.locals.planEstudios,
-          });
+        const view = req.originalUrl.toLowerCase().includes('consultar')
+          ? 'asignacionProfesores/asignacionesConsultar'
+          : 'asignacionProfesores/asignacionesCumplimentar';
+        res.render(view, {
+          profesores,
+          asignacion: asignacions,
+          nuevopath,
+          cambiopath,
+          aprobarpath: `${req.baseUrl}/respDoc/aprobarAsignacion`,
+          planID: req.session.planID,
+          estadoProfesores:
+            res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
+          estadoProgDoc:
+            res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
+          pdID,
+          menu: req.session.menu,
+          submenu: req.session.submenu,
+          permisoDenegado: res.locals.permisoDenegado,
+          departamentoID: req.session.departamentoID,
+          departamentosResponsables: res.locals.departamentosResponsables,
+          estadosProfesor: estados.estadoProfesor,
+          estadosProgDoc: estados.estadoProgDoc,
+          planEstudios: res.locals.planEstudios
+        });
       } catch (error) {
         console.log('Error:', error);
         next(error);
@@ -242,8 +310,7 @@ exports.getAsignaciones = async function (req, res, next) {
   }
 };
 
-
-exports.editAsignacion = async function (req, res, next) {
+exports.editAsignacion = async function(req, res, next) {
   req.session.submenu = 'Profesores2';
   const { pdID } = req.session;
   const { departamentoID } = req.session;
@@ -256,33 +323,43 @@ exports.editAsignacion = async function (req, res, next) {
     try {
       gruposBBDD = await grupoController.getGrupos2(pdID);
       profesores = await personaYProfesorController.getProfesores();
-      asignacions = await getAsignacion(pdID, departamentoID, profesores, pdID, gruposBBDD);
-      const asign = asignacions.find((obj) => (obj.identificador === asignaturaIdentificador));
-      res.render('asignacionProfesores/asignacionesCumplimentarAsignatura',
-        {
-          asign,
-          pdID,
-          cancelarpath: `${req.baseUrl}/respDoc/profesores?planID=${req.session.planID}&departamentoID=${departamentoID}`,
-          nuevopath: `${req.baseUrl}/respDoc/guardarAsignacion`,
-          planID: req.session.planID,
-          departamentoID: req.session.departamentoID,
-          menu: req.session.menu,
-          submenu: req.session.submenu,
-          profesores,
-          estadosProfesor: estados.estadoProfesor,
-          estadosProgDoc: estados.estadoProgDoc,
-          estadoProfesores: res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
-          planEstudios: res.locals.planEstudios,
-          // desde esta ventana solo se pueden añadir profesores al sistema.
-          onlyProfesor: true,
-        });
+      asignacions = await getAsignacion(
+        pdID,
+        departamentoID,
+        profesores,
+        pdID,
+        gruposBBDD
+      );
+      const asign = asignacions.find(
+        obj => obj.identificador === asignaturaIdentificador
+      );
+      res.render('asignacionProfesores/asignacionesCumplimentarAsignatura', {
+        asign,
+        pdID,
+        cancelarpath: `${req.baseUrl}/respDoc/profesores?planID=${req.session.planID}&departamentoID=${departamentoID}`,
+        nuevopath: `${req.baseUrl}/respDoc/guardarAsignacion`,
+        planID: req.session.planID,
+        departamentoID: req.session.departamentoID,
+        menu: req.session.menu,
+        submenu: req.session.submenu,
+        profesores,
+        estadosProfesor: estados.estadoProfesor,
+        estadosProgDoc: estados.estadoProgDoc,
+        estadoProfesores:
+          res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
+        planEstudios: res.locals.planEstudios,
+        // desde esta ventana solo se pueden añadir profesores al sistema.
+        onlyProfesor: true
+      });
     } catch (error) {
       console.log('Error:', error);
       next(error);
     }
   } else {
     req.session.save(() => {
-      res.redirect(`${req.baseUrl}/respDoc/profesores?pdID=${pdID}&departamentoID=${departamentoID}`);
+      res.redirect(
+        `${req.baseUrl}/respDoc/profesores?pdID=${pdID}&departamentoID=${departamentoID}`
+      );
     });
   }
 };
@@ -297,7 +374,7 @@ tambien cambia el estado a asignatura a "N" para indicar este modo
 cuando quieres cambiar de grupo comun a individual solo cambia el parametro estado a "S"
 deja todos los profesores en todos los grupos.
 */
-exports.changeModeAsignacion = async function (req, res, next) {
+exports.changeModeAsignacion = async function(req, res, next) {
   const { pdID } = req.session;
   const { departamentoID } = req.session;
   let gruposBBDD;
@@ -313,13 +390,21 @@ exports.changeModeAsignacion = async function (req, res, next) {
     try {
       gruposBBDD = await grupoController.getGrupos2(pdID);
       profesores = await personaYProfesorController.getProfesores();
-      asignacions = await getAsignacion(pdID, departamentoID, profesores, pdID, gruposBBDD);
-      asign = asignacions.find((obj) => (obj.identificador === asignaturaIdentificador));
+      asignacions = await getAsignacion(
+        pdID,
+        departamentoID,
+        profesores,
+        pdID,
+        gruposBBDD
+      );
+      asign = asignacions.find(
+        obj => obj.identificador === asignaturaIdentificador
+      );
       if (modo === 'N') {
         // se rellena el array con los profesores no repetidos
         // si el estado es S no se hace nada simplemente se cambia el modo.
-        asign.grupos.forEach((g) => {
-          g.profesors.forEach((p) => {
+        asign.grupos.forEach(g => {
+          g.profesors.forEach(p => {
             if (!profesoresIdNoRepetidos.includes(p.identificador)) {
               profesoresIdNoRepetidos.push(p.identificador);
             }
@@ -328,9 +413,9 @@ exports.changeModeAsignacion = async function (req, res, next) {
         /*
         se añaden los profesores que no estaban en los grupos en los que puede existir la asignatura
         */
-        asign.grupos.forEach((g) => {
-          profesoresIdNoRepetidos.forEach((p) => {
-            const coincide = g.profesors.find((obj) => obj.identificador === p);
+        asign.grupos.forEach(g => {
+          profesoresIdNoRepetidos.forEach(p => {
+            const coincide = g.profesors.find(obj => obj.identificador === p);
             if (!coincide) {
               const nuevaEntrada = {};
               nuevaEntrada.AsignaturaId = asign.identificador;
@@ -340,16 +425,14 @@ exports.changeModeAsignacion = async function (req, res, next) {
             }
           });
         });
-        await models.AsignacionProfesor.bulkCreate(
-          queryToAnadir,
-        );
+        await models.AsignacionProfesor.bulkCreate(queryToAnadir);
       }
       // cambio el modo.
       await models.Asignatura.update(
         {
-          estado: modo,
+          estado: modo
         },
-        { where: { identificador: asign.identificador } },
+        { where: { identificador: asign.identificador } }
       );
       req.session.save(() => {
         res.redirect(`${req.baseUrl}/respDoc/profesores`);
@@ -365,48 +448,61 @@ exports.changeModeAsignacion = async function (req, res, next) {
   }
 };
 
-
 // POST respDoc/guardarAsignacion
-exports.guardarAsignacion = async function (req, res, next) {
+exports.guardarAsignacion = async function(req, res, next) {
   const whereEliminar = {};
   const identificador = Number(req.body.asignaturaId);
   const { pdID } = req.session;
   const { planID } = req.session;
   const { departamentoID } = req.session;
   const gruposBBDD = await grupoController.getGrupos2(pdID);
-  const coordinador = req.body.coordinador ? Number(req.body.coordinador) : null;
+  const coordinador = req.body.coordinador
+    ? Number(req.body.coordinador)
+    : null;
   try {
-    const as = await models.Asignatura.findAll(
-      {
-        where: {
-          identificador,
-          ProgramacionDocenteIdentificador: pdID,
-        },
-        attributes: ['identificador', 'DepartamentoResponsable', 'estado', 'semestre', 'curso'],
-        include: [{
+    const as = await models.Asignatura.findAll({
+      where: {
+        identificador,
+        ProgramacionDocenteIdentificador: pdID
+      },
+      attributes: [
+        'identificador',
+        'DepartamentoResponsable',
+        'estado',
+        'semestre',
+        'curso'
+      ],
+      include: [
+        {
           // incluye las asignaciones de profesores y los horarios.
           model: models.AsignacionProfesor,
           // left join
-          required: false,
-        }],
-        raw: true,
-      },
-    );
+          required: false
+        }
+      ],
+      raw: true
+    });
     /*
     que es la progdoc correspondiente ya se ve en que debe de estar abierta / incidencia
     en el modulo de permisos
     */
-    if (!as[0] || !as[0].DepartamentoResponsable
-      || as[0].DepartamentoResponsable !== departamentoID) {
-      res.locals.permisoDenegado = 'No tiene permiso contacte con el Jefe de Estudios si debería tenerlo'; // lo unico que hara será saltarse lo siguiente
+    if (
+      !as[0] ||
+      !as[0].DepartamentoResponsable ||
+      as[0].DepartamentoResponsable !== departamentoID
+    ) {
+      res.locals.permisoDenegado =
+        'No tiene permiso contacte con el Jefe de Estudios si debería tenerlo'; // lo unico que hara será saltarse lo siguiente
     }
     if (!res.locals.permisoDenegado) {
       if (coordinador || !req.body.coordinador) {
         await models.Asignatura.update(
-          { CoordinadorAsignatura: coordinador }, /* set attributes' value */
-          { where: { identificador } }, /* where criteria */
+          { CoordinadorAsignatura: coordinador } /* set attributes' value */,
+          { where: { identificador } } /* where criteria */
         );
       }
+      // generar CSV
+      await generateCsvCoordinadores(req.session.pdID);
       // eslint-disable-next-line no-use-before-define
       paso2();
       // eslint-disable-next-line no-inner-declarations
@@ -422,26 +518,38 @@ exports.guardarAsignacion = async function (req, res, next) {
             toEliminar = [toEliminar];
           }
           whereEliminar.identificador = [];
-          toEliminar.forEach((element) => {
+          toEliminar.forEach(element => {
             const asignacions = Number(element.split('_')[2]);
-            const asig = as.find((obj) => (asignacions && obj['AsignacionProfesors.identificador'] === asignacions));
+            const asig = as.find(
+              obj =>
+                asignacions &&
+                obj['AsignacionProfesors.identificador'] === asignacions
+            );
             if (!asig || !asig['AsignacionProfesors.ProfesorId']) {
               console.log('Intenta cambiar una nota o un horario');
             } else if (asig.estado === 'N') {
               // si esta la opcion de grupo comun
               // se deben coger todas las asignaciones de profesor de dicha asignatura
-              const coincidencias = as.filter((a) => (a['AsignacionProfesors.ProfesorId'] === asig['AsignacionProfesors.ProfesorId']));
+              const coincidencias = as.filter(
+                a =>
+                  a['AsignacionProfesors.ProfesorId'] ===
+                  asig['AsignacionProfesors.ProfesorId']
+              );
               // eslint-disable-next-line
               coincidencias.forEach((c, index) => {
-                whereEliminar.identificador.push(c['AsignacionProfesors.identificador']);
+                whereEliminar.identificador.push(
+                  c['AsignacionProfesors.identificador']
+                );
               });
             } else {
               whereEliminar.identificador.push(asignacions);
             }
           });
-          if (funciones.isEmpty(whereEliminar)) { whereEliminar.identificador = 'Identificador erróneo'; }
+          if (funciones.isEmpty(whereEliminar)) {
+            whereEliminar.identificador = 'Identificador erróneo';
+          }
           await models.AsignacionProfesor.destroy({
-            where: whereEliminar,
+            where: whereEliminar
           });
         }
         // eslint-disable-next-line no-use-before-define
@@ -449,30 +557,38 @@ exports.guardarAsignacion = async function (req, res, next) {
         async function paso3() {
           let toAnadir = req.body.anadir;
           const queryToAnadir = [];
-          const asig = as.find((obj) => (obj.identificador === identificador));
+          const asig = as.find(obj => obj.identificador === identificador);
           const s1 = asignaturaController.getSemestresAsignaturainPD(
-            progDocController.getTipoPd(pdID), asig.semestre,
+            progDocController.getTipoPd(pdID),
+            asig.semestre
           )[0];
           const s2 = asignaturaController.getSemestresAsignaturainPD(
-            progDocController.getTipoPd(pdID), asig.semestre,
+            progDocController.getTipoPd(pdID),
+            asig.semestre
           )[1];
           // coincidencias de grupos a los que podria pertenecer la asignatura
           let coincidencias = [];
           if (s1) {
             coincidencias = gruposBBDD.filter(
-              (gr) => (Number(gr.curso) === Number(asig.curso) && Number(gr.nombre.split('.')[1]) === 1),
+              gr =>
+                Number(gr.curso) === Number(asig.curso) &&
+                Number(gr.nombre.split('.')[1]) === 1
             );
           }
           if (s2) {
-            coincidencias = coincidencias.concat(gruposBBDD.filter(
-              (gr) => (Number(gr.curso) === Number(asig.curso) && Number(gr.nombre.split('.')[1]) === 2),
-            ));
+            coincidencias = coincidencias.concat(
+              gruposBBDD.filter(
+                gr =>
+                  Number(gr.curso) === Number(asig.curso) &&
+                  Number(gr.nombre.split('.')[1]) === 2
+              )
+            );
           }
           if (toAnadir) {
             if (!Array.isArray(toAnadir)) {
               toAnadir = [toAnadir];
             }
-            toAnadir.forEach((element) => {
+            toAnadir.forEach(element => {
               const profesor = element.split('_')[3];
               let grupoId = element.split('_')[2];
               // eslint-disable-next-line no-restricted-globals
@@ -480,7 +596,7 @@ exports.guardarAsignacion = async function (req, res, next) {
                 grupoId = Number(grupoId);
                 // si esta la opcion de grupo comun
                 if (asig.estado === 'N') {
-                  coincidencias.forEach((c) => {
+                  coincidencias.forEach(c => {
                     const nuevaEntrada = {};
                     nuevaEntrada.AsignaturaId = identificador;
                     nuevaEntrada.ProfesorId = profesor;
@@ -497,17 +613,19 @@ exports.guardarAsignacion = async function (req, res, next) {
               }
             });
           }
-          await models.AsignacionProfesor.bulkCreate(
-            queryToAnadir,
-          );
+          await models.AsignacionProfesor.bulkCreate(queryToAnadir);
           req.session.save(() => {
-            res.redirect(`${req.baseUrl}/respDoc/profesores?pdID=${pdID}&departamentoID=${departamentoID}&planID=${planID}`);
+            res.redirect(
+              `${req.baseUrl}/respDoc/profesores?pdID=${pdID}&departamentoID=${departamentoID}&planID=${planID}`
+            );
           });
         }
       }
     } else {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/respDoc/profesores?pdID=${pdID}&departamentoID=${departamentoID}&planID=${planID}`);
+        res.redirect(
+          `${req.baseUrl}/respDoc/profesores?pdID=${pdID}&departamentoID=${departamentoID}&planID=${planID}`
+        );
       });
     }
   } catch (error) {
@@ -516,39 +634,54 @@ exports.guardarAsignacion = async function (req, res, next) {
   }
 };
 
-
 // post respDoc/aprobarAsignacion:pdID
-exports.aprobarAsignacion = async function (req, res, next) {
+exports.aprobarAsignacion = async function(req, res, next) {
   const { pdID } = req.session;
   const { departamentoID } = req.session;
   const date = new Date();
   let estadoProfesores;
   try {
-    const pd = await models.ProgramacionDocente.findOne({ where: { identificador: pdID }, attributes: ['estadoProfesores'] });
+    const pd = await models.ProgramacionDocente.findOne({
+      where: { identificador: pdID },
+      attributes: ['estadoProfesores']
+    });
     estadoProfesores = pd.estadoProfesores;
     if (!res.locals.permisoDenegado) {
-      // eslint-disable-next-line default-case
       switch (estadoProfesores[departamentoID]) {
-      case (estados.estadoProfesor.abierto):
-        estadoProfesores[departamentoID] = estados.estadoProfesor.aprobadoResponsable;
-        break;
-      case (estados.estadoProfesor.aprobadoResponsable):
-        estadoProfesores[departamentoID] = req.body.decision !== 'aceptar' ? estados.estadoProfesor.abierto : estados.estadoProfesor.aprobadoDirector;
-        break;
+        case estados.estadoProfesor.abierto:
+          estadoProfesores[departamentoID] =
+            estados.estadoProfesor.aprobadoResponsable;
+          break;
+        case estados.estadoProfesor.aprobadoResponsable:
+          estadoProfesores[departamentoID] =
+            req.body.decision !== 'aceptar'
+              ? estados.estadoProfesor.abierto
+              : estados.estadoProfesor.aprobadoDirector;
+          break;
+        default:
+          break;
       }
       await models.ProgramacionDocente.update(
         {
           estadoProfesores,
-          fechaProfesores: date,
-        }, /* set attributes' value */
-        { where: { identificador: pdID } }, /* where criteria */
+          fechaProfesores: date
+        } /* set attributes' value */,
+        { where: { identificador: pdID } } /* where criteria */
       );
+      // generar csv
+      await generateCsvCoordinadores(req.session.pdID);
       req.session.save(() => {
-        progDocController.isPDLista(pdID, res.redirect(`${req.baseUrl}/respDoc/profesores`));
+        progDocController.isPDLista(
+          pdID,
+          res.redirect(`${req.baseUrl}/respDoc/profesores`)
+        );
       });
     } else {
       req.session.save(() => {
-        progDocController.isPDLista(pdID, res.redirect(`${req.baseUrl}/respDoc/profesores`));
+        progDocController.isPDLista(
+          pdID,
+          res.redirect(`${req.baseUrl}/respDoc/profesores`)
+        );
       });
     }
   } catch (error) {
@@ -557,13 +690,14 @@ exports.aprobarAsignacion = async function (req, res, next) {
   }
 };
 
-
 // GET respDoc/tribunales:pdID/:departamentoID
-exports.getTribunales = async function (req, res, next) {
+exports.getTribunales = async function(req, res, next) {
   req.session.submenu = 'Tribunales';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.originalUrl.toLowerCase().includes('consultar') ? 'tribunales/tribunalesConsultar' : 'tribunales/tribunalesCumplimentar';
+    const view = req.originalUrl.toLowerCase().includes('consultar')
+      ? 'tribunales/tribunalesConsultar'
+      : 'tribunales/tribunalesCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado,
@@ -577,15 +711,27 @@ exports.getTribunales = async function (req, res, next) {
       estadosProgDoc: estados.estadoProgDoc,
       planEstudios: res.locals.planEstudios,
       // desde esta ventana solo se pueden añadir profesores al sistema.
-      onlyProfesor: true,
+      onlyProfesor: true
     });
-  } else if (!comprobarEstadoCumpleUno(estados.estadoTribunal.abierto, res.locals.progDoc['ProgramacionDocentes.estadoTribunales'])
-    && !comprobarEstadoCumpleUno(estados.estadoTribunal.aprobadoResponsable, res.locals.progDoc['ProgramacionDocentes.estadoTribunales'])
-    && (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.abierto || res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] === estados.estadoProgDoc.listo)
-    && !req.originalUrl.toLowerCase().includes('consultar')) {
+  } else if (
+    !comprobarEstadoCumpleUno(
+      estados.estadoTribunal.abierto,
+      res.locals.progDoc['ProgramacionDocentes.estadoTribunales']
+    ) &&
+    !comprobarEstadoCumpleUno(
+      estados.estadoTribunal.aprobadoResponsable,
+      res.locals.progDoc['ProgramacionDocentes.estadoTribunales']
+    ) &&
+    (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
+      estados.estadoProgDoc.abierto ||
+      res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
+        estados.estadoProgDoc.listo) &&
+    !req.originalUrl.toLowerCase().includes('consultar')
+  ) {
     // hay que comprobar que no sea una url de consultar.
     res.render('tribunales/tribunalesCumplimentar', {
-      estado: 'Asignación de tribunales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe',
+      estado:
+        'Asignación de tribunales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe',
       permisoDenegado: res.locals.permisoDenegado,
       profesores: null,
       menu: req.session.menu,
@@ -595,10 +741,11 @@ exports.getTribunales = async function (req, res, next) {
       departamentosResponsables: res.locals.departamentosResponsables,
       estadosTribunal: estados.estadoTribunal,
       estadosProgDoc: estados.estadoProgDoc,
-      estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
+      estadoTribunales:
+        res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
       planEstudios: res.locals.planEstudios,
       // desde esta ventana solo se pueden añadir profesores al sistema.
-      onlyProfesor: true,
+      onlyProfesor: true
     });
   } else {
     const { pdID } = req.session;
@@ -607,25 +754,28 @@ exports.getTribunales = async function (req, res, next) {
     const whereAsignaturas = [];
     const { departamentoID } = req.session;
     try {
-      const pdsAnteriores = await progDocController
-        .getProgramacionDocentesAnteriores(
-          progDocController.getPlanPd(pdID),
-          progDocController.getTipoPd(pdID),
-          progDocController.getAnoPd(pdID),
-          pdID,
-          null,
-        );
+      const pdsAnteriores = await progDocController.getProgramacionDocentesAnteriores(
+        progDocController.getPlanPd(pdID),
+        progDocController.getTipoPd(pdID),
+        progDocController.getAnoPd(pdID),
+        pdID,
+        null
+      );
       whereAsignaturas.push(pdID);
       // voy a obtener el identificador del plan y de paso preparo el where para asignaturas
       for (let i = 0; i < pdsAnteriores.length; i++) {
         whereAsignaturas.push(pdsAnteriores[i].identificador);
       }
-      const departamentoExisteEnElPlan = res.locals.departamentosResponsables
-        .find((obj) => obj.codigo === departamentoID);
+      const departamentoExisteEnElPlan = res.locals.departamentosResponsables.find(
+        obj => obj.codigo === departamentoID
+      );
       if (!departamentoExisteEnElPlan) {
-        const view = req.originalUrl.toLowerCase().includes('consultar') ? 'tribunales/tribunalesConsultar' : 'tribunales/tribunalesCumplimentar';
+        const view = req.originalUrl.toLowerCase().includes('consultar')
+          ? 'tribunales/tribunalesConsultar'
+          : 'tribunales/tribunalesCumplimentar';
         res.render(view, {
-          existe: 'El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior',
+          existe:
+            'El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior',
           permisoDenegado: res.locals.permisoDenegado,
           profesores: null,
           menu: req.session.menu,
@@ -635,13 +785,16 @@ exports.getTribunales = async function (req, res, next) {
           departamentosResponsables: res.locals.departamentosResponsables,
           estadosTribunal: estados.estadoTribunal,
           estadosProgDoc: estados.estadoProgDoc,
-          estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
+          estadoTribunales:
+            res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
           planEstudios: res.locals.planEstudios,
           // desde esta ventana solo se pueden añadir profesores al sistema.
-          onlyProfesor: true,
+          onlyProfesor: true
         });
       } else if (res.locals.permisoDenegado) {
-        const view = req.originalUrl.toLowerCase().includes('consultar') ? 'tribunales/tribunalesConsultar' : 'tribunales/tribunalesCumplimentar';
+        const view = req.originalUrl.toLowerCase().includes('consultar')
+          ? 'tribunales/tribunalesConsultar'
+          : 'tribunales/tribunalesCumplimentar';
         res.render(view, {
           permisoDenegado: res.locals.permisoDenegado,
           profesores: null,
@@ -652,10 +805,11 @@ exports.getTribunales = async function (req, res, next) {
           departamentosResponsables: res.locals.departamentosResponsables,
           estadosTribunal: estados.estadoTribunal,
           estadosProgDoc: estados.estadoProgDoc,
-          estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
+          estadoTribunales:
+            res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
           planEstudios: res.locals.planEstudios,
           // desde esta ventana solo se pueden añadir profesores al sistema.
-          onlyProfesor: true,
+          onlyProfesor: true
         });
       } else {
         // eslint-disable-next-line no-use-before-define
@@ -663,49 +817,64 @@ exports.getTribunales = async function (req, res, next) {
       }
       // eslint-disable-next-line no-inner-declarations
       async function getMiembrosTribunal(
-        ProgramacionDocentesIdentificador, DepartamentoResponsable,
+        ProgramacionDocentesIdentificador,
+        DepartamentoResponsable
       ) {
         const profesores = await personaYProfesorController.getProfesores();
         const asigns = await models.Asignatura.findAll({
           where: {
             // se obtendrá con req D510 1
             ProgramacionDocenteIdentificador: {
-              [op.in]: ProgramacionDocentesIdentificador,
+              [op.in]: ProgramacionDocentesIdentificador
             },
-            DepartamentoResponsable,
+            DepartamentoResponsable
           },
-          attributes: ['acronimo', 'nombre', 'curso', 'codigo', 'semestre', 'identificador',
-            'PresidenteTribunalAsignatura', 'VocalTribunalAsignatura', 'SecretarioTribunalAsignatura',
-            'SuplenteTribunalAsignatura', 'ProgramacionDocenteIdentificador'],
+          attributes: [
+            'acronimo',
+            'nombre',
+            'curso',
+            'codigo',
+            'semestre',
+            'identificador',
+            'PresidenteTribunalAsignatura',
+            'VocalTribunalAsignatura',
+            'SecretarioTribunalAsignatura',
+            'SuplenteTribunalAsignatura',
+            'ProgramacionDocenteIdentificador'
+          ],
           order: [
             [Sequelize.literal('"Asignatura"."curso"'), 'ASC'],
             [Sequelize.literal('"Asignatura"."semestre"'), 'ASC'],
             [Sequelize.literal('"Asignatura"."acronimo"'), 'ASC'],
-            [Sequelize.literal('"Asignatura"."nombre"'), 'ASC'],
+            [Sequelize.literal('"Asignatura"."nombre"'), 'ASC']
           ],
-          raw: true,
+          raw: true
         });
-        asigns.forEach((asigni) => {
-          const presidente = profesores
-            .find((obj) => obj.identificador === asigni.PresidenteTribunalAsignatura);
+        asigns.forEach(asigni => {
+          const presidente = profesores.find(
+            obj => obj.identificador === asigni.PresidenteTribunalAsignatura
+          );
           if (presidente) {
             // eslint-disable-next-line no-param-reassign
             asigni.presidenteNombre = presidente.nombreCorregido;
           }
-          const vocal = profesores
-            .find((obj) => obj.identificador === asigni.VocalTribunalAsignatura);
+          const vocal = profesores.find(
+            obj => obj.identificador === asigni.VocalTribunalAsignatura
+          );
           if (vocal) {
             // eslint-disable-next-line no-param-reassign
             asigni.vocalNombre = vocal.nombreCorregido;
           }
-          const secretario = profesores
-            .find((obj) => obj.identificador === asigni.SecretarioTribunalAsignatura);
+          const secretario = profesores.find(
+            obj => obj.identificador === asigni.SecretarioTribunalAsignatura
+          );
           if (secretario) {
             // eslint-disable-next-line no-param-reassign
             asigni.secretarioNombre = secretario.nombreCorregido;
           }
-          const suplente = profesores
-            .find((obj) => obj.identificador === asigni.SuplenteTribunalAsignatura);
+          const suplente = profesores.find(
+            obj => obj.identificador === asigni.SuplenteTribunalAsignatura
+          );
           if (suplente) {
             // eslint-disable-next-line no-param-reassign
             asigni.suplenteNombre = suplente.nombreCorregido;
@@ -724,32 +893,35 @@ exports.getTribunales = async function (req, res, next) {
             asignaturasAntiguas.push(as);
           }
         });
-        const view = req.originalUrl.toLowerCase().includes('consultar') ? 'tribunales/tribunalesConsultar' : 'tribunales/tribunalesCumplimentar';
+        const view = req.originalUrl.toLowerCase().includes('consultar')
+          ? 'tribunales/tribunalesConsultar'
+          : 'tribunales/tribunalesCumplimentar';
         const nuevopath = `${req.baseUrl}/respdoc/guardarTribunales`;
         const cancelarpath = `${req.baseUrl}/respdoc/tribunales?planID=${req.session.planID}&departamentoID=${DepartamentoResponsable}`;
-        res.render(view,
-          {
-            profesores,
-            tribunales: asignaturas,
-            tribunalesAntiguos: asignaturasAntiguas,
-            nuevopath,
-            aprobarpath: `${req.baseUrl}/respDoc/aprobarTribunales`,
-            cancelarpath,
-            planID: req.session.planID,
-            estadoTribunales: res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
-            estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
-            pdID,
-            submenu: req.session.submenu,
-            menu: req.session.menu,
-            permisoDenegado: res.locals.permisoDenegado,
-            departamentoID: req.session.departamentoID,
-            departamentosResponsables: res.locals.departamentosResponsables,
-            estadosTribunal: estados.estadoTribunal,
-            estadosProgDoc: estados.estadoProgDoc,
-            planEstudios: res.locals.planEstudios,
-            // desde esta ventana solo se pueden añadir profesores al sistema.
-            onlyProfesor: true,
-          });
+        res.render(view, {
+          profesores,
+          tribunales: asignaturas,
+          tribunalesAntiguos: asignaturasAntiguas,
+          nuevopath,
+          aprobarpath: `${req.baseUrl}/respDoc/aprobarTribunales`,
+          cancelarpath,
+          planID: req.session.planID,
+          estadoTribunales:
+            res.locals.progDoc['ProgramacionDocentes.estadoTribunales'],
+          estadoProgDoc:
+            res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
+          pdID,
+          submenu: req.session.submenu,
+          menu: req.session.menu,
+          permisoDenegado: res.locals.permisoDenegado,
+          departamentoID: req.session.departamentoID,
+          departamentosResponsables: res.locals.departamentosResponsables,
+          estadosTribunal: estados.estadoTribunal,
+          estadosProgDoc: estados.estadoProgDoc,
+          planEstudios: res.locals.planEstudios,
+          // desde esta ventana solo se pueden añadir profesores al sistema.
+          onlyProfesor: true
+        });
       }
     } catch (error) {
       console.log('Error:', error);
@@ -759,55 +931,68 @@ exports.getTribunales = async function (req, res, next) {
 };
 
 // POST respDoc/guardarTribunales
-exports.guardarTribunales = async function (req, res, next) {
+exports.guardarTribunales = async function(req, res, next) {
   const { departamentoID } = req.session;
   const { pdID } = req.session;
   let toActualizar = req.body.actualizar;
   if (toActualizar && !res.locals.permisoDenegado) {
     try {
       // debo de comprobar que estoy cambiando asignaturas de mi pd
-      const as = await models.Asignatura.findAll(
-        {
-          where: {
-            ProgramacionDocenteIdentificador: pdID,
-          },
-          attributes: ['identificador', 'DepartamentoResponsable'],
-          raw: true,
+      const as = await models.Asignatura.findAll({
+        where: {
+          ProgramacionDocenteIdentificador: pdID
         },
-      );
+        attributes: ['identificador', 'DepartamentoResponsable'],
+        raw: true
+      });
       if (!Array.isArray(toActualizar)) {
         toActualizar = [toActualizar];
       }
       const promises = [];
       const tribunalesToActualizar = [];
-      toActualizar.forEach((element) => {
+      toActualizar.forEach(element => {
         let tribunalToActualizar;
         const tribunalId = Number(element.split('_')[0]);
-        const asig = as.find((obj) => (tribunalId && obj.identificador === tribunalId));
-        if (!asig || !asig.DepartamentoResponsable
-          || asig.DepartamentoResponsable !== departamentoID) {
+        const asig = as.find(
+          obj => tribunalId && obj.identificador === tribunalId
+        );
+        if (
+          !asig ||
+          !asig.DepartamentoResponsable ||
+          asig.DepartamentoResponsable !== departamentoID
+        ) {
           console.log('Ha intentado cambiar una asignatura que no puede');
         } else {
-          const profesorIdentificador = element.split('_')[1] ? element.split('_')[1] : null;
+          const profesorIdentificador = element.split('_')[1]
+            ? element.split('_')[1]
+            : null;
           const puestoTribunal = `${element.split('_')[2]}TribunalAsignatura`;
-          tribunalToActualizar = tribunalesToActualizar
-            .find((obj) => obj.identificador === tribunalId);
+          tribunalToActualizar = tribunalesToActualizar.find(
+            obj => obj.identificador === tribunalId
+          );
           if (tribunalToActualizar) {
-            tribunalToActualizar.puestos[puestoTribunal] = profesorIdentificador;
+            tribunalToActualizar.puestos[
+              puestoTribunal
+            ] = profesorIdentificador;
           } else {
             tribunalToActualizar = {};
             tribunalToActualizar.identificador = tribunalId;
             tribunalToActualizar.puestos = {};
-            tribunalToActualizar.puestos[puestoTribunal] = profesorIdentificador;
+            tribunalToActualizar.puestos[
+              puestoTribunal
+            ] = profesorIdentificador;
             tribunalesToActualizar.push(tribunalToActualizar);
           }
         }
       });
       tribunalesToActualizar.forEach((element, index) => {
-        promises.push(models.Asignatura.update(
-          tribunalesToActualizar[index].puestos,
-          { where: { identificador: tribunalesToActualizar[index].identificador } },
-        ));
+        promises.push(
+          models.Asignatura.update(tribunalesToActualizar[index].puestos, {
+            where: {
+              identificador: tribunalesToActualizar[index].identificador
+            }
+          })
+        );
       });
       await Promise.all(promises);
       next();
@@ -821,48 +1006,135 @@ exports.guardarTribunales = async function (req, res, next) {
 };
 
 // get
-exports.reenviar = function (req, res) {
+exports.reenviar = function(req, res) {
   req.session.save(() => {
-    res.redirect(`${req.baseUrl}/respDoc/tribunales?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`);
+    res.redirect(
+      `${req.baseUrl}/respDoc/tribunales?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
+    );
   });
 };
 // post respDoc/aprobarTribunales:pdID
-exports.aprobarTribunales = async function (req, res, next) {
+exports.aprobarTribunales = async function(req, res, next) {
   const { pdID } = req.session;
   const { departamentoID } = req.session;
   const date = new Date();
   let estadoTribunales;
   try {
-    const pd = await models.ProgramacionDocente.findOne({ where: { identificador: pdID }, attributes: ['estadoTribunales'] });
+    const pd = await models.ProgramacionDocente.findOne({
+      where: { identificador: pdID },
+      attributes: ['estadoTribunales']
+    });
     estadoTribunales = pd.estadoTribunales;
     if (!res.locals.permisoDenegado) {
       switch (estadoTribunales[departamentoID]) {
-      case (estados.estadoTribunal.abierto):
-        estadoTribunales[departamentoID] = estados.estadoTribunal.aprobadoResponsable;
-        break;
-      case (estados.estadoTribunal.aprobadoResponsable):
-        estadoTribunales[departamentoID] = req.body.decision !== 'aceptar' ? estados.estadoTribunal.abierto : estados.estadoTribunal.aprobadoDirector;
-        break;
-      default:
-        break;
+        case estados.estadoTribunal.abierto:
+          estadoTribunales[departamentoID] =
+            estados.estadoTribunal.aprobadoResponsable;
+          break;
+        case estados.estadoTribunal.aprobadoResponsable:
+          estadoTribunales[departamentoID] =
+            req.body.decision !== 'aceptar'
+              ? estados.estadoTribunal.abierto
+              : estados.estadoTribunal.aprobadoDirector;
+          break;
+        default:
+          break;
       }
       await models.ProgramacionDocente.update(
         {
           estadoTribunales,
-          fechaTribunales: date,
-        }, /* set attributes' value */
-        { where: { identificador: pdID } }, /* where criteria */
+          fechaTribunales: date
+        } /* set attributes' value */,
+        { where: { identificador: pdID } } /* where criteria */
       );
       req.session.save(() => {
-        progDocController.isPDLista(pdID, res.redirect(`${req.baseUrl}/respDoc/tribunales`));
+        progDocController.isPDLista(
+          pdID,
+          res.redirect(`${req.baseUrl}/respDoc/tribunales`)
+        );
       });
     } else {
       req.session.save(() => {
-        progDocController.isPDLista(pdID, res.redirect(`${req.baseUrl}/respDoc/tribunales`));
+        progDocController.isPDLista(
+          pdID,
+          res.redirect(`${req.baseUrl}/respDoc/tribunales`)
+        );
       });
     }
   } catch (error) {
     console.log('Error:', error);
     next(error);
+  }
+};
+
+const generateCsvCoordinadores = async function(pdID) {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const pd = await models.ProgramacionDocente.findOne({
+      where: { identificador: pdID },
+      attributes: ['estadoProGDoc', 'estadoProfesores']
+    });
+    // solo se genera el pdf si se tiene permiso
+    const fields = [
+      'codigo_programa',
+      'nombre_programa',
+      'codigo_asignatura',
+      'nombre_asignatura',
+      'curso',
+      'duracion',
+      'nombre_cordinador',
+      'apellidos_cordinador',
+      'email'
+    ];
+    const opts = { fields };
+    const idPlan = progDocController.getPlanPd(pdID);
+    const ano = progDocController.getAnoPd(pdID);
+    const coordinadoresAsignaturas = await asignaturaController.getCoordinadoresAsignaturasProgDoc(
+      pdID
+    );
+    const planInfo = await planController.getPlanInfo(idPlan);
+    const { estadoProfesores } = pd;
+    const data = coordinadoresAsignaturas.map(coordinadorAsign => {
+      return {
+        codigo_programa: planInfo.codigo,
+        nombre_programa: planInfo.nombreCompleto,
+        codigo_asignatura: coordinadorAsign.codigo,
+        nombre_asignatura: coordinadorAsign.nombre,
+        curso: coordinadorAsign.curso,
+        duracion: coordinadorAsign.semestre,
+        nombre_cordinador: coordinadorAsign['Coordinador.Persona.nombre'],
+        apellidos_cordinador: coordinadorAsign['Coordinador.Persona.apellido'],
+        email: coordinadorAsign['Coordinador.Persona.email']
+      };
+    });
+    // si esta abierto se guarda en borrador
+    let folder = '/coordinadores/';
+    let folder2 = '';
+    if (
+      !progDocController.CumpleTodos(
+        estados.estadoProfesor.aprobadoDirector,
+        estadoProfesores
+      )
+    ) {
+      folder = '/borrador/';
+      folder2 = '_borrador';
+    }
+    const dir = `${PATH_PDF}/pdfs/${progDocController.getAnoPd(
+      pdID
+    )}/${progDocController.getTipoPd(pdID)}/${progDocController.getPlanPd(
+      pdID
+    )}/${progDocController.getVersionPd(pdID)}${folder}`;
+    const fileName = `coordinadores_${idPlan}_${ano}_${progDocController.getVersionPd(
+      pdID
+    )}${folder2}.csv`;
+    const ruta = dir + fileName;
+    funciones.ensureDirectoryExistence(ruta);
+    const csv = json2csv(data, opts);
+    fs.writeFile(ruta, csv, err => {
+      if (err) console.log(err);
+    });
+  } catch (error) {
+    // se propaga el error lo captura el middleware
+    throw error;
   }
 };
