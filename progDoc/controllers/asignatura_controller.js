@@ -105,8 +105,8 @@ exports.getCoordinadoresAsignaturasProgDoc = async function (pdID) {
           {
             model: models.Profesor,
             as: 'Coordinador',
-             // inner join
-            required: true,
+             // left join
+            required: false,
             include: [
               {
                 model: models.Persona,

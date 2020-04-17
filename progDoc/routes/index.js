@@ -1471,6 +1471,7 @@ router.post(
   pdfController.generarPDF,
   examenController.getExamenes,
   examenController.generateCsvExamens,
+  asignacionYTribunalController.generateCsvCoordinadoresRouter,
   abrirProgDoc2Controller.cerrarProgDoc2
 );
 

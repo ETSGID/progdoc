@@ -1080,6 +1080,7 @@ const generateCsvCoordinadores = async function(pdID) {
       'nombre_programa',
       'codigo_asignatura',
       'nombre_asignatura',
+      'acronimo_asignatura',
       'curso',
       'duracion',
       'nombre_cordinador',
@@ -1100,11 +1101,12 @@ const generateCsvCoordinadores = async function(pdID) {
         nombre_programa: planInfo.nombreCompleto,
         codigo_asignatura: coordinadorAsign.codigo,
         nombre_asignatura: coordinadorAsign.nombre,
+        acronimo_asignatura: coordinadorAsign.acronimo || coordinadorAsign.codigo,
         curso: coordinadorAsign.curso,
         duracion: coordinadorAsign.semestre,
-        nombre_cordinador: coordinadorAsign['Coordinador.Persona.nombre'],
-        apellidos_cordinador: coordinadorAsign['Coordinador.Persona.apellido'],
-        email: coordinadorAsign['Coordinador.Persona.email']
+        nombre_cordinador: coordinadorAsign['Coordinador.Persona.nombre'] || 'NO ASIGNADO',
+        apellidos_cordinador: coordinadorAsign['Coordinador.Persona.apellido'] || 'NO ASIGNADO',
+        email: coordinadorAsign['Coordinador.Persona.email'] || 'NO ASIGNADO'
       };
     });
     // si esta abierto se guarda en borrador
@@ -1138,3 +1140,13 @@ const generateCsvCoordinadores = async function(pdID) {
     throw error;
   }
 };
+
+exports.generateCsvCoordinadoresRouter = async function(req,res,next){
+  try{
+    await generateCsvCoordinadores(req.session.pdID);
+    next();
+  }catch(error){
+    console.log('Error:', error);
+    next(error);
+  }
+}
