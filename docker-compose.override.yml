@@ -17,6 +17,7 @@ services:
   progdoc:
     build: 
       context: .
+#    image: git.etsit.upm.es:4567/grupointegraciondigital/gestiondoc:stable
     depends_on:
       - db
     env_file:
