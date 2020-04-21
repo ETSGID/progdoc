@@ -624,44 +624,25 @@ exports.generarPDF = async function(req, res, next) {
         res.locals.progDoc.identificador;
       const pdfDatos = await generatePDFFile(pdID, view, req.calendario);
       // eslint-disable-next-line
-      pdf.create(pdfDatos.html, pdfDatos.configPdfOptions).toStream((err, stream) => {
-          if (err) {
-            console.log(err);
-            const errortoPrint = new Error(
-              `Error al crear el fichero ${pdfDatos.fileName}`
-            );
-            next(errortoPrint);
-          } else {
-            const writeStream = stream.pipe(
-              fs.createWriteStream(pdfDatos.ruta)
-            );
-            writeStream.on('finish', function() {
-              switch (view) {
-                case 'pdfs/pdfDraftGenerado':
-                  res.render(view, {
-                    file: pdfDatos.file,
-                    planID: req.session.planID,
-                    planEstudios: res.locals.planEstudios,
-                    pdID,
-                    menu: req.session.menu,
-                    submenu: req.session.submenu
-                  });
-                  break;
-                case 'pdfCerrado':
-                  next();
-                  break;
-                default:
-                  next();
-                  break;
-              }
-            });
-            writeStream.on('error', function(error) {
-              console.log(error);
-              const errortoPrint = new Error(
-                `Error al crear el fichero ${pdfDatos.fileName}`
-              );
-              next(errortoPrint);
-            });
+      pdf.create(pdfDatos.html, pdfDatos.configPdfOptions).toFile(pdfDatos.ruta, (err, resp) => {
+          if (err) return console.log(err);
+          switch (view) {
+            case 'pdfs/pdfDraftGenerado':
+              res.render(view, {
+                file: pdfDatos.file,
+                planID: req.session.planID,
+                planEstudios: res.locals.planEstudios,
+                pdID,
+                menu: req.session.menu,
+                submenu: req.session.submenu
+              });
+              break;
+            case 'pdfCerrado':
+              next();
+              break;
+            default:
+              next();
+              break;
           }
         });
     } catch (error) {

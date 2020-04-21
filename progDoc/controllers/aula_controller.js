@@ -1,7 +1,6 @@
 /* global PATH_PDF, CONTEXT */
 const Sequelize = require('sequelize');
 const ejs = require('ejs');
-const fs = require('fs');
 const pdf = require('html-pdf');
 const { configPdfCerrado } = require('./pdf_controller');
 const models = require('../models');
@@ -27,7 +26,7 @@ const paletaColores = [
 
 // le pasas un string y lo convierte en un int de 32 bits
 // eslint-disable-next-line func-names
-const hashCode = function (s) {
+const hashCode = function(s) {
   // eslint-disable-next-line
   return s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0);
 };
@@ -67,7 +66,7 @@ async function getAllGruposConAula(progDocs) {
  * @param {*} next
  */
 
-exports.getAulas = async function (req, res, next) {
+exports.getAulas = async function(req, res, next) {
   let anoSeleccionado = req.body.ano || req.query.ano;
   const cuatrimestreSeleccionado =
     req.body.cuatrimestre || 'Primer cuatrimestre';
@@ -328,33 +327,22 @@ exports.getAulas = async function (req, res, next) {
       html +=
         '<img style="display:none" src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg">';
       html += '</body></html>';
-      const fileName = `aulas_${anoCodigo}_${cuatrimestreSeleccionado}.pdf`;
-      const file = `${anoCodigo}/aulas/${fileName}`;
+      let file = `aulas_${anoCodigo}_${cuatrimestreSeleccionado}.pdf`;
+      file = `${anoCodigo}/aulas/${file}`;
       // console.log("the fileç: ", file);
       const ruta = `${PATH_PDF}/pdfs/${file}`;
       const configPdfOptions = configPdfCerrado;
       // save file
       // eslint-disable-next-line no-unused-vars
-      pdf.create(html, configPdfOptions).toStream((err, stream) => {
+      pdf.create(html, configPdfOptions).toFile(ruta, (err, resp) => {
         if (err) {
           console.log(err);
           res.json({
             success: false,
-            msg: `Error al crear el fichero ${fileName}`
-          });
-        } else {
-          const writeStream = stream.pipe(fs.createWriteStream(ruta));
-          writeStream.on('finish', function () {
-            res.json({ success: true, path: `${CONTEXT}/pdfs/${file}` });
-          });
-          writeStream.on('error', function (error) {
-            console.log("Error", error);
-            res.json({
-              success: false,
-              msg: `Error al crear el fichero ${fileName}`
-            });
+            msg: 'Ha habido un error la acción no se ha podido completar'
           });
         }
+        res.json({ success: true, path: `${CONTEXT}/pdfs/${file}` });
       });
     }
   } catch (error) {
