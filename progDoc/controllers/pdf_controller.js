@@ -565,9 +565,9 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
     y deben ser obtenidas de una url pq lo que te carga la dirección local es
     después del footer.
     html += `<img src="images/politecnica.jpg" alt="Politécnica" width="50" height="33">`
-    html += '<img style="display:none"
-    src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg">';
     */
+    html +=
+      '<img style="display:none" src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg">';
 
     html += '</body></html>';
     const fileName = tipoPDF.toLowerCase().includes('draft')
