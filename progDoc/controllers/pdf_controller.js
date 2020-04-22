@@ -4,7 +4,6 @@ const Sequelize = require('sequelize');
 const moment = require('moment');
 const pdf = require('html-pdf');
 const ejs = require('ejs');
-const fs = require('fs');
 const funciones = require('../funciones');
 const enumsPD = require('../enumsPD');
 const models = require('../models');

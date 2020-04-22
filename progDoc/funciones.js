@@ -228,6 +228,7 @@ exports.siguienteAnoAcademico = function(anoActual) {
 
 exports.ensureDirectoryExistence = function probar(filePath, notCreate) {
   const dirname = path.dirname(filePath);
+  // sync para evitar condiciones de bloqueo
   if (fs.existsSync(dirname)) {
     return;
   }

@@ -1,7 +1,7 @@
 /* global PATH_PDF */
 
 const Sequelize = require('sequelize');
-const fs = require('fs');
+const fs = require('fs').promises;
 const json2csv = require('json2csv').parse;
 const models = require('../models');
 
@@ -501,10 +501,8 @@ exports.guardarAsignacion = async function(req, res, next) {
           { where: { identificador } } /* where criteria */
         );
       }
-      // generar CSV
-      await generateCsvCoordinadores(req.session.pdID);
       // eslint-disable-next-line no-use-before-define
-      paso2();
+      await paso2();
       // eslint-disable-next-line no-inner-declarations
       async function paso2() {
         let toEliminar = req.body.eliminar;
@@ -553,7 +551,7 @@ exports.guardarAsignacion = async function(req, res, next) {
           });
         }
         // eslint-disable-next-line no-use-before-define
-        paso3();
+        await paso3();
         async function paso3() {
           let toAnadir = req.body.anadir;
           const queryToAnadir = [];
@@ -614,6 +612,8 @@ exports.guardarAsignacion = async function(req, res, next) {
             });
           }
           await models.AsignacionProfesor.bulkCreate(queryToAnadir);
+          // generar CSV
+          await generateCsvCoordinadores(req.session.pdID);
           req.session.save(() => {
             res.redirect(
               `${req.baseUrl}/respDoc/profesores?pdID=${pdID}&departamentoID=${departamentoID}&planID=${planID}`
@@ -1087,7 +1087,7 @@ const generateCsvCoordinadores = async function(pdID) {
       'apellidos_cordinador',
       'email'
     ];
-    const opts = { fields };
+    const opts = { fields, withBOM: true, delimiter: ';' };
     const idPlan = progDocController.getPlanPd(pdID);
     const ano = progDocController.getAnoPd(pdID);
     const coordinadoresAsignaturas = await asignaturaController.getCoordinadoresAsignaturasProgDoc(
@@ -1101,16 +1101,19 @@ const generateCsvCoordinadores = async function(pdID) {
         nombre_programa: planInfo.nombreCompleto,
         codigo_asignatura: coordinadorAsign.codigo,
         nombre_asignatura: coordinadorAsign.nombre,
-        acronimo_asignatura: coordinadorAsign.acronimo || coordinadorAsign.codigo,
+        acronimo_asignatura:
+          coordinadorAsign.acronimo || coordinadorAsign.codigo,
         curso: coordinadorAsign.curso,
         duracion: coordinadorAsign.semestre,
-        nombre_cordinador: coordinadorAsign['Coordinador.Persona.nombre'] || 'NO ASIGNADO',
-        apellidos_cordinador: coordinadorAsign['Coordinador.Persona.apellido'] || 'NO ASIGNADO',
+        nombre_cordinador:
+          coordinadorAsign['Coordinador.Persona.nombre'] || 'NO ASIGNADO',
+        apellidos_cordinador:
+          coordinadorAsign['Coordinador.Persona.apellido'] || 'NO ASIGNADO',
         email: coordinadorAsign['Coordinador.Persona.email'] || 'NO ASIGNADO'
       };
     });
     // si esta abierto se guarda en borrador
-    let folder = '/coordinadores/';
+    let folder = '/';
     let folder2 = '';
     if (
       !progDocController.CumpleTodos(
@@ -1132,21 +1135,19 @@ const generateCsvCoordinadores = async function(pdID) {
     const ruta = dir + fileName;
     funciones.ensureDirectoryExistence(ruta);
     const csv = json2csv(data, opts);
-    fs.writeFile(ruta, csv, err => {
-      if (err) console.log(err);
-    });
+    await fs.writeFile(ruta, csv);
   } catch (error) {
     // se propaga el error lo captura el middleware
     throw error;
   }
 };
 
-exports.generateCsvCoordinadoresRouter = async function(req,res,next){
-  try{
+exports.generateCsvCoordinadoresRouter = async function(req, res, next) {
+  try {
     await generateCsvCoordinadores(req.session.pdID);
     next();
-  }catch(error){
+  } catch (error) {
     console.log('Error:', error);
     next(error);
   }
-}
+};

@@ -1,7 +1,7 @@
 /* global PATH_PDF */
 const Sequelize = require('sequelize');
 const moment = require('moment');
-const fs = require('fs');
+const fs = require('fs').promises;
 const json2csv = require('json2csv').parse;
 const models = require('../models');
 
@@ -694,7 +694,7 @@ exports.generateCsvExamens = async function(req, res, next) {
         'asignatura',
         'departamento responsable'
       ];
-      const opts = { fields };
+      const opts = { fields, withBOM: true, delimiter: ';' };
       let data = [];
       const ano = progDocController.getAnoPd(req.session.pdID);
       // supongo que un acronimo como mucho 10 letras, si es mayor cojo el identificador del plan
@@ -702,63 +702,67 @@ exports.generateCsvExamens = async function(req, res, next) {
         acronimoOIdPlan = progDocController.getPlanPd(req.session.pdID);
       }
       if (res.locals.asignacionsExamen) {
-        res.locals.asignacionsExamen.forEach(asignacions => {
-          data = [];
-          asignacions.asignaturas.forEach(ex => {
-            // eslint-disable-next-line no-param-reassign
-            ex.titulacion = acronimoOIdPlan;
-            // eslint-disable-next-line no-param-reassign
-            ex.dia = ex.examen.fecha;
-            if (moment(ex.examen.horaInicio, 'HH:mm:ss').isValid()) {
+        await Promise.all(
+          res.locals.asignacionsExamen.map(async asignacions => {
+            data = [];
+            asignacions.asignaturas.forEach(ex => {
               // eslint-disable-next-line no-param-reassign
-              ex['hora de comienzo'] = moment(
-                ex.examen.horaInicio,
-                'HH:mm:ss'
-              ).format('HH:mm');
-            }
-            if (
-              moment(ex.examen.horaInicio, 'HH:mm:ss')
-                .add(ex.examen.duracion)
-                .isValid()
-            ) {
+              ex.titulacion = acronimoOIdPlan;
               // eslint-disable-next-line no-param-reassign
-              ex['hora finalizacion'] = moment(ex.examen.horaInicio, 'HH:mm:ss')
-                .add(ex.examen.duracion, 'm')
-                .format('HH:mm');
-            }
-            // eslint-disable-next-line no-param-reassign
-            ex.asignatura = ex.nombre;
-            // eslint-disable-next-line no-param-reassign
-            ex['departamento responsable'] = ex.departamentoResponsable;
-            data.push(ex);
-          });
+              ex.dia = ex.examen.fecha;
+              if (moment(ex.examen.horaInicio, 'HH:mm:ss').isValid()) {
+                // eslint-disable-next-line no-param-reassign
+                ex['hora de comienzo'] = moment(
+                  ex.examen.horaInicio,
+                  'HH:mm:ss'
+                ).format('HH:mm');
+              }
+              if (
+                moment(ex.examen.horaInicio, 'HH:mm:ss')
+                  .add(ex.examen.duracion)
+                  .isValid()
+              ) {
+                // eslint-disable-next-line no-param-reassign
+                ex['hora finalizacion'] = moment(
+                  ex.examen.horaInicio,
+                  'HH:mm:ss'
+                )
+                  .add(ex.examen.duracion, 'm')
+                  .format('HH:mm');
+              }
+              // eslint-disable-next-line no-param-reassign
+              ex.asignatura = ex.nombre;
+              // eslint-disable-next-line no-param-reassign
+              ex['departamento responsable'] = ex.departamentoResponsable;
+              data.push(ex);
+            });
 
-          // si esta abierto se guarda en borrador
-          let folder = '/examenes/';
-          let folder2 = '';
-          if (estadoExamenes === estados.estadoExamen.abierto) {
-            folder = '/borrador/';
-            folder2 = '_borrador';
-          }
-          const dir = `${PATH_PDF}/pdfs/${progDocController.getAnoPd(
-            req.session.pdID
-          )}/${progDocController.getTipoPd(
-            req.session.pdID
-          )}/${progDocController.getPlanPd(
-            req.session.pdID
-          )}/${progDocController.getVersionPd(req.session.pdID)}${folder}`;
-          const fileName = `${acronimoOIdPlan}_${ano}_${
-            asignacions.periodo
-          }_${progDocController.getVersionPd(req.session.pdID)}${folder2}.csv`;
-          const ruta = dir + fileName;
-          funciones.ensureDirectoryExistence(ruta);
-          const csv = json2csv(data, opts);
-          fs.writeFile(ruta, csv, err => {
-            if (err) {
-              console.log(err);
+            // si esta abierto se guarda en borrador
+            let folder = '/';
+            let folder2 = '';
+            if (estadoExamenes === estados.estadoExamen.abierto) {
+              folder = '/borrador/';
+              folder2 = '_borrador';
             }
-          });
-        });
+            const dir = `${PATH_PDF}/pdfs/${progDocController.getAnoPd(
+              req.session.pdID
+            )}/${progDocController.getTipoPd(
+              req.session.pdID
+            )}/${progDocController.getPlanPd(
+              req.session.pdID
+            )}/${progDocController.getVersionPd(req.session.pdID)}${folder}`;
+            const fileName = `${acronimoOIdPlan}_${ano}_${
+              asignacions.periodo
+            }_${progDocController.getVersionPd(
+              req.session.pdID
+            )}${folder2}.csv`;
+            const ruta = dir + fileName;
+            funciones.ensureDirectoryExistence(ruta);
+            const csv = json2csv(data, opts);
+            await fs.writeFile(ruta, csv);
+            console.log(ruta);
+          })
+        );
         next();
       } else {
         next();
