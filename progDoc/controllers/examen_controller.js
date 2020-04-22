@@ -760,7 +760,6 @@ exports.generateCsvExamens = async function(req, res, next) {
             funciones.ensureDirectoryExistence(ruta);
             const csv = json2csv(data, opts);
             await fs.writeFile(ruta, csv);
-            console.log(ruta);
           })
         );
         next();
