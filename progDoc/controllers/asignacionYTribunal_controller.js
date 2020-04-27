@@ -1067,9 +1067,12 @@ exports.aprobarTribunales = async function(req, res, next) {
   }
 };
 
-const generateCsvCoordinadores = async function(pdID) {
+const generateCsvCoordinadores = async function(pdID, definitivo) {
   // eslint-disable-next-line no-useless-catch
   try {
+    const plan = progDocController.getPlanPd(pdID);
+    const planInfo = await planController.getPlanInfo(plan);
+    const planAcronimo = planInfo.nombre || plan;
     const pd = await models.ProgramacionDocente.findOne({
       where: { identificador: pdID },
       attributes: ['estadoProGDoc', 'estadoProfesores']
@@ -1088,13 +1091,12 @@ const generateCsvCoordinadores = async function(pdID) {
       'email'
     ];
     const opts = { fields, withBOM: true, delimiter: ';' };
-    const idPlan = progDocController.getPlanPd(pdID);
     const ano = progDocController.getAnoPd(pdID);
     const coordinadoresAsignaturas = await asignaturaController.getCoordinadoresAsignaturasProgDoc(
       pdID
     );
-    const planInfo = await planController.getPlanInfo(idPlan);
     const { estadoProfesores } = pd;
+    const estadoProgDoc = pd.estadoProGDoc;
     const data = coordinadoresAsignaturas.map(coordinadorAsign => {
       return {
         codigo_programa: planInfo.codigo,
@@ -1119,19 +1121,21 @@ const generateCsvCoordinadores = async function(pdID) {
       !progDocController.CumpleTodos(
         estados.estadoProfesor.aprobadoDirector,
         estadoProfesores
-      )
+      ) ||
+      (estadoProgDoc === estados.estadoProgDoc.incidencia &&
+        definitivo !== true)
     ) {
       folder = '/borrador/';
       folder2 = '_borrador';
     }
     const dir = `${PATH_PDF}/pdfs/${progDocController.getAnoPd(
       pdID
-    )}/${progDocController.getTipoPd(pdID)}/${progDocController.getPlanPd(
+    )}/${progDocController.getPlanPd(pdID)}/${progDocController.getTipoPd(
       pdID
-    )}/${progDocController.getVersionPd(pdID)}${folder}`;
-    const fileName = `coordinadores_${idPlan}_${ano}_${progDocController.getVersionPd(
+    )}/${progDocController.getVersionPdNormalized(pdID)}${folder}`;
+    const fileName = `coordinadores_${planAcronimo}_${plan}_${ano}_${progDocController.getTipoPd(
       pdID
-    )}${folder2}.csv`;
+    )}_${progDocController.getVersionPdNormalized(pdID)}${folder2}.csv`;
     const ruta = dir + fileName;
     funciones.ensureDirectoryExistence(ruta);
     const csv = json2csv(data, opts);
@@ -1144,7 +1148,7 @@ const generateCsvCoordinadores = async function(pdID) {
 
 exports.generateCsvCoordinadoresRouter = async function(req, res, next) {
   try {
-    await generateCsvCoordinadores(req.session.pdID);
+    await generateCsvCoordinadores(req.session.pdID, req.definitivo);
     next();
   } catch (error) {
     console.log('Error:', error);

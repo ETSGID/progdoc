@@ -23,16 +23,44 @@ exports.getTipoPd = function(pdID) {
   return pdID ? pdID.split('_')[3] : null;
 };
 
-// devuelve el version de la PD a partir del id v1
+// devuelve el version de la PD a partir del id: v1
 // PD_09TT_201819_I_v1
-exports.getVersionPd = function(pdID) {
+function getVersionPd(pdID) {
   return pdID ? pdID.split('_')[4] : null;
-};
+}
+
+// devuelve la version de la PD a partir del id normalizada: v001
+function getVersionPdNormalized(pdID) {
+  const v = getVersionPdNumber(pdID);
+  return v ? `v${v.toString().padStart(3, '0')}` : null;
+}
 
 // devuelve el numero version de la PD a partir del id 1
 // PD_09TT_201819_I_v1
-exports.getVersionPdNumber = function(pdID) {
-  return pdID ? Number(pdID.split('_')[4].split('v')[1]) : null;
+function getVersionPdNumber(pdID) {
+  const v = getVersionPd(pdID);
+  return v ? Number(v.split('v')[1]) : null;
+}
+// devuelve el id de PD con version normalizada: PD_09TT_201819_I_v001
+function getProgramacionDocenteIdNormalized(pdID) {
+  if (pdID) {
+    const pdIDArray = pdID.split('_');
+    pdIDArray.splice(4, 1, getVersionPdNormalized(pdID));
+    return pdIDArray.join('_');
+  }
+  return null;
+}
+
+// devuelve el id de PD con version normalizada y acronimo: PD_GITST_09TT_201819_I_v001
+exports.getProgramacionDocenteIdNormalizedAcronimo = function(pdID, acronimo) {
+  if (pdID && acronimo) {
+    const pdIDNormalizedArray = getProgramacionDocenteIdNormalized(pdID).split(
+      '_'
+    );
+    pdIDNormalizedArray.splice(1, 0, acronimo);
+    return pdIDNormalizedArray.join('_');
+  }
+  return pdID;
 };
 
 exports.getProgramacionDocenteById = async function(pdID) {
@@ -403,3 +431,7 @@ exports.getAllProgramacionDocentes = async function(planes, tipoPD, ano) {
 };
 
 exports.CumpleTodos = CumpleTodos;
+exports.getVersionPd = getVersionPd;
+exports.getVersionPdNumber = getVersionPdNumber;
+exports.getVersionPdNormalized = getVersionPdNormalized;
+exports.getProgramacionDocenteIdNormalized = getProgramacionDocenteIdNormalized;

@@ -1453,6 +1453,7 @@ router.post(
 router.post(
   '/cerrarIncidenciaProgDoc',
   (req, res, next) => {
+    req.definitivo = true;
     res.locals.rols.push({
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,

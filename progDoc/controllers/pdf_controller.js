@@ -69,6 +69,7 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
   const asignaturas = [];
   const asignaturasViejas = [];
   const asignacionsExamen = [];
+  let planAcronimo;
   let pdsAnteriores = [];
   let anoFinal;
   let semestre;
@@ -79,7 +80,6 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
       raw: true,
       include: [
         {
-          // incluye las asignaciones de profesores y los horarios.
           model: models.ProgramacionDocente,
           where: { identificador: pdID },
           // left join
@@ -87,6 +87,7 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
         }
       ]
     });
+    planAcronimo = pd.nombre || plan;
     anoFinal =
       2000 +
       Number(
@@ -569,15 +570,22 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
       '<img style="display:none" src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg">';
 
     html += '</body></html>';
-    const fileName = tipoPDF.toLowerCase().includes('draft')
-      ? `${pdID}_borrador.pdf`
-      : `${pdID}.pdf`;
-    const borrador = tipoPDF.toLowerCase().includes('draft') ? 'borrador/' : '';
+    let folder = '/';
+    let folder2 = '';
+    if (tipoPDF.toLowerCase().includes('draft')) {
+      folder = '/borrador/';
+      folder2 = '_borrador';
+    }
+
+    const fileName = `${progDocController.getProgramacionDocenteIdNormalizedAcronimo(
+      pdID,
+      planAcronimo
+    )}${folder2}.pdf`;
     const file = `${progDocController.getAnoPd(
       pdID
-    )}/${progDocController.getTipoPd(pdID)}/${progDocController.getPlanPd(
+    )}/${progDocController.getPlanPd(pdID)}/${progDocController.getTipoPd(
       pdID
-    )}/${progDocController.getVersionPd(pdID)}/${borrador}${fileName}`;
+    )}/${progDocController.getVersionPdNormalized(pdID)}${folder}${fileName}`;
     // console.log("the fileç: ", file);
     const ruta = `${PATH_PDF}/pdfs/${file}`;
     const configPdfOptions = tipoPDF.toLowerCase().includes('draft')

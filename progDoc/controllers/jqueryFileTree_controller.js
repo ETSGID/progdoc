@@ -21,6 +21,8 @@ const _getDirList = function(req, res) {
   let r = '<ul class="jqueryFileTree" style="display: none;">';
   try {
     r = '<ul class="jqueryFileTree" style="display: none;">';
+    let rDirectory = '';
+    let rFiles = '';
     const files = fs.readdirSync(dir);
     files.forEach(f => {
       let ff = dir + f;
@@ -33,13 +35,15 @@ const _getDirList = function(req, res) {
           // eslint-disable-next-line no-param-reassign
           f = `${plan.nombre}(${f})`;
         }
-        r += `<li class="directory collapsed"><a href="#" rel="${ff}/">${f}</a></li>`;
+        rDirectory += `<li class="directory collapsed"><a href="#" rel="${ff}/">${f}</a></li>`;
       } else {
         ff = ff.replace(PATH_PDF, CONTEXT);
         const e = f.split('.')[1];
-        r += `<li class="file ext_${e}"><a href="${ff}" rel="${ff}">${f}</a></li>`;
+        rFiles += `<li class="file ext_${e}"><a href="${ff}" rel="${ff}">${f}</a></li>`;
       }
     });
+    r += rDirectory;
+    r += rFiles;
     r += '</ul>';
   } catch (e) {
     console.log(e);

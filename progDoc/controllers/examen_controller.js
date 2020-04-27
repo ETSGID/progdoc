@@ -10,6 +10,7 @@ const estados = require('../estados');
 const enumsPD = require('../enumsPD');
 const funciones = require('../funciones');
 const progDocController = require('./progDoc_controller');
+const planController = require('./plan_controller');
 
 async function getFranjasExamenes(pdID) {
   // eslint-disable-next-line no-useless-catch
@@ -676,14 +677,17 @@ exports.aprobarExamenes = async function(req, res, next) {
 
 exports.generateCsvExamens = async function(req, res, next) {
   try {
+    const plan = progDocController.getPlanPd(req.session.pdID);
+    const planInfo = await planController.getPlanInfo(plan);
+    const planAcronimo = planInfo.nombre || plan;
     const pd = await models.ProgramacionDocente.findOne({
       where: { identificador: req.session.pdID },
       attributes: ['estadoProGDoc', 'estadoExamenes']
     });
     const { estadoExamenes } = pd;
+    const estadoProgDoc = pd.estadoProGDoc;
     // solo se genera el pdf si se tiene permiso
     if (!res.locals.permisoDenegado) {
-      let acronimoOIdPlan = progDocController.getPlanPd(req.session.pdID);
       const fields = [
         'codigo',
         'titulacion',
@@ -697,17 +701,13 @@ exports.generateCsvExamens = async function(req, res, next) {
       const opts = { fields, withBOM: true, delimiter: ';' };
       let data = [];
       const ano = progDocController.getAnoPd(req.session.pdID);
-      // supongo que un acronimo como mucho 10 letras, si es mayor cojo el identificador del plan
-      if (acronimoOIdPlan.length > 10) {
-        acronimoOIdPlan = progDocController.getPlanPd(req.session.pdID);
-      }
       if (res.locals.asignacionsExamen) {
         await Promise.all(
           res.locals.asignacionsExamen.map(async asignacions => {
             data = [];
             asignacions.asignaturas.forEach(ex => {
               // eslint-disable-next-line no-param-reassign
-              ex.titulacion = acronimoOIdPlan;
+              ex.titulacion = plan;
               // eslint-disable-next-line no-param-reassign
               ex.dia = ex.examen.fecha;
               if (moment(ex.examen.horaInicio, 'HH:mm:ss').isValid()) {
@@ -740,20 +740,26 @@ exports.generateCsvExamens = async function(req, res, next) {
             // si esta abierto se guarda en borrador
             let folder = '/';
             let folder2 = '';
-            if (estadoExamenes === estados.estadoExamen.abierto) {
+            if (
+              estadoExamenes === estados.estadoExamen.abierto ||
+              (estadoProgDoc === estados.estadoProgDoc.incidencia &&
+                req.definitivo !== true)
+            ) {
               folder = '/borrador/';
               folder2 = '_borrador';
             }
             const dir = `${PATH_PDF}/pdfs/${progDocController.getAnoPd(
               req.session.pdID
-            )}/${progDocController.getTipoPd(
-              req.session.pdID
             )}/${progDocController.getPlanPd(
               req.session.pdID
-            )}/${progDocController.getVersionPd(req.session.pdID)}${folder}`;
-            const fileName = `${acronimoOIdPlan}_${ano}_${
+            )}/${progDocController.getTipoPd(
+              req.session.pdID
+            )}/${progDocController.getVersionPdNormalized(
+              req.session.pdID
+            )}${folder}`;
+            const fileName = `examenes_${planAcronimo}_${plan}_${ano}_${
               asignacions.periodo
-            }_${progDocController.getVersionPd(
+            }_${progDocController.getVersionPdNormalized(
               req.session.pdID
             )}${folder2}.csv`;
             const ruta = dir + fileName;
