@@ -238,6 +238,7 @@ exports.isPDLista = async function(progID, thenFunction) {
       ) &&
       prog.estadoHorarios === estados.estadoHorario.aprobadoCoordinador &&
       prog.estadoExamenes === estados.estadoExamen.aprobadoCoordinador &&
+      //calendario de actividades
       prog.estadoCalendario === estados.estadoCalendario.aprobadoCoordinador
     ) {
       nuevoEstado = estados.estadoProgDoc.listo;

@@ -49,7 +49,7 @@ async function getNotasGruposSinAsignatura(gruposBBDD) {
 }
 
 // GET /respDoc/:pdID/:departamentoID/Horario
-exports.getHorario = async function(req, res, next) {
+exports.getHorario = async function (req, res, next) {
   req.session.submenu = 'Horarios';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
@@ -69,11 +69,11 @@ exports.getHorario = async function(req, res, next) {
     // hay que comprobar que no sea una url de consultar.
   } else if (
     estados.estadoHorario.abierto !==
-      res.locals.progDoc['ProgramacionDocentes.estadoHorarios'] &&
+    res.locals.progDoc['ProgramacionDocentes.estadoHorarios'] &&
     (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
       estados.estadoProgDoc.abierto ||
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
-        estados.estadoProgDoc.listo) &&
+      estados.estadoProgDoc.listo) &&
     !req.originalUrl.toLowerCase().includes('consultar')
   ) {
     res.render('horarios/horariosCumplimentar', {
@@ -385,10 +385,10 @@ exports.getHorario = async function(req, res, next) {
   }
 };
 
-exports.guardarHorarios = async function(req, res, next) {
+exports.guardarHorarios = async function (req, res, next) {
   const whereEliminar = {};
   const { pdID } = req.session;
-  let toEliminar = req.body.eliminar;
+  let toEliminar = req.body.eliminarAsignacions;
   const promises = [];
   if (!res.locals.permisoDenegado) {
     try {
@@ -408,26 +408,22 @@ exports.guardarHorarios = async function(req, res, next) {
         raw: true
       });
       if (toEliminar) {
-        if (!Array.isArray(toEliminar)) {
-          toEliminar = [toEliminar];
-        }
         whereEliminar.identificador = [];
         toEliminar.forEach(element => {
           let asignacion;
-          if (element.split('_').length === 7) {
-            // si es una hora
-            asignacion = Number(element.split('_')[6]);
-            const asig = asignaturaAsignacions.find(
-              obj =>
-                asignacion &&
-                obj['AsignacionProfesors.identificador'] === asignacion
-            );
-            if (!asig || !asig['AsignacionProfesors.Dia']) {
-              console.log('Intenta cambiar una nota o un profesor');
-            } else {
-              whereEliminar.identificador.push(asignacion);
-            }
+          asignacion = Number(element.asignacion);
+          //comprobar que borra una asignacion de la asignatura y no cualquier otra
+          const asig = asignaturaAsignacions.find(
+            obj =>
+              asignacion &&
+              obj['AsignacionProfesors.identificador'] === asignacion
+          );
+          if (!asig || !asig['AsignacionProfesors.Dia']) {
+            console.log('Intenta cambiar una nota o un profesor');
+          } else {
+            whereEliminar.identificador.push(asignacion);
           }
+
         });
         if (funciones.isEmpty(whereEliminar)) {
           whereEliminar.identificador = 'Identificador erróneo';
@@ -437,23 +433,16 @@ exports.guardarHorarios = async function(req, res, next) {
         });
         promises.push(promise1);
       }
-      let toAnadir = req.body.anadir;
+      let toAnadir = req.body.newAsignacions;
       const queryToAnadir = [];
       if (toAnadir) {
-        if (!Array.isArray(toAnadir)) {
-          toAnadir = [toAnadir];
-        }
         toAnadir.forEach(element => {
           const nuevaEntrada = {};
-          if (element.split('_')[0] === 'horario') {
-            // si es una hora
-            nuevaEntrada.Duracion = 60;
-            // eslint-disable-next-line prefer-destructuring
-            nuevaEntrada.Dia = element.split('_')[3];
-            nuevaEntrada.HoraInicio = `${element.split('_')[4]}:00:00`;
-            nuevaEntrada.AsignaturaId = Number(element.split('_')[6]);
-            nuevaEntrada.GrupoId = Number(element.split('_')[2]);
-          }
+          nuevaEntrada.Duracion = 60;
+          nuevaEntrada.Dia = element.dia;
+          nuevaEntrada.HoraInicio = element.horaInicio;
+          nuevaEntrada.AsignaturaId = element.asignaturaId;
+          nuevaEntrada.GrupoId = Number(element.grupoId);
           const asig = asignaturaAsignacions.find(
             obj =>
               nuevaEntrada.AsignaturaId &&
@@ -469,17 +458,20 @@ exports.guardarHorarios = async function(req, res, next) {
         promises.push(promise2);
       }
       await Promise.all(promises);
-      next();
+      res.json({ success: true });
     } catch (error) {
       console.log('Error:', error);
-      next(error);
+      res.json({
+        success: false,
+        msg: 'Ha habido un error la acción no se ha podido completar'
+      });
     }
   } else {
-    next();
+    res.json({ success: true });
   }
 };
 // recibe la info de una nota nueva y la crea en la asignatura y grupo correspondiente
-exports.guardarNota = async function(req, res) {
+exports.guardarNota = async function (req, res) {
   if (!res.locals.permisoDenegado) {
     try {
       const notaToAnadir = {};
@@ -507,7 +499,7 @@ exports.guardarNota = async function(req, res) {
 };
 
 // recibe la info de una nota existente y la actualiza en la asignatura y grupo correspondiente
-exports.updateNota = async function(req, res) {
+exports.updateNota = async function (req, res) {
   if (!res.locals.permisoDenegado) {
     try {
       const notaToUpdate = {};
@@ -533,7 +525,7 @@ exports.updateNota = async function(req, res) {
   }
 };
 // recibe la info de una nota existente y la elimina
-exports.eliminarNota = async function(req, res) {
+exports.eliminarNota = async function (req, res) {
   if (!res.locals.permisoDenegado) {
     try {
       await models.AsignacionProfesor.destroy({
@@ -553,7 +545,7 @@ exports.eliminarNota = async function(req, res) {
 };
 
 // get
-exports.reenviar = function(req, res) {
+exports.reenviar = function (req, res) {
   req.session.save(() => {
     res.redirect(
       `${req.baseUrl}/coordinador/horarios?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
@@ -561,7 +553,7 @@ exports.reenviar = function(req, res) {
   });
 };
 // post
-exports.aprobarHorarios = async function(req, res, next) {
+exports.aprobarHorarios = async function (req, res, next) {
   const { pdID } = req.session;
   const date = new Date();
   let estadoHorarios;

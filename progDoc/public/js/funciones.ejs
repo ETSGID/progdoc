@@ -1,19 +1,44 @@
 <%
-/*si no existen elementos con campo name alguno de los que se pasa en el primer array
+/*si existen elementos con en el html con campo 'name' coincidente con
+lo que se pasa en el primer array
 y si activado es true 
-no se saca el mensaje, sino sí.
+se muestra el mensaje, sino no.
 */
 //names debe ser un array
 confirmarSalirSinGuardar = function(names, activado) { 
-    let contador = 0;
+    let areElements = false;
     names.forEach(function (name) {
-       let elements = document.getElementsByName(name);
+       let element = document.getElementsByName(name);
        /**miro si hay algun elemento que case con eso, en caso afirmativo
         es que existe algo nuevo que no se ha guardado
         **/
-       contador += elements.length;
+        if (element.length > 0){
+           areElements = true;
+       }
     })
-    if (contador > 0 && activado){
+    if (areElements && activado){
+        return "Es posible que los cambios aplicados no se guarden"
+    }else{
+        return null;
+    }
+};
+
+/*si los elementos pasados en arrays alguno no está vacíos 
+y si activado es true 
+se muestra el mensaje, sino no.
+*/
+//elements debe ser un array de arrays
+confirmarSalirSinGuardarArrays = function(elements, activado) { 
+    let areElements = false;
+    elements.forEach(function (element) {
+        /**miro si hay algun elemento que case con eso, en caso afirmativo
+        es que existe algo nuevo que no se ha guardado
+        **/
+       if (element.length > 0){
+           areElements = true;
+       }
+    })
+    if (areElements && activado){
         return "Es posible que los cambios aplicados no se guarden"
     }else{
         return null;
@@ -21,11 +46,19 @@ confirmarSalirSinGuardar = function(names, activado) {
 };
 
 
+
 //le añade un 0 a la hora y a los minutos si solo tienen un digito
 formatHora = function(input) {
     if (input.value.length === 1) {
         input.value = "0" + input.value;
     }
+}
+
+formatHoraNumber = function(hora){
+    if ( hora.length === 1) {
+        return "0" + hora;
+    }
+    return hora
 }
 
 //devuelve el acronimo si existe sino el nombre de la asignatura pasada

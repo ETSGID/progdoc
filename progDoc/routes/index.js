@@ -1254,7 +1254,6 @@ router.post(
   },
   planController.getPlanes,
   rolController.comprobarRols,
-  horarioController.guardarHorarios,
   horarioController.aprobarHorarios
 );
 
