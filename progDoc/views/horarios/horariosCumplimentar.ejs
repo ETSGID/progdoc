@@ -234,8 +234,13 @@ function cambiarPorClase(clase_1, clase_2) {
         let semestreArray = cursoArray.semestres.find(function (obj) { return obj.semestre === semestre});
         let grupoArray = semestreArray.grupos.find(function (obj) { return obj.grupoCodigo === grupo});
 
-        //asignaturas que dan en ese horario
+        // Asignaturas que dan en ese horario
         let asignaturas = grupoArray.asignaturas;
+        
+        // Asignaturas que el horario original tiene en esa fecha + hora
+        let asignacionesOriginales = grupoArray.asignaciones.filter(function (obj) {
+            return obj.dia === dia && obj.horaInicio === formatHoraNumber(horaInicio)+':00:00'
+        });
 
         // Cogemos las asignaturas que vamos a borrar de ese día / hora
         let selectedEliminar = $( this ).find('span').text();
@@ -248,16 +253,21 @@ function cambiarPorClase(clase_1, clase_2) {
                     // Comprobamos si se había guardado para añadirla en esa hora
                     // (es decir, no estaba en ese horario inicialmente; por tanto, aún no está en la base de datos)
                     let asignPendienteAnadir = newAsignacions.find(function (obj) {
-                        return (obj.asignacion === asignOld.identificador && obj.dia === dia && obj.horaInicio === formatHoraNumber(horaInicio)+':00:00' && obj.grupoId === grupo)
+                        return (obj.asignaturaId === asignOld.identificador && obj.dia === dia && obj.horaInicio === formatHoraNumber(horaInicio)+':00:00' && obj.grupoId === grupo)
+                    });
+
+                    // Comprobamos si estaba originalmente en esa hora
+                    let asignaturaActual = asignacionesOriginales.find(function (obj) {
+                        return obj.asignaturaIdentificador === asignOld.identificador
                     });
 
                     // Si aún no estaba guardada en la base de datos, la eliminamos de la variable donde se guardan las asignaturas que queríamos añadir a la BDD
                     if (asignPendienteAnadir) {
                         newAsignacions.splice(newAsignacions.indexOf(asignPendienteAnadir), 1);
                     // Si no, la añadimos a la variable donde se guardan las asignaturas que queremos quitar de la BDD
-                    } else {
+                    } else if (asignaturaActual) {
                         eliminarAsignacions.push({
-                            asignacion: asignOld.identificador,
+                            asignacion: asignaturaActual.identificador,
                             dia: dia,
                             horaInicio: formatHoraNumber(horaInicio)+':00:00',
                             grupoId: grupo
@@ -275,19 +285,33 @@ function cambiarPorClase(clase_1, clase_2) {
                 let asignNew = asignaturas.find(function (obj) { return (obj.nombre === selected || obj.acronimo === selected) });
 
                 if (asignNew) {
-                    // Comprobamos si se había guardado para eliminarla de esa hora
-                    // (es decir, estaba en ese horario inicialmente; por tanto, todavía está la base de datos)
-                    let asignPendienteEliminar = eliminarAsignacions.find(function (obj) {
-                        return (obj.asignacion === asignNew.identificador && obj.dia === dia && obj.horaInicio === formatHoraNumber(horaInicio)+':00:00' && obj.grupoId === grupo)
+                    // Comprobamos si estaba originalmente en esa hora
+                    let asignaturaActual = asignacionesOriginales.find(function (obj) {
+                        return obj.asignaturaIdentificador === asignNew.identificador
                     });
 
-                    // Si todavía estaba guardada en la base de datos, la eliminamos de la variable donde se guardan las asignaturas que queríamos quitar de la BDD
-                    if (asignPendienteEliminar) {
-                        eliminarAsignacions.splice(eliminarAsignacions.indexOf(asignPendienteEliminar), 1);
-                    // Si no, la añadimos a la variable donde se guardan las asignaturas que queremos añadir a la BDD
+                    if (asignaturaActual) {
+                        // Comprobamos si se había guardado para eliminarla de esa hora
+                        // (es decir, estaba en ese horario inicialmente; por tanto, todavía está la base de datos)
+                        let asignPendienteEliminar = eliminarAsignacions.find(function (obj) {
+                            return (obj.asignacion === asignaturaActual.identificador && obj.dia === dia && obj.horaInicio === formatHoraNumber(horaInicio)+':00:00' && obj.grupoId === grupo)
+                        });
+
+                        // Si todavía estaba guardada en la base de datos, la eliminamos de la variable donde se guardan las asignaturas que queríamos quitar de la BDD
+                        if (asignPendienteEliminar) {
+                            eliminarAsignacions.splice(eliminarAsignacions.indexOf(asignPendienteEliminar), 1);
+                        // Si no, la añadimos a la variable donde se guardan las asignaturas que queremos añadir a la BDD
+                        } else {
+                            newAsignacions.push({
+                                asignaturaId: asignNew.identificador,
+                                dia: dia,
+                                horaInicio: formatHoraNumber(horaInicio)+':00:00',
+                                grupoId: grupo
+                            });
+                        }
                     } else {
                         newAsignacions.push({
-                            asignacion: asignNew.identificador,
+                            asignaturaId: asignNew.identificador,
                             dia: dia,
                             horaInicio: formatHoraNumber(horaInicio)+':00:00',
                             grupoId: grupo
