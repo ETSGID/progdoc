@@ -35,6 +35,11 @@ function getVersionPdNormalized(pdID) {
   return v ? `v${v.toString().padStart(3, '0')}` : null;
 }
 
+function getVersionPdNormalizedWithoutV(pdID){
+  const v = getVersionPdNumber(pdID);
+  return v ? `${v.toString().padStart(3, '0')}` : null;
+}
+
 // devuelve el numero version de la PD a partir del id 1
 // PD_09TT_201819_I_v1
 function getVersionPdNumber(pdID) {
@@ -435,4 +440,5 @@ exports.CumpleTodos = CumpleTodos;
 exports.getVersionPd = getVersionPd;
 exports.getVersionPdNumber = getVersionPdNumber;
 exports.getVersionPdNormalized = getVersionPdNormalized;
+exports.getVersionPdNormalizedWithoutV = getVersionPdNormalizedWithoutV;
 exports.getProgramacionDocenteIdNormalized = getProgramacionDocenteIdNormalized;

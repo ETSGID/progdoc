@@ -13,49 +13,51 @@ const actividadParcialController = require('./actividadParcial_controller');
 const cursoController = require('./curso_controller');
 
 const op = Sequelize.Op;
-// local
-const base = path.resolve('public'); //  just relative path to absolute path
-// despliegue¿?
-const configPdfDraft = {
-  format: 'A4', // allowed units: A3, A4, A5, Legal, Letter, Tabloid
-  base: `file://${base}/`, // you have to set 'file://' Ahí puedo ya referenciar a todos por ejemplo una imagen images/imagen.png, o un css
-  orientation: 'portrait', // portrait or landscape
-  paginationOffset: 1, // Override the initial pagination number
-  header: {
-    height: '35mm',
-    contents:
-      '<img src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg" alt="Politécnica" style="width:30mm;height:20mm;"><div class="draft"><p class="draftText">Borrador</div >'
-  },
-  footer: {
-    height: '10mm',
-    contents: {
-      first: ' ',
-      default:
-        '<span style="color: #444; font-size: 8pt;">{{page}}/{{pages}}</span>' // fallback value
+
+const configPdf = function(draft, planNombre, pdId) {
+  const base = path.resolve('public'); //  just relative path to absolute path
+  const styleHeader = 'margin:0; font-size: 6pt; text-align: center';
+  const heightHeader = '35mm';
+  const heightFooter = '10mm';
+  const draftStyle = draft
+    ? '<div class="draft"><p class="draftText">Borrador</div>'
+    : '';
+  const borrador = draft ? '(Borrador),' : '';
+  const textoHeader = `<p style="${styleHeader}">${planNombre.toUpperCase()}</p>
+  <p style="${styleHeader}">E.T.S. Ingenieros de Telecomunicación</p>
+  <p style="${styleHeader}">
+  Versión ${progDocController.getVersionPdNormalizedWithoutV(pdId)}, ${borrador}
+  ${moment()
+    .locale('es')
+    .format('LL')}
+
+  </p>`;
+  return {
+    format: 'A4', // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+    base: `file://${base}/`, // you have to set 'file://' Ahí puedo ya referenciar a todos por ejemplo una imagen images/imagen.png, o un css
+    orientation: 'portrait', // portrait or landscape
+    paginationOffset: 1, // Override the initial pagination number
+    header: {
+      height: heightHeader,
+      contents: `
+      <img src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg" alt="Politécnica" style="width:30mm;height:20mm; float:left;">
+      <div style="padding-top:5mm">
+      ${textoHeader}
+      </div>
+      <div style="clear:both"></div>
+      ${draftStyle}`
+    },
+    footer: {
+      height: heightFooter,
+      contents: {
+        first: ' ',
+        default:
+          '<span style="color: #444; font-size: 8pt;">{{page}}/{{pages}}</span>' // fallback value
+      }
     }
-  }
+  };
 };
-exports.configPdfDraft = configPdfDraft;
-const configPdfCerrado = {
-  format: 'A4', // allowed units: A3, A4, A5, Legal, Letter, Tabloid
-  base: `file://${base}/`, // you have to set 'file://' Ahí puedo ya referenciar a todos por ejemplo una imagen images/imagen.png, o un css
-  orientation: 'portrait', // portrait or landscape
-  paginationOffset: 1, // Override the initial pagination number
-  header: {
-    height: '35mm',
-    contents:
-      '<img src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg" alt="Politécnica" style="width:30mm;height:20mm;">'
-  },
-  footer: {
-    height: '10mm',
-    contents: {
-      first: ' ',
-      default:
-        '<span style="color: #444; font-size: 8pt;">{{page}}/{{pages}}</span>' // fallback value
-    }
-  }
-};
-exports.configPdfCerrado = configPdfCerrado;
+
 // pdID el identificador de pd
 // tipoPDF puede ser pdfDraftGenerado si es pintar un draft o pdfCerrado
 // calendario se le pasa la informacion de calendario
@@ -70,6 +72,7 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
   const asignaturasViejas = [];
   const asignacionsExamen = [];
   let planAcronimo;
+  let planNombre;
   let pdsAnteriores = [];
   let anoFinal;
   let semestre;
@@ -88,6 +91,7 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
       ]
     });
     planAcronimo = pd.nombre || plan;
+    planNombre = pd.nombreCompleto;
     anoFinal =
       2000 +
       Number(
@@ -409,7 +413,8 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
               array_dias: [],
               anoSeleccionado: progDocController.getAnoPd(pdID),
               estadoCalendario: 0,
-              progDoc: pd
+              progDoc: pd,
+              version: progDocController.getVersionPdNormalizedWithoutV(pdID)
             },
             (err, str) => {
               if (err) {
@@ -431,7 +436,8 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
               array_dias: calendario.array_dias,
               anoSeleccionado: progDocController.getAnoPd(pdID),
               estadoCalendario: 1,
-              progDoc: pd
+              progDoc: pd,
+              version: progDocController.getVersionPdNormalizedWithoutV(pdID)
             },
             (err, str) => {
               if (err) {
@@ -588,9 +594,13 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
     )}/${progDocController.getVersionPdNormalized(pdID)}${folder}${fileName}`;
     // console.log("the fileç: ", file);
     const ruta = `${PATH_PDF}/pdfs/${file}`;
-    const configPdfOptions = tipoPDF.toLowerCase().includes('draft')
-      ? configPdfDraft
-      : configPdfCerrado;
+    // si incluye palabra draft incluye el estilo de draft
+    const configPdfOptions = configPdf(
+      tipoPDF.toLowerCase().includes('draft'),
+      planNombre,
+      pdID
+    );
+
     return {
       html,
       configPdfOptions,
