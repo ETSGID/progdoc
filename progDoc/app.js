@@ -13,6 +13,8 @@ const CASAuthentication = require('cas-authentication');
 // Create a new instance of CASAuthentication.
 const service = process.env.SERVICE || 'http://localhost:3000';
 const casUrl = process.env.CAS || 'https://repo.etsit.upm.es/cas-upm';
+// Version del sw
+const { version } = require('./package.json');
 
 const cas = new CASAuthentication({
   cas_url: casUrl,
@@ -116,6 +118,7 @@ if (DEV === 'true') {
 app.use(async (req, res, next) => {
   // Hacer visible req.session en las vistas
   res.locals.session = req.session;
+  res.locals.version = version;
   /*
   convert mail and employeetype to array
   because CAS sometimes returns array and other strings

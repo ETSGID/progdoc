@@ -23,35 +23,43 @@
   </style>
 </head>
 <body>
-  <div class="sidenav">
-  <div>
-  <h2 <%if (pruebas == "pruebas"){%>style="background-color:red"<%}%>><a style="padding:0" href="<%=CONTEXT%>">Progdoc</a></h2>
+  <div class='allContent'>
+    <div class="sidenav">
+      <div>
+      <h2 <%if (pruebas == "pruebas"){%>style="background-color:red"<%}%>><a style="padding:0" href="<%=CONTEXT%>">Progdoc</a></h2>
+      </div>
+      <button id='drop_ProgDoc' class="dropdown-btn">Programación Docente 
+         <i class="glyphicon glyphicon-chevron-down fa fa-caret-down" aria-hidden="true"></i>
+      </button>
+      <div class="dropdown-container">
+        <a id='element_ProgDocConsultar' href="<%=CONTEXT%>/Consultar">Consultar</a>
+        <a id='element_ProgDocCumplimentar' href="<%=CONTEXT%>/Cumplimentar">Cumplimentar</a>
+        <a id='element_ProgDocGestion' href="<%=CONTEXT%>/Gestion">Jefatura Estudios</a>
+        <a id='element_ProgDocHistorial' href="<%=CONTEXT%>/Historial">Historial</a>
+        <a href="<%=CONTEXT%>/ayuda.pdf" download>Ayuda</a>
+      </div>
+      <% if (locals.menu) { %>
+        <% for(var i=0; i< menu.length; i++){ %>
+          <input type="hidden" name="menu" value="<%=menu[i]%>">
+        <% }%>
+    
+      <%} else {%>
+        <input type="hidden" name="menu">
+      <%}%>
+    </div>
+    <div class="main">
+     <div id="buttonMenuPortales123" style="position:fixed; z-index:4; text-align: right"></div>
+      <%- body %>
+    </div>
   </div>
-  <button id='drop_ProgDoc' class="dropdown-btn">Programación Docente 
-     <i class="glyphicon glyphicon-chevron-down fa fa-caret-down" aria-hidden="true"></i>
-  </button>
-  <div class="dropdown-container">
-    <a id='element_ProgDocConsultar' href="<%=CONTEXT%>/Consultar">Consultar</a>
-    <a id='element_ProgDocCumplimentar' href="<%=CONTEXT%>/Cumplimentar">Cumplimentar</a>
-    <a id='element_ProgDocGestion' href="<%=CONTEXT%>/Gestion">Jefatura Estudios</a>
-    <a id='element_ProgDocHistorial' href="<%=CONTEXT%>/Historial">Historial</a>
-    <a href="<%=CONTEXT%>/ayuda.pdf" download>Ayuda</a>
+  
+<footer>
+  <div class="container">
+      <span class="text-muted">&copy; <%=new Date().getFullYear()%> Universidad Politécnica de Madrid</span>
+      <span class="text-muted" style="float: right;">v<%=version%></span>
   </div>
-</div>
-<% if (locals.menu) { %>
-    <% for(var i=0; i< menu.length; i++){ %>
-      <input type="hidden" name="menu" value="<%=menu[i]%>">
-    <% }%>
+</footer>
 
-  <%} else {%>
-    <input type="hidden" name="menu">
-  <%}%>
-
-<div class="main">
-
- <div id="buttonMenuPortales123" style="position:fixed; z-index:4; text-align: right"></div>
-  <%- body %>
-</div>
 <script>
 /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
 let dropdown = document.getElementsByClassName("dropdown-btn");
