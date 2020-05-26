@@ -84,6 +84,57 @@ exports.updatePlanesAndDeparts = async function() {
   }
 };
 
+/**
+ * Funcion que devuelve el departamento responsable
+ * de todos los que tiene la asignatura en api upm
+ * @param {{codigo_departamento: String, responsable: String}[]} apiDepartamentos departamentos de la asignatura en api upm con el formato que devuelve api upm
+ * @param {{codigo: String}[]} departamentosBBDD  departamentos en la bbdd con el formato de la bbdd
+ * @param {String} nombreCompletoPlan  nombre completo del plan
+ * @param {String} codigoTipoAsignatura codigo tipo de la asignatura
+ * @retruns {String} codigoDepartamento o null con el codigo del departamento responsable
+ */
+
+const addDepartamentoResponsable = function(
+  apiDepartamentos,
+  departamentosBBDD,
+  nombreCompletoPlan,
+  codigoTipoAsignatura
+) {
+  let departamentoResponsable = null;
+  if (apiDepartamentos.length === 0) {
+    if (
+      codigoTipoAsignatura === 'P' &&
+      (nombreCompletoPlan.toUpperCase().includes('MASTER') ||
+        nombreCompletoPlan.toUpperCase().includes('MÁSTER'))
+    ) {
+      departamentoResponsable = 'TFM';
+    }
+    if (
+      codigoTipoAsignatura === 'P' &&
+      nombreCompletoPlan.toUpperCase().includes('GRADO')
+    ) {
+      departamentoResponsable = 'TFG';
+    }
+  } else {
+    // devuelve el ultimo departamento del array si varios cumplen las condiciones:
+    // el departamento debe estar en la base de datos
+    // el departamento en api upm debe tener esas dos etiquetas
+    apiDepartamentos.forEach(element => {
+      if (
+        (element.responsable === 'S' || element.responsable === '') &&
+        departamentosBBDD.find(
+          dep => dep.codigo === element.codigo_departamento
+        )
+      ) {
+        departamentoResponsable = element.codigo_departamento;
+      }
+    });
+  }
+
+  return departamentoResponsable;
+};
+
 exports.getAsignaturasApiUpm = getAsignaturasApiUpm;
 exports.getPlanesApiUpm = getPlanesApiUpm;
 exports.getDepartamentosApiUpm = getDepartamentosApiUpm;
+exports.addDepartamentoResponsable = addDepartamentoResponsable;

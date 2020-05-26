@@ -109,6 +109,7 @@
                                         <th scope="col">Código</th>
                                         <th scope="col">Nombre</th>
                                         <th scope="col">Acrónimo</th>
+                                        <th scope="col">Departamento Responsable</th>
                                         </tr>
                                     </thead>
                                     <tbody id='body_tb_<%= curso %>'>
@@ -128,6 +129,7 @@
                                             }%>
                                             <input type="text" maxlength="5" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='asignatura_<%=curso%>_<%=asignaturaCurso["identificador"]%>' onchange="MarcarChangeAsignatura('asignatura_<%=curso%>_<%=asignaturaCurso.identificador%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
                                             </td>
+                                            <td><%=asignaturaCurso.DepartamentoResponsable || '-'%></td>
                                             </tr>
                                         <%}%>
                                     </tbody>

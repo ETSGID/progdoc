@@ -68,6 +68,7 @@ exports.getGestionPlanes = async function(req, res, next) {
 };
 
 exports.updateAsignaturasApiUpm = async function(req, res, next) {
+  // actualizar departamentos en el sistema
   await apiUpmController.updatePlanesAndDeparts();
   const { pdID } = req.session;
   let apiAsignaturas = [];
@@ -92,15 +93,16 @@ exports.updateAsignaturasApiUpm = async function(req, res, next) {
       const ano = progDocController.getAnoPd(pdID);
       const tipoPD = progDocController.getTipoPd(pdID);
       const planBBDD = res.locals.planEstudios.find(obj => obj.codigo === plan);
+      const departamentosBBDD = await departamentoController.getAllDepartamentos();
       const promisesUpdate = [];
       /*
       si aparece una asignatura de un departamento que no tenia asignado debo meterla y al reves,
       igual se tiene que eliminar un departamento
       */
-      const departamentosResponsables = [];
       // el set para no tener elementos repetidos
       // los profesores se deben copiar a los nuevos grupos si cambia de semestre o año
       const copiarProfesores = new Set();
+      const departamentosResponsables = new Set();
       // las cosas que se van a eliminar de la base de datos
       const whereEliminarAsignatura = [];
       const whereEliminarProfesor = [];
@@ -126,6 +128,7 @@ exports.updateAsignaturasApiUpm = async function(req, res, next) {
         ],
         raw: true
       });
+      // asingaturas presentes en la bbdd
       asignaturasBBDD.forEach(asignBBDD => {
         const { identificador } = asignBBDD;
         const nuevaAsignatura = nuevasAsignaturas.find(
@@ -193,28 +196,15 @@ exports.updateAsignaturasApiUpm = async function(req, res, next) {
             const tipoCambio = as.tipo !== asignBBDD.tipo;
 
             const apiDepartamentos = apiAsignatura.departamentos;
-            if (apiDepartamentos.length === 0) {
-              if (
-                apiAsignatura.codigo_tipo_asignatura === 'P' &&
-                (planBBDD.nombreCompleto.toUpperCase().includes('MASTER') ||
-                  planBBDD.nombreCompleto.toUpperCase().includes('MÁSTER'))
-              ) {
-                as.DepartamentoResponsable = 'TFM';
-              } else if (
-                apiAsignatura.codigo_tipo_asignatura === 'P' &&
-                planBBDD.nombreCompleto.toUpperCase().includes('GRADO')
-              ) {
-                as.DepartamentoResponsable = 'TFG';
-              } else {
-                as.DepartamentoResponsable = null;
-                // hasDepartamento = false;
-              }
-            }
-            apiDepartamentos.forEach(element => {
-              if (element.responsable === 'S' || element.responsable === '') {
-                as.DepartamentoResponsable = element.codigo_departamento;
-              }
-            });
+            // debe estar el departamento en el sistema sino no incluye departamento
+            // ademas se coge el departamento que sea responsable
+            as.DepartamentoResponsable = apiUpmController.addDepartamentoResponsable(
+              apiDepartamentos,
+              departamentosBBDD,
+              planBBDD.nombreCompleto,
+              apiAsignatura.codigo_tipo_asignatura
+            );
+
             const departamentoResponsableCambio =
               as.DepartamentoResponsable !== asignBBDD.DepartamentoResponsable;
             if (apiAsignatura.curso === '') {
@@ -257,14 +247,17 @@ exports.updateAsignaturasApiUpm = async function(req, res, next) {
               semestreCambio
             ) {
               /*
-               añade el departamentoResponsable si no estaba.
+               añade el departamentoResponsable.
+               si ese departamento responsable no existe en el sistema no se muestra
+               la asignatura
                 Solo en las asignaturas nuevas que se añaden o las que permanecen
               */
-              const index = departamentosResponsables.indexOf(
-                as.DepartamentoResponsable
-              );
-              if (index < 0 && as.DepartamentoResponsable) {
-                departamentosResponsables.push(as.DepartamentoResponsable);
+              if (
+                departamentosBBDD.find(
+                  dep => dep.codigo === as.DepartamentoResponsable
+                )
+              ) {
+                departamentosResponsables.add(as.DepartamentoResponsable);
               }
               cambioAsignaturas.push(as);
               cambioAsignaturasAntigua.push(asignBBDD);
@@ -298,14 +291,15 @@ exports.updateAsignaturasApiUpm = async function(req, res, next) {
               as.identificador = asignBBDD.identificador;
             } else {
               /*
-              añado el departamentoResponsable si no estaba.
+              añado el departamentoResponsable.
               Solo en las asignaturas nuevas que se añaden o las que permanecen
               */
-              const index = departamentosResponsables.indexOf(
-                as.DepartamentoResponsable
-              );
-              if (index < 0 && as.DepartamentoResponsable) {
-                departamentosResponsables.push(as.DepartamentoResponsable);
+              if (
+                departamentosBBDD.find(
+                  dep => dep.codigo === as.DepartamentoResponsable
+                )
+              ) {
+                departamentosResponsables.add(as.DepartamentoResponsable);
               }
               viejasAsignaturas.push(as);
             }
@@ -376,28 +370,12 @@ exports.updateAsignaturasApiUpm = async function(req, res, next) {
             semestre = '';
           }
           const apiDepartamentos = apiAsignEncontrada.departamentos;
-          let depResponsable = null;
-          if (apiDepartamentos.length === 0) {
-            if (
-              apiAsignEncontrada.codigo_tipo_asignatura === 'P' &&
-              (planBBDD.nombreCompleto.toUpperCase().includes('MASTER') ||
-                planBBDD.nombreCompleto.toUpperCase().includes('MÁSTER'))
-            ) {
-              depResponsable = 'TFM';
-            } else if (
-              apiAsignEncontrada.codigo_tipo_asignatura === 'P' &&
-              planBBDD.nombreCompleto.toUpperCase().includes('GRADO')
-            ) {
-              depResponsable = 'TFG';
-            } else {
-              depResponsable = null;
-            }
-          }
-          apiDepartamentos.forEach(element => {
-            if (element.responsable === 'S' || element.responsable === '') {
-              depResponsable = element.codigo_departamento;
-            }
-          });
+          const depResponsable = apiUpmController.addDepartamentoResponsable(
+            apiDepartamentos,
+            departamentosBBDD,
+            planBBDD.nombreCompleto,
+            apiAsignEncontrada.codigo_tipo_asignatura
+          );
           /*
           Nueva asignatura a anadir.
           Es una asignatura si tiene curso, semestre y departamentoResponsable
@@ -443,12 +421,10 @@ exports.updateAsignaturasApiUpm = async function(req, res, next) {
                 break;
             }
             /*
-            Añade el departamentoResponsable si no estaba.
             Solo en las asignaturas nuevas que se añaden o las que permanecen
             */
-            const index = departamentosResponsables.indexOf(depResponsable);
-            if (index < 0 && depResponsable) {
-              departamentosResponsables.push(depResponsable);
+            if (departamentosBBDD.find(dep => dep.codigo === depResponsable)) {
+              departamentosResponsables.add(depResponsable);
             }
             nuevasAsignaturas.push(nuevaAsign);
           }
@@ -529,7 +505,7 @@ exports.updateAsignaturasApiUpm = async function(req, res, next) {
         const estadoProfesores = {};
         const estadoTribunales = {};
         const nuevaEntrada = {};
-        departamentosResponsables.forEach(element => {
+        [...departamentosResponsables].forEach(element => {
           estadoProfesores[element] =
             res.locals.progDoc['ProgramacionDocentes.estadoProfesores'][
               element

@@ -387,13 +387,14 @@ function Enviar(aprobarpath){
         form2.submit();
     }else{
         return false;
+        activado = true;
     }
     activado = true;
 }
 
 
 window.onbeforeunload = function(){
-  //primero debes mirar que activado sea true o false (en confirmarSalirSinGuarar y despues marcarlo como true) 
+  //primero debes mirar que activado sea true o false (en confirmarSalirSinGuardar y despues marcarlo como true) 
   let confirma = confirmarSalirSinGuardarArrays([newAsignacions, eliminarAsignacions], activado)
   activado = true
   //reinicializar selects por si selecciona seguir en la página

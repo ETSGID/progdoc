@@ -197,6 +197,7 @@ app.use((req, res, next) => {
 });
 
 // error handler
+//TODO diferenciar entre rutas de API (o ajax) y rutas tradicionales
 app.use((err, req, res) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
@@ -204,9 +205,17 @@ app.use((err, req, res) => {
 
   // render the error page
   res.status(err.status || 500);
+  /**
   res.render('error', {
     CONTEXT,
     layout: false
+  });
+   */
+  res.json({
+    success: false,
+    msg: 'Ha habido un error la acción no se ha podido completar',
+    message: res.locals.message,
+    error: res.locals.error
   });
 });
 

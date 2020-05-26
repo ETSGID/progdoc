@@ -424,9 +424,9 @@ exports.guardarExamenes = async function(req, res, next) {
   const promises = [];
   if (!res.locals.permisoDenegado) {
     try {
-      let toAnadir = req.body.anadir;
-      let toActualizar = req.body.actualizar;
-      let toEliminar = req.body.eliminar;
+      const toAnadir = req.body.createExamens;
+      const toActualizar = req.body.updateExamens;
+      const toEliminar = req.body.deleteExamens;
       const queryToAnadir = [];
       const as = await models.Asignatura.findAll({
         where: {
@@ -443,25 +443,14 @@ exports.guardarExamenes = async function(req, res, next) {
         raw: true
       });
       if (toAnadir) {
-        if (!Array.isArray(toAnadir)) {
-          toAnadir = [toAnadir];
-        }
         toAnadir.forEach(element => {
           const nuevaEntrada = {};
-          const hora = req.body[`hora_${element}`];
-          let minutos = req.body[`minutos_${element}`];
-          if (!minutos) minutos = '00';
-          nuevaEntrada.AsignaturaIdentificador = Number(element.split('_')[0]);
-          // eslint-disable-next-line prefer-destructuring
-          nuevaEntrada.periodo = element.split('_')[2];
-          nuevaEntrada.fecha = moment(
-            req.body[`date_${element}`],
-            'DD/MM/YYYY'
-          );
-          if (hora && minutos) {
-            nuevaEntrada.horaInicio = `${hora}:${minutos}`;
-          }
-          nuevaEntrada.duracion = Number(req.body[`duracion_${element}`]);
+          nuevaEntrada.AsignaturaIdentificador =
+            element.asignaturaIdentificador;
+          nuevaEntrada.periodo = element.periodo;
+          nuevaEntrada.fecha = moment(element.fecha, 'DD/MM/YYYY');
+          nuevaEntrada.horaInicio = element.horaInicio;
+          nuevaEntrada.duracion = Number(element.duracion);
           const asig = as.find(
             obj =>
               nuevaEntrada.AsignaturaIdentificador &&
@@ -477,23 +466,12 @@ exports.guardarExamenes = async function(req, res, next) {
         promises.push(promise1);
       }
       if (toActualizar) {
-        if (!Array.isArray(toActualizar)) {
-          toActualizar = [toActualizar];
-        }
         toActualizar.forEach(element => {
           const nuevaEntrada = {};
-          const hora = req.body[`hora_${element}`];
-          let minutos = req.body[`minutos_${element}`];
-          if (!minutos) minutos = '00';
-          const identificador = Number(element.split('_')[1]);
-          nuevaEntrada.fecha = moment(
-            req.body[`date_${element}`],
-            'DD/MM/YYYY'
-          );
-          if (hora && minutos) {
-            nuevaEntrada.horaInicio = `${hora}:${minutos}`;
-          }
-          nuevaEntrada.duracion = Number(req.body[`duracion_${element}`]);
+          const identificador = Number(element.identificador);
+          nuevaEntrada.fecha = moment(element.fecha, 'DD/MM/YYYY');
+          nuevaEntrada.horaInicio = element.horaInicio;
+          nuevaEntrada.duracion = Number(element.duracion);
           const asig = as.find(
             obj =>
               identificador && obj['Examens.identificador'] === identificador
@@ -511,12 +489,9 @@ exports.guardarExamenes = async function(req, res, next) {
         });
       }
       if (toEliminar) {
-        if (!Array.isArray(toEliminar)) {
-          toEliminar = [toEliminar];
-        }
         whereEliminar.identificador = [];
         toEliminar.forEach(element => {
-          const identificador = Number(element.split('_')[1]);
+          const identificador = Number(element.identificador);
           whereEliminar.identificador.push(identificador);
         });
         if (funciones.isEmpty(whereEliminar)) {
@@ -634,6 +609,10 @@ exports.reenviarExamenes = function(req, res) {
       `${req.baseUrl}/coordinador/examenes?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
     );
   });
+};
+
+exports.reenviarExamenesAjax = function(req, res) {
+  res.json({ success: true });
 };
 
 // post

@@ -6,6 +6,7 @@ const models = require('../models');
 const op = Sequelize.Op;
 const funciones = require('../funciones');
 const progDocController = require('./progDoc_controller');
+const departamentoController = require('./departamento_controller');
 const actividadParcialController = require('./actividadParcial_controller');
 const apiUpmController = require('./apiUpm_controller');
 const enumsPD = require('../enumsPD');
@@ -16,6 +17,7 @@ const enumsPD = require('../enumsPD');
  */
 exports.abrirNuevaProgDoc = async function(req, res, next) {
   try {
+    // cargar nuevos planes y departamentos en el sistema
     await apiUpmController.updatePlanesAndDeparts();
     const tipoPD = req.body.semestre;
     const { plan } = req.body;
@@ -58,9 +60,12 @@ exports.abrirNuevaProgDoc = async function(req, res, next) {
     let pdId1 = 'no programacion';
     let pdId2 = 'no programacion';
     // departamentos responsables que participan en la titulación
+    // se utiliza el set para no guardar elementos repetidos
+    const depsResponsables = new Set();
     res.locals.departamentosResponsables = [];
     const planBBDD = res.locals.planEstudios.find(obj => obj.codigo === plan);
     const response = await apiUpmController.getAsignaturasApiUpm(plan, ano);
+    const departamentosBBDD = await departamentoController.getAllDepartamentos();
     apiAsignaturas = response.data;
     /* En api upm
         T: Basica
@@ -268,37 +273,13 @@ exports.abrirNuevaProgDoc = async function(req, res, next) {
             break;
         }
         const apiDepartamentos = apiAsignatura.departamentos;
-        if (apiDepartamentos.length === 0) {
-          /*
-              No existen los departamentos TFM ni TFG en Api UPM pero en la app sí, se parchean así.
-              Solo se crean en el caso que no tenga departamento asignado el TFT.
-              Hay planes que tienen un departamento responsable para el TFT
-              */
-          if (
-            apiAsignatura.codigo_tipo_asignatura === 'P' &&
-            (planBBDD.nombreCompleto.toUpperCase().includes('MASTER') ||
-              planBBDD.nombreCompleto.toUpperCase().includes('MÁSTER'))
-          ) {
-            asignBBDD.DepartamentoResponsable = 'TFM';
-          } else if (
-            apiAsignatura.codigo_tipo_asignatura === 'P' &&
-            planBBDD.nombreCompleto.toUpperCase().includes('GRADO')
-          ) {
-            asignBBDD.DepartamentoResponsable = 'TFG';
-          } else {
-            asignBBDD.DepartamentoResponsable = null;
-            /*
-            no se usa porque aunque no tengan departamento asingado si que se coge la asignatura.
-            Por ej: prácticas
-          */
-          }
-        }
-        // Sólo se guarda el departamento responsable
-        apiDepartamentos.forEach(element => {
-          if (element.responsable === 'S' || element.responsable === '') {
-            asignBBDD.DepartamentoResponsable = element.codigo_departamento;
-          }
-        });
+        // el departamento responsable debe existir en el sistema
+        asignBBDD.DepartamentoResponsable = apiUpmController.addDepartamentoResponsable(
+          apiDepartamentos,
+          departamentosBBDD,
+          planBBDD.nombreCompleto,
+          apiAsignatura.codigo_tipo_asignatura
+        );
         const { curso } = asignBBDD;
         if (apiAsignatura.curso === '') {
           hasCurso = false;
@@ -528,33 +509,13 @@ exports.abrirNuevaProgDoc = async function(req, res, next) {
           semestre = '';
         }
         const apiDepartamentos = apiAsignEncontrada.departamentos;
-        let depResponsable = null;
-        if (apiDepartamentos.length === 0) {
-          /*
-          No existen los departamentos TFM ni TFG en Api UPM pero en la app sí, se parchean así.
-          Solo se crean en el caso que no tenga departamento asignado el TFT.
-          Hay planes que tienen un departamento responsable para el TFT
-          */
-          if (
-            apiAsignEncontrada.codigo_tipo_asignatura === 'P' &&
-            (planBBDD.nombreCompleto.toUpperCase().includes('MASTER') ||
-              planBBDD.nombreCompleto.toUpperCase().includes('MÁSTER'))
-          ) {
-            depResponsable = 'TFM';
-          } else if (
-            apiAsignEncontrada.codigo_tipo_asignatura === 'P' &&
-            planBBDD.nombreCompleto.toUpperCase().includes('GRADO')
-          ) {
-            depResponsable = 'TFG';
-          } else {
-            depResponsable = null;
-          }
-        }
-        apiDepartamentos.forEach(element => {
-          if (element.responsable === 'S' || element.responsable === '') {
-            depResponsable = element.codigo_departamento;
-          }
-        });
+        // el departamento responsable debe existir en el sistema
+        const depResponsable = apiUpmController.addDepartamentoResponsable(
+          apiDepartamentos,
+          departamentosBBDD,
+          planBBDD.nombreCompleto,
+          apiAsignEncontrada.codigo_tipo_asignatura
+        );
         // nueva asignatura a anadir.
         // Es una asignatura si tiene curso, semestre y departamentoResponsable
         if (
@@ -707,13 +668,13 @@ exports.abrirNuevaProgDoc = async function(req, res, next) {
     });
     asignaturasNuevas.forEach(asignaturaNueva => {
       // actualizar los departamentos responsables que participan en la titulación
-      const index = res.locals.departamentosResponsables.indexOf(
-        asignaturaNueva.DepartamentoResponsable
-      );
-      if (index < 0 && asignaturaNueva.DepartamentoResponsable) {
-        res.locals.departamentosResponsables.push(
-          asignaturaNueva.DepartamentoResponsable
-        );
+      // deben estar en el sistmea
+      if (
+        departamentosBBDD.find(
+          dep => dep.codigo === asignaturaNueva.DepartamentoResponsable
+        )
+      ) {
+        depsResponsables.add(asignaturaNueva.DepartamentoResponsable);
       }
       /*
       actualizar los identificadores de la asignatura que antes se pusieron con el código+_a
@@ -753,6 +714,7 @@ exports.abrirNuevaProgDoc = async function(req, res, next) {
       if (cambioAsignatura2)
         cambioAsignatura2.idNuevo = asignaturaNueva.identificador;
     });
+    res.locals.departamentosResponsables = [...depsResponsables];
     /*
         Hay que incluir asignaciones sin profesor ni horario ni asignatura:
         Se corresponde a notas que no se asocian a ninguna asignatura sino a grupo
@@ -985,8 +947,11 @@ exports.abrirCopiaProgDoc = async function(req, res, next) {
   const conjuntoActividadesParcGrToAnadir = [];
   const promisesActividades = [];
   // departamentos responsables del plan
+  // se utiliza el set para no guardar elementos repetidos
+  const depsResponsables = new Set();
   res.locals.departamentosResponsables = [];
   try {
+    const departamentosBBDD = await departamentoController.getAllDepartamentos();
     const pd = await models.ProgramacionDocente.findOne({
       attributes: [
         'identificador',
@@ -1189,13 +1154,13 @@ exports.abrirCopiaProgDoc = async function(req, res, next) {
     });
     asignaturasNuevas.forEach(asignaturaNueva => {
       // actualizar los departamentos responsables que participan en la titulación
-      const index = res.locals.departamentosResponsables.indexOf(
-        asignaturaNueva.DepartamentoResponsable
-      );
-      if (index < 0 && asignaturaNueva.DepartamentoResponsable) {
-        res.locals.departamentosResponsables.push(
-          asignaturaNueva.DepartamentoResponsable
-        );
+      // deben estar en el sistmea
+      if (
+        departamentosBBDD.find(
+          dep => dep.codigo === asignaturaNueva.DepartamentoResponsable
+        )
+      ) {
+        depsResponsables.add(asignaturaNueva.DepartamentoResponsable);
       }
       /*
       actualizar los identificadores de la asignatura que antes se pusieron con el código+_a
@@ -1230,6 +1195,7 @@ exports.abrirCopiaProgDoc = async function(req, res, next) {
       if (viejaAsignatura2)
         viejaAsignatura2.idNuevo = asignaturaNueva.identificador;
     });
+    res.locals.departamentosResponsables = [...depsResponsables];
     /*
         Hay que incluir asignaciones sin profesor ni horario ni asignatura:
         Se corresponde a notas que no se asocian a ninguna asignatura sino a grupo

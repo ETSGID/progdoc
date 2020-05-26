@@ -49,7 +49,7 @@ async function getNotasGruposSinAsignatura(gruposBBDD) {
 }
 
 // GET /respDoc/:pdID/:departamentoID/Horario
-exports.getHorario = async function (req, res, next) {
+exports.getHorario = async function(req, res, next) {
   req.session.submenu = 'Horarios';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
@@ -69,11 +69,11 @@ exports.getHorario = async function (req, res, next) {
     // hay que comprobar que no sea una url de consultar.
   } else if (
     estados.estadoHorario.abierto !==
-    res.locals.progDoc['ProgramacionDocentes.estadoHorarios'] &&
+      res.locals.progDoc['ProgramacionDocentes.estadoHorarios'] &&
     (res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
       estados.estadoProgDoc.abierto ||
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
-      estados.estadoProgDoc.listo) &&
+        estados.estadoProgDoc.listo) &&
     !req.originalUrl.toLowerCase().includes('consultar')
   ) {
     res.render('horarios/horariosCumplimentar', {
@@ -385,10 +385,10 @@ exports.getHorario = async function (req, res, next) {
   }
 };
 
-exports.guardarHorarios = async function (req, res, next) {
+exports.guardarHorarios = async function(req, res) {
   const whereEliminar = {};
   const { pdID } = req.session;
-  let toEliminar = req.body.eliminarAsignacions;
+  const toEliminar = req.body.eliminarAsignacions;
   const promises = [];
   if (!res.locals.permisoDenegado) {
     try {
@@ -412,7 +412,7 @@ exports.guardarHorarios = async function (req, res, next) {
         toEliminar.forEach(element => {
           let asignacion;
           asignacion = Number(element.asignacion);
-          //comprobar que borra una asignacion de la asignatura y no cualquier otra
+          // comprobar que borra una asignacion de la asignatura y no cualquier otra
           const asig = asignaturaAsignacions.find(
             obj =>
               asignacion &&
@@ -423,7 +423,6 @@ exports.guardarHorarios = async function (req, res, next) {
           } else {
             whereEliminar.identificador.push(asignacion);
           }
-
         });
         if (funciones.isEmpty(whereEliminar)) {
           whereEliminar.identificador = 'Identificador erróneo';
@@ -433,7 +432,7 @@ exports.guardarHorarios = async function (req, res, next) {
         });
         promises.push(promise1);
       }
-      let toAnadir = req.body.newAsignacions;
+      const toAnadir = req.body.newAsignacions;
       const queryToAnadir = [];
       if (toAnadir) {
         toAnadir.forEach(element => {
@@ -471,7 +470,7 @@ exports.guardarHorarios = async function (req, res, next) {
   }
 };
 // recibe la info de una nota nueva y la crea en la asignatura y grupo correspondiente
-exports.guardarNota = async function (req, res) {
+exports.guardarNota = async function(req, res) {
   if (!res.locals.permisoDenegado) {
     try {
       const notaToAnadir = {};
@@ -499,7 +498,7 @@ exports.guardarNota = async function (req, res) {
 };
 
 // recibe la info de una nota existente y la actualiza en la asignatura y grupo correspondiente
-exports.updateNota = async function (req, res) {
+exports.updateNota = async function(req, res) {
   if (!res.locals.permisoDenegado) {
     try {
       const notaToUpdate = {};
@@ -525,7 +524,7 @@ exports.updateNota = async function (req, res) {
   }
 };
 // recibe la info de una nota existente y la elimina
-exports.eliminarNota = async function (req, res) {
+exports.eliminarNota = async function(req, res) {
   if (!res.locals.permisoDenegado) {
     try {
       await models.AsignacionProfesor.destroy({
@@ -545,7 +544,7 @@ exports.eliminarNota = async function (req, res) {
 };
 
 // get
-exports.reenviar = function (req, res) {
+exports.reenviar = function(req, res) {
   req.session.save(() => {
     res.redirect(
       `${req.baseUrl}/coordinador/horarios?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
@@ -553,7 +552,7 @@ exports.reenviar = function (req, res) {
   });
 };
 // post
-exports.aprobarHorarios = async function (req, res, next) {
+exports.aprobarHorarios = async function(req, res, next) {
   const { pdID } = req.session;
   const date = new Date();
   let estadoHorarios;

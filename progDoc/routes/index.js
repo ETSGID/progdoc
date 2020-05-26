@@ -1160,7 +1160,7 @@ router.post(
   examenController.guardarExamenes,
   examenController.getExamenes,
   examenController.generateCsvExamens,
-  examenController.reenviarExamenes
+  examenController.reenviarExamenesAjax
 );
 
 router.post(
@@ -1301,7 +1301,6 @@ router.post(
   },
   planController.getPlanes,
   rolController.comprobarRols,
-  examenController.guardarExamenes,
   examenController.aprobarExamenes,
   examenController.getExamenes,
   examenController.generateCsvExamens,
