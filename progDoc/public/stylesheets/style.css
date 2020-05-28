@@ -304,3 +304,11 @@ tr.espacio>td {
   /*list-style: none;*/
   padding-left: 0;
 }
+
+.horario-horas-flechas {
+  display: grid;
+  grid-template-columns: 78px auto;
+  grid-template-areas: 
+  'hora flechas'
+  ;
+}

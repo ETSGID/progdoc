@@ -38,7 +38,29 @@
                             </button>
                             <button type="button" id='buttonSimplificar_table_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>' class="btn btn-default hidden" onclick = "simplificar('table_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
                             Simplificar 
-                            </button></h4>
+                            </button>
+                            <button type="button" id='buttonRotar_table_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>' class="btn btn-default hidden"
+                                onclick="ToggleBotonesRotar('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
+                                <span class="glyphicon glyphicon-pencil"></span> 
+                            </button>
+                            <script>
+                                function ToggleBotonesRotar(idHorario) {
+                                    let buttonSimplificar = document.getElementById('buttonSimplificar_table_'+idHorario)
+                                    let text = buttonSimplificar.innerHTML.trim();
+
+                                    if ($( ".btn-rotar-horario_" + idHorario ).is(":hidden")) {
+                                        if (text !== 'Simplificar') {
+                                            simplificar('table_' + idHorario);   
+                                        }
+                                        buttonSimplificar.disabled = true;
+                                    } else {
+                                        buttonSimplificar.disabled = false;
+                                    }
+
+                                    $( ".btn-rotar-horario_" + idHorario ).toggle();
+                                }
+                            </script>
+                            </h4>
                             <div class="hidden" id="div_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>">
                                 <% let getAsignacions = function (hora,dia){
                                         let found = asignacionsHorario[i].semestres[j].grupos[k].asignaciones.filter(
@@ -58,21 +80,132 @@
                                     <thead>
                                         <tr>
                                         <th scope="col">Hora</th>
-                                        <th scope="col">Lunes</th>
-                                        <th scope="col">Martes</th>
-                                        <th scope="col">Miércoles</th>
-                                        <th scope="col">Jueves</th>
-                                        <th scope="col">Viernes</th>
+                                        <th scope="col">
+                                            <button type="button" class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_L','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_V')">
+                                            <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-="" rule="evenodd"></path>
+                                            </svg>
+                                            </button>
+                                            Lunes
+                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_L','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_M')">
+                                            <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            </button>
+                                        </th>
+                                        <th scope="col">
+                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_M','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_L')">
+                                            <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-="" rule="evenodd"></path>
+                                            </svg>
+                                            </button>
+                                            Martes
+                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_M','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_X')">
+                                            <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            </button>
+                                        </th>
+                                        <th scope="col">
+                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_X','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_M')">
+                                            <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-="" rule="evenodd"></path>
+                                            </svg>
+                                            </button>
+                                            Miércoles
+                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_X','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_J')">
+                                            <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            </button>
+                                        </th>
+                                        <th scope="col">
+                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_J','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_X')">
+                                            <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-="" rule="evenodd"></path>
+                                            </svg>
+                                            </button>
+                                            Jueves
+                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_J','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_V')">
+                                            <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            </button>
+                                        </th>
+                                        <th scope="col">
+                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_V','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_J')">
+                                            <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-="" rule="evenodd"></path>
+                                            </svg>
+                                            </button>
+                                            Viernes
+                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_V','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_L')">
+                                            <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            </button>
+                                        </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <%  let l = 8;
                                             while (l <= 20){ %> 
                                         <tr>
-                                        <td scope="col"><%= ""+l+"-"+(l+1) %></td>
+                                        <td scope="col">
+                                            <div class="horario-horas-flechas">
+                                                <div style="min-width: 78px;">
+                                                <%= ""+l+"-"+(l+1) %>
+                                                </div>
+                                                <div style="grid-area: flechas">
+                                                <%if (l == 8) {%>
+                                                    <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                        onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l%>', '<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_20')">
+                                                    <svg class="bi bi-chevron-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 01.708 0l6 6a.5.5 0 01-.708.708L8 5.707l-5.646 5.647a.5.5 0 01-.708-.708l6-6z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    </button>
+                                                <%} else {%>
+                                                    <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                        onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l%>', '<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l-1%>')">
+                                                    <svg class="bi bi-chevron-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 01.708 0l6 6a.5.5 0 01-.708.708L8 5.707l-5.646 5.647a.5.5 0 01-.708-.708l6-6z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    </button>
+                                                <%}%>
+                                                <%if (l == 20) {%>
+                                                    <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                        onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l%>', '<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_8')">
+                                                    <svg class="bi bi-chevron-down" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 01.708 0L8 10.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    </button>
+                                                <%} else {%>
+                                                    <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                        onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l%>', '<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l+1%>')">
+                                                    <svg class="bi bi-chevron-down" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" >
+                                                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 01.708 0L8 10.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    </button>
+                                                </div>
+                                                <%}%>
+                                            </div>
+                                        </td>
                                         <% let dias = ['L','M','X','J','V'];
                                             for(let d = 0; d<dias.length; d++){%>
-                                                <td scope="col" id='horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%=asignacionsHorario[i].semestres[j].semestre%>' onclick="mostrar('horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%=asignacionsHorario[i].semestres[j].semestre%>')">
+                                                <!-- Cada celda pertenece a las clases grupoCodigo_dia y grupoCodigo_hora para poder seleccionarlas para cambiarlas -->
+                                                <td scope="col" class="<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%> <%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l%>"
+                                                    id='horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%=asignacionsHorario[i].semestres[j].semestre%>'
+                                                    onclick="mostrar('horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%=asignacionsHorario[i].semestres[j].semestre%>')">
                                                 <% let found = getAsignacions(l,dias[d])
                                                     if (found.length === 0){%>
                                                         <span>-</span>
@@ -142,6 +275,128 @@ let newAsignacions = [];
 let eliminarAsignacions = [];
 //se utiliza para disparar el evento de onbeforeunload
 let activado = true;
+
+/**
+ * Intercambia los elementos de las dos clases indicadas 
+ * (las clases pueden ser dos días o dos horas)
+ * @param  {String} clase_1 La primera clase para intercambiar
+ * @param  {String} clase_2 La segunda clase para intercambiar
+ */
+function cambiarPorClase(clase_1, clase_2) {
+    // Se guarda una copia de las asignaturas a intercambiar
+    asigs1Tmp = $( 'td.' + clase_1 + ' > span').clone();
+    asigs2Tmp = $( 'td.' + clase_2 + ' > span').clone();
+    
+    sustituirClase(clase_1, asigs2Tmp);
+    sustituirClase(clase_2, asigs1Tmp);
+
+    function sustituirClase(clase, asigsTmp) {
+        $( 'td.' + clase ).each(function( index ) {
+        // console.log(this);
+
+        let curso = this.id.split("_")[1];
+        let grupo = Number(this.id.split("_")[2]);
+        let dia = this.id.split("_")[3];
+        let horaInicio = this.id.split("_")[4];
+        let semestre = Number(this.id.split("_")[5]);
+
+        let cursoArray = asignacionsHorario.find(function (obj) { return obj.curso === curso});
+        let semestreArray = cursoArray.semestres.find(function (obj) { return obj.semestre === semestre});
+        let grupoArray = semestreArray.grupos.find(function (obj) { return obj.grupoCodigo === grupo});
+
+        // Asignaturas que dan en ese horario
+        let asignaturas = grupoArray.asignaturas;
+        
+        // Asignaturas que el horario original tiene en esa fecha + hora
+        let asignacionesOriginales = grupoArray.asignaciones.filter(function (obj) {
+            return obj.dia === dia && obj.horaInicio === formatHoraNumber(horaInicio)+':00:00'
+        });
+
+        // Cogemos las asignaturas que vamos a borrar de ese día / hora
+        let selectedEliminar = $( this ).find('span').text();
+        if (selectedEliminar != '-') {
+            selectedEliminar.split('/').forEach((selected) => {
+                // Las buscamos en la variable asignaturas
+                let asignOld = asignaturas.find(function (obj) { return (obj.nombre === selected || obj.acronimo === selected) });
+
+                if (asignOld) {
+                    // Comprobamos si se había guardado para añadirla en esa hora
+                    // (es decir, no estaba en ese horario inicialmente; por tanto, aún no está en la base de datos)
+                    let asignPendienteAnadir = newAsignacions.find(function (obj) {
+                        return (obj.asignaturaId === asignOld.identificador && obj.dia === dia && obj.horaInicio === formatHoraNumber(horaInicio)+':00:00' && obj.grupoId === grupo)
+                    });
+
+                    // Comprobamos si estaba originalmente en esa hora
+                    let asignaturaActual = asignacionesOriginales.find(function (obj) {
+                        return obj.asignaturaIdentificador === asignOld.identificador
+                    });
+
+                    // Si aún no estaba guardada en la base de datos, la eliminamos de la variable donde se guardan las asignaturas que queríamos añadir a la BDD
+                    if (asignPendienteAnadir) {
+                        newAsignacions.splice(newAsignacions.indexOf(asignPendienteAnadir), 1);
+                    // Si no, la añadimos a la variable donde se guardan las asignaturas que queremos quitar de la BDD
+                    } else if (asignaturaActual) {
+                        eliminarAsignacions.push({
+                            asignacion: asignaturaActual.identificador,
+                            dia: dia,
+                            horaInicio: formatHoraNumber(horaInicio)+':00:00',
+                            grupoId: grupo
+                        });
+                    }
+                }
+            });
+        }
+
+        // Cogemos las asignaturas que vamos a añadir en ese día / hora
+        let selectedAnadir = asigsTmp.get(index).textContent.trim();
+        if (selectedAnadir != '-') {
+            selectedAnadir.split('/').forEach((selected) => {
+                // Las buscamos en la variable asignaturas
+                let asignNew = asignaturas.find(function (obj) { return (obj.nombre === selected || obj.acronimo === selected) });
+
+                if (asignNew) {
+                    // Comprobamos si estaba originalmente en esa hora
+                    let asignaturaActual = asignacionesOriginales.find(function (obj) {
+                        return obj.asignaturaIdentificador === asignNew.identificador
+                    });
+
+                    if (asignaturaActual) {
+                        // Comprobamos si se había guardado para eliminarla de esa hora
+                        // (es decir, estaba en ese horario inicialmente; por tanto, todavía está la base de datos)
+                        let asignPendienteEliminar = eliminarAsignacions.find(function (obj) {
+                            return (obj.asignacion === asignaturaActual.identificador && obj.dia === dia && obj.horaInicio === formatHoraNumber(horaInicio)+':00:00' && obj.grupoId === grupo)
+                        });
+
+                        // Si todavía estaba guardada en la base de datos, la eliminamos de la variable donde se guardan las asignaturas que queríamos quitar de la BDD
+                        if (asignPendienteEliminar) {
+                            eliminarAsignacions.splice(eliminarAsignacions.indexOf(asignPendienteEliminar), 1);
+                        // Si no, la añadimos a la variable donde se guardan las asignaturas que queremos añadir a la BDD
+                        } else {
+                            newAsignacions.push({
+                                asignaturaId: asignNew.identificador,
+                                dia: dia,
+                                horaInicio: formatHoraNumber(horaInicio)+':00:00',
+                                grupoId: grupo
+                            });
+                        }
+                    } else {
+                        newAsignacions.push({
+                            asignaturaId: asignNew.identificador,
+                            dia: dia,
+                            horaInicio: formatHoraNumber(horaInicio)+':00:00',
+                            grupoId: grupo
+                        });
+                    }
+                }
+            });
+        }
+
+        // Actualizamos el span con la información de la asignatura y el texto HTML que se presenta
+        $( this ).find('span').replaceWith(asigsTmp.get(index));
+        });
+    }
+}
+
 //se ejecuta siempre que se pulsa en una celda
 async function mostrar(id){
     //solo dejo un select picker activo a la vez
@@ -284,13 +539,16 @@ function MostrarOcultar(id){
     let table = document.getElementById(id);
     let buttonSpan = document.getElementById('button_'+id)
     let buttonSimplificar = document.getElementById('buttonSimplificar_table_'+id.split("_")[1])
+    let buttonRotar = document.getElementById('buttonRotar_table_'+id.split("_")[1])
     let clases = table.className.split(" ");
     let clases2 = buttonSimplificar.className.split(" ");
+    let clases3 = buttonRotar.className.split(" ");
     let oculto = clases.find(function (obj) { return obj === 'hidden'});
     //si estaba oculto debo quitarlo
     if (oculto){
         table.className = "";
         buttonSimplificar.className = "";
+        buttonRotar.className = "";
         for (let i =0; i<clases.length; i++){
             if (clases[i] !== 'hidden'){
                 table.className += " " +clases[i]
@@ -301,6 +559,11 @@ function MostrarOcultar(id){
                 buttonSimplificar.className += " " + clases2[i]
             }    
         }
+        for (let i =0; i<clases3.length; i++){
+            if (clases3[i] !== 'hidden'){
+                buttonRotar.className += " " + clases3[i]
+            }    
+        }
         
         buttonSpan.className = "glyphicon glyphicon-chevron-up"
     }
@@ -308,6 +571,7 @@ function MostrarOcultar(id){
     else{
         table.className += " hidden"
         buttonSimplificar.className += " hidden"
+        buttonRotar.className += " hidden"
         buttonSpan.className = "glyphicon glyphicon-chevron-down"
 
     }
