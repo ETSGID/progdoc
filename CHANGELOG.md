@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Desplazamiento de exámenes
 - Gestión de personal
 
-## [1.0.3] - 2020-05-28
+## [1.0.3] - 2020-06-08
 ### Added
 - Intercambios por horas y días en **Horarios**.
 
