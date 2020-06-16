@@ -225,7 +225,8 @@ Grupo.belongsToMany(ConjuntoActividadParcial, {
   foreignKey: 'GrupoId'
 });
 
-sequelize.sync();
+//If you want to create de schema
+//sequelize.sync();
 sequelizeSession.sync();
 
 // Exportamos modelos
