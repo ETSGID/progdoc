@@ -208,8 +208,11 @@ docker-compose build
 # Arrancar los contenedores llamando a los ficheros de configuracón creados en la carpeta externa al proyecto
 docker-compose up -d
 
-#para impoftar la base de datos
+#para importar la base de datos. Necesario entrar en el contenedor de la base de datos o tener un clinete de la bbdd en el host.
 psql -U [userpostgres] -h localhost  [database] < [file.sql]
+
+file.sql puede contener toda la base de datos, el esquema o solo los datos.
+En docker se debe borrar el volumen dbdata de la bbdd ya que sino seguirá la versión anterior.
 
 ```
 
@@ -236,6 +239,11 @@ En docker se debe borrar el volumen dbdata de la bbdd ya que sino seguirá la ve
 
 ## Nota adicional
 El fichero `progDoc/script.sh`, se ejecuta cuando termina de arrancar el contenedor que aloja el servidor para migrar y reimportar la base de datos. Posteriormente arranca el servidor. En este proceso se hace un sleep de 30 segundos para esperar a que las bases de datos terminen de arrancar. En caso de fallo, alargar este sleep. 
+
+## Gestión de roles
+En desarrollo se puede utilizar USER_DEV para simular cualquier ROL
+Además en desarrollo/pruebas si se crea el user Admin en la tabla roles y deja realizar todas las acciones
+Otra opción en desarrollo es meter en la base de datos a la persona y asignarle el rol deseado.
 
 ## Enlaces relevantes
 [Variables de entorno desde `docer-compose.ym`](https://docs.docker.com/compose/environment-variables/)
