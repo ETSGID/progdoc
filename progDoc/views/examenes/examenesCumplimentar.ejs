@@ -817,6 +817,7 @@ function Change2(id){
     let hora = document.getElementById("hora_"+id).value;
     let minutos = document.getElementById("minutos_"+id).value;
     let duracion = document.getElementById("duracion_"+id).value;
+    let element = document.getElementById("date_"+id).value;
     let examenPeriods = asignacionsExamen.find(period => period.periodo === periodName)
     let examen = examenPeriods.asignaturas.find(asignatura => asignatura.identificador == asignaturaId).examen
     if (isNaN(minutos) || minutos === ''){
@@ -831,6 +832,7 @@ function Change2(id){
         duracion = '0'
     }
     examen.duracion = duracion;
+    examen.fecha = element;
     //si ya existia en la base de datos se marca actualizar a true
     // para asi evitar actualizar todos
     if(examenId !== ''){
@@ -1037,6 +1039,9 @@ function Volver(cancelarpath){
 }
 
 function updateArraysCreate_Update_DeleteExamens(){
+    createExamens = []
+    updateExamens = []
+    deleteExamens = []
     asignacionsExamen.forEach(period => {
         period.asignaturas.forEach(asignatura => {
             //los examenes que se eliminan son los que tenian id en la bbdd y ahora NO tienen fecha
@@ -1069,9 +1074,7 @@ function updateArraysCreate_Update_DeleteExamens(){
 }
 
 function Guardar(nuevopath){
-    createExamens = []
-    updateExamens = []
-    deleteExamens = []
+
     updateArraysCreate_Update_DeleteExamens();
     activado = false;
     let rowsSolapan = document.getElementsByClassName('solapa').length;
