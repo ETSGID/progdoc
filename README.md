@@ -248,6 +248,7 @@ Por ejemplo:
 
 ```
 UPDATE public."Rols" SET "PersonaId"= 282 WHERE identificador=1;
+INSERT INTO public."Rols"(rol, "PersonaId") VALUES ('Admin', 282);
 
 ```
 
