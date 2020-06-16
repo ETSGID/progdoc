@@ -244,6 +244,12 @@ El fichero `progDoc/script.sh`, se ejecuta cuando termina de arrancar el contene
 En desarrollo se puede utilizar USER_DEV para simular cualquier ROL
 Además en desarrollo/pruebas si se crea el user Admin en la tabla roles y deja realizar todas las acciones
 Otra opción en desarrollo es meter en la base de datos a la persona y asignarle el rol deseado.
+Por ejemplo:
+
+```
+UPDATE public."Rols" SET "PersonaId"= 282 WHERE identificador=1;
+
+```
 
 ## Enlaces relevantes
 [Variables de entorno desde `docer-compose.ym`](https://docs.docker.com/compose/environment-variables/)
