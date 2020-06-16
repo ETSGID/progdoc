@@ -312,3 +312,15 @@ tr.espacio>td {
   'hora flechas'
   ;
 }
+
+.dropdown-toggle {
+  background-color: #ffffff;
+}
+
+.dropdown-menu {
+  min-width: 0px;
+}
+
+.dropdown-item:hover {
+  background-color: #e6e6e6;
+}
