@@ -43,23 +43,6 @@
                                 onclick="ToggleBotonesRotar('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
                                 <span class="glyphicon glyphicon-pencil"></span> 
                             </button>
-                            <script>
-                                function ToggleBotonesRotar(idHorario) {
-                                    let buttonSimplificar = document.getElementById('buttonSimplificar_table_'+idHorario)
-                                    let text = buttonSimplificar.innerHTML.trim();
-
-                                    if ($( ".btn-rotar-horario_" + idHorario ).is(":hidden")) {
-                                        if (text !== 'Simplificar') {
-                                            simplificar('table_' + idHorario);   
-                                        }
-                                        buttonSimplificar.disabled = true;
-                                    } else {
-                                        buttonSimplificar.disabled = false;
-                                    }
-
-                                    $( ".btn-rotar-horario_" + idHorario ).toggle();
-                                }
-                            </script>
                             </h4>
                             <div class="hidden" id="div_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>">
                                 <% let getAsignacions = function (hora,dia){
@@ -275,6 +258,22 @@ let newAsignacions = [];
 let eliminarAsignacions = [];
 //se utiliza para disparar el evento de onbeforeunload
 let activado = true;
+
+function ToggleBotonesRotar(idHorario) {
+    let buttonSimplificar = document.getElementById('buttonSimplificar_table_'+idHorario)
+    let text = buttonSimplificar.innerHTML.trim();
+
+    if ($( ".btn-rotar-horario_" + idHorario ).is(":hidden")) {
+        if (text !== 'Simplificar') {
+            simplificar('table_' + idHorario);   
+        }
+        buttonSimplificar.disabled = true;
+    } else {
+        buttonSimplificar.disabled = false;
+    }
+
+    $( ".btn-rotar-horario_" + idHorario ).toggle();
+}
 
 /**
  * Intercambia los elementos de las dos clases indicadas 

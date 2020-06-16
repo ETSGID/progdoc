@@ -37,7 +37,492 @@
                         </button>
                         <button type="button" id='buttonCalendario_div_<%=asignacionsExamen[i].periodo%>' class="btn btn-default hidden" onclick = "mostrarCalendario('calendario_<%=asignacionsExamen[i].periodo%>')">
                         Modo Calendario
-                        </button></h2>
+                        </button>
+                        <div class="dropdown" style="display: inline-block;">
+                            <button class="btn btn-default dropdown-toggle hidden" type="button" id='buttonMoverCal_div_<%=asignacionsExamen[i].periodo%>'
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-placement="right" title="Sólo en Modo Calendario" 
+                                disabled>
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="buttonMoverCal_div_<%=asignacionsExamen[i].periodo%>">
+                                <li><a data-toggle="modal" data-target="#modal-rotar_<%=asignacionsExamen[i].periodo%>" style="cursor: pointer;">Rotar</a></li>
+                                <li><a data-toggle="modal" data-target="#modal-desplazar_<%=asignacionsExamen[i].periodo%>" style="cursor: pointer;">Desplazar</a></li>
+                              </ul>
+                        </div>
+
+                        <script>
+                            function rotarExamenes(periodo) {
+                                let sentidoInput = $( '#modal-rotar_' + periodo + ' input[name=' + periodo + '_sentido-rotacion]:checked' );
+                                let sentido = sentidoInput[0].value;
+                                let cursos = $( '#modal-rotar_' + periodo + ' input[name=' + periodo + '_cursos-rotacion]:checked' );
+
+                                if (sentidoInput.length === 0 && cursos.length === 0) {
+                                    alert("Por favor, seleccione el sentido de la rotación y al menos un curso.");
+                                    return false;
+                                } else if (sentidoInput.length === 0) {
+                                    alert("Por favor, seleccione el sentido de la rotación.");
+                                    return false;
+                                } else if (cursos.length === 0) {
+                                    alert("Por favor, seleccione al menos un curso.");
+                                    return false;
+                                }
+
+                                cursos.each((indexCurso, elementCurso) => {
+                                    let tds, exams;
+                                    if (sentido === '1') {
+                                        tds = $( 'table#table_calendario_' + periodo + ' tr td:nth-child(' + (parseInt(elementCurso.value) + 1) + ')' );
+                                        exams = $( 'table#table_calendario_' + periodo + ' tr td:nth-child(' + (parseInt(elementCurso.value) + 1) + ')' ).clone();
+                                    } else if (sentido === '0') {
+                                        tds = $($( 'table#table_calendario_' + periodo + ' tr td:nth-child(' + (parseInt(elementCurso.value) + 1) + ')' ).get().reverse());
+                                        exams = $($( 'table#table_calendario_' + periodo + ' tr td:nth-child(' + (parseInt(elementCurso.value) + 1) + ')' ).get().reverse())
+                                            .clone();
+                                    }
+
+                                    let inicio = true;
+                                    let primerIndex, primeraFecha, primeraHoraInicio, primeraFranja;
+                                    let indexReplace;
+                                            
+                                    tds.each((indexExam, elementExam) => {
+                                        if (elementExam.children.length > 0) {
+                                            let titleAsigOld = exams.get(indexExam).children[0].getAttribute("title");
+                                            let codigoAsigOld = titleAsigOld.substring(titleAsigOld.lastIndexOf("(") + 1, titleAsigOld.lastIndexOf(")"));
+                                            let objetoAsignaturaOld = (asignacionsExamen.find(element => element.periodo === periodo)).asignaturas
+                                                .find(asignatura => asignatura.codigo === codigoAsigOld);
+                                            let objetoExamenOld = objetoAsignaturaOld.examen;
+
+                                            if (inicio) {
+                                                primerIndex = indexExam;
+                                                let subFechas = objetoExamenOld.fecha.split("-"); 
+                                                primeraFecha = subFechas[2] + "/" + subFechas[1] + "/" + subFechas[0];
+                                                primeraFranja = document
+                                                    .getElementById("franja_" + objetoAsignaturaOld.identificador + "_" + objetoExamenOld.identificador +
+                                                    "_" + periodo).value;
+                                                primeraHoraInicio = objetoExamenOld.horaInicio;
+
+                                                inicio = false;
+                                            } else {
+                                                while (elementExam.firstChild) {
+                                                    elementExam.removeChild(elementExam.lastChild);
+                                                }
+                                                // Acutalizamos las fechas y horas de los exámenes a poner en la casilla actual a las nuevas;
+                                                // también lo hacemos para los elementos del modo lista
+                                                let primerSpan = true;
+                                                for (let span of exams.get(indexReplace).children) {
+                                                    let titleAsigReplace = span.getAttribute("title");
+                                                    let codigoAsigReplace = titleAsigReplace.substring(titleAsigReplace.lastIndexOf("(") + 1, titleAsigReplace.lastIndexOf(")"));
+                                                    let objetoAsignaturaReplace = (asignacionsExamen.find(element => element.periodo === periodo)).asignaturas
+                                                        .find(asignatura => asignatura.codigo === codigoAsigReplace);
+
+                                                    let subFechas = objetoExamenOld.fecha.split("-");
+                                                    objetoAsignaturaReplace.examen.fecha = subFechas[2] + "/" + subFechas[1] + "/" + subFechas[0];
+                                                    document
+                                                        .getElementById("date_" + objetoAsignaturaReplace.identificador + "_" + objetoAsignaturaReplace.examen.identificador +
+                                                        "_" + periodo).value = objetoAsignaturaReplace.examen.fecha;
+                                                    
+                                                    document
+                                                        .getElementById("franja_" + objetoAsignaturaReplace.identificador + "_" + objetoAsignaturaReplace.examen.identificador +
+                                                        "_" + periodo).value = document
+                                                        .getElementById("franja_" + objetoAsignaturaOld.identificador + "_" + objetoExamenOld.identificador +
+                                                        "_" + periodo).value;
+
+                                                    let subHoras = objetoAsignaturaOld.examen.horaInicio.split(":");
+                                                    objetoAsignaturaReplace.examen.horaInicio = objetoExamenOld.horaInicio;
+                                                    document
+                                                        .getElementById("hora_" + objetoAsignaturaReplace.identificador + "_" + objetoAsignaturaReplace.examen.identificador +
+                                                        "_" + periodo).value = subHoras[0];
+                                                    document
+                                                        .getElementById("minutos_" + objetoAsignaturaReplace.identificador + "_" + objetoAsignaturaReplace.examen.identificador +
+                                                        "_" + periodo).value = subHoras[1];
+
+                                                    objetoAsignaturaReplace.examen.actualizar = true;
+
+                                                    if (primerSpan) {
+                                                        elementExam.appendChild(span.cloneNode(true));
+                                                        primerSpan = false;
+                                                    } else {
+                                                        elementExam.innerHTML += " / ";
+                                                        elementExam.appendChild(span.cloneNode(true));
+                                                    }
+                                                }
+                                            }
+
+                                            indexReplace = indexExam;
+                                        }
+                                    });
+
+                                    let primerElement;
+                                    if (sentido === '1') {
+                                        primerElement = $( 'table#table_calendario_' + periodo + ' tr td:nth-child(' + (parseInt(elementCurso.value) + 1) + ')' )
+                                            .get(primerIndex);
+                                    } else if (sentido === '0') {
+                                        primerElement =  $($( 'table#table_calendario_' + periodo + ' tr td:nth-child(' + (parseInt(elementCurso.value) + 1) + ')' )
+                                            .get().reverse()).get(primerIndex);
+                                    }
+
+                                    while (primerElement.firstChild) {
+                                        primerElement.removeChild(primerElement.lastChild);
+                                    }
+
+                                    let primerSpan = true;
+                                    for (span of exams.get(indexReplace).children) {
+                                        let titleAsigReplace = span.getAttribute("title");
+                                        let codigoAsigReplace = titleAsigReplace.substring(titleAsigReplace.lastIndexOf("(") + 1, titleAsigReplace.lastIndexOf(")"));
+                                        let objetoAsignaturaReplace = (asignacionsExamen.find(element => element.periodo === periodo)).asignaturas
+                                            .find(asignatura => asignatura.codigo === codigoAsigReplace);
+
+                                        objetoAsignaturaReplace.examen.fecha = primeraFecha;
+                                        document
+                                            .getElementById("date_" + objetoAsignaturaReplace.identificador + "_" + objetoAsignaturaReplace.examen.identificador +
+                                            "_" + periodo).value = objetoAsignaturaReplace.examen.fecha;
+                                                    
+                                        document
+                                            .getElementById("franja_" + objetoAsignaturaReplace.identificador + "_" + objetoAsignaturaReplace.examen.identificador +
+                                            "_" + periodo).value = primeraFranja;
+
+                                        let subHoras = primeraHoraInicio.split(":");
+                                        objetoAsignaturaReplace.examen.horaInicio = primeraHoraInicio;
+                                        document
+                                            .getElementById("hora_" + objetoAsignaturaReplace.identificador + "_" + objetoAsignaturaReplace.examen.identificador +
+                                            "_" + periodo).value = subHoras[0];
+                                        document
+                                            .getElementById("minutos_" + objetoAsignaturaReplace.identificador + "_" + objetoAsignaturaReplace.examen.identificador +
+                                            "_" + periodo).value = subHoras[1];
+
+                                        objetoAsignaturaReplace.examen.actualizar = true;
+
+                                        if (primerSpan) {
+                                            primerElement.appendChild(span.cloneNode(true));
+                                            primerSpan = false;
+                                        } else {
+                                            primerElement.innerHTML += " / ";
+                                            primerElement.appendChild(span.cloneNode(true));
+                                        }
+                                    }
+                                });
+
+                                updateArraysCreate_Update_DeleteExamens();
+                            }
+                            
+                            function desplazarExamenes (periodo) {
+                                let diasInput = $( '#modal-desplazar_' + periodo + ' input[name=' + periodo + '_dias-desplazamiento]' ).val();
+                                let dias = Number(diasInput);
+                                let sentidoInput = $( '#modal-desplazar_' + periodo + ' input[name=' + periodo + '_sentido-desplazamiento]:checked' );
+                                let sentido = sentidoInput[0].value;
+                                let cursos = $( '#modal-desplazar_' + periodo + ' input[name=' + periodo + '_cursos-desplazamiento]:checked' );
+
+                                if (diasInput === "" && sentidoInput.length === 0 && cursos.length === 0) {
+                                    alert("Por favor, seleccione el número de días, el sentido del desplazamiento y al menos un curso.")
+                                    return false;
+                                } else if (diasInput === "" && sentidoInput.length === 0) {
+                                    alert("Por favor, seleccione el número de días y el sentido del desplazamiento.")
+                                    return false;
+                                } else if (diasInput === "" && cursos.length === 0) {
+                                    alert("Por favor, seleccione el número de días y al menos un curso.")
+                                    return false;
+                                } else if (sentidoInput.length === 0 && cursos.length === 0) {
+                                    alert("Por favor, seleccione el sentido del desplazamiento y al menos un curso.")
+                                    return false;
+                                } else if (diasInput === "") {
+                                    alert("Por favor seleccione el número de días.")
+                                    return false;
+                                } else if (sentidoInput.length === 0) {
+                                    alert("Por favor, seleccione el sentido del desplazamiento.")
+                                    return false;
+                                } else if (cursos.length === 0) {
+                                    alert("Por favor, seleccione al menos un curso.")
+                                    return false;
+                                }
+
+                                cursos.each((indexCurso, elementCurso) => {
+                                    let tds, fechas, exams = [];
+                                    if (sentido === '1') {
+                                        fechas = $( 'table#table_calendario_' + periodo + ' tr td:nth-child(1)');
+                                        tds = $( 'table#table_calendario_' + periodo + ' tr td:nth-child(' + (parseInt(elementCurso.value) + 1) + ')' );
+                                    } else if (sentido === '0') {
+                                        fechas = $($( 'table#table_calendario_' + periodo + ' tr td:nth-child(1)').get().reverse());
+                                        tds = $($( 'table#table_calendario_' + periodo + ' tr td:nth-child(' + (parseInt(elementCurso.value) + 1) + ')' ).get().reverse());
+                                    }
+                                    
+                                    let indexExam = 0, fechaMes, fechaDia, fechaWeekday;
+                                    let franja = 3;
+                                    fechas.each((indexFecha, elementFecha) => {
+                                        if (elementFecha.classList.length === 0) {
+                                            fechaMes = elementFecha.textContent;
+                                        } else {
+                                            if (franja === 3) {
+                                                if (!fechaDia) {
+                                                    let fechaTd = fechas.get(indexFecha + 1).textContent;
+                                                    fechaDia = fechaTd.split(" ")[1];
+                                                    switch (fechaTd.split(" ")[0]) {
+                                                        case "L": fechaWeekday = 1;
+                                                        break;
+                                                        case "M": fechaWeekday = 2;
+                                                        break;
+                                                        case "X": fechaWeekday = 3;
+                                                        break;
+                                                        case "J": fechaWeekday = 4;
+                                                        break;
+                                                        case "V": fechaWeekday = 5;
+                                                        break;
+                                                        case "S": fechaWeekday = 6;
+                                                        break;
+                                                        case "D": fechaWeekday = 0;
+                                                        break;
+                                                    }
+                                                } else {
+                                                    fechaDia++;
+                                                    fechaWeekday++;
+                                                    if (fechaWeekday === 7) {
+                                                        fechaWeekday = 0;
+                                                    }
+                                                }
+
+                                                franja = 0;
+                                            }
+
+                                            let elementExam = tds.get(indexExam);
+
+                                            if (elementExam.children.length > 0) {
+                                                for (let span of elementExam.children) {
+                                                    let exam = {};
+                                                    
+                                                    exam.span = span.cloneNode(true);
+
+                                                    let titleAsig = span.getAttribute("title");
+                                                    let codigoAsig = titleAsig.substring(titleAsig.lastIndexOf("(") + 1, titleAsig.lastIndexOf(")"));
+                                                    exam.asignatura = (asignacionsExamen.find(element => element.periodo === periodo)).asignaturas
+                                                        .find(asignatura => asignatura.codigo === codigoAsig);
+
+                                                    if (fechaWeekday === 6 || fechaWeekday === 0) {
+                                                        exam.diasCounter = (dias - 1) * 3 + (franja + 1);
+                                                    } else {
+                                                        exam.diasCounter = dias * 3 + 1;
+                                                    }
+
+                                                    exams.push(exam);
+                                                }
+
+                                                while (elementExam.firstChild) {
+                                                    elementExam.removeChild(elementExam.lastChild);
+                                                }
+                                            }
+
+                                            if (!(fechaWeekday === 6 || fechaWeekday === 0)) {
+                                                let primerSpan = true;
+                                                exams.forEach((exam) => {
+                                                    exam.diasCounter--;
+
+                                                    if (exam.diasCounter === 0) {
+                                                        let mes;
+                                                        switch (fechaMes) {
+                                                            case "Enero": mes = 0;
+                                                            break;
+                                                            case "Febrero": mes = 1;
+                                                            break;
+                                                            case "Mayo": mes = 4;
+                                                            break;
+                                                            case "Junio": mes = 5;
+                                                            break;
+                                                            case "Julio": mes = 6;
+                                                            break;
+                                                            case "Diciembre": mes = 11;
+                                                            break;
+                                                            default: console.log("Error parseando el mes del examen")
+                                                            break;
+                                                        }
+                                                        //fecha mal
+                                                        //eliminar franjas y probar
+                                                        exam.asignatura.examen.fecha = moment(exam.asignatura.examen.fecha, "YYYY-MM-DD")
+                                                            .month(mes).date(fechaDia).format("DD/MM/YYYY");
+
+                                                        exam.asignatura.examen.actualizar = true;
+
+                                                        document
+                                                            .getElementById("date_" + exam.asignatura.identificador + "_" + exam.asignatura.examen.identificador +
+                                                            "_" + periodo).value = exam.asignatura.examen.fecha;
+
+                                                        if (primerSpan) {
+                                                            elementExam.appendChild(exam.span.cloneNode(true));
+                                                            primerSpan = false;
+                                                        } else {
+                                                            elementExam.innerHTML += " / ";
+                                                            elementExam.appendChild(exam.span.cloneNode(true));
+                                                        }
+
+                                                        exams.splice(exams.indexOf(exam), 1);
+                                                    }
+                                                });
+                                            }
+
+                                            indexExam++;
+                                            franja++;
+                                        }
+                                    });
+
+                                    while (exams.length > 0) {
+                                        exams.forEach((exam) => {
+                                            exam.diasCounter--;
+
+                                            if(exam.diasCounter === 0) {
+                                                let fechaNew = moment(exam.asignatura.examen.fecha, "YYYY-MM-DD").add(dias, 'days');
+                                                
+                                                exam.asignatura.examen.fecha = fechaNew.format("DD/MM/YYYY");
+
+                                                exam.asignatura.examen.actualizar = true;
+
+                                                document
+                                                    .getElementById("date_" + exam.asignatura.identificador + "_" + exam.asignatura.examen.identificador +
+                                                    "_" + periodo).value = exam.asignatura.examen.fecha;
+
+                                                exams.splice(exams.indexOf(exam), 1);
+                                            }
+                                        });
+
+                                        mostrarCalendario('calendario_' + periodo, true);
+                                    }
+                                });
+
+                                updateArraysCreate_Update_DeleteExamens();
+                            }
+
+                            $('.modal-rotar').on('hidden.bs.modal', function () {
+                                $( '.modal-rotar input[class=sentido-rotacion]:checked' ).each((index, sentido) => { sentido.checked = false });
+                                $( '.modal-rotar input[class=cursos-rotacion]:checked' ).each((index, curso) => { curso.checked = false });
+                            });
+                            $('.modal-desplazar').on('hidden.bs.modal', function () {
+                                $( '.modal-desplazar input[class=dias-desplazamiento]' ).each((index, dias) => { dias.value = 1 });
+                                $( '.modal-desplazar input[class=sentido-desplazamiento]:checked' ).each((index, sentido) => { sentido.checked = false });
+                                $( '.modal-desplazar input[class=cursos-desplazamiento]:checked' ).each((index, curso) => { curso.checked = false });                            });
+                        </script>
+                        <style>
+                            .dropdown-toggle {
+                                background-color: #ffffff;
+                            }
+                            .dropdown-menu {
+                                min-width: 0px;
+                            }
+                            .dropdown-item:hover {
+                                background-color: #e6e6e6;
+                            }
+                        </style>
+                        </h2>
+
+                        <div class="modal modal-rotar fade" id="modal-rotar_<%=asignacionsExamen[i].periodo%>" tabindex="-1" role="dialog"
+                            aria-labelledby="modal-rotar_<%=asignacionsExamen[i].periodo%>">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h3 class="modal-title">Rotar exámenes</h3>
+                                    </div>
+                                    <div class="modal-body">
+                                        Desplaza cada examen a la fecha en la que se encuentra el siguiente o el anterior.
+                                        <hr>
+                                        <div class="form-group">
+                                            Sentido de la rotación:
+                                            <br>
+                                            <div class="row">
+                                                <div class="col-xs-6">
+                                                    <input type="radio" class="sentido-rotacion" name="<%=asignacionsExamen[i].periodo%>_sentido-rotacion" value="1">
+                                                    <label for="adelante">Hacia adelante</label>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <input type="radio" class="sentido-rotacion" name="<%=asignacionsExamen[i].periodo%>_sentido-rotacion" value="0">
+                                                    <label for="atras">Hacia atrás</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            Cursos(s) a rotar:
+                                            <br>
+                                            <% if (cursos.length == 1) { %>
+                                                <input type="checkbox" class="cursos-rotacion" name="<%=asignacionsExamen[i].periodo%>_cursos-rotacion"
+                                                    value="<%=curso[0]%>" checked readonly>
+                                                <label for="<%=cursos[0]%>"><%=curso[0]%></label>
+                                            <% } else { %>
+                                                <div class="row">
+                                                <% cursos.forEach(curso => {%>
+                                                    <div class="col-xs-2">
+                                                        <input type="checkbox" class="cursos-rotacion" name="<%=asignacionsExamen[i].periodo%>_cursos-rotacion"
+                                                            value="<%=curso%>">
+                                                        <label for="<%=curso%>"><%=curso%></label>
+                                                    </div>
+                                                <%}) %>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-primary rotar-submit" data-dismiss="modal"
+                                            onclick="rotarExamenes('<%=asignacionsExamen[i].periodo%>')">Rotar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal modal-desplazar fade" id="modal-desplazar_<%=asignacionsExamen[i].periodo%>" tabindex="-1" role="dialog"
+                            aria-labelledby="modal-desplazar_<%=asignacionsExamen[i].periodo%>">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h3 class="modal-title">Desplazar exámenes</h3>
+                                    </div>
+                                    <div class="modal-body">
+                                        Adelanta o atrasa los exámanes del (los) curso(s) señalados el número de días indicados.
+                                        <hr>
+                                        <div class="form-group">
+                                            Número de días a desplazar:
+                                            <br>
+                                            <input type="number" class="dias-desplazamiento" name="<%=asignacionsExamen[i].periodo%>_dias-desplazamiento"
+                                                min="1" max="15" value="1">
+                                        </div>
+                                        <div class="form-group">
+                                            Sentido del cambio:
+                                            <br>
+                                            <div class="row">
+                                                <div class="col-xs-6">
+                                                    <input type="radio" class="sentido-desplazamiento" name="<%=asignacionsExamen[i].periodo%>_sentido-desplazamiento"
+                                                        value="1">
+                                                    <label for="adelante">Hacia adelante</label>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <input type="radio" class="sentido-desplazamiento" name="<%=asignacionsExamen[i].periodo%>_sentido-desplazamiento"
+                                                        value="0">
+                                                    <label for="atras">Hacia atrás</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            Cursos(s) a desplazar:
+                                            <br>
+                                            <% if (cursos.length == 1) { %>
+                                                <input type="checkbox" class="cursos-desplazamiento" name="<%=asignacionsExamen[i].periodo%>_cursos-desplazamiento"
+                                                    value="<%=curso[0]%>" checked readonly>
+                                                <label for="<%=cursos[0]%>"><%=curso[0]%></label>
+                                            <% } else { %>
+                                                <div class="row">
+                                                <% cursos.forEach(curso => {%>
+                                                    <div class="col-xs-2">
+                                                        <input type="checkbox" class="cursos-desplazamiento" name="<%=asignacionsExamen[i].periodo%>_cursos-desplazamiento"
+                                                            value="<%=curso%>">
+                                                        <label for="<%=curso%>"><%=curso%></label>
+                                                    </div>
+                                                <%}) %>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-primary rotar-submit" data-dismiss="modal"
+                                            onclick="desplazarExamenes('<%=asignacionsExamen[i].periodo%>')">Desplazar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="hidden" id="div_<%=asignacionsExamen[i].periodo%>">
                             <div id="div_<%=franjasExamen[i].periodo%>">
                                 <% 
@@ -359,13 +844,16 @@ function MostrarOcultar(id){
     let div = document.getElementById(id);
     let buttonSpan = document.getElementById('button_'+id)
     let buttonCalendario = document.getElementById('buttonCalendario_'+id)
+    let buttonMoverCal = document.getElementById('buttonMoverCal_' + id)
     let clases = div.className.split(" ");
     let clases2 = buttonCalendario.className.split(" ");
+    let clases3 = buttonMoverCal.className.split(" ");
     let oculto = clases.find(function (obj) { return obj === 'hidden'});
     //si estaba oculto debo quitarlo
     if (oculto){
         div.className = "";
         buttonCalendario.className = "";
+        buttonMoverCal.className = "";
         for (let i =0; i<clases.length; i++){
             if (clases[i] !== 'hidden'){
                 div.className += " " +clases[i]
@@ -376,6 +864,11 @@ function MostrarOcultar(id){
                 buttonCalendario.className += " " + clases2[i]
             }    
         }
+        for (let i =0; i<clases3.length; i++){
+            if (clases3[i] !== 'hidden'){
+                buttonMoverCal.className += " " + clases3[i]
+            }    
+        }
         
         buttonSpan.className = "glyphicon glyphicon-chevron-up"
     }
@@ -383,13 +876,14 @@ function MostrarOcultar(id){
     else{
         div.className += " hidden"
         buttonCalendario.className += " hidden"
+        buttonMoverCal.className += " hidden"
         buttonSpan.className = "glyphicon glyphicon-chevron-down"
 
     }
 
 }
 
-function mostrarCalendario(id){
+function mostrarCalendario(id, repaint){
     let estadoExamenes=[];
     let table = document.getElementById("table_"+id);
     let tableBody = document.getElementById("body_table_"+id);
@@ -402,6 +896,7 @@ function mostrarCalendario(id){
     let numFranjas =  period.franjas.length === 0 ? 1 : period.franjas.length;
     let tableDatos = document.getElementById("table_"+periodo)
     let buttonCalendario = document.getElementById('buttonCalendario_div_'+periodo)
+    let buttonMoverCal = document.getElementById('buttonMoverCal_div_'+periodo)
     let text = buttonCalendario.innerHTML.trim();
     let primeroEncontrado = false;
     let ultimoEncontrado = false;
@@ -427,7 +922,7 @@ function mostrarCalendario(id){
     }
     let fechaLimiteInicio = fechasLimite[periodoKey][0]
     let fechaLimiteFinal = fechasLimite[periodoKey][1]
-    if(text === 'Modo Calendario'){
+    if(text === 'Modo Calendario' || repaint){
         //borro lo que había en el body para repintarlo
         while (tableBody.firstChild) {
             tableBody.removeChild(tableBody.firstChild);
@@ -523,10 +1018,16 @@ function mostrarCalendario(id){
         buttonCalendario.innerHTML = 'Modo Lista'
         tableDatos.style.display = "none";
         table.style.display = "block";
+        
+        buttonMoverCal.removeAttribute("title");
+        buttonMoverCal.disabled = false;
     }else{
         buttonCalendario.innerHTML = 'Modo Calendario'
         tableDatos.style.display = "block";
         table.style.display = "none";
+
+        buttonMoverCal.setAttribute("title", "Sólo en Modo Calendario");
+        buttonMoverCal.disabled = true;
     }
 }
 
