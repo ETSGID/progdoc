@@ -43,23 +43,6 @@
                                 onclick="ToggleBotonesRotar('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
                                 <span class="glyphicon glyphicon-pencil"></span> 
                             </button>
-                            <script>
-                                function ToggleBotonesRotar(idHorario) {
-                                    let buttonSimplificar = document.getElementById('buttonSimplificar_table_'+idHorario)
-                                    let text = buttonSimplificar.innerHTML.trim();
-
-                                    if ($( ".btn-rotar-horario_" + idHorario ).is(":hidden")) {
-                                        if (text !== 'Simplificar') {
-                                            simplificar('table_' + idHorario);   
-                                        }
-                                        buttonSimplificar.disabled = true;
-                                    } else {
-                                        buttonSimplificar.disabled = false;
-                                    }
-
-                                    $( ".btn-rotar-horario_" + idHorario ).toggle();
-                                }
-                            </script>
                             </h4>
                             <div class="hidden" id="div_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>">
                                 <% let getAsignacions = function (hora,dia){
@@ -81,14 +64,14 @@
                                         <tr>
                                         <th scope="col">Hora</th>
                                         <th scope="col">
-                                            <button type="button" class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                            <button type="button" class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                 onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_L','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_V')">
                                             <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-="" rule="evenodd"></path>
                                             </svg>
                                             </button>
                                             Lunes
-                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                            <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                 onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_L','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_M')">
                                             <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"></path>
@@ -96,14 +79,14 @@
                                             </button>
                                         </th>
                                         <th scope="col">
-                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                            <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                 onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_M','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_L')">
                                             <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-="" rule="evenodd"></path>
                                             </svg>
                                             </button>
                                             Martes
-                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                            <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                 onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_M','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_X')">
                                             <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"></path>
@@ -111,14 +94,14 @@
                                             </button>
                                         </th>
                                         <th scope="col">
-                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                            <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                 onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_X','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_M')">
                                             <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-="" rule="evenodd"></path>
                                             </svg>
                                             </button>
                                             Miércoles
-                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                            <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                 onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_X','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_J')">
                                             <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"></path>
@@ -126,14 +109,14 @@
                                             </button>
                                         </th>
                                         <th scope="col">
-                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                            <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                 onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_J','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_X')">
                                             <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-="" rule="evenodd"></path>
                                             </svg>
                                             </button>
                                             Jueves
-                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                            <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                 onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_J','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_V')">
                                             <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"></path>
@@ -141,14 +124,14 @@
                                             </button>
                                         </th>
                                         <th scope="col">
-                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                            <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                 onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_V','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_J')">
                                             <svg class="bi bi-chevron-left" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-="" rule="evenodd"></path>
                                             </svg>
                                             </button>
                                             Viernes
-                                            <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                            <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                 onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_V','<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_L')">
                                             <svg class="bi bi-chevron-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"></path>
@@ -158,6 +141,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <!-- Cada celda pertenece a las clases grupoCodigo_dia y grupoCodigo_hora para poder seleccionarlas para cambiarlas -->
                                         <%  let l = 8;
                                             while (l <= 20){ %> 
                                         <tr>
@@ -168,14 +152,14 @@
                                                 </div>
                                                 <div style="grid-area: flechas">
                                                 <%if (l == 8) {%>
-                                                    <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                    <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                         onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l%>', '<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_20')">
                                                     <svg class="bi bi-chevron-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                         <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 01.708 0l6 6a.5.5 0 01-.708.708L8 5.707l-5.646 5.647a.5.5 0 01-.708-.708l6-6z" clip-rule="evenodd"/>
                                                     </svg>
                                                     </button>
                                                 <%} else {%>
-                                                    <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                    <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                         onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l%>', '<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l-1%>')">
                                                     <svg class="bi bi-chevron-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                         <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 01.708 0l6 6a.5.5 0 01-.708.708L8 5.707l-5.646 5.647a.5.5 0 01-.708-.708l6-6z" clip-rule="evenodd"/>
@@ -183,14 +167,14 @@
                                                     </button>
                                                 <%}%>
                                                 <%if (l == 20) {%>
-                                                    <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                    <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                         onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l%>', '<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_8')">
                                                     <svg class="bi bi-chevron-down" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                         <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 01.708 0L8 10.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z" clip-rule="evenodd"/>
                                                     </svg>
                                                     </button>
                                                 <%} else {%>
-                                                    <button type="button"  class="btn btn-default btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
+                                                    <button type="button"  class="btn btn-default btn-rotar-horario btn-rotar-horario_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>" style="display: none;"
                                                         onClick="cambiarPorClase('<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l%>', '<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l+1%>')">
                                                     <svg class="bi bi-chevron-down" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" >
                                                         <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 01.708 0L8 10.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z" clip-rule="evenodd"/>
@@ -202,7 +186,6 @@
                                         </td>
                                         <% let dias = ['L','M','X','J','V'];
                                             for(let d = 0; d<dias.length; d++){%>
-                                                <!-- Cada celda pertenece a las clases grupoCodigo_dia y grupoCodigo_hora para poder seleccionarlas para cambiarlas -->
                                                 <td scope="col" class="<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%> <%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=l%>"
                                                     id='horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%=asignacionsHorario[i].semestres[j].semestre%>'
                                                     onclick="mostrar('horario_<%= asignacionsHorario[i].curso %>_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>_<%=dias[d]%>_<%=l%>_<%=asignacionsHorario[i].semestres[j].semestre%>')">
@@ -276,6 +259,10 @@ let eliminarAsignacions = [];
 //se utiliza para disparar el evento de onbeforeunload
 let activado = true;
 
+function ToggleBotonesRotar(idHorario) {
+    $( ".btn-rotar-horario_" + idHorario ).toggle();
+}
+
 /**
  * Intercambia los elementos de las dos clases indicadas 
  * (las clases pueden ser dos días o dos horas)
@@ -283,6 +270,29 @@ let activado = true;
  * @param  {String} clase_2 La segunda clase para intercambiar
  */
 function cambiarPorClase(clase_1, clase_2) {
+    // Comprobamos si el cambio es por horas
+    if (!isNaN(clase_1.split("_")[1])) {
+        let idHorario = clase_2.split("_")[0];
+        let horaCambio = Number(clase_2.split("_")[1]);
+        if (horaCambio > Number(clase_1.split("_")[1])) {
+            while($( 'td.' + clase_2).parent().attr('class') === "hidden") {
+                horaCambio++;
+                if (horaCambio === 21) {
+                    horaCambio = 8;
+                }
+                clase_2 = idHorario + "_" + horaCambio;
+            }
+        } else if (horaCambio < Number(clase_1.split("_")[1])) {
+            while($( 'td.' + clase_2).parent().attr('class') === "hidden") {
+                horaCambio--;
+                if (horaCambio === 7) {
+                    horaCambio = 20;
+                }
+                clase_2 = idHorario + "_" + horaCambio;
+            }
+        }
+    }
+
     // Se guarda una copia de las asignaturas a intercambiar
     asigs1Tmp = $( 'td.' + clase_1 + ' > span').clone();
     asigs2Tmp = $( 'td.' + clase_2 + ' > span').clone();
