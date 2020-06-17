@@ -34,7 +34,7 @@
                             if (departamento["acronimo"] !== null && departamento["acronimo"].trim() !== "") {
                             acronimo = departamento["acronimo"]
                             }%>
-                            <input type="text" maxlength="5" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='departamento_<%=departamento.codigo%>' onchange="MarcarChangeDep('departamento_<%=departamento.codigo%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
+                            <input type="text" autocorrect="off" maxlength="5" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='departamento_<%=departamento.codigo%>' onchange="MarcarChangeDep('departamento_<%=departamento.codigo%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
                             </td>
                             </tr>
                         <%}%>
@@ -82,7 +82,7 @@
                                 if (plan["nombre"] !== null && plan["nombre"].trim() !== "") {
                                 acronimo = plan["nombre"]
                                 }%>
-                                <input type="text" maxlength="8" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='plan_<%=planID%>' onchange="MarcarChangePlan('plan_<%=planID%>%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
+                                <input type="text" autocorrect="off" maxlength="8" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='plan_<%=planID%>' onchange="MarcarChangePlan('plan_<%=planID%>%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
                                 </td>
                             </tr>
 
@@ -127,7 +127,7 @@
                                             if (asignaturaCurso["acronimo"] !== null && asignaturaCurso["acronimo"].trim() !== "") {
                                             acronimo = asignaturaCurso["acronimo"]
                                             }%>
-                                            <input type="text" maxlength="5" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='asignatura_<%=curso%>_<%=asignaturaCurso["identificador"]%>' onchange="MarcarChangeAsignatura('asignatura_<%=curso%>_<%=asignaturaCurso.identificador%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
+                                            <input type="text" autocorrect="off" maxlength="5" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='asignatura_<%=curso%>_<%=asignaturaCurso["identificador"]%>' onchange="MarcarChangeAsignatura('asignatura_<%=curso%>_<%=asignaturaCurso.identificador%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
                                             </td>
                                             <td><%=asignaturaCurso.DepartamentoResponsable || '-'%></td>
                                             </tr>

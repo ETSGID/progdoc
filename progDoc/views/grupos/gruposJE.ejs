@@ -43,7 +43,7 @@
                                                 if (grupos[i].semestres[j].grupos[k].aula !== null && grupos[i].semestres[j].grupos[k].aula.trim() !== "") {
                                                 aula = grupos[i].semestres[j].grupos[k].aula
                                                 }%>
-                                                <input type="text" value="<%=aula%>" placeholder="<%=aula%>" name="grupo_<%=grupos[i].semestres[j].grupos[k].nombre%>_aula_<%=grupos[i].curso%>" onchange="MarcarChange('grupo_<%=grupos[i].semestres[j].grupos[k].grupoId%>_<%=grupos[i].semestres[j].grupos[k].nombre%>_<%= grupos[i].curso %>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
+                                                <input type="text" autocorrect="off" value="<%=aula%>" placeholder="<%=aula%>" name="grupo_<%=grupos[i].semestres[j].grupos[k].nombre%>_aula_<%=grupos[i].curso%>" onchange="MarcarChange('grupo_<%=grupos[i].semestres[j].grupos[k].grupoId%>_<%=grupos[i].semestres[j].grupos[k].nombre%>_<%= grupos[i].curso %>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
                                             </td>
                                             <td>
                                                 <% let capacidad = "0"
@@ -57,7 +57,7 @@
                                                 if (grupos[i].semestres[j].grupos[k].nombreItinerario !== null && grupos[i].semestres[j].grupos[k].nombreItinerario.trim() !== "") {
                                                 itinerario = grupos[i].semestres[j].grupos[k].nombreItinerario
                                                 }%>
-                                                <input type="text" value="<%=itinerario%>" placeholder="<%=itinerario%>" name="grupo_<%=grupos[i].semestres[j].grupos[k].nombre%>_nombreItinerario_<%=grupos[i].curso%>" onchange="MarcarChange('grupo_<%=grupos[i].semestres[j].grupos[k].grupoId%>_<%=grupos[i].semestres[j].grupos[k].nombre%>_<%= grupos[i].curso %>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
+                                                <input type="text" autocorrect="off" value="<%=itinerario%>" placeholder="<%=itinerario%>" name="grupo_<%=grupos[i].semestres[j].grupos[k].nombre%>_nombreItinerario_<%=grupos[i].curso%>" onchange="MarcarChange('grupo_<%=grupos[i].semestres[j].grupos[k].grupoId%>_<%=grupos[i].semestres[j].grupos[k].nombre%>_<%= grupos[i].curso %>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
                                             </td>
                                         </tr>
                                 <%}
@@ -87,7 +87,7 @@
                                                 if (grupos[i].semestres[j].grupos[k].aula !== null && grupos[i].semestres[j].grupos[k].aula.trim() !== "") {
                                                 aula = grupos[i].semestres[j].grupos[k].aula
                                                 }%>
-                                                <input type="text" value="<%=aula%>" placeholder="<%=aula%>" name="grupo_<%=grupos[i].semestres[j].grupos[k].nombre%>_aula_<%=grupos[i].curso%>" onchange="MarcarChange('grupo_<%=grupos[i].semestres[j].grupos[k].grupoId%>_<%=grupos[i].semestres[j].grupos[k].nombre%>_<%= grupos[i].curso %>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
+                                                <input type="text" autocorrect="off" value="<%=aula%>" placeholder="<%=aula%>" name="grupo_<%=grupos[i].semestres[j].grupos[k].nombre%>_aula_<%=grupos[i].curso%>" onchange="MarcarChange('grupo_<%=grupos[i].semestres[j].grupos[k].grupoId%>_<%=grupos[i].semestres[j].grupos[k].nombre%>_<%= grupos[i].curso %>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
                                             </td>
                                             <td>
                                                 <% let capacidad = "0"
@@ -101,7 +101,7 @@
                                             if (grupos[i].semestres[j].grupos[k].nombreItinerario !== null && grupos[i].semestres[j].grupos[k].nombreItinerario.trim() !== "") {
                                             itinerario = grupos[i].semestres[j].grupos[k].nombreItinerario
                                             }%>
-                                            <input type="text" value="<%=itinerario%>" placeholder="<%=itinerario%>" name="grupo_<%=grupos[i].semestres[j].grupos[k].nombre%>_nombreItinerario_<%=grupos[i].curso%>" onchange="MarcarChange('grupo_<%=grupos[i].semestres[j].grupos[k].grupoId%>_<%=grupos[i].semestres[j].grupos[k].nombre%>_<%= grupos[i].curso %>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
+                                            <input type="text" autocorrect="off" value="<%=itinerario%>" placeholder="<%=itinerario%>" name="grupo_<%=grupos[i].semestres[j].grupos[k].nombre%>_nombreItinerario_<%=grupos[i].curso%>" onchange="MarcarChange('grupo_<%=grupos[i].semestres[j].grupos[k].grupoId%>_<%=grupos[i].semestres[j].grupos[k].nombre%>_<%= grupos[i].curso %>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
                                         </td>
                                         </tr>
                                 <%}
@@ -205,15 +205,15 @@ function Anadir(id){
 
         let onChange = "grupo_"+grupoExistente.grupoId+"_"+grupoExistente.nombre+"_"+curso
         onChange = "'"+onChange+"'"
-        cell1.innerHTML='<input type="text" placeholder="'+aula+'" name="grupo_'+newGrupo+'_aula_'+curso+'" onchange="MarcarChange(' + onChange +')"  onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">'
+        cell1.innerHTML='<input type="text" autocorrect="off" placeholder="'+aula+'" name="grupo_'+newGrupo+'_aula_'+curso+'" onchange="MarcarChange(' + onChange +')"  onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">'
         cell2.innerHTML='<input type="number" value="'+capacidad+'" name="grupo_'+newGrupo+'_capacidad_'+curso+'" min="0" onchange="MarcarChange(' + onChange + ')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">'
-        cell3.innerHTML='<input type="text" placeholder="'+itinerario+'" name="grupo_'+newGrupo+'_nombreItinerario_'+curso+'" onchange="MarcarChange(' + onChange +')"  onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">'
+        cell3.innerHTML='<input type="text" autocorrect="off" placeholder="'+itinerario+'" name="grupo_'+newGrupo+'_nombreItinerario_'+curso+'" onchange="MarcarChange(' + onChange +')"  onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">'
         let grupoInput = document.getElementById("grupo_"+grupoExistente.grupoId+"_"+grupoExistente.nombre+"_"+curso);
         grupoInput.name = 'momentaneo'
     }else{
-        cell1.innerHTML='<input type="text" placeholder="Indefinida" name="grupo_'+newGrupo+'_aula_'+curso+'"  onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">'
+        cell1.innerHTML='<input type="text" autocorrect="off" placeholder="Indefinida" name="grupo_'+newGrupo+'_aula_'+curso+'"  onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">'
         cell2.innerHTML='<input type="number" value="0" name="grupo_'+newGrupo+'_capacidad_'+curso+'" min="0" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">'
-        cell3.innerHTML='<input type="text" placeholder="-" name="grupo_'+newGrupo+'_nombreItinerario_'+curso+'" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">'
+        cell3.innerHTML='<input type="text" autocorrect="off" placeholder="-" name="grupo_'+newGrupo+'_nombreItinerario_'+curso+'" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">'
         let div = document.createElement('div');
         div.innerHTML = '<input type="hidden" name ="anadir" id="grupo_noID_'+newGrupo+'_'+curso+'" value="grupo_noID_'+newGrupo+'_'+curso+'">'
         let nuevo = div.firstChild;

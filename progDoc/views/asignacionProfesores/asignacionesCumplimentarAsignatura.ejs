@@ -14,7 +14,7 @@
 <ul style="list-style-type:none">
     <li>Coordinador:
     <div class="autocomplete" style="width:500px;">
-    <input id="coordinadorInput" type="text" name="coordinadorInput" value="<%= asign.coordinador.nombreCorregido %>" placeholder="<%= asign.coordinador.nombreCorregido %>" onclick= 'LimpiaCoordinador()'>
+    <input id="coordinadorInput" type="text" autocorrect="off" name="coordinadorInput" value="<%= asign.coordinador.nombreCorregido %>" placeholder="<%= asign.coordinador.nombreCorregido %>" onclick= 'LimpiaCoordinador()'>
     <input id="coordinador" type="hidden" name="coordinador" value="<%=asign.coordinador.identificador%>">
     </div>
     <span><button type="button"  class="btn btn-default" onclick="EliminarCoordinador()">Eliminar</button></span>
@@ -92,13 +92,13 @@ function EliminarCoordinador(){
 
 function AnadirProfesor(id){
  let div = document.createElement('div');
-  div.innerHTML = '<div id="'+id+'_vacio" class="autocomplete" style="width:500px;"><input id="momentaneo" type="text" name="vacio" value="" placeholder="Seleccionar Profesor"></div>'
+  div.innerHTML = '<div id="'+id+'_vacio" class="autocomplete" style="width:500px;"><input id="momentaneo" type="text" autocorrect="off" name="vacio" value="" placeholder="Seleccionar Profesor"></div>'
   let node = div.firstChild;
   /*No se puede usar innerHtml directamente pq si añades varios buscadores en un mismo grupo desaparece la funcionalidad de los primeros
   buscadores. Con javascript debes crear primero un elemento, la forma más sencislla para hacerlo con un string es esa
   Alternativaemtne se podría hacer con jquery así
   */
-  //$( "#"+id ).append('<div class="autocomplete" style="width:500px;"><input id="momentaneo" type="text" name="anadir" value="" placeholder="Seleccionar Profesor"></div> ' ); 
+  //$( "#"+id ).append('<div class="autocomplete" style="width:500px;"><input id="momentaneo" type="text" autocorrect="off" name="anadir" value="" placeholder="Seleccionar Profesor"></div> ' ); 
   let contenedor = document.getElementById(id)
   //solo permite un input por grupo hasta que se rellene
   if(!document.getElementById(id+"_vacio")){

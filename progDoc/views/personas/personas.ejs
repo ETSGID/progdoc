@@ -30,12 +30,15 @@
                 <td>
                     <%= p['Profesor.ProfesorId'] !== null ? 'Sí' : 'No' %>
                 </td>
-                <td>
+                <td style="min-width: 150px;">
+                    <div class="btn-group" role="group" aria-label="Basic example">
                     <button type="button" class="btn btn-default" onclick="editPersona('<%=p.identificador%>')">
                         <span class="glyphicon glyphicon-pencil"></span>
                     </button>
                     <button type="button" class="btn btn-default" onclick="eliminarPersona('<%=p.identificador%>')">
                         <span class="glyphicon glyphicon-trash"></span>
+                    </button>
+                    </div>
                 </td>
             </tr>
             <%})%>
@@ -79,7 +82,6 @@
     }
 
     function editPersona(id) {
-        console.log(id)
         let persona = personas.find(p => p.identificador === Number(id));
         //funcion para pintar el modal de edit_addPersona
         showPersona(persona);
