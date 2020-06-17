@@ -1,0 +1,130 @@
+<%- include ../menus/gestion.ejs %>
+<div class="contenido">
+    <%if(locals.permisoDenegado && locals.permisoDenegado!== null){%>
+        <p><%=permisoDenegado%></p>
+    <%}else{%>
+        <%- include ./pagination.ejs %>
+    <button type="button" class="btn btn-primary" onclick="addPersona()">Añadir persona en el sistema</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Apellidos</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Profesor</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody id="body_table_personas">
+            <% personas.forEach(p => { %>
+            <tr id='id_persona_<%=p.identificador%>'>
+                <td>
+                    <%=p.apellido%>
+                </td>
+                <td>
+                    <%=p.nombre%>
+                </td>
+                <td>
+                    <%=p.email%>
+                </td>
+                <td>
+                    <%= p['Profesor.ProfesorId'] !== null ? 'Sí' : 'No' %>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-default" onclick="editPersona('<%=p.identificador%>')">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" onclick="eliminarPersona('<%=p.identificador%>')">
+                        <span class="glyphicon glyphicon-trash"></span>
+                </td>
+            </tr>
+            <%})%>
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-primary" onclick="addPersona()">Añadir persona en el sistema</button>
+    <%- include ./pagination.ejs %>
+    <%- include ./edit_addPersona.ejs %>
+    <%}%>
+</div>
+
+<script>
+    let personas = <%-JSON.stringify(personas)%>;
+
+    function addPersona(){
+        //funcion para pintar el modal de edit_addPersona
+        showPersona(null);
+    }
+
+     // funcion cuando edit_addPersona añade persona al sistema
+     function addPersonaRespuesta(persona){
+        personas.push(persona);
+        //actualizar tabla
+        let tableBody = document.getElementById('body_table_personas');
+        let row = tableBody.insertRow(0);
+        row.id = `id_persona_${persona.identificador}`
+        let cell0 = row.insertCell();
+        cell0.innerHTML = persona.apellido;
+        let cell1 = row.insertCell();
+        cell1.innerHTML = persona.nombre;
+        let cell2 = row.insertCell();
+        cell2.innerHTML = persona.email;
+        let cell3 = row.insertCell();
+        cell3.innerHTML =  persona['Profesor.ProfesorId'] !== null ? 'Sí' : 'No'
+        let cell4 = row.insertCell();
+        cell4.innerHTML = ` <button type="button" class="btn btn-default" onclick="editPersona('${persona.identificador}')">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" onclick="eliminarPersona('${persona.identificador}')">
+                        <span class="glyphicon glyphicon-trash"></span>`
+    }
+
+    function editPersona(id) {
+        console.log(id)
+        let persona = personas.find(p => p.identificador === Number(id));
+        //funcion para pintar el modal de edit_addPersona
+        showPersona(persona);
+    }
+
+    // funcion cuando edit_addPersona edita persona en el sistema
+    function editPersonaRespuesta(persona){
+        personas = personas.filter(p => p.identificador !== persona.identificador)
+        personas.push(persona);
+        let row = document.getElementById(`id_persona_${persona.identificador}`)
+        let cells = row.cells
+        cells[0].innerHTML = persona.apellido;
+        cells[1].innerHTML = persona.nombre;
+        cells[2].innerHTML = persona.email;
+        cells[3].innerHTML = persona['Profesor.ProfesorId'] !== null ? 'Sí' : 'No';
+
+    }
+
+    function eliminarPersona(id){
+        if(confirm('Si elmina a la persona del sistema se perderá toda la información relativa a ella: roles, docencia, tribunales y coordinadores')){
+            $.ajax({
+            url: CONTEXT+'/personaAndProfesor/'+id,
+            method: 'DELETE',
+            dataType: "json",
+            contentType: "application/json",
+            }).done(function(res) {
+                if(!res.success){
+                    alert(`Ha habido un error y la persona no se ha podido eliminar. ${res.msg || ''}`)
+                }else{
+                //funcion para pintar el modal de edit_addPersona
+                eliminarPersonaRespuesta(res.persona)
+                //cerrar el modal
+                Cancel()
+                }            
+            }).fail( function( jqXHR, textStatus, errorThrown ) {
+                alert("Ha habido un error:" + jqXHR.status + " " + textStatus)
+            })
+        }
+    }
+
+    function eliminarPersonaRespuesta(persona){
+        personas = personas.filter(p => p.identificador !== persona.identificador)
+        // borrar persona de la tabla
+        let row = document.getElementById(`id_persona_${persona.identificador}`)
+        row.parentNode.removeChild(row);
+
+    }
+</script>

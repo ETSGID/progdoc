@@ -30,7 +30,8 @@ exports.getProfesorAsignaturas = async function(req, res, next) {
       break;
   }
   try {
-    profesor = await personaYProfesorController.getProfesorCorreo(
+    profesor = await personaYProfesorController.getPersonCorreo(
+      true,
       req.params.profesorCorreo
     );
     if (!profesor) {

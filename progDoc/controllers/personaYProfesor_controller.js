@@ -41,7 +41,7 @@ async function getPersonCorreo(onlyProfesor, correo) {
   const required = onlyProfesor === true;
   // eslint-disable-next-line no-useless-catch
   try {
-    const pers = await models.Persona.findOne({
+    return await models.Persona.findOne({
       attributes: ['identificador', 'email', 'nombre', 'apellido'],
       where: {
         email: correo
@@ -55,31 +55,38 @@ async function getPersonCorreo(onlyProfesor, correo) {
 
       raw: true
     });
-    if (pers) {
-      const nombre = `${pers.apellido} ${pers.nombre}`;
-      let nombreCorregido = `${pers.apellido}, ${pers.nombre}`;
-      nombreCorregido = funciones.primerasMayusc(nombreCorregido);
-      // eslint-disable-next-line no-param-reassign
-      correo = pers.email;
-      const { identificador } = pers;
-      const persona = {
-        nombre,
-        correo,
-        nombreCorregido,
-        identificador
-      };
-      return persona;
-    }
-    return null;
   } catch (error) {
     // se propaga el error lo captura el middleware
     throw error;
   }
 }
 
-// te da las ultimas pds existentes para el plan, tipoPD y ano
-// en caso de pasar la pdIDNoIncluir te obvia esa, se utiliza para el pdf
-exports.getPersonas = async function() {
+async function getPeoplePagination(onlyProfesor, page, limit) {
+  const offset = 0 + (page - 1) * limit;
+  const required = onlyProfesor === true;
+  // eslint-disable-next-line no-useless-catch
+  try {
+    // includes
+    const { count, rows } = await models.Persona.findAndCountAll({
+      offset,
+      limit,
+      order: [['apellido', 'ASC']],
+      include: [
+        {
+          model: models.Profesor,
+          required
+        }
+      ],
+      raw: true
+    });
+    return { count, personas: rows };
+  } catch (error) {
+    // se propaga el error lo captura el middleware
+    throw error;
+  }
+}
+
+exports.getPersonas = async function () {
   // eslint-disable-next-line no-useless-catch
   try {
     const personas = await getPeople(false);
@@ -90,8 +97,36 @@ exports.getPersonas = async function() {
   }
 };
 
+exports.getPersonasPagination = async function (req, res, next) {
+  req.session.submenu = 'Personal';
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const page = Number(req.query.page) || 1;
+    const itemsPerPage = 50;
+    const { count, personas } = await getPeoplePagination(
+      false,
+      page,
+      itemsPerPage
+    );
+    const pages = Math.ceil(count / itemsPerPage);
+    res.render('personas/personas', {
+      count,
+      permisoDenegado: res.locals.permisoDenegado,
+      page,
+      pages,
+      personas,
+      menu: req.session.menu,
+      submenu: req.session.submenu,
+      path: `${req.baseUrl}/Personal`
+    });
+  } catch (error) {
+    // se propaga el error lo captura el middleware
+    next(error);
+  }
+};
+
 // get profesores
-exports.getProfesores = async function() {
+exports.getProfesores = async function () {
   // eslint-disable-next-line no-useless-catch
   try {
     const profesores = await getPeople(true);
@@ -102,30 +137,9 @@ exports.getProfesores = async function() {
   }
 };
 
-exports.getProfesorCorreo = async function(correo) {
-  // eslint-disable-next-line no-useless-catch
-  try {
-    const prof = await getPersonCorreo(true, correo);
-    return prof;
-  } catch (error) {
-    // se propaga el error lo captura el middleware
-    throw error;
-  }
-};
-
-exports.getPersonaCorreo = async function(correo) {
-  // eslint-disable-next-line no-useless-catch
-  try {
-    const person = await getPersonCorreo(false, correo);
-    return person;
-  } catch (error) {
-    // se propaga el error lo captura el middleware
-    throw error;
-  }
-};
-
 // anadir un profesor o persona
-exports.anadirProfesor = async function(req, res) {
+// TODO cambiar y usar la de abajo
+exports.anadirProfesor = async function (req, res) {
   try {
     let id = '';
     const nuevaPersona = await models.Persona.findOrCreate({
@@ -149,3 +163,145 @@ exports.anadirProfesor = async function(req, res) {
     res.json({ success: false });
   }
 };
+
+// anadir un profesor o persona
+exports.anadirPersonaAndProfesor = async function (req, res) {
+  if (!res.locals.permisoDenegado) {
+    try {
+      const [persona, created] = await models.Persona.findOrCreate({
+        where: { email: req.body.email },
+        defaults: {
+          email: req.body.email,
+          nombre: req.body.nombre.toUpperCase(),
+          apellido: req.body.apellido.toUpperCase()
+        }
+      });
+      if (!created) {
+        res.json({
+          success: false,
+          msg: `Una persona con ese email ya está en el sistema se trata de ${persona.nombre} ${persona.apellido}`
+        });
+      } else {
+        const prof = {};
+        prof.ProfesorId = persona.identificador;
+        if (req.body.isProfesor === true) {
+          const profesorToAnadir = models.Profesor.build(prof);
+          await profesorToAnadir.save();
+        }
+        res.json({
+          success: true,
+          persona: await getPersonCorreo(false, req.body.email)
+        });
+      }
+    } catch (error) {
+      console.log('Error:', error);
+      res.json({ success: false });
+    }
+  } else {
+    res.json({ success: false, msg: 'No tiene permiso para realizar esta acción' });
+  }
+};
+
+// update un profesor o persona
+exports.updatePersonaAndProfesor = async function (req, res) {
+  if (!res.locals.permisoDenegado) {
+    try {
+      const { id } = req.params;
+      // eslint-disable-next-line no-restricted-globals
+      if (!isNaN(id) && id !== null) {
+        await models.Persona.update(
+          {
+            email: req.body.email,
+            nombre: req.body.nombre.toUpperCase(),
+            apellido: req.body.apellido.toUpperCase()
+          },
+          { where: { identificador: id } }
+        );
+        if (req.body.isProfesor === true) {
+          await models.Profesor.findOrCreate({
+            where: { ProfesorId: id },
+            defaults: {
+              ProfesorId: id
+            }
+          });
+        } else {
+          /**
+           borrar las asignaciones de profesores
+           para evitar entradas de asignacion profesores con solo
+           asignatura asignatura y grupo
+           de asignatura se queda vacío si es coordinador o tribunal
+           de roles se queda vacío ese rol
+           */
+          await models.AsignacionProfesor.destroy({
+            where: {
+              ProfesorId: id
+            }
+          });
+          await models.Profesor.destroy({
+            where: { ProfesorId: id }
+          });
+        }
+        res.json({
+          success: true,
+          persona: await getPersonCorreo(false, req.body.email)
+        });
+      } else {
+        res.json({
+          success: false,
+          msg: 'id de persona no encontrado'
+        });
+      }
+    } catch (error) {
+      console.log('Error:', error);
+      res.json({ success: false });
+    }
+  } else {
+    res.json({ success: false, msg: 'No tiene permiso para realizar esta acción' });
+  }
+};
+
+// delete un profesor y persona
+exports.deletePersonaAndProfesor = async function (req, res) {
+  if (!res.locals.permisoDenegado) {
+    try {
+      const { id } = req.params;
+      // eslint-disable-next-line no-restricted-globals
+      if (!isNaN(id) && id !== null) {
+        /**
+          borrar las asignaciones de profesores
+          para evitar entradas de asignacion profesores con solo
+          asignatura asignatura y grupo
+          de asignatura se queda vacío si es coordinador o tribunal
+          de roles se queda vacío ese rol
+          */
+        await models.AsignacionProfesor.destroy({
+          where: {
+            ProfesorId: id
+          }
+        });
+        await models.Profesor.destroy({
+          where: { ProfesorId: id }
+        });
+        await models.Persona.destroy({
+          where: { identificador: id }
+        });
+        res.json({
+          success: true,
+          persona: { identificador: Number(id) }
+        });
+      } else {
+        res.json({
+          success: false,
+          msg: 'id de persona no encontrado'
+        });
+      }
+    } catch (error) {
+      console.log('Error:', error);
+      res.json({ success: false });
+    }
+  } else {
+    res.json({ success: false, msg: 'No tiene permiso para realizar esta acción' });
+  }
+};
+
+exports.getPersonCorreo = getPersonCorreo;

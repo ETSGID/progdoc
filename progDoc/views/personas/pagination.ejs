@@ -1,0 +1,17 @@
+<nav aria-label="Page navigation example">
+    <% const disabledAnterior =  page === 1 %>
+    <% const disabledSiguiente =  page === pages %>
+    <ul class="pagination">
+        <li class="page-item <%= disabledAnterior ? 'disabled' : ''%>">
+            <a class="page-link" href="<%=path%>?page=<%=page - 1 %>" <%= disabledAnterior ? 'tabindex="-1"' : ''%>>Anterior</a>
+        </li>
+        <%for (let i = 1; i <= pages; i++ ){%>
+            <li class="page-item <%=page === i ? 'active' : ''%>">
+                <a class="page-link" href="<%=path%>?page=<%=i%>" <%=page === i ? 'tabindex="-1"' : ''%>><%=i%></a>
+            </li>
+        <%}%>
+        <li class="page-item <%= disabledSiguiente ? 'disabled' : ''%>">
+        <a class="page-link" href="<%=path%>?page=<%=page +1 %>" <%= disabledSiguiente ? 'tabindex="-1"' : ''%>>Siguiente</a>
+        </li>
+    </ul>
+</nav>

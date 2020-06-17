@@ -1349,7 +1349,67 @@ router.post(
   grupoController.AnadirGruposJE
 );
 
+router.get(
+  '/Personal',
+  (req, res, next) => {
+    res.locals.rols.push({
+      rol: enumsPD.rols.JefeEstudios,
+      PlanEstudioCodigo: null,
+      DepartamentoCodigo: null,
+      condiciones: []
+    });
+    next();
+  },
+  rolController.comprobarRols,
+  personaYProfesorController.getPersonasPagination
+);
+
 router.post('/anadirProfesor', personaYProfesorController.anadirProfesor);
+
+router.post(
+  '/personaAndProfesor',
+  (req, res, next) => {
+    res.locals.rols.push({
+      rol: enumsPD.rols.JefeEstudios,
+      PlanEstudioCodigo: null,
+      DepartamentoCodigo: null,
+      condiciones: []
+    });
+    next();
+  },
+  rolController.comprobarRols,
+  personaYProfesorController.anadirPersonaAndProfesor
+);
+
+router.put(
+  '/personaAndProfesor/:id',
+  (req, res, next) => {
+    res.locals.rols.push({
+      rol: enumsPD.rols.JefeEstudios,
+      PlanEstudioCodigo: null,
+      DepartamentoCodigo: null,
+      condiciones: []
+    });
+    next();
+  },
+  rolController.comprobarRols,
+  personaYProfesorController.updatePersonaAndProfesor
+);
+
+router.delete(
+  '/personaAndProfesor/:id',
+  (req, res, next) => {
+    res.locals.rols.push({
+      rol: enumsPD.rols.JefeEstudios,
+      PlanEstudioCodigo: null,
+      DepartamentoCodigo: null,
+      condiciones: []
+    });
+    next();
+  },
+  rolController.comprobarRols,
+  personaYProfesorController.deletePersonaAndProfesor
+);
 
 router.get(
   '/AbrirCerrar',

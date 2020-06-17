@@ -135,6 +135,7 @@ Rol.belongsTo(Persona, { foreignKey: 'PersonaId' });
 
 // Relación 1 a N entre Plan e Itinerario ->
 // ojo si se elimina un plan de estudio en la bbdd debe quedar para ver los de los años anteriores
+// no se utiliza hasta ahora
 PlanEstudio.hasMany(Itinerario);
 Itinerario.belongsTo(PlanEstudio);
 
