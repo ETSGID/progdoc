@@ -305,6 +305,10 @@ tr.espacio>td {
   padding-left: 0;
 }
 
+.btn-rotar-horario {
+  padding: 4px 4px 2px 4px !important;
+}
+
 .horario-horas-flechas {
   display: grid;
   grid-template-columns: 78px auto;
