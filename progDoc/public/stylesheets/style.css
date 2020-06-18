@@ -316,6 +316,7 @@ tr.espacio>td {
   'hora flechas'
   ;
 }
+
 .pagination {
   margin:5px !important;
 }
@@ -329,3 +330,15 @@ tr.espacio>td {
        z-index: 1 !important;
      }
 
+
+.dropdown-toggle {
+  background-color: #ffffff;
+}
+
+.dropdown-menu {
+  min-width: 0px;
+}
+
+.dropdown-item:hover {
+  background-color: #e6e6e6;
+}
