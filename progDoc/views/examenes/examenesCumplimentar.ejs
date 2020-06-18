@@ -115,10 +115,11 @@
                                         Adelanta o atrasa los exámanes del (los) curso(s) señalados el número de días indicados.
                                         <hr>
                                         <div class="form-group">
-                                            Número de días a desplazar:
+                                            Número de días (hábiles) a desplazar:
                                             <br>
                                             <input type="number" class="dias-desplazamiento" name="<%=asignacionsExamen[i].periodo%>_dias-desplazamiento"
                                                 min="1" max="15" value="1">
+                                            <p class="note-text">Los exámenes en fin de semana empezarán a contar a partir del primer día hábil.</p>
                                         </div>
                                         <div class="form-group">
                                             Sentido del cambio:
