@@ -44,6 +44,7 @@
 
     <div class="tab">
         <button id='AbrirCerrar' class="tablinks" onclick="cambiarSubmenu(event, 'AbrirCerrar')">Abrir/Cerrar</button>
+        <button id='Personal' class="tablinks" onclick="cambiarSubmenu(event, 'Personal')">Personal</button>
         <button id='Roles' class="tablinks" onclick="cambiarSubmenu(event, 'Roles')">Roles</button>
         <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')">Calendario</button>
         <button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>
@@ -83,6 +84,11 @@ if (elementPlan){
 }
 if(submenu === 'AbrirCerrar'){
     let url = "<%=CONTEXT%>/AbrirCerrar"
+    window.location.replace(url);
+}
+
+if(submenu === 'Personal'){
+    let url = "<%=CONTEXT%>/Personal"
     window.location.replace(url);
 }
 

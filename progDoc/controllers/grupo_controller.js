@@ -155,6 +155,7 @@ exports.EliminarGruposJE = async function(req, res, next) {
         whereEliminar2.identificador = 'Identificador erróneo';
       }
       // antes de borrarlo de grupos voy a borrarlo de las asignaciones
+      // de conjuntoActividadParcialGrupos ya se elemina solo
       await models.AsignacionProfesor.destroy({
         where: whereEliminar2
       });

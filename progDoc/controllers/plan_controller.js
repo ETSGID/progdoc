@@ -4,17 +4,17 @@ const funciones = require('../funciones');
 
 const op = Sequelize.Op;
 
-const getPlanInfo = async function(planId){
-  try{
+const getPlanInfo = async function(planId) {
+  try {
     const planBBDD = await models.PlanEstudio.findById(planId, {
       raw: true
     });
     return planBBDD;
-  }catch(error){
+  } catch (error) {
     // se propaga el error lo captura el middleware
     throw error;
   }
-}
+};
 
 // un plan es activo cuando tiene nombre == acronimo asignado
 const getPlanesFunction = async function(onlyActive) {

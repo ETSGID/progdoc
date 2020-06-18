@@ -31,7 +31,7 @@ footer {
   min-height: 100%;
   width: 215px;
   position: fixed;
-  z-index: 1;
+  z-index: 4;
   top: 0;
   left: 0;
   background-color: #4664a2;
@@ -312,3 +312,16 @@ tr.espacio>td {
   'hora flechas'
   ;
 }
+.pagination {
+  margin:5px !important;
+}
+
+.pagination>.active>a,
+ .pagination>.active>a:focus,
+  .pagination>.active>a:hover,
+   .pagination>.active>span,
+    .pagination>.active>span:focus,
+     .pagination>.active>span:hover {
+       z-index: 1 !important;
+     }
+

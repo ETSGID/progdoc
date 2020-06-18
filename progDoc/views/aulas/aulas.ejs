@@ -16,7 +16,7 @@
         </select>
         <button type="button"  class="btn btn-default" onclick="generarPdf('<%= generarPdfpath %>')">Descargar Pdf</button>
         <div class="autocomplete" style="width:500px;">
-        <input type="text" id="buscador" onkeypress="buscadorOnKeyPress(event)" placeholder="buscar..."/>
+        <input type="text" autocorrect="off" id="buscador" onkeypress="buscadorOnKeyPress(event)" placeholder="buscar..."/>
         </div>
         <div>
             <iframe  id="pdfIframe" src="" style="display:none; height:100%; width:100%;" ></iframe>

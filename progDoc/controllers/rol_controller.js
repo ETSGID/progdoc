@@ -10,11 +10,19 @@ const op = Sequelize.Op;
 
 // comprueba el rol o si es delegado de dicho rol en función del estado de la PD pasada
 exports.comprobarRols = async function(req, res, next) {
-  const { rols } = req.session.user;
-  const rolsCoincidentes = [];
-  // de esta forma también se evita que se cierre una programacion docente y justo alguien edite
-  const { pdID } = req.session;
   try {
+    req.session.user.rols = await models.Rol.findAll({
+      attributes: ['rol', 'PlanEstudioCodigo', 'DepartamentoCodigo'],
+      where: {
+        PersonaId: req.session.user.PersonaId
+      },
+      raw: true
+    });
+
+    const { rols } = req.session.user;
+    const rolsCoincidentes = [];
+    // de esta forma también se evita que se cierre una programacion docente y justo alguien edite
+    const { pdID } = req.session;
     const plan = progDocController.getPlanPd(pdID);
     const pd = await models.PlanEstudio.findOne({
       where: { codigo: plan },
@@ -203,8 +211,6 @@ exports.guardarRoles = async function(req, res, next) {
     !req.body.rol.split('_')[0]
   ) {
     try {
-      // para asi luego obligarle a volver a buscarlos por los cambios que hayan
-      delete req.session.user.rols;
       // sacar name del rol  guardar
       let personaId;
       // si hay que eliminarlo sigue existiendo el rol pero no asignado a nadie.

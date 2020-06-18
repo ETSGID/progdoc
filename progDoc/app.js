@@ -167,20 +167,6 @@ app.use(async (req, res, next) => {
       console.log('Error:', error);
       next(error);
     }
-  } else if (!req.session.user.rols) {
-    try {
-      req.session.user.rols = await models.Rol.findAll({
-        attributes: ['rol', 'PlanEstudioCodigo', 'DepartamentoCodigo'],
-        where: {
-          PersonaId: req.session.user.PersonaId
-        },
-        raw: true
-      });
-      next();
-    } catch (error) {
-      console.log('Error:', error);
-      next(error);
-    }
   } else {
     next();
   }
@@ -197,7 +183,7 @@ app.use((req, res, next) => {
 });
 
 // error handler
-//TODO diferenciar entre rutas de API (o ajax) y rutas tradicionales
+// TODO diferenciar entre rutas de API (o ajax) y rutas tradicionales
 app.use((err, req, res) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
