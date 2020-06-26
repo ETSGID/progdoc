@@ -846,166 +846,16 @@ function parseFechaMoment(fecha) {
     }
 }
 
-function rotarExamenes(periodo) {
-    let sentidoInput = $( '#modal-rotar_' + periodo + ' input[name=' + periodo + '_sentido-rotacion]:checked' );
-    let sentido = sentidoInput[0].value;
-    let cursos = $( '#modal-rotar_' + periodo + ' input[name=' + periodo + '_cursos-rotacion]:checked' );
+function ordenarPorFecha(a, b) {
+    let fecha_a = parseFechaMoment(a.examen.fecha), fecha_b = parseFechaMoment(b.examen.fecha);
 
-    if (sentidoInput.length === 0 && cursos.length === 0) {
-        alert("Por favor, seleccione el sentido de la rotación y al menos un curso.");
-        return false;
-    } else if (sentidoInput.length === 0) {
-        alert("Por favor, seleccione el sentido de la rotación.");
-        return false;
-    } else if (cursos.length === 0) {
-        alert("Por favor, seleccione al menos un curso.");
-        return false;
+    if ( fecha_a.isBefore(fecha_b) ) {
+        return -1;
     }
-
-    cursos.each((indexCurso, elementCurso) => {
-        let asigs = new Map();
-        let asigsPeriodo = asignacionsExamen.find(element => element.periodo === periodo).asignaturas
-            .filter(element => element.curso === elementCurso.value);
-
-        function ordenarPorFecha(a, b) {
-            let fecha_a = parseFechaMoment(a.examen.fecha), fecha_b = parseFechaMoment(b.examen.fecha);
-
-            if ( fecha_a.isBefore(fecha_b) ) {
-                return -1;
-            }
-            if ( fecha_a.isAfter(fecha_b) ) {
-                return 1;
-            }
-            return 0;
-        }
-
-        function ordenarPorFechaInversa(a, b) {
-            let fecha_a = parseFechaMoment(a, "DD/MM/YYYY"), fecha_b = parseFechaMoment(b, "DD/MM/YYYY");
-
-            if ( fecha_a.isBefore(fecha_b) ) {
-                return 1;
-            }
-            if ( fecha_a.isAfter(fecha_b) ) {
-                return -1;
-            }
-            return 0;
-        }
-
-        if (sentido === "1") {
-            asigsPeriodo.sort( ordenarPorFecha );
-        } else if (sentido === "0") {
-            asigsPeriodo.sort( ordenarPorFechaInversa );
-        }
-        
-        asigsPeriodo.forEach((asig) => {
-            let fecha = asig.examen.fecha;
-
-            if (!asigs.get(fecha)) {
-                asigs.set(fecha, []);
-            }
-
-            asigs.get(fecha).push(asig);
-        });
-
-        let fechas = Array.from( asigs.keys() );
-        for (var i = 0; i < fechas.length; i++) {
-            asigs.get(fechas[i]).forEach((asig) => {
-                let fechaNew;
-                if (i === (fechas.length - 1)) {
-                    fechaNew = parseFechaMoment(fechas[0]);
-                } else {
-                    fechaNew = parseFechaMoment(fechas[i + 1]);
-                }
-                
-                asig.examen.fecha = fechaNew.format("DD/MM/YYYY");
-                asig.examen.actualizar = true;
-
-                document
-                    .getElementById("date_" + asig.identificador + "_" + asig.examen.identificador +
-                    "_" + periodo).value = fechaNew.format("DD/MM/YYYY");
-            });
-        }
-    });
-
-    if (document.getElementById('buttonCalendario_div_' + periodo).innerHTML.trim() === 'Modo Lista') {
-        mostrarCalendario('calendario_' + periodo, true)
+    if ( fecha_a.isAfter(fecha_b) ) {
+        return 1;
     }
-    updateArraysCreate_Update_DeleteExamens();
-}
-
-function desplazarExamenes(periodo) {
-    let diasInput = $( '#modal-desplazar_' + periodo + ' input[name=' + periodo + '_dias-desplazamiento]' ).val();
-    let dias = Number(diasInput);
-    let sentidoInput = $( '#modal-desplazar_' + periodo + ' input[name=' + periodo + '_sentido-desplazamiento]:checked' );
-    let sentido = sentidoInput[0].value;
-    let cursos = $( '#modal-desplazar_' + periodo + ' input[name=' + periodo + '_cursos-desplazamiento]:checked' );
-
-    if (diasInput === "" && sentidoInput.length === 0 && cursos.length === 0) {
-        alert("Por favor, seleccione el número de días, el sentido del desplazamiento y al menos un curso.")
-        return false;
-    } else if (diasInput === "" && sentidoInput.length === 0) {
-        alert("Por favor, seleccione el número de días y el sentido del desplazamiento.")
-        return false;
-    } else if (diasInput === "" && cursos.length === 0) {
-        alert("Por favor, seleccione el número de días y al menos un curso.")
-        return false;
-    } else if (sentidoInput.length === 0 && cursos.length === 0) {
-        alert("Por favor, seleccione el sentido del desplazamiento y al menos un curso.")
-        return false;
-    } else if (diasInput === "") {
-        alert("Por favor seleccione el número de días.")
-        return false;
-    } else if (sentidoInput.length === 0) {
-        alert("Por favor, seleccione el sentido del desplazamiento.")
-        return false;
-    } else if (cursos.length === 0) {
-        alert("Por favor, seleccione al menos un curso.")
-        return false;
-    }
-
-    cursos.each((indexCurso, elementCurso) => {
-        let asigs = asignacionsExamen.find(element => element.periodo === periodo).asignaturas
-            .filter(element => element.curso === elementCurso.value);
-
-        asigs.forEach((asig) => {
-            let fechaOld;
-            if (asig.examen.fecha.includes("-")) {
-                fechaOld = moment(asig.examen.fecha, "YYYY-MM-DD");
-            } else if (asig.examen.fecha.includes ("/")) {
-                fechaOld = moment(asig.examen.fecha, "DD/MM/YYYY");
-            }
-            let weekdayOld = fechaOld.day();
-            let fechaNew;
-            if (sentido) {
-                let weekendsDays;
-                if (weekdayOld === 6) {
-                    weekendsDays = 2 * Math.floor((weekdayOld + dias - 6) / 7) + 1;
-                } else {
-                    weekendsDays = 2 * Math.floor((weekdayOld + dias + 1) / 7);
-                }
-                fechaNew = fechaOld.add(dias + weekendsDays, 'days');
-            } else if (!sentido) {
-                let weekendsDays;
-                if (weekdayOld === 0) {
-                    weekendsDays = 2 * Math.floor(dias / 7) + 1;
-                } else {
-                    weekendsDays = 2 * Math.floor((dias - weekdayOld + 7) / 7);
-                }
-                fechaNew = fechaOld.subtract(dias + weekendsDays, 'days');
-            }
-            asig.examen.fecha = fechaNew.format("DD/MM/YYYY");
-            asig.examen.actualizar = true;
-
-            document
-                .getElementById("date_" + asig.identificador + "_" + asig.examen.identificador +
-                "_" + periodo).value = asig.examen.fecha;
-        });
-    });
-
-    if (document.getElementById('buttonCalendario_div_' + periodo).innerHTML.trim() === 'Modo Lista') {
-        mostrarCalendario('calendario_' + periodo, true)
-    }
-    updateArraysCreate_Update_DeleteExamens();
+    return 0;
 }
 
 function desplazarExamenes2(periodo, sentido, rotar) {
@@ -1013,18 +863,6 @@ function desplazarExamenes2(periodo, sentido, rotar) {
 
     let asigs = asignacionsExamen.find(element => element.periodo === periodo).asignaturas
         .filter(asignatura => !(asignatura.examen.fecha == null));
-
-    function ordenarPorFecha(a, b) {
-        let fecha_a = parseFechaMoment(a.examen.fecha), fecha_b = parseFechaMoment(b.examen.fecha);
-
-        if ( fecha_a.isBefore(fecha_b) ) {
-            return -1;
-        }
-        if ( fecha_a.isAfter(fecha_b) ) {
-            return 1;
-        }
-        return 0;
-    }
 
     asigs.sort( ordenarPorFecha );
 
@@ -1063,11 +901,15 @@ function desplazarExamenes2(periodo, sentido, rotar) {
         asig.examen.fecha = fechaNew.format("DD/MM/YYYY");
         asig.examen.actualizar = true;
 
-        document
-            .getElementById("date_" + asig.identificador + "_" + asig.examen.identificador +
-            "_" + periodo).value = asig.examen.fecha;
-        $('#date_' + asig.identificador + "_" + asig.examen.identificador +
-            "_" + periodo).datepicker('update');
+        if (document.getElementById("date_" + asig.identificador + "_" + asig.examen.identificador + "_" + periodo)) {
+                document.getElementById("date_" + asig.identificador + "_" + asig.examen.identificador + "_" + periodo)
+                    .value = asig.examen.fecha;
+                $('#date_' + asig.identificador + "_" + asig.examen.identificador + "_" + periodo)
+                    .datepicker('update');
+        } else {
+            document.getElementById("date_" + asig.identificador + "__" + periodo).value = asig.examen.fecha;
+            $('#date_' + asig.identificador + "__" + periodo).datepicker('update');
+        }
     });
 
     if (document.getElementById('buttonCalendario_div_' + periodo).innerHTML.trim() === 'Modo Lista') {
@@ -1075,16 +917,6 @@ function desplazarExamenes2(periodo, sentido, rotar) {
     }
     updateArraysCreate_Update_DeleteExamens();
 }
-
-$('.modal-rotar').on('hidden.bs.modal', function () {
-    $( '.modal-rotar input[class=sentido-rotacion]:checked' ).each((index, sentido) => { sentido.checked = false });
-    $( '.modal-rotar input[class=cursos-rotacion]:checked' ).each((index, curso) => { curso.checked = false });
-});
-$('.modal-desplazar').on('hidden.bs.modal', function () {
-    $( '.modal-desplazar input[class=dias-desplazamiento]' ).each((index, dias) => { dias.value = 1 });
-    $( '.modal-desplazar input[class=sentido-desplazamiento]:checked' ).each((index, sentido) => { sentido.checked = false });
-    $( '.modal-desplazar input[class=cursos-desplazamiento]:checked' ).each((index, curso) => { curso.checked = false });
-});
 
 window.onbeforeunload = function(){
   updateArraysCreate_Update_DeleteExamens();
