@@ -22,6 +22,8 @@
                 <% } %>
                 <% if(vacio === true) { %>
                     <button type="button" class="btn btn-default"  title="Pulse para copiar eventos del año anterior"  onclick="copiar(<%=ano%>)"  >Copiar eventos</button>
+                <% }else{ %>
+                    <button type="button" class="btn btn-default"  title="Para copiar eventos del año anterior no debe haber ningún evento asignado" disabled >Copiar eventos</button>
                 <% } %>
                 <br>
                 <% if(ano == ano1) { %>

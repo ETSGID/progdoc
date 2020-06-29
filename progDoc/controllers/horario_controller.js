@@ -3,9 +3,11 @@ const models = require('../models');
 
 const op = Sequelize.Op;
 const estados = require('../estados');
+const enumsPD = require('../enumsPD');
 const funciones = require('../funciones');
 const progDocController = require('../controllers/progDoc_controller');
 const grupoController = require('./grupo_controller');
+
 
 // para obtener las notas definidas para el grupo completo no ligadas a asignatura
 async function getNotasGruposSinAsignatura(gruposBBDD) {
@@ -53,12 +55,12 @@ exports.getHorario = async function(req, res, next) {
   req.session.submenu = 'Horarios';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.originalUrl.toLowerCase().includes('consultar')
+    const view = req.session.menuBar === enumsPD.menuBar.consultar
       ? 'horarios/horariosConsultar'
       : 'horarios/horariosCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
@@ -74,12 +76,12 @@ exports.getHorario = async function(req, res, next) {
       estados.estadoProgDoc.abierto ||
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
         estados.estadoProgDoc.listo) &&
-    !req.originalUrl.toLowerCase().includes('consultar')
+    req.session.menuBar !== enumsPD.menuBar.consultar
   ) {
     res.render('horarios/horariosCumplimentar', {
       estado:
-        'Asignación de horarios ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe',
-      permisoDenegado: res.locals.permisoDenegado,
+        'Asignación de horarios ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
+      permisoDenegado: res.locals.permisoDenegado || null,
       menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
@@ -355,7 +357,7 @@ exports.getHorario = async function(req, res, next) {
         });
         const cancelarpath = `${req.baseUrl}/coordinador/horarios?planID=${req.session.planID}`;
         const nuevopath = `${req.baseUrl}/coordinador/guardarHorarios`;
-        const view = req.originalUrl.toLowerCase().includes('consultar')
+        const view = req.session.menuBar === enumsPD.menuBar.consultar
           ? 'horarios/horariosConsultar'
           : 'horarios/horariosCumplimentar';
         res.render(view, {
@@ -367,7 +369,7 @@ exports.getHorario = async function(req, res, next) {
           pdID,
           menu: req.session.menu,
           submenu: req.session.submenu,
-          permisoDenegado: res.locals.permisoDenegado,
+          permisoDenegado: res.locals.permisoDenegado || null,
           estadosHorario: estados.estadoHorario,
           estadosProgDoc: estados.estadoProgDoc,
           estadoHorarios:

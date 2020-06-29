@@ -59,10 +59,11 @@ module.exports = function(sequelize, DataTypes) {
       fechaExamenes: {
         type: DataTypes.DATE
       },
+      // calenadario de actividades
       estadoCalendario: {
         type: DataTypes.INTEGER
       },
-      // fecha actualización de calendario
+      // fecha actualización de calendario de actividades
       fechaCalendario: {
         type: DataTypes.DATE
       },

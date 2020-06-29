@@ -222,7 +222,7 @@ exports.getProgramacionDocente = async function(req, res, next) {
 };
 
 // TODO: cuando se añadan las otras funciones hay que ponerlas aquí
-// para comprobar si la pd se puede marcar como lista para que el jefe de estudios la cierre
+// para comprobar si la pd se puede marcar como lista para que Jefatura de Estudios la cierre
 exports.isPDLista = async function(progID, thenFunction) {
   // eslint-disable-next-line no-useless-catch
   try {

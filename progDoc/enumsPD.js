@@ -32,6 +32,20 @@ exports.delegacion = {
   [rols.SubdirectorPosgrado]: []
 };
 
+// type of permissions
+exports.permisions = {
+  consultar: 'consultar',
+  cumplimentar: 'cumplimentar'
+}
+
+// type of menu
+exports.menuBar = {
+  consultar: 'consultar',
+  cumplimentar: 'cumplimentar',
+  gestion: 'gestion',
+  historial: 'historial'
+}
+
 exports.eventoGeneral = {
   NoEditable: 0,
   Editable: 1

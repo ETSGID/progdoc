@@ -61,7 +61,7 @@ exports.gestionProgDoc = async function(req, res, next) {
           semestre: pdBBDD.semestre
         });
         // TODO: cuando se añadan las otras funciones hay que ponerlas aquí
-        // para comprobar si la pd se puede marcar como lista para que el jefe de estudios la cierre
+        // para comprobar si la pd se puede marcar como lista para que Jefatura de Estudios la cierre
         // si manualmente cambia algo de las otras partes para que al acceder a gestión cambie
         if (
           pdBBDD.estadoProGDoc === estados.estadoProgDoc.abierto &&
@@ -151,7 +151,7 @@ exports.gestionProgDoc = async function(req, res, next) {
       res.render('gestionPlanes/abrirCerrarPds', {
         planes: res.locals.planEstudios,
         pds,
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         pdsAnteriores,
         estadosProgDoc: estados.estadoProgDoc,
         anos,

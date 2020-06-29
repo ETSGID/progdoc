@@ -322,12 +322,12 @@ exports.getExamenesView = function(req, res) {
   Ojo también comprueba que no esté en incidencia para el JE
   */
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.originalUrl.toLowerCase().includes('consultar')
+    const view = req.session.menuBar === enumsPD.menuBar.consultar
       ? 'examenes/examenesConsultar'
       : 'examenes/examenesCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
@@ -345,7 +345,7 @@ exports.getExamenesView = function(req, res) {
     const cancelarpath = `${req.baseUrl}/coordinador/examenes?planID=${req.session.planID}`;
     const selectExamenespath = `${req.baseUrl}/coordinador/franjasexamenes?planID=${req.session.planID}`;
     const nuevopath = `${req.baseUrl}/coordinador/guardarExamenes`;
-    const view = req.originalUrl.toLowerCase().includes('consultar')
+    const view = req.session.menuBar === enumsPD.menuBar.consultar
       ? 'examenes/examenesConsultar'
       : 'examenes/examenesCumplimentar';
     res.render(view, {
@@ -361,7 +361,7 @@ exports.getExamenesView = function(req, res) {
       cursos: res.locals.cursos,
       menu: req.session.menu,
       submenu: req.session.submenu,
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       estadosExamen: estados.estadoExamen,
       estadosProgDoc: estados.estadoProgDoc,
       estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
@@ -383,7 +383,7 @@ exports.getFranjasView = function(req, res) {
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
     res.render(view, {
       existe: 'Programación docente no abierta',
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
@@ -407,7 +407,7 @@ exports.getFranjasView = function(req, res) {
       pdID: req.session.pdID,
       menu: req.session.menu,
       submenu: req.session.submenu,
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       estadosExamen: estados.estadoExamen,
       estadosProgDoc: estados.estadoProgDoc,
       estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],

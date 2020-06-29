@@ -4,12 +4,12 @@
         <input type="hidden" value="<%=ano%>" id="anoSeleccionado">
     <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
         <p><%=permisoDenegado%></p>
-    <%}else if(estado === 0){ %>
-        <p style="margin-top: 30px">Calendario no aprobado.</p>
     <%}else if(ano === null){ %>
         <p style="margin-top: 30px">Programación docente no abierta</p>
     <%}else{%>
-        
+        <%if(estado === 0){ %>
+            <p style="margin-top: 30px">Calendario no aprobado.  Se muestra la parte relativa al calendario general cumplimentada hasta el momento.</p>
+        <%}%>
         <div class="">       
             <h2>Calendario <%=ano%>/<%=parseInt(ano)+1%>
                 
@@ -232,11 +232,7 @@
                   </div>
                 </div>
               </div>
-</div>
-
-
-
-        
+</div>       
     <%}%>
 
 </div>

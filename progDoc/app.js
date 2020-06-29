@@ -74,7 +74,15 @@ app.use(
 // Rutas que no empiezan por /api/
 app.use(path.join(CONTEXT, 'api'), routerApi);
 // exit del cas el primero para que no entre en bucle. El cas es el encargado de eliminar la sesión
-app.get(path.join(CONTEXT, 'logout'), cas.logout);
+if (DEV === 'true') {
+  app.get(path.join(CONTEXT, 'logout'), (req, res, next) => {
+    req.session.destroy();
+    res.redirect(CONTEXT);
+  });
+} else {
+  app.get(path.join(CONTEXT, 'logout'), cas.logout);
+}
+
 app.use(partials());
 
 if (DEV === 'true') {

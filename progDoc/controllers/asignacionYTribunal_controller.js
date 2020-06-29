@@ -7,6 +7,7 @@ const models = require('../models');
 
 const op = Sequelize.Op;
 const estados = require('../estados');
+const enumsPD = require('../enumsPD');
 const funciones = require('../funciones');
 const progDocController = require('./progDoc_controller');
 const asignaturaController = require('./asignatura_controller');
@@ -167,12 +168,12 @@ exports.getAsignaciones = async function(req, res, next) {
   req.session.submenu = 'Profesores';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.originalUrl.toLowerCase().includes('consultar')
+    const view = req.session.menuBar === enumsPD.menuBar.consultar
       ? 'asignacionProfesores/asignacionesConsultar'
       : 'asignacionProfesores/asignacionesCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       profesores: null,
       menu: req.session.menu,
       submenu: req.session.submenu,
@@ -198,12 +199,12 @@ exports.getAsignaciones = async function(req, res, next) {
       estados.estadoProgDoc.abierto ||
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
         estados.estadoProgDoc.listo) &&
-    !req.originalUrl.toLowerCase().includes('consultar')
+    req.session.menuBar !== enumsPD.menuBar.consultar
   ) {
     res.render('asignacionProfesores/asignacionesCumplimentar', {
       estado:
-        'Asignación de profesores ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe',
-      permisoDenegado: res.locals.permisoDenegado,
+        'Asignación de profesores ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
+      permisoDenegado: res.locals.permisoDenegado || null,
       profesores: null,
       menu: req.session.menu,
       submenu: req.session.submenu,
@@ -226,13 +227,13 @@ exports.getAsignaciones = async function(req, res, next) {
     );
     let profesores;
     if (!departamentoExisteEnElPlan) {
-      const view = req.originalUrl.toLowerCase().includes('consultar')
+      const view = req.session.menuBar === enumsPD.menuBar.consultar
         ? 'asignacionProfesores/asignacionesConsultar'
         : 'asignacionProfesores/asignacionesCumplimentar';
       res.render(view, {
         existe:
           'El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior',
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         profesores: null,
         menu: req.session.menu,
         submenu: req.session.submenu,
@@ -246,11 +247,11 @@ exports.getAsignaciones = async function(req, res, next) {
         planEstudios: res.locals.planEstudios
       });
     } else if (res.locals.permisoDenegado) {
-      const view = req.originalUrl.toLowerCase().includes('consultar')
+      const view = req.session.menuBar === enumsPD.menuBar.consultar
         ? 'asignacionProfesores/asignacionesConsultar'
         : 'asignacionProfesores/asignacionesCumplimentar';
       res.render(view, {
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         asignacion: null,
         profesores: null,
         menu: req.session.menu,
@@ -278,7 +279,7 @@ exports.getAsignaciones = async function(req, res, next) {
         const nuevopath = `${req.baseUrl}/respdoc/editAsignacion`;
         // se usa cambiopath para cambiar a la asignacions de profesores por grupo o comun
         const cambiopath = `${req.baseUrl}/respdoc/editAsignacion/cambioModo`;
-        const view = req.originalUrl.toLowerCase().includes('consultar')
+        const view = req.session.menuBar === enumsPD.menuBar.consultar
           ? 'asignacionProfesores/asignacionesConsultar'
           : 'asignacionProfesores/asignacionesCumplimentar';
         res.render(view, {
@@ -295,7 +296,7 @@ exports.getAsignaciones = async function(req, res, next) {
           pdID,
           menu: req.session.menu,
           submenu: req.session.submenu,
-          permisoDenegado: res.locals.permisoDenegado,
+          permisoDenegado: res.locals.permisoDenegado || null,
           departamentoID: req.session.departamentoID,
           departamentosResponsables: res.locals.departamentosResponsables,
           estadosProfesor: estados.estadoProfesor,
@@ -492,7 +493,7 @@ exports.guardarAsignacion = async function(req, res, next) {
       as[0].DepartamentoResponsable !== departamentoID
     ) {
       res.locals.permisoDenegado =
-        'No tiene permiso contacte con el Jefe de Estudios si debería tenerlo'; // lo unico que hara será saltarse lo siguiente
+        'No tiene permiso contacte con Jefatura de Estudios si debería tenerlo'; // lo unico que hara será saltarse lo siguiente
     }
     if (!res.locals.permisoDenegado) {
       if (coordinador || !req.body.coordinador) {
@@ -695,12 +696,12 @@ exports.getTribunales = async function(req, res, next) {
   req.session.submenu = 'Tribunales';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.originalUrl.toLowerCase().includes('consultar')
+    const view = req.session.menuBar === enumsPD.menuBar.consultar
       ? 'tribunales/tribunalesConsultar'
       : 'tribunales/tribunalesCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       profesores: null,
       menu: req.session.menu,
       submenu: req.session.submenu,
@@ -726,13 +727,13 @@ exports.getTribunales = async function(req, res, next) {
       estados.estadoProgDoc.abierto ||
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
         estados.estadoProgDoc.listo) &&
-    !req.originalUrl.toLowerCase().includes('consultar')
+    req.session.menuBar !== enumsPD.menuBar.consultar
   ) {
     // hay que comprobar que no sea una url de consultar.
     res.render('tribunales/tribunalesCumplimentar', {
       estado:
-        'Asignación de tribunales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe',
-      permisoDenegado: res.locals.permisoDenegado,
+        'Asignación de tribunales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
+      permisoDenegado: res.locals.permisoDenegado || null,
       profesores: null,
       menu: req.session.menu,
       submenu: req.session.submenu,
@@ -770,13 +771,13 @@ exports.getTribunales = async function(req, res, next) {
         obj => obj.codigo === departamentoID
       );
       if (!departamentoExisteEnElPlan) {
-        const view = req.originalUrl.toLowerCase().includes('consultar')
+        const view = req.session.menuBar === enumsPD.menuBar.consultar
           ? 'tribunales/tribunalesConsultar'
           : 'tribunales/tribunalesCumplimentar';
         res.render(view, {
           existe:
             'El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior',
-          permisoDenegado: res.locals.permisoDenegado,
+          permisoDenegado: res.locals.permisoDenegado || null,
           profesores: null,
           menu: req.session.menu,
           submenu: req.session.submenu,
@@ -792,11 +793,11 @@ exports.getTribunales = async function(req, res, next) {
           onlyProfesor: true
         });
       } else if (res.locals.permisoDenegado) {
-        const view = req.originalUrl.toLowerCase().includes('consultar')
+        const view = req.session.menuBar === enumsPD.menuBar.consultar
           ? 'tribunales/tribunalesConsultar'
           : 'tribunales/tribunalesCumplimentar';
         res.render(view, {
-          permisoDenegado: res.locals.permisoDenegado,
+          permisoDenegado: res.locals.permisoDenegado || null,
           profesores: null,
           menu: req.session.menu,
           submenu: req.session.submenu,
@@ -893,7 +894,7 @@ exports.getTribunales = async function(req, res, next) {
             asignaturasAntiguas.push(as);
           }
         });
-        const view = req.originalUrl.toLowerCase().includes('consultar')
+        const view = req.session.menuBar === enumsPD.menuBar.consultar
           ? 'tribunales/tribunalesConsultar'
           : 'tribunales/tribunalesCumplimentar';
         const nuevopath = `${req.baseUrl}/respdoc/guardarTribunales`;
@@ -913,7 +914,7 @@ exports.getTribunales = async function(req, res, next) {
           pdID,
           submenu: req.session.submenu,
           menu: req.session.menu,
-          permisoDenegado: res.locals.permisoDenegado,
+          permisoDenegado: res.locals.permisoDenegado || null,
           departamentoID: req.session.departamentoID,
           departamentosResponsables: res.locals.departamentosResponsables,
           estadosTribunal: estados.estadoTribunal,

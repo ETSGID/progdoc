@@ -1,4 +1,5 @@
-<%- include ../menus/gestion.ejs %>
+
+<%- include ../menus/menuSelector.ejs %>
 <div class="contenido">
     <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
         <p><%=permisoDenegado%></p>
@@ -153,11 +154,8 @@
         else{
             divSemestre.className += " hidden"
             buttonSpan.className = "glyphicon glyphicon-chevron-down"
-
         }
-
     }
-
     function buscadorOnKeyPress(key){
         if(key.keyCode == 13){
             $('#aulas1').children('div').each(function () {
@@ -178,7 +176,6 @@
             });
         }
     }
-
     function changeCuatrimestre(){
         document.getElementById("pdfIframe").style.display = "none";
         if(document.getElementById("cuatrimestreSelector").value === "Primer cuatrimestre"){
@@ -216,7 +213,6 @@
             }
         })
     }
-
     document.addEventListener("DOMContentLoaded", function() {
         let element3 = document.getElementById('anoSelector');
         if (element3){
@@ -230,7 +226,6 @@
     th{
         text-align: center;
     }
-
     td{
         text-align: center;
     }

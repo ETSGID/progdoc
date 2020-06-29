@@ -26,7 +26,7 @@ exports.getAcronimos = async function(req, res, next) {
       res.render('acronimos/acronimosJE', {
         existe:
           'Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada',
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
@@ -46,7 +46,7 @@ exports.getAcronimos = async function(req, res, next) {
         asignaturasPorCursos[as.curso].push(as);
       });
       res.render('acronimos/acronimosJE', {
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,

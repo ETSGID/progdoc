@@ -48,6 +48,7 @@ router.all('*', (req, res, next) => {
       rol: enumsPD.rols.Admin,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
   }
@@ -55,6 +56,7 @@ router.all('*', (req, res, next) => {
     rol: enumsPD.rols.SubdirectorPosgrado,
     PlanEstudioCodigo: null,
     DepartamentoCodigo: null,
+    tipo: enumsPD.permisions.cumplimentar,
     condiciones: []
   });
   next();
@@ -64,8 +66,14 @@ router.all('*', rolController.comprobarRolYPersona);
 
 // Unauthenticated clients will be redirected to the CAS login and then back to
 // this route once authenticated.
-router.get('/', (req, res) => {
-  res.render('index');
+router.get('/', async (req, res) => {
+  req.session.user.rols = await rolController.getRolsPersona(
+    req.session.user.PersonaId
+  );
+  res.render('index', {
+    rolsSistema: enumsPD.rols,
+    rolsDelegados: enumsPD.delegacion
+  });
 });
 
 // ruta para comprobar permisos para Asignar profesores(responsableDocente es principal)
@@ -75,6 +83,7 @@ router.get(
     req.session.menu = [];
     req.session.menu.push('drop_ProgDoc');
     req.session.menu.push('element_ProgDocCumplimentar');
+    req.session.menuBar = enumsPD.menuBar.cumplimentar;
     next();
   },
   planController.getPlanes,
@@ -87,6 +96,7 @@ router.get(
     req.session.menu = [];
     req.session.menu.push('drop_ProgDoc');
     req.session.menu.push('element_ProgDocConsultar');
+    req.session.menuBar = enumsPD.menuBar.consultar;
     next();
   },
   planController.getPlanes,
@@ -99,6 +109,7 @@ router.get(
     req.session.menu = [];
     req.session.menu.push('drop_ProgDoc');
     req.session.menu.push('element_ProgDocHistorial');
+    req.session.menuBar = enumsPD.menuBar.historial;
     next();
   },
   planController.getPlanes,
@@ -111,6 +122,7 @@ router.get(
     req.session.menu = [];
     req.session.menu.push('drop_ProgDoc');
     req.session.menu.push('element_ProgDocGestion');
+    req.session.menuBar = enumsPD.menuBar.gestion;
     next();
   },
   (req, res, next) => {
@@ -118,6 +130,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -148,6 +161,7 @@ router.get(
       rol: enumsPD.rols.ResponsableDocente,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoTribunales', req.session.departamentoID],
@@ -163,6 +177,7 @@ router.get(
       rol: enumsPD.rols.DirectorDepartamento,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoTribunales', req.session.departamentoID],
@@ -182,6 +197,7 @@ router.get(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoTribunales', req.session.departamentoID],
@@ -197,6 +213,7 @@ router.get(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoTribunales', req.session.departamentoID],
@@ -213,6 +230,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -261,6 +279,7 @@ router.get(
       rol: enumsPD.rols.ResponsableDocente,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProfesores', req.session.departamentoID],
@@ -280,6 +299,7 @@ router.get(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoProfesores', req.session.departamentoID],
@@ -296,6 +316,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -317,6 +338,7 @@ router.get(
       rol: enumsPD.rols.ResponsableDocente,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProfesores', req.session.departamentoID],
@@ -336,6 +358,7 @@ router.get(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoProfesores', req.session.departamentoID],
@@ -351,6 +374,7 @@ router.get(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoProfesores', req.session.departamentoID],
@@ -367,6 +391,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -389,6 +414,7 @@ router.post(
       rol: enumsPD.rols.ResponsableDocente,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProfesores', req.session.departamentoID],
@@ -404,6 +430,7 @@ router.post(
       rol: enumsPD.rols.DirectorDepartamento,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProfesores', req.session.departamentoID],
@@ -423,6 +450,7 @@ router.post(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoProfesores', req.session.departamentoID],
@@ -438,6 +466,7 @@ router.post(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoProfesores', req.session.departamentoID],
@@ -454,6 +483,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -476,6 +506,7 @@ router.post(
       rol: enumsPD.rols.ResponsableDocente,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProfesores', req.session.departamentoID],
@@ -495,6 +526,7 @@ router.post(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoProfesores', req.session.departamentoID],
@@ -510,6 +542,7 @@ router.post(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoProfesores', req.session.departamentoID],
@@ -526,6 +559,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -547,6 +581,7 @@ router.post(
       rol: enumsPD.rols.ResponsableDocente,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoTribunales', req.session.departamentoID],
@@ -562,6 +597,7 @@ router.post(
       rol: enumsPD.rols.DirectorDepartamento,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoTribunales', req.session.departamentoID],
@@ -581,6 +617,7 @@ router.post(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoTribunales', req.session.departamentoID],
@@ -596,6 +633,7 @@ router.post(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoTribunales', req.session.departamentoID],
@@ -612,6 +650,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -634,6 +673,7 @@ router.post(
       rol: enumsPD.rols.ResponsableDocente,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoTribunales', req.session.departamentoID],
@@ -649,6 +689,7 @@ router.post(
       rol: enumsPD.rols.DirectorDepartamento,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoTribunales', req.session.departamentoID],
@@ -668,6 +709,7 @@ router.post(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoTribunales', req.session.departamentoID],
@@ -683,6 +725,7 @@ router.post(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoTribunales', req.session.departamentoID],
@@ -699,6 +742,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -722,6 +766,7 @@ router.get(
       rol: enumsPD.rols.ResponsableDocente,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProfesores', req.session.departamentoID],
@@ -737,6 +782,7 @@ router.get(
       rol: enumsPD.rols.DirectorDepartamento,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: req.session.departamentoID,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProfesores', req.session.departamentoID],
@@ -756,6 +802,7 @@ router.get(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoProfesores', req.session.departamentoID],
@@ -771,6 +818,7 @@ router.get(
         rol: enumsPD.rols.CoordinadorTitulacion,
         PlanEstudioCodigo: req.session.planID,
         DepartamentoCodigo: null,
+        tipo: enumsPD.permisions.cumplimentar,
         condiciones: [
           {
             condicion: ['estadoProfesores', req.session.departamentoID],
@@ -787,6 +835,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -816,6 +865,7 @@ router.get(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoHorarios'],
@@ -831,6 +881,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -853,6 +904,7 @@ router.get(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoExamenes'],
@@ -868,6 +920,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -879,6 +932,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -911,6 +965,7 @@ router.get(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoExamenes'],
@@ -926,6 +981,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -937,6 +993,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -966,6 +1023,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoHorarios'],
@@ -981,6 +1039,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1002,6 +1061,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoHorarios'],
@@ -1017,6 +1077,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1038,6 +1099,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoHorarios'],
@@ -1053,6 +1115,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1073,6 +1136,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoHorarios'],
@@ -1088,6 +1152,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1109,6 +1174,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoExamenes'],
@@ -1124,6 +1190,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1135,6 +1202,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1146,6 +1214,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1170,6 +1239,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoExamenes'],
@@ -1185,6 +1255,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1196,6 +1267,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1207,6 +1279,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1228,6 +1301,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoHorarios'],
@@ -1243,6 +1317,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1264,6 +1339,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoExamenes'],
@@ -1279,6 +1355,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1290,6 +1367,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1321,6 +1399,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1338,6 +1417,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1356,6 +1436,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1373,6 +1454,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1388,6 +1470,7 @@ router.put(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1403,6 +1486,7 @@ router.delete(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1418,6 +1502,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1434,6 +1519,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1451,6 +1537,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1472,7 +1559,9 @@ router.post(
     res.locals.rols.push({
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
-      DepartamentoCodigo: null
+      DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
+      condiciones: []
     });
     next();
   },
@@ -1493,6 +1582,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['reabierto'],
@@ -1516,6 +1606,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1549,6 +1640,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1567,6 +1659,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1585,6 +1678,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1602,6 +1696,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1619,6 +1714,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1636,6 +1732,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1647,6 +1744,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1658,6 +1756,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1679,6 +1778,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1690,6 +1790,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1701,6 +1802,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1722,6 +1824,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1741,6 +1844,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1757,6 +1861,7 @@ router.delete(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1773,6 +1878,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1789,6 +1895,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1805,6 +1912,7 @@ router.get(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
 
@@ -1826,6 +1934,7 @@ router.delete(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1843,6 +1952,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1870,6 +1980,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1881,6 +1992,13 @@ router.post(
 );
 
 // -----Aulas-----//
+
+router.get(
+  '/consultar/aulas',
+  planController.getPlanes,
+  aulaController.getAulas
+);
+
 router.get(
   '/gestion/aulas',
   (req, res, next) => {
@@ -1888,6 +2006,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1903,6 +2022,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1919,6 +2039,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: []
     });
     next();
@@ -1944,6 +2065,7 @@ router.get(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoCalendario'],
@@ -1959,6 +2081,7 @@ router.get(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -1978,6 +2101,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoCalendario'],
@@ -1993,6 +2117,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -2014,6 +2139,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoCalendario'],
@@ -2029,6 +2155,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -2050,6 +2177,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoCalendario'],
@@ -2065,6 +2193,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -2085,6 +2214,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoCalendario'],
@@ -2100,6 +2230,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -2121,6 +2252,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoCalendario'],
@@ -2136,6 +2268,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -2157,6 +2290,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoCalendario'],
@@ -2172,6 +2306,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],
@@ -2193,6 +2328,7 @@ router.post(
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoCalendario'],
@@ -2208,6 +2344,7 @@ router.post(
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
       DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
       condiciones: [
         {
           condicion: ['estadoProGDoc'],

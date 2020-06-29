@@ -3,6 +3,8 @@ const moment = require('moment');
 const models = require('../models');
 const funciones = require('../funciones');
 const estados = require('../estados');
+const enumsPD = require('../enumsPD');
+
 
 const op = Sequelize.Op;
 const progDocController = require('./progDoc_controller');
@@ -15,13 +17,13 @@ exports.getActividadParcial = async function(req, res, next) {
   const { pdID } = req.session;
   let grupos;
   let asignaturas;
-  const view = req.originalUrl.toLowerCase().includes('consultar')
+  const view = req.session.menuBar === enumsPD.menuBar.consultar
     ? 'actividades/actividadesConsultar'
     : 'actividades/actividadesCumplimentar';
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
     res.render(view, {
       existe: 'Programación docente no abierta',
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
@@ -49,12 +51,12 @@ exports.getActividadParcial = async function(req, res, next) {
       estados.estadoProgDoc.abierto ||
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
         estados.estadoProgDoc.listo) &&
-    !req.originalUrl.toLowerCase().includes('consultar')
+    req.session.menuBar !== enumsPD.menuBar.consultar
   ) {
     res.render(view, {
       estado:
-        'Asignación de actividades parciales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y el Jefe de Estudios la apruebe',
-      permisoDenegado: res.locals.permisoDenegado,
+        'Asignación de actividades parciales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
+      permisoDenegado: res.locals.permisoDenegado || null,
       menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
@@ -91,7 +93,7 @@ exports.getActividadParcial = async function(req, res, next) {
         asignaturas:asignaturas, grupos:grupos, cursos: cursos})
       */
       res.render(view, {
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,

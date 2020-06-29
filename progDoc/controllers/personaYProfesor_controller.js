@@ -111,7 +111,7 @@ exports.getPersonasPagination = async function (req, res, next) {
     const pages = Math.ceil(count / itemsPerPage);
     res.render('personas/personas', {
       count,
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       page,
       pages,
       personas,

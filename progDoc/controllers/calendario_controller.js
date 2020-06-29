@@ -218,7 +218,7 @@ function generarArrayDias(dic_eventos, ano) {
               dic_dias[enumsPD.diasDeSemana.Miercoles] += 1;
             }
           }
-        } catch (error) {}
+        } catch (error) { }
         if (noContar) {
         }
       }
@@ -315,7 +315,7 @@ function generarArrayDias(dic_eventos, ano) {
  * @param {*} next
  */
 
-exports.getCalendario = async function(req, res, next) {
+exports.getCalendario = async function (req, res, next) {
   try {
     const { ano } = req;
     req.session.ano = req.ano_mostrar;
@@ -348,7 +348,7 @@ exports.getCalendario = async function(req, res, next) {
         await models.Calendario.findCreateFind({ where: objeto_ano });
         req.session.submenu = 'Calendario';
         res.render('calendarios/calendario', {
-          permisoDenegado: res.locals.permisoDenegado,
+          permisoDenegado: res.locals.permisoDenegado || null,
           menu: req.session.menu,
           submenu: req.session.submenu,
           planID: req.session.planID,
@@ -367,7 +367,7 @@ exports.getCalendario = async function(req, res, next) {
       } else {
         req.session.submenu = 'Calendario';
         res.render('calendarios/calendario', {
-          permisoDenegado: res.locals.permisoDenegado,
+          permisoDenegado: res.locals.permisoDenegado || null,
           planID: req.session.planID,
           menu: req.session.menu,
           submenu: req.session.submenu,
@@ -399,7 +399,7 @@ exports.getCalendario = async function(req, res, next) {
         await models.Calendario.findCreateFind({ where: objeto_ano });
         req.session.submenu = 'Calendario';
         res.render('calendarios/calendarioCumplimentarJefeDeEstudios', {
-          permisoDenegado: res.locals.permisoDenegado,
+          permisoDenegado: res.locals.permisoDenegado || null,
           menu: req.session.menu,
           submenu: req.session.submenu,
           general,
@@ -415,7 +415,7 @@ exports.getCalendario = async function(req, res, next) {
       } else {
         req.session.submenu = 'Calendario';
         res.render('calendarios/calendarioCumplimentarJefeDeEstudios', {
-          permisoDenegado: res.locals.permisoDenegado,
+          permisoDenegado: res.locals.permisoDenegado || null,
           menu: req.session.menu,
           submenu: req.session.submenu,
           planID: req.session.planID,
@@ -435,7 +435,7 @@ exports.getCalendario = async function(req, res, next) {
     next(error);
   }
 };
-exports.getCalendarioPlanConsultar = async function(req, res, next) {
+exports.getCalendarioPlanConsultar = async function (req, res, next) {
   try {
     req.calendario = {};
     const { ano } = req;
@@ -443,7 +443,7 @@ exports.getCalendarioPlanConsultar = async function(req, res, next) {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioConsultar', {
         CONTEXT,
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
@@ -474,7 +474,7 @@ exports.getCalendarioPlanConsultar = async function(req, res, next) {
       await models.Calendario.findCreateFind({ where: objeto_ano });
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioConsultar', {
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
@@ -486,7 +486,7 @@ exports.getCalendarioPlanConsultar = async function(req, res, next) {
     } else if (resultado[0].estado === 0) {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioConsultar', {
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
@@ -498,7 +498,7 @@ exports.getCalendarioPlanConsultar = async function(req, res, next) {
     } else {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioConsultar', {
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
@@ -520,7 +520,7 @@ exports.getCalendarioPlanConsultar = async function(req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.getCalendarioPDF = async function(req, res, next) {
+exports.getCalendarioPDF = async function (req, res, next) {
   try {
     req.calendario = {};
     if (res.locals.progDoc) {
@@ -544,13 +544,14 @@ exports.getCalendarioPDF = async function(req, res, next) {
         await models.Calendario.findCreateFind({ where: objeto_ano });
         req.calendario.estado = 0;
         next();
-      } else if (resultado[0].estado === 0) {
-        req.calendario.estado = 0;
-        next();
       } else {
-        (req.calendario.calendario = array_datos[1]),
-          (req.calendario.array_dias = array_datos[0]),
-          (req.calendario.estado = 1);
+        req.calendario.calendario = array_datos[1];
+        req.calendario.array_dias = array_datos[0];
+        if (resultado[0].estado === 0) {
+          req.calendario.estado = 0;
+        } else {
+          req.calendario.estado = 1;
+        }
         next();
       }
     } else {
@@ -577,7 +578,7 @@ exports.getCalendarioPDF = async function(req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.eventosDiccionario = async function(req, res, next) {
+exports.eventosDiccionario = async function (req, res, next) {
   try {
     let dic_eventos = {};
     if (req.dic_eventos !== undefined) {
@@ -639,11 +640,11 @@ exports.eventosDiccionario = async function(req, res, next) {
         if (e.fechaInicio.split('-')[1] === e.fechaFin.split('-')[1]) {
           var mensaje = `${e.fechaInicio.split('-')[2]}-${
             e.fechaFin.split('-')[2]
-          }: ${nombre}`;
+            }: ${nombre}`;
         } else {
           var mensaje = `${e.fechaInicio.split('-')[2]}/${
             e.fechaInicio.split('-')[1]
-          }-${e.fechaFin.split('-')[2]}/${e.fechaFin.split('-')[1]}: ${nombre}`;
+            }-${e.fechaFin.split('-')[2]}/${e.fechaFin.split('-')[1]}: ${nombre}`;
         }
         var { fechaFin } = e;
       }
@@ -687,7 +688,7 @@ exports.eventosDiccionario = async function(req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.eventosPlanDiccionario = async function(req, res, next) {
+exports.eventosPlanDiccionario = async function (req, res, next) {
   try {
     const dic_eventos = {};
     const editados = [];
@@ -717,7 +718,7 @@ exports.eventosPlanDiccionario = async function(req, res, next) {
           if (nombre.substring(0, 11) === 'eliminado//') {
             return;
           }
-        } catch (error) {}
+        } catch (error) { }
         let tipo = '';
         if (nombre.includes('festivo//')) {
           tipo = 'festivo';
@@ -747,13 +748,13 @@ exports.eventosPlanDiccionario = async function(req, res, next) {
           if (e.fechaInicio.split('-')[1] === e.fechaFin.split('-')[1]) {
             var mensaje = `${e.fechaInicio.split('-')[2]}-${
               e.fechaFin.split('-')[2]
-            }: ${nombre}`;
+              }: ${nombre}`;
           } else {
             var mensaje = `${e.fechaInicio.split('-')[2]}/${
               e.fechaInicio.split('-')[1]
-            }-${e.fechaFin.split('-')[2]}/${
+              }-${e.fechaFin.split('-')[2]}/${
               e.fechaFin.split('-')[1]
-            }: ${nombre}`;
+              }: ${nombre}`;
           }
           var { fechaFin } = e;
         }
@@ -790,7 +791,7 @@ exports.eventosPlanDiccionario = async function(req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.anoDeTrabajo = function(req, res, next) {
+exports.anoDeTrabajo = function (req, res, next) {
   // Lo primero que hace el codigo es ver si se le ha metido el año como query
   let { ano } = req.query;
 
@@ -827,7 +828,7 @@ exports.anoDeTrabajo = function(req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.anoDeTrabajoPDF = function(req, res, next) {
+exports.anoDeTrabajoPDF = function (req, res, next) {
   /*
     let planID = req.session.pdID;
     let ano = planID.split("_")[2].substring(0,4);
@@ -852,7 +853,7 @@ exports.anoDeTrabajoPDF = function(req, res, next) {
   next();
 };
 
-exports.postEventoGeneral = async function(req, res, next) {
+exports.postEventoGeneral = async function (req, res, next) {
   try {
     let { fechaFin } = req.query;
     if (fechaFin !== undefined) {
@@ -893,7 +894,7 @@ exports.postEventoGeneral = async function(req, res, next) {
   }
 };
 
-exports.deleteEventoGeneral = async function(req, res, next) {
+exports.deleteEventoGeneral = async function (req, res, next) {
   try {
     await models.EventoPlan.destroy({
       where: {
@@ -913,7 +914,7 @@ exports.deleteEventoGeneral = async function(req, res, next) {
 };
 
 // EN REALIDAD SE GUARDA COMO ELIMINADO EN LA BBDD
-exports.deleteEventoPlan = async function(req, res, next) {
+exports.deleteEventoPlan = async function (req, res, next) {
   try {
     const { planID } = req.session;
     const eventoGeneralId = req.query.identificador;
@@ -953,7 +954,7 @@ exports.deleteEventoPlan = async function(req, res, next) {
   }
 };
 
-exports.postEventoPlan = async function(req, res, next) {
+exports.postEventoPlan = async function (req, res, next) {
   try {
     const { planID } = req.session;
     let eventoGeneralId = req.query.identificador;
@@ -1030,7 +1031,7 @@ exports.postEventoPlan = async function(req, res, next) {
   }
 };
 
-exports.aprobarGeneral = async function(req, res, next) {
+exports.aprobarGeneral = async function (req, res, next) {
   try {
     const { ano } = req.query;
     if (ano === undefined) {
@@ -1053,14 +1054,14 @@ exports.aprobarGeneral = async function(req, res, next) {
   }
 };
 
-exports.getCalendarioPlan = async function(req, res, next) {
+exports.getCalendarioPlan = async function (req, res, next) {
   try {
     const { ano } = req;
     if (ano === null) {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioCumplimentar', {
         CONTEXT,
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
@@ -1090,7 +1091,7 @@ exports.getCalendarioPlan = async function(req, res, next) {
       await models.Calendario.findCreateFind({ where: objeto_ano });
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioCumplimentar', {
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
@@ -1102,7 +1103,7 @@ exports.getCalendarioPlan = async function(req, res, next) {
     } else {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioCumplimentar', {
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
@@ -1118,7 +1119,7 @@ exports.getCalendarioPlan = async function(req, res, next) {
   }
 };
 
-exports.editablePlan = async function(req, res, next) {
+exports.editablePlan = async function (req, res, next) {
   try {
     const { planID } = req.session;
     const { identificador } = req.query;
@@ -1151,7 +1152,7 @@ exports.editablePlan = async function(req, res, next) {
   }
 };
 
-exports.copiarEventos = async function(req, res, next) {
+exports.copiarEventos = async function (req, res, next) {
   const { ano } = req.query;
   if (ano === undefined) {
     res.status(400);

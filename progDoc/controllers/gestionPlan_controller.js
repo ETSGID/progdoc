@@ -33,7 +33,7 @@ exports.getGestionPlanes = async function(req, res, next) {
     const departamentos = await departamentoController.getAllDepartamentos();
     res.render('gestionPlanes/gestionPlanes', {
       estado,
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
@@ -499,7 +499,7 @@ exports.updateAsignaturasApiUpm = async function(req, res, next) {
         /*
         añado los nuevos o quito los departamentos que desaparecen en el plan.
         Si aparece uno nuevo se pone en cerrado
-        el jefe de estudios debería retraer su estado
+        Jefatura de Estudios debería retraer su estado
         si desaparece un departamentoResponsable también desaparecerá en el estado
         */
         const estadoProfesores = {};

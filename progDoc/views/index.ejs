@@ -1,4 +1,27 @@
 <div>
-<h1 style="margin:20px">Bienvenido</h1>
+<h1 style="margin:20px">Bienvenido <%=session.user.cn%></h1>
+<%if (session.user.PersonaId === null){%>
+    <h2 style="margin:20px">Usted no se encuentra registrado en el sistema, si considera que debería estarlo contacte con Jefatura de Estudios para que le dé de alta</h2>
+<%}else if(!session.user.rols || session.user.rols.length === 0 ){%>
+    <h2 style="margin:20px">Usted se encuentra registrado en el sistema pero no posee ningún rol asociado al mismo</h2>
+<%}else{%>
+    <h2 style="margin:20px">Usted se encuentra registrado en el sistema y posee los siguientes roles:</h2>
+    <ul>
+        <% session.user.rols.forEach(rol => {%>
+            <li>
+                <%=rol.rol%>
+                <%if(rol.planEstudioCodigo){%>
+                    del plan <%=rol.PlanEstudioCodigo%>
+                <%}if(rol.DepartamentoCodigo){%>
+                    del departamento <%=rol.DepartamentoCodigo%>
+                <%} Object.keys(rolsDelegados).forEach(key => {%>
+                    <%if(rolsDelegados[key].includes(rol.rol)){%>
+                        delegado de <%=key%>
+                   <%}
+                })%>
+            </li>   
+        <%})%>
+    </ul> 
+<%}%>
 </div>
 

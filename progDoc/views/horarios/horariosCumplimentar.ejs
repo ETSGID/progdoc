@@ -22,7 +22,7 @@
   <ul>
     <li>Abierto: el coordinador del plan de estudios </li>
     <li>Aprobado: nadie tiene permiso </li>
-    <li>Incidencia: el jefe de estudios</li>
+    <li>Incidencia: Jefatura de Estudios</li>
   </ul>
 <%}else{%>
         <form id="formulario" autocomplete="off" action="<%=aprobarpath%>" method="post" >
@@ -302,7 +302,6 @@ function cambiarPorClase(clase_1, clase_2) {
 
     function sustituirClase(clase, asigsTmp) {
         $( 'td.' + clase ).each(function( index ) {
-        // console.log(this);
 
         let curso = this.id.split("_")[1];
         let grupo = Number(this.id.split("_")[2]);

@@ -1,0 +1,16 @@
+<%switch (session.menuBar){
+    case 'cumplimentar':%>
+        <%- include ./cumplimentar.ejs %>
+        <% break;
+    case 'consultar':%>
+        <%- include ./consultar.ejs %>
+        <% break;
+    case 'gestion':%>
+        <%- include ./gestion.ejs %>
+        <% break;
+    case 'historial':%>
+        <%- include ./historial.ejs %>
+        <% break;
+    default:
+        break;
+}%>

@@ -2,7 +2,7 @@
 const Sequelize = require('sequelize');
 const ejs = require('ejs');
 const pdf = require('html-pdf');
-const { configPdfCerrado } = require('./pdf_controller');
+const { configPdf } = require('./pdf_controller');
 const models = require('../models');
 
 const op = Sequelize.Op;
@@ -67,6 +67,7 @@ async function getAllGruposConAula(progDocs) {
  */
 
 exports.getAulas = async function(req, res, next) {
+  req.session.submenu = 'Aulas';
   let anoSeleccionado = req.body.ano || req.query.ano;
   const cuatrimestreSeleccionado =
     req.body.cuatrimestre || 'Primer cuatrimestre';
@@ -283,10 +284,9 @@ exports.getAulas = async function(req, res, next) {
     aulas1.sort((a, b) => (a.aulaOrder > b.aulaOrder ? 1 : -1));
     aulas2.sort((a, b) => (a.aulaOrder > b.aulaOrder ? 1 : -1));
     if (!req.body.generarPdf) {
-      req.session.submenu = 'Aulas';
       res.render('aulas/aulas', {
         CONTEXT,
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
@@ -331,7 +331,7 @@ exports.getAulas = async function(req, res, next) {
       file = `${anoCodigo}/aulas/${file}`;
       // console.log("the fileç: ", file);
       const ruta = `${PATH_PDF}/pdfs/${file}`;
-      const configPdfOptions = configPdfCerrado;
+      const configPdfOptions = configPdf(false, null, null);
       // save file
       // eslint-disable-next-line no-unused-vars
       pdf.create(html, configPdfOptions).toFile(ruta, (err, resp) => {

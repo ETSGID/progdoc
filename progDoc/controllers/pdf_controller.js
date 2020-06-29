@@ -14,7 +14,7 @@ const cursoController = require('./curso_controller');
 
 const op = Sequelize.Op;
 
-const configPdf = function(draft, planNombre, pdId) {
+const configPdf = function (draft, planNombre, pdId) {
   const base = path.resolve('public'); //  just relative path to absolute path
   const styleHeader = 'margin:0; font-size: 6pt; text-align: center';
   const heightHeader = '35mm';
@@ -23,15 +23,21 @@ const configPdf = function(draft, planNombre, pdId) {
     ? '<div class="draft"><p class="draftText">Borrador</div>'
     : '';
   const borrador = draft ? '(Borrador),' : '';
-  const textoHeader = `<p style="${styleHeader}">${planNombre.toUpperCase()}</p>
-  <p style="${styleHeader}">E.T.S. Ingenieros de Telecomunicación</p>
-  <p style="${styleHeader}">
-  Versión ${progDocController.getVersionPdNormalizedWithoutV(pdId)}, ${borrador}
-  ${moment()
-    .locale('es')
-    .format('LL')}
+  let textoHeader = '';
+  if (planNombre) {
+    textoHeader += `<p style="${styleHeader}">${planNombre.toUpperCase()}</p>`
+  }
+  textoHeader += `<p style="${styleHeader}">E.T.S. Ingenieros de Telecomunicación</p>
+  <p style="${styleHeader}">`
+  if (pdId) {
+    textoHeader += ` Versión ${progDocController.getVersionPdNormalizedWithoutV(pdId)}, `
+  }
+  textoHeader += ` ${borrador}
+    ${moment()
+      .locale('es')
+      .format('LL')}
+    </p>`;
 
-  </p>`;
   return {
     format: 'A4', // allowed units: A3, A4, A5, Legal, Letter, Tabloid
     base: `file://${base}/`, // you have to set 'file://' Ahí puedo ya referenciar a todos por ejemplo una imagen images/imagen.png, o un css
@@ -362,9 +368,9 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
           // debo convertir la fecha a formato dd/mm/yyyy
           nuevoExamen.fecha = `${
             asignaturaConExamen['Examens.fecha'].split('-')[2]
-          }/${asignaturaConExamen['Examens.fecha'].split('-')[1]}/${
+            }/${asignaturaConExamen['Examens.fecha'].split('-')[1]}/${
             asignaturaConExamen['Examens.fecha'].split('-')[0]
-          }`;
+            }`;
           nuevoExamen.horaInicio = asignaturaConExamen['Examens.horaInicio'];
           nuevoExamen.duracion = asignaturaConExamen['Examens.duracion'];
           p.examenes.push(nuevoExamen);
@@ -400,59 +406,32 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
     });
     promises2.push(
       new Promise((resolve, reject) => {
-        // console.log("11");
-        if (calendario.estado === 0) {
-          ejs.renderFile(
-            './views/pdfs/pdfAsignaturas.ejs',
-            {
-              asignaturas,
-              asignaturasViejas,
-              cursosConGrupos,
-              profesores,
-              calendario: [],
-              array_dias: [],
-              anoSeleccionado: progDocController.getAnoPd(pdID),
-              estadoCalendario: 0,
-              progDoc: pd,
-              version: progDocController.getVersionPdNormalizedWithoutV(pdID)
-            },
-            (err, str) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(str);
-              }
+        ejs.renderFile(
+          './views/pdfs/pdfAsignaturas.ejs',
+          {
+            asignaturas,
+            asignaturasViejas,
+            cursosConGrupos,
+            profesores,
+            calendario: calendario.calendario || [],
+            array_dias: calendario.array_dias || [],
+            anoSeleccionado: progDocController.getAnoPd(pdID),
+            calendarioEstado: calendario.estado,
+            progDoc: pd,
+            version: progDocController.getVersionPdNormalizedWithoutV(pdID)
+          },
+          (err, str) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(str);
             }
-          );
-        } else {
-          ejs.renderFile(
-            './views/pdfs/pdfAsignaturas.ejs',
-            {
-              asignaturas,
-              asignaturasViejas,
-              cursosConGrupos,
-              profesores,
-              calendario: calendario.calendario,
-              array_dias: calendario.array_dias,
-              anoSeleccionado: progDocController.getAnoPd(pdID),
-              estadoCalendario: 1,
-              progDoc: pd,
-              version: progDocController.getVersionPdNormalizedWithoutV(pdID)
-            },
-            (err, str) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(str);
-              }
-            }
-          );
-        }
+          }
+        );
       })
     );
     promises2.push(
       new Promise((resolve, reject) => {
-        // console.log("22");
         ejs.renderFile(
           './views/pdfs/pdfGruposyHorarios.ejs',
           {
@@ -473,7 +452,6 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
     );
     promises2.push(
       new Promise((resolve, reject) => {
-        // console.log("33");
         asignacionsExamen.forEach(as => {
           const fr = franjasExamen.find(obj => obj.periodo === as.periodo);
           // eslint-disable-next-line no-param-reassign
@@ -502,7 +480,6 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
               console.log('error');
               reject(err);
             } else {
-              // console.log("éxito!");
               resolve(str);
             }
           }
@@ -511,7 +488,6 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
     );
     promises2.push(
       new Promise((resolve, reject) => {
-        // console.log("44");
         ejs.renderFile(
           './views/pdfs/pdfActividades.ejs',
           {
@@ -592,7 +568,6 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
     )}/${progDocController.getPlanPd(pdID)}/${progDocController.getTipoPd(
       pdID
     )}/${progDocController.getVersionPdNormalized(pdID)}${folder}${fileName}`;
-    // console.log("the fileç: ", file);
     const ruta = `${PATH_PDF}/pdfs/${file}`;
     // si incluye palabra draft incluye el estilo de draft
     const configPdfOptions = configPdf(
@@ -613,8 +588,8 @@ async function generatePDFFile(pdID, tipoPDF, calendario) {
   }
 }
 
-exports.generarPDF = async function(req, res, next) {
-  const view = req.originalUrl.toLowerCase().includes('consultar')
+exports.generarPDF = async function (req, res, next) {
+  const view = req.session.menuBar === enumsPD.menuBar.consultar
     ? 'pdfs/pdfDraftGenerado'
     : 'pdfCerrado';
   if (view === 'pdfs/pdfDraftGenerado') {
@@ -642,29 +617,32 @@ exports.generarPDF = async function(req, res, next) {
       const pdfDatos = await generatePDFFile(pdID, view, req.calendario);
       // eslint-disable-next-line
       pdf.create(pdfDatos.html, pdfDatos.configPdfOptions).toFile(pdfDatos.ruta, (err, resp) => {
-          if (err) return console.log(err);
-          switch (view) {
-            case 'pdfs/pdfDraftGenerado':
-              res.render(view, {
-                file: pdfDatos.file,
-                planID: req.session.planID,
-                planEstudios: res.locals.planEstudios,
-                pdID,
-                menu: req.session.menu,
-                submenu: req.session.submenu
-              });
-              break;
-            case 'pdfCerrado':
-              next();
-              break;
-            default:
-              next();
-              break;
-          }
-        });
+        if (err) return console.log(err);
+        switch (view) {
+          case 'pdfs/pdfDraftGenerado':
+            res.render(view, {
+              file: pdfDatos.file,
+              planID: req.session.planID,
+              planEstudios: res.locals.planEstudios,
+              pdID,
+              menu: req.session.menu,
+              submenu: req.session.submenu
+            });
+            break;
+          case 'pdfCerrado':
+            next();
+            break;
+          default:
+            next();
+            break;
+        }
+      });
     } catch (error) {
       console.log('Error:', error);
       next(error);
     }
   }
 };
+
+
+exports.configPdf = configPdf;

@@ -1,18 +1,19 @@
 const Sequelize = require('sequelize');
 const models = require('../models');
 const estados = require('../estados');
+const enumsPD = require('../enumsPD');
 const funciones = require('../funciones');
 
 exports.getGrupos = async function(req, res, next) {
   req.session.submenu = 'Grupos';
-  const view = req.originalUrl.toLowerCase().includes('consultar')
+  const view = req.session.menuBar === enumsPD.menuBar.consultar
     ? 'grupos/gruposConsultar'
     : 'grupos/gruposJE';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
     res.render(view, {
       existe: 'Programación docente no abierta',
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
@@ -26,12 +27,12 @@ exports.getGrupos = async function(req, res, next) {
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] &&
     estados.estadoProgDoc.incidencia !==
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] &&
-    !req.originalUrl.toLowerCase().includes('consultar')
+    req.session.menuBar !== enumsPD.menuBar.consultar
   ) {
     res.render('grupos/gruposJE', {
       existe:
         'Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada',
-      permisoDenegado: res.locals.permisoDenegado,
+      permisoDenegado: res.locals.permisoDenegado || null,
       menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
@@ -90,7 +91,7 @@ exports.getGrupos = async function(req, res, next) {
       const nuevopath = `${req.baseUrl}/gestionGrupos/guardarGruposJE`;
       const cancelarpath = `${req.baseUrl}/gestionGrupos/getGrupos?planID=${req.session.planID}`;
       res.render(view, {
-        permisoDenegado: res.locals.permisoDenegado,
+        permisoDenegado: res.locals.permisoDenegado || null,
         menu: req.session.menu,
         submenu: req.session.submenu,
         nuevopath,
