@@ -66,15 +66,7 @@ router.all('*', rolController.comprobarRolYPersona);
 
 // Unauthenticated clients will be redirected to the CAS login and then back to
 // this route once authenticated.
-router.get('/', async (req, res) => {
-  req.session.user.rols = await rolController.getRolsPersona(
-    req.session.user.PersonaId
-  );
-  res.render('index', {
-    rolsSistema: enumsPD.rols,
-    rolsDelegados: enumsPD.delegacion
-  });
-});
+router.get('/', rolController.getRolsPersonaView);
 
 // ruta para comprobar permisos para Asignar profesores(responsableDocente es principal)
 router.get(

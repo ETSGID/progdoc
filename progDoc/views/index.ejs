@@ -9,11 +9,11 @@
     <ul>
         <% session.user.rols.forEach(rol => {%>
             <li>
-                <%=rol.rol%>
-                <%if(rol.planEstudioCodigo){%>
-                    del plan <%=rol.PlanEstudioCodigo%>
+                <b><%=rol.rol%></b>
+                <%if(rol.PlanEstudioCodigo){%>
+                    del plan <i><%=rol['PlanEstudio.nombre'] || rol['PlanEstudio.nombreCompleto']%> (<%=rol.PlanEstudioCodigo%>)</i>
                 <%}if(rol.DepartamentoCodigo){%>
-                    del departamento <%=rol.DepartamentoCodigo%>
+                    del departamento <i><%=rol['Departamento.acronimo'] || rol['Departamento.nombre']%> (<%=rol.DepartamentoCodigo%>)</i>
                 <%} Object.keys(rolsDelegados).forEach(key => {%>
                     <%if(rolsDelegados[key].includes(rol.rol)){%>
                         delegado de <%=key%>
@@ -23,5 +23,6 @@
         <%})%>
     </ul> 
 <%}%>
+<p style="margin:20px">Pulse en el <b>menú de la izquierda</b> para acceder a las funciones de programación docente</p>
 </div>
 

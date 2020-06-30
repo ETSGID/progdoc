@@ -17,6 +17,17 @@ async function getRolsPersona(personaId) {
         where: {
           PersonaId: personaId
         },
+        // left join
+        include: [
+          {
+            model: models.PlanEstudio,
+            attributes: ['nombre', 'nombreCompleto']
+          },
+          {
+            model: models.Departamento,
+            attributes: ['nombre', 'acronimo']
+          }
+        ],
         raw: true
       });
     }
@@ -26,6 +37,19 @@ async function getRolsPersona(personaId) {
     throw error;
   }
 }
+
+exports.getRolsPersonaView = async function (req, res, next) {
+  try {
+    req.session.user.rols = await getRolsPersona(req.session.user.PersonaId);
+    res.render('index', {
+      rolsSistema: enumsPD.rols,
+      rolsDelegados: enumsPD.delegacion
+    });
+  } catch (error) {
+    console.log('Error:', error);
+    next(error);
+  }
+};
 
 // comprueba el rol o si es delegado de dicho rol en función del estado de la PD pasada
 exports.comprobarRols = async function (req, res, next) {
@@ -190,9 +214,10 @@ exports.getRoles = async function (req, res, next) {
     // aqui llamar a la funcion de sacar los nombres de cada id
     const nuevopath = `${req.baseUrl}/gestionRoles/guardarRoles`;
     const cancelarpath = `${req.baseUrl}/gestionRoles`;
-    const view = req.session.menuBar === enumsPD.menuBar.consultar
-      ? 'roles/rolesConsultar'
-      : 'roles/gestionRoles';
+    const view =
+      req.session.menuBar === enumsPD.menuBar.consultar
+        ? 'roles/rolesConsultar'
+        : 'roles/gestionRoles';
     // foco al cambiar de plan desde la view para que vuelva a ese punto
     const foco = !!req.query.foco;
     res.render(view, {
