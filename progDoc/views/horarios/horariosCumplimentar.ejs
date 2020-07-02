@@ -294,8 +294,8 @@ function cambiarPorClase(clase_1, clase_2) {
     }
 
     // Se guarda una copia de las asignaturas a intercambiar
-    asigs1Tmp = $( 'td.' + clase_1 + ' > span').clone();
-    asigs2Tmp = $( 'td.' + clase_2 + ' > span').clone();
+    asigs1Tmp = $( 'td.' + clase_1).clone();
+    asigs2Tmp = $( 'td.' + clase_2).clone();
     
     sustituirClase(clase_1, asigs2Tmp);
     sustituirClase(clase_2, asigs1Tmp);
@@ -401,7 +401,8 @@ function cambiarPorClase(clase_1, clase_2) {
         }
 
         // Actualizamos el span con la información de la asignatura y el texto HTML que se presenta
-        $( this ).find('span').replaceWith(asigsTmp.get(index));
+        $( this ).empty();
+        $( this ).append(asigsTmp.get(index).children)
         });
     }
 }
