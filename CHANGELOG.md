@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [1.0.6] - 2020-07-08
+### Added
+- **.dockerignore**
+### Changed
+- Colores de **Aulas** .
+- Orden pestañas de **Gestión**.
+- **Dockerfile** instalación módulos con *npm ci*.
+### Fixed
+- Modal **Actividades** calendario *orientation top*.
+- Bug intercambios **Horarios**.
+
 ## [1.0.5] - 2020-06-30
 ### Added
 - Desplazamiento de **Exámenes**.
