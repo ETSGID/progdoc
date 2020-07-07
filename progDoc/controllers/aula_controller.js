@@ -11,17 +11,15 @@ const progDocController = require('./progDoc_controller');
 const paletaColores = [
   'maroon',
   '#FF5733',
-  '#47C242',
+  'blue',
   '#942653',
   'darkgreen',
-  'red',
-  'blue',
-  '#1B6A92',
-  '#8D1B92',
-  '#943026',
-  '#42AFC2',
-  '#946726',
-  '#000000'
+  '#8e402a',
+  '#47C242',
+  '#1A5E80',
+  '#DC5B00',
+  '#8B4513',
+  '#002000'
 ];
 
 // le pasas un string y lo convierte en un int de 32 bits
