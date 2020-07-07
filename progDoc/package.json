@@ -10,7 +10,7 @@
   "dependencies": {
     "axios": "^0.18.1",
     "body-parser": "^1.18.2",
-    "bootstrap-select": "^1.13.1",
+    "bootstrap-select": "^1.13.18",
     "cas-authentication": "git+https://github.com/javicond3/cas-authentication.git",
     "connect-session-sequelize": "^6.0.0",
     "cookie-parser": "~1.4.3",
