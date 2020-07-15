@@ -1,11 +1,14 @@
-<div>
-<h1 style="margin:20px">Bienvenido <%=session.user.cn%></h1>
+<div style="margin:20px">
+<h1>Bienvenido a la aplicación de Programación Docente.</h1>
+<p>Puede consultar el estado de las programaciones docentes y el historial a través del 
+    <button style="background:none;border:none;outline:none;" onclick="clickButton('drop_ProgDoc')"><b><u>menu de la izquierda</u></b></button>.
+</p>
 <%if (session.user.PersonaId === null){%>
-    <h2 style="margin:20px">Usted no se encuentra registrado en el sistema, si considera que debería estarlo contacte con Jefatura de Estudios para que le dé de alta</h2>
+    <p>Usted no tiene ningún rol en el sistema.</p>
 <%}else if(!session.user.rols || session.user.rols.length === 0 ){%>
-    <h2 style="margin:20px">Usted se encuentra registrado en el sistema pero no posee ningún rol asociado al mismo</h2>
+    <p>Usted no tiene ningún rol en el sistema.<p>
 <%}else{%>
-    <h2 style="margin:20px">Usted se encuentra registrado en el sistema y posee los siguientes roles:</h2>
+    <p>Usted tiene los siguientes roles:</h2>
     <ul>
         <% session.user.rols.forEach(rol => {%>
             <li>
@@ -23,6 +26,15 @@
         <%})%>
     </ul> 
 <%}%>
-<p style="margin:20px">Pulse en el <b>menú de la izquierda</b> para acceder a las funciones de programación docente</p>
+<p>Si considera que debería tener un rol distinto (responsable docente, coordinador de titulación, delegado, etc.)  contacte con Jefatura de Estudios para otorgar los permisos pertinentes.</p>
+<p>Puede consultar los roles y sus permisos en la sección  
+    <button style="background:none;border:none;outline:none;" onclick="clickButton('element_ProgDocAyuda')"><b><u>'Ayuda'</u></b></button>.
+</p>
+
 </div>
+<script>
+    function clickButton(id){
+        document.getElementById(id).click();
+    }
+</script>
 
