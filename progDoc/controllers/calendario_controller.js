@@ -4,6 +4,9 @@ const moment = require('moment');
 const models = require('../models');
 const enumsPD = require('../enumsPD');
 
+const Sequelize = require('sequelize');
+const op = Sequelize.Op;
+
 function comprobarColor(buffer_eventos, eventos, dia) {
   let code = -1;
   const nuevo_buffer = [];
@@ -657,7 +660,7 @@ exports.eventosDiccionario = async function (req, res, next) {
         editable: e.editable,
         mensaje: ` ${mensaje}`,
         tipo,
-        identificadorPlan: '0'
+        identificadorEventoPlan: '0'
       };
       try {
         dic_eventos[e.fechaInicio].push(objeto_evento);
@@ -715,6 +718,8 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
         editados.push(e.EventoGeneralId);
         let nombre = e.evento;
         try {
+          // los eventos generales eliminados
+          // en un calendario de un plan no se devuelven
           if (nombre.substring(0, 11) === 'eliminado//') {
             return;
           }
@@ -767,7 +772,7 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
           mensaje: ` ${mensaje}`,
           tipo,
           identificador: e.EventoGeneralId,
-          identificadorPlan: e.identificador
+          identificadorEventoPlan: e.identificador
         };
         try {
           dic_eventos[e.fechaInicio].push(objeto_evento);
@@ -853,6 +858,7 @@ exports.anoDeTrabajoPDF = function (req, res, next) {
   next();
 };
 
+//create or update eventoGeneral
 exports.postEventoGeneral = async function (req, res, next) {
   try {
     let { fechaFin } = req.query;
@@ -872,16 +878,12 @@ exports.postEventoGeneral = async function (req, res, next) {
       fechaFin,
       editable
     };
+    //si no existe se crea
     if (req.query.identificador === '0') {
       await models.EventoGeneral.findCreateFind({ where: evento });
       // res.status(409);
       res.json({ estado: 'exito' });
     } else {
-      await models.EventoPlan.destroy({
-        where: {
-          EventoGeneralId: req.query.identificador
-        }
-      });
       await models.EventoGeneral.update(evento, {
         where: { identificador: req.query.identificador }
       });
@@ -896,11 +898,16 @@ exports.postEventoGeneral = async function (req, res, next) {
 
 exports.deleteEventoGeneral = async function (req, res, next) {
   try {
+    // borra el evento de los planes especificos
+    // que habian sido borrados antes
+    // los que ya habían sido modificados los deja
     await models.EventoPlan.destroy({
       where: {
-        EventoGeneralId: req.query.identificador
+        EventoGeneralId: req.query.identificador,
+        evento: { [op.like]: 'eliminado//%' }
       }
     });
+    //borra el evento general
     await models.EventoGeneral.destroy({
       where: {
         identificador: req.query.identificador
@@ -914,16 +921,18 @@ exports.deleteEventoGeneral = async function (req, res, next) {
 };
 
 // EN REALIDAD SE GUARDA COMO ELIMINADO EN LA BBDD
+// cuando se elimina un evento general en un calendario particular
 exports.deleteEventoPlan = async function (req, res, next) {
   try {
     const { planID } = req.session;
     const eventoGeneralId = req.query.identificador;
-    let nombre = req.query.evento;
     const { fechaInicio } = req.query;
+    let nombre = req.query.evento;
+    // si no es un eventoGeneral simplemente se borra
     if (eventoGeneralId === 'null') {
       await models.EventoPlan.destroy({
         where: {
-          identificador: req.query.identificadorPlan
+          identificador: req.query.identificadorEventoPlan
         }
       });
       // res.status(409);
@@ -953,7 +962,7 @@ exports.deleteEventoPlan = async function (req, res, next) {
     next(error);
   }
 };
-
+//create or edit eventoPlan
 exports.postEventoPlan = async function (req, res, next) {
   try {
     const { planID } = req.session;
@@ -979,6 +988,7 @@ exports.postEventoPlan = async function (req, res, next) {
     if (fechaFin !== undefined) {
       fechaFin = moment(fechaFin, 'YYYY-MM-DD');
     }
+    // update eventoPlan no asociado a evento general
     if (eventoGeneralId === 'null') {
       const evento = {
         evento: nombre,
@@ -989,24 +999,25 @@ exports.postEventoPlan = async function (req, res, next) {
         EventoGeneralId: null
       };
       await models.EventoPlan.update(evento, {
-        where: { identificador: parseInt(req.query.identificadorPlan) }
+        where: { identificador: parseInt(req.query.identificadorEventoPlan) }
       });
       // res.status(409);
       res.json({ estado: 'exito' });
     } else if (eventoGeneralId === '0') {
-      eventoGeneralId = null;
+      // create eventoPlan no asociado a evento general
       const evento = {
         evento: nombre,
         color: undefined,
         fechaInicio: moment(fechaInicio, 'YYYY-MM-DD'),
         fechaFin,
         PlanEstudioId: planID,
-        EventoGeneralId: eventoGeneralId
+        EventoGeneralId: null
       };
       await models.EventoPlan.findCreateFind({ where: evento });
       // res.status(409);
       res.json({ estado: 'exito' });
     } else {
+      // create or update evento asociado a general 
       const evento = {
         evento: nombre,
         color: undefined,
@@ -1031,17 +1042,25 @@ exports.postEventoPlan = async function (req, res, next) {
   }
 };
 
-exports.aprobarGeneral = async function (req, res, next) {
+exports.trasladarGeneral = async function (req, res, next) {
   try {
     const { ano } = req.query;
+    let { newEstado } = req.query;
+    newEstado = parseInt(newEstado);
     if (ano === undefined) {
       res.status(400);
       res.json({
         estado: 'falta año'
       });
+    } else if (newEstado !== 0 && newEstado !== 1) {
+      res.status(400);
+      res.json({
+        estado: 'quiere pasar el calendario a un estado incorrecto'
+      });
     } else {
+
       await models.Calendario.update(
-        { estado: 1 },
+        { estado: newEstado },
         { where: { ano: parseInt(ano) } }
       );
       res.json({
@@ -1126,11 +1145,14 @@ exports.editablePlan = async function (req, res, next) {
     const { editable } = req.query;
     if (editable === 'false') {
       await models.EventoPlan.destroy({
-        where: { EventoGeneralId: identificador }
+        where: {
+          EventoGeneralId: identificador,
+          PlanEstudioId: planID
+        }
       });
       res.json({ estado: 'exito' });
     } else {
-      const evento_general = await models.EventoGeneral.find({
+      const evento_general = await models.EventoGeneral.findOne({
         where: {
           identificador
         }
@@ -1143,7 +1165,13 @@ exports.editablePlan = async function (req, res, next) {
         PlanEstudioId: planID,
         EventoGeneralId: identificador
       };
-      await models.EventoPlan.findCreateFind({ where: evento });
+      await models.EventoPlan.findOrCreate({
+        where: {
+          PlanEstudioId: planID,
+          EventoGeneralId: identificador
+        },
+        defaults: evento
+      });
       res.json({ estado: 'exito' });
     }
   } catch (error) {
@@ -1181,77 +1209,50 @@ exports.copiarEventos = async function (req, res, next) {
         const e = eventosGeneral[i];
         const nombre = e.evento;
         if (nombre.includes('festivo//')) {
-          e.fechaInicio =
-            String(parseInt(e.fechaInicio.substring(0, 4), 10) + 1) +
-            e.fechaInicio.substring(4, 10);
+          e.fechaInicio = moment(e.fechaInicio).add(1, 'year').format('YYYY-MM-DD')
 
           if (e.fechaFin !== null) {
-            e.fechaFin =
-              String(parseInt(e.fechaFin.substring(0, 4), 10) + 1) +
-              e.fechaFin.substring(4, 10);
+            e.fechaFin = moment(e.fechaFin).add(1, 'year').format('YYYY-MM-DD')
           }
           delete e.identificador;
-
-          await models.EventoGeneral.findCreateFind({ where: e, transaction });
+          await models.EventoGeneral.findOrCreate({ where: e, transaction });
         } else if (nombre.includes('especial//')) {
         } else {
           let { fechaInicio } = e;
           let { fechaFin } = e;
           if (e.fechaFin === null) {
-            const nuevaFecha = new Date(
-              parseInt(fechaInicio.substring(0, 4)) + 1,
-              parseInt(fechaInicio.substring(5, 7) - 1),
-              parseInt(fechaInicio.substring(8, 10))
-            );
-            if (nuevaFecha.getDay() === 0) {
-              nuevaFecha.setDate(nuevaFecha.getDate() + 1);
-            } else if (nuevaFecha.getDay() === 6) {
-              nuevaFecha.setDate(nuevaFecha.getDate() + 2);
+            let nuevaFecha = moment(fechaInicio).add(1, 'year')
+            if (nuevaFecha.day() === 0) {
+              nuevaFecha = nuevaFecha.add(1, 'day');
+            } else if (nuevaFecha.day() === 6) {
+              nuevaFecha = nuevaFecha.add(2, 'day');
             }
 
-            fechaInicio = `${String(nuevaFecha.getFullYear())}-${String(
-              nuevaFecha.getMonth() + 1
-            )}-${String(nuevaFecha.getDate())}`;
-
-            e.fechaInicio = fechaInicio;
+            fechaInicio = nuevaFecha;
+            e.fechaInicio = fechaInicio.format('YYYY-MM-DD');
             delete e.identificador;
-
-            await models.EventoGeneral.findCreateFind({
+            await models.EventoGeneral.findOrCreate({
               where: e,
               transaction
             });
           } else {
-            const nuevaFecha = new Date(
-              parseInt(fechaInicio.substring(0, 4)) + 1,
-              parseInt(fechaInicio.substring(5, 7) - 1),
-              parseInt(fechaInicio.substring(8, 10))
-            );
-            const nuevaFechaFin = new Date(
-              parseInt(fechaFin.substring(0, 4)) + 1,
-              parseInt(fechaFin.substring(5, 7) - 1),
-              parseInt(fechaFin.substring(8, 10))
-            );
-
-            if (nuevaFecha.getDay() === 0) {
-              nuevaFecha.setDate(nuevaFecha.getDate() + 1);
-              nuevaFechaFin.setDate(nuevaFechaFin.getDate() + 1);
-            } else if (nuevaFecha.getDay() === 6) {
-              nuevaFecha.setDate(nuevaFecha.getDate() + 2);
-              nuevaFechaFin.setDate(nuevaFechaFin.getDate() + 2);
+            let nuevaFecha = moment(fechaInicio).add(1, 'year')
+            let nuevaFechaFin = moment(fechaFin).add(1, 'year')
+            if (nuevaFecha.day() === 0) {
+              nuevaFecha = nuevaFecha.add(1, 'day');
+              nuevaFechaFin = nuevaFechaFin.add(1, 'day');
+            } else if (nuevaFecha.day() === 6) {
+              nuevaFecha = nuevaFecha.add(2, 'day');
+              nuevaFechaFin = nuevaFechaFin.add(2, 'day');
             }
 
-            fechaInicio = `${String(nuevaFecha.getFullYear())}-${String(
-              nuevaFecha.getMonth() + 1
-            )}-${String(nuevaFecha.getDate())}`;
-            fechaFin = `${String(nuevaFechaFin.getFullYear())}-${String(
-              nuevaFechaFin.getMonth() + 1
-            )}-${String(nuevaFechaFin.getDate())}`;
+            fechaInicio = nuevaFecha;
+            fechaFin = nuevaFechaFin;
 
-            e.fechaInicio = fechaInicio;
-            e.fechaFin = fechaFin;
+            e.fechaInicio = fechaInicio.format('YYYY-MM-DD');
+            e.fechaFin = fechaFin.format('YYYY-MM-DD');
             delete e.identificador;
-
-            await models.EventoGeneral.findCreateFind({
+            await models.EventoGeneral.findOrCreate({
               where: e,
               transaction
             });

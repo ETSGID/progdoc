@@ -1864,7 +1864,7 @@ router.delete(
 );
 
 router.post(
-  '/gestion/calendario/aprobarGeneral',
+  '/gestion/calendario/trasladarGeneral',
   (req, res, next) => {
     res.locals.rols.push({
       rol: enumsPD.rols.JefeEstudios,
@@ -1877,7 +1877,7 @@ router.post(
   },
   planController.getPlanes,
   rolController.comprobarRols,
-  calendarioController.aprobarGeneral
+  calendarioController.trasladarGeneral
 );
 
 router.post(

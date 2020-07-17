@@ -1,0 +1,46 @@
+<button type="button" class="btn btn-default" data-toggle="popover" title="Leyenda de colores" data-content="">Leyenda de colores</button>
+
+<div id="myPopoverContent" style="display: none;">
+    <table border="1" style="width:100%;  font-size: 17px;">
+        <tr>
+            <th style="text-align: center">Evento</th>
+            <th style="text-align: center">Color</th>
+        </tr>
+        <tr>
+            <td>Días no lectivos o de ajuste</td>
+            <td style="background-color: SpringGreen"></td>
+        </tr>
+        <tr>
+            <td>Días especiales</td>
+            <td style="background-color: red"></td>
+        </tr>
+        <tr>
+            <td>Exámenes</td>
+            <td style="background-color: yellow"></td>
+        </tr>
+        <tr>
+            <td>Defensas de TFTs</td>
+            <td style="background-color: LightSkyBlue"></td>
+        </tr>
+        <tr>
+            <td>Días festivos o no lectivos oficiales UPM</td>
+            <td style="background-color: grey"></td>
+        </tr>
+        <tr>
+            <td>Fechas importantes</td>
+            <td style="background-color: Orange"></td>
+        </tr>
+    </table>
+</div>
+
+
+<script>
+$('[data-toggle=popover]').popover({
+
+content: $('#myPopoverContent').html(),
+html: true
+
+}).click(function() {
+$(this).popover('show');
+});
+</script>

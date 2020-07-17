@@ -7,65 +7,12 @@
     <%}else{%>
         <input type="hidden" value="<%=ano%>" id="anoSeleccionado">
         <div class="">       
-            <h2>Calendario por titulación
-                
-                <button type="button" class="btn btn-default" data-toggle="popover" title="Leyenda de colores" data-content="">Leyenda de colores</button>
-                
-               
-                <small>En esta interfaz puedes definir eventos editables por titulación.</small>
-                
-            </h2>
-
-            
+            <h2>Calendario por titulación 
+                <%- include ./popoverEvents.ejs %>
+                <small>En esta interfaz puedes definir eventos editables por titulación.</small>     
+            </h2>   
         </div>
         
-        <div id="myPopoverContent" style="display: none;">
-            <table border="1" style="width:100%;  font-size: 17px;">
-                <tr>
-                    <th style="text-align: center">Evento</th>
-                    <th style="text-align: center">Color</th>
-                </tr>
-                <tr>
-                    <td>Días no lectivos o de ajuste</td>
-                    <td style="background-color: SpringGreen"></td>
-                </tr>
-                <tr>
-                    <td>Días especiales</td>
-                    <td style="background-color: red"></td>
-                </tr>
-                <tr>
-                    <td>Exámenes</td>
-                    <td style="background-color: yellow"></td>
-                </tr>
-                <tr>
-                    <td>Defensas de TFTs</td>
-                    <td style="background-color: LightSkyBlue"></td>
-                </tr>
-                <tr>
-                    <td>Días festivos o no lectivos oficiales UPM</td>
-                    <td style="background-color: grey"></td>
-                </tr>
-                <tr>
-                    <td>Fechas importantes</td>
-                    <td style="background-color: Orange"></td>
-                </tr>
-                    
-                    
-                    
-                    
-               
-            </table>
-        </div>
-        <script>
-            $('[data-toggle=popover]').popover({
-
-                content: $('#myPopoverContent').html(),
-                html: true
-
-            }).click(function() {
-                $(this).popover('show');
-            });
-        </script>
         <div  id="calendario_comun" style=" margin-top: 35px;">
             
             <table style="font-size: 17px; border-color: black" border="2">
@@ -147,13 +94,13 @@
 
                         <% } %>
                                 
-                        <td style="border: 0px;">
-                            <span style="margin-left: 1em;margin-right: 1em;">
+                        <td style="border: 0px; margin-left: 1em;margin-right: 1em;">
+                            <span>
                                 
                                 <% for( var j=0 ; j < array_eventos.length ; j++){ %>
                                     <% var json_stringify = JSON.stringify(array_eventos[j]) %>
                                     <input type="hidden" value="<%= json_stringify%>" id="data-<%= array_eventos[j].mensaje %>">
-                                    <button  id="button-<%= array_eventos[j].mensaje %>" onclick="eventoAntiguoBoton(<%=json_stringify%>)"><%= array_eventos[j].mensaje %></button>
+                                    <button style="text-align: left;" onclick="eventoAntiguoBoton(<%=json_stringify%>)"><%= array_eventos[j].mensaje %></button>
                                 <% }%>
                             </span>
                         </td>
@@ -203,21 +150,11 @@
                 </div>
               </div>
 </div>
-
-
-
         
     <%}%>
 
 </div>
-<style>
-        .calendario-boton{
-            border-color: black;
-            height: 3em;
-            width: 3em;
-            border-radius: 0px;
-        }    
-    </style>
+
 <script>
 
         //el multiselect del layout funciona con jquery
@@ -279,6 +216,7 @@
                     location.reload();
                 },
                 error: function(e){
+                    alert("Error en el servidor, la acción no se ha podido completar")
                 }
             });
             
@@ -309,19 +247,6 @@
             document.getElementById("formularioEventoPersonalizado").style.display = "block";
             $('#eventoModal').modal('show');
             
-        }
-
-        function cambiarano(){
-            let ano = document.getElementById("selectano").value;
-            let search = parseQueryString();
-            delete search.ano;
-            search.ano = ano;
-            let url = parseStringQuery(search);
-            window.location.replace(url);
-        }
-        
-        function Enviar(){
-            return confirm("Una vez aprobado el calendario, los coordinadores de las titulaciones podrán comenzar a adaptarlo. ¿Estás seguro de querer aprobarlo?");
         }
 
         document.addEventListener("DOMContentLoaded", function() {
