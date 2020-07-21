@@ -4,14 +4,14 @@
             <div>
                 <% if(estadoProfesores[departamentoID] === estadosProfesor.abierto && estadoProgDoc === estadosProgDoc.abierto ) { %>
                     <form autocomplete="off" action="<%= aprobarpath %>" method="post" onsubmit="return Enviar()">
-                    <input type='submit'  class="btn btn-default" value='Aprobar responsable docente'>
+                    <input type='submit'  class="btn btn-default" value='Proponer profesores al director de departamento'>
                     </form>
                 <% } %>
                     <% if(estadoProfesores[departamentoID] === estadosProfesor.aprobadoResponsable && estadoProgDoc === estadosProgDoc.abierto) { %>
                         <form autocomplete="off" id="formDecision" action="<%= aprobarpath %>" method="post">
                         <input id="decision" type="hidden" name="decision" value='aceptar'>
-                        <button type='button'  class="btn btn-primary" onclick="Decidir('aceptar')">Aprobar director departamento</button>
-                        <button type="button"  class="btn btn-default" onclick="Decidir('rechazar')">No aprobar</button>
+                        <button type='button'  class="btn btn-primary" onclick="Decidir('aceptar')">Confirmar profesores</button>
+                        <button type="button"  class="btn btn-default" onclick="Decidir('rechazar')">Volver a editar</button>
                         </form>
                     <% }
                     if(estadoProfesores[departamentoID] === estadosProfesor.aprobadoDirector && estadoProgDoc === estadosProgDoc.abierto){%>
@@ -29,7 +29,7 @@
             <div>
                 <%if(estadoTribunales[departamentoID] === estadosTribunal.abierto || estadoProgDoc === estadosProgDoc.incidencia) {
                     if(estadoTribunales[departamentoID] === estadosTribunal.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
-                    <button type='button'  class="btn btn-primary" onclick="Enviar('<%= aprobarpath %>')" >Aprobar responsable docente</button>
+                    <button type='button'  class="btn btn-primary" onclick="Enviar('<%= aprobarpath %>')" >Proponer tribunales al director de departamento</button>
                     <%}%>
                     <button type='button'  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
                     <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
@@ -37,8 +37,8 @@
                         if(estadoTribunales[departamentoID] === estadosTribunal.aprobadoResponsable && estadoProgDoc === estadosProgDoc.abierto) { %>
                             <form id="formDecision" action="<%= aprobarpath %>" method="post">
                             <input id="decision" type="hidden" name="decision" value='aceptar'>
-                            <button type='button'  class="btn btn-primary" onclick="Decidir('aceptar')">Aprobar director departamento</button>
-                            <button type="button"  class="btn btn-default" onclick="Decidir('rechazar')">No aprobar</button>
+                            <button type='button'  class="btn btn-primary" onclick="Decidir('aceptar')">Confirmar tribunales</button>
+                            <button type="button"  class="btn btn-default" onclick="Decidir('rechazar')">Volver a editar</button>
                             </form>
                         <%} if(estadoTribunales[departamentoID] === estadosTribunal.aprobadoDirector && estadoProgDoc === estadosProgDoc.abierto){%>
                             <p>La asignación de tribunales ya ha sido aprobada por el director del departamento</p>
@@ -49,7 +49,7 @@
         case "Horarios":%>
             <div>
                 <%if(estadoHorarios === estadosHorario.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
-                    <button type='button'  class="btn btn-primary" onclick="Enviar('<%= aprobarpath %>')" >Aprobar coordinador titulación</button>
+                    <button type='button'  class="btn btn-primary" onclick="Enviar('<%= aprobarpath %>')" >Confirmar horarios</button>
                 <%}%>
                 <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
                 <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
@@ -59,7 +59,7 @@
             <div>
                 <form id="formulario" role="form" data-toggle="validator" autocomplete="off" action="<%=aprobarpath%>" method="post" onsubmit="return Enviar()" >
                 <%if(estadoCalendario === estadosCalendario.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
-                    <input type="submit"  class="btn btn-default" value='Aprobar actividades titulación'>
+                    <input type="submit"  class="btn btn-default" value='Confirmar actividades'>
                 <%}%>
                 <button type="button"  class="btn btn-default" onclick="anadirConjuntoActividad('conjuntoActividad',false)">Nuevo conjunto de actividades</button>
             </form>
@@ -72,7 +72,7 @@
                 <option value="FranjaExamenes" title="FranjaExamenes">Franja Exámenes</option>      
             </select>
                 <%if(estadoExamenes === estadosExamen.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
-                    <button type='button'  class="btn btn-primary" onclick="Enviar('<%= aprobarpath %>')" >Aprobar exámenes titulación</button>
+                    <button type='button'  class="btn btn-primary" onclick="Enviar('<%= aprobarpath %>')" >Confirmar exámenes</button>
                 <%}%>
                 <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
                 <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
