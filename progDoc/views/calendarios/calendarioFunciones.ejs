@@ -12,7 +12,8 @@
             endDate: "<%-String(parseInt(ano) + 1)%>-08-30",
             toggleActive: true,
             defaultViewDate: { year: 2019, month: 11, day: 03 },
-            orientation:"bottom"
+            orientation: "auto",
+            container: "#eventoModal"
 
         });
     });
@@ -58,7 +59,8 @@
                 clearBtn: true,
                 startDate: "<%-ano%>-09-01",
                 endDate: "<%-String(parseInt(ano) + 1)%>-08-30",
-                orientation: "bottom"
+                orientation: "auto",
+                container: "#eventoModal"
 
             });
 
@@ -587,7 +589,8 @@
             clearBtn: true,
             startDate: "<%-ano%>-09-01",
             endDate: "<%-String(parseInt(ano) + 1)%>-08-30",
-            orientation: "top"
+            orientation: "auto",
+            container: "#eventoModal"
         });
 
         document.getElementById("inicioEvento").value = evento.fechaInicio; 
@@ -612,7 +615,8 @@
                 clearBtn: true,
                 startDate: "<%-ano%>-09-01",
                 endDate: "<%-String(parseInt(ano) + 1)%>-08-30",
-                orientation: "bottom"
+                orientation: "auto",
+                container: "#eventoModal"
             });
             document.getElementById("inicioEventoLabel").innerHTML = "Editar la fecha de inicio del evento";
         }

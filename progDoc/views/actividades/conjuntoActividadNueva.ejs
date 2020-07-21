@@ -51,7 +51,7 @@ function anadirConjuntoActividad(id,conjuntoActividadParcialId){
     if (conjuntoActividadParcial.fechaFin){ 
         fFin= conjuntoActividadParcial.fechaFin
     }
-    div.innerHTML =`<form id="formConjuntoActividadParcial" method="post"><p id="">
+    div.innerHTML =`<form id="formConjuntoActividadParcial" method="post" autocomplete="off"><p id="">
     <input type="hidden" name="conjuntoActividadParcialId" value="${conjuntoActividadParcialId}">
   <span><b>${cursoCoincidente}º curso ${semestreCoincidente}</b></span>
   <div class="form-group">
@@ -87,7 +87,7 @@ function anadirConjuntoActividad(id,conjuntoActividadParcialId){
     <option value="2S">Segundo Semestre</option>`
     let fInicio = "DD/MM/YYYY"
     let fFin = "DD/MM/YYYY"
-    div.innerHTML =`<form id="formConjuntoActividadParcial" method="post"><p id="">
+    div.innerHTML =`<form id="formConjuntoActividadParcial" method="post" autocomplete="off"><p id="">
     <input type="hidden" name="conjuntoActividadParcialId" value="${conjuntoActividadParcialId}">
    <div class="form-group"><label>Curso</label><select  name="curso" class="form-control" id="selectCurso_${conjuntoActividadParcialId}">${optionsCurso}</select></div> 
    <div class="form-group"><label>Semestre</label><select  name="semestre" class="form-control" id="selectSemestre_${conjuntoActividadParcialId}">${optionsSemestre}</select></div>
@@ -130,7 +130,9 @@ function anadirConjuntoActividad(id,conjuntoActividadParcialId){
             format: "dd/mm/yyyy",
             clearBtn: false,
             startDate: fechasLimite[0],
-            endDate: fechasLimite[1]
+            endDate: fechasLimite[1],
+            orientation:"auto",
+            container: "#nuevoConjuntoActividadModal"
     });
   //si la actividad ya existia se debe actualizar solo por lo que se debe cargar su contenido
    if(conjuntoActividadParcialId !== false){
