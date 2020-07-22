@@ -62,7 +62,7 @@ exports.gestionProgDoc = async function(req, res, next) {
         });
         // TODO: cuando se añadan las otras funciones hay que ponerlas aquí
         // para comprobar si la pd se puede marcar como lista para que Jefatura de Estudios la cierre
-        // si manualmente cambia algo de las otras partes para que al acceder a gestión cambie
+        // si manualmente cambia algo de las otras partes para que al acceder a JE cambie
         if (
           pdBBDD.estadoProGDoc === estados.estadoProgDoc.abierto &&
           progDocController.CumpleTodos(

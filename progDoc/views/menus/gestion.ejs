@@ -1,7 +1,7 @@
 <body>
 <%- include ../../public/js/funcionesMenu.ejs %>
 <div class="myHeader">
-    <p>Gestión <% if ( session && session.pdID && (locals.submenu === "Grupos")){ %>
+    <p>Jefatura Estudios <% if ( session && session.pdID && (locals.submenu === "Grupos")){ %>
     <%= session.pdID %>
     <%}%></p>
     <%if (locals.planID && locals.planEstudios && (locals.submenu === "Grupos" || locals.submenu === "Planes")) { %>

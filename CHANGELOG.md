@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **.dockerignore**
 ### Changed
 - Colores de **Aulas** .
-- Orden pestañas de **Gestión**.
+- Orden pestañas de **Jefatura Estudios**.
 - **Dockerfile** instalación módulos con *npm ci*.
 ### Fixed
 - Modal **Actividades** calendario *orientation top*.
