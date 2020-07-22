@@ -68,7 +68,7 @@ const configPdf = function (draft, planNombre, pdId) {
 // tipoPDF puede ser pdfDraftGenerado si es pintar un draft o pdfCerrado
 // calendario se le pasa la informacion de calendario
 // eslint-disable-next-line consistent-return
-async function generatePDFFile(pdID, tipoPDF, calendario) {
+const generatePDFFile = async function (pdID, tipoPDF, calendario) {
   const promises = [];
   const promises2 = [];
   const cursosConGrupos = [];

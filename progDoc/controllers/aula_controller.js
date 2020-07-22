@@ -30,7 +30,7 @@ const hashCode = function(s) {
 };
 
 // te da todos los grupos de las programciones docentes pasadas como array
-async function getAllGruposConAula(progDocs) {
+const getAllGruposConAula = async function (progDocs) {
   const gruposPorProgramacionDocente = {};
   // eslint-disable-next-line no-useless-catch
   try {

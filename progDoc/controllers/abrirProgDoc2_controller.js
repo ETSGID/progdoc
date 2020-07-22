@@ -5,21 +5,6 @@ const progDocController = require('./progDoc_controller');
 
 const funciones = require('../funciones');
 
-/*
-borra todos las programaciones docentes con errores que no deberia haberlas
-y lo relacionado con las mismas
-*/
-const borrarPdsWithErrores = async function() {
-  await models.sequelize
-    .query(`DELETE FROM public."ProgramacionDocentes" p  WHERE p."estadoProGDoc" = -1; 
-        DELETE FROM public."Grupos" g WHERE g."ProgramacionDocenteId" is null; 
-        DELETE FROM public."Asignaturas" asign WHERE asign."ProgramacionDocenteIdentificador" is null; 
-        DELETE FROM public."AsignacionProfesors" a WHERE a."GrupoId" is null;
-        DELETE FROM public."Examens" e WHERE e."AsignaturaIdentificador" is null;
-        DELETE FROM public."FranjaExamens" f WHERE f."ProgramacionDocenteId" is null;
-        DELETE FROM public."ConjuntoActividadParcials" c WHERE c."ProgramacionDocenteId" is null;
-        DELETE FROM public."ActividadParcials" act WHERE act."ConjuntoActividadParcialId" is null;`);
-};
 
 exports.gestionProgDoc = async function(req, res, next) {
   req.session.submenu = 'AbrirCerrar';
@@ -33,7 +18,7 @@ exports.gestionProgDoc = async function(req, res, next) {
   const anos = [];
   try {
     // borras si hay algun error las pds que puedan tenerlos
-    borrarPdsWithErrores();
+    await progDocController.borrarPdsWithErrores();
     // la incidencia se marca sobre la pd anterior (no la versión anterior)
     const pdsBBDD = await models.ProgramacionDocente.findAll({
       order: [
@@ -58,7 +43,8 @@ exports.gestionProgDoc = async function(req, res, next) {
           siguienteAnoAcademico: funciones.siguienteAnoAcademico(
             pdBBDD.anoAcademico
           ),
-          semestre: pdBBDD.semestre
+          semestre: pdBBDD.semestre,
+          isPDInitialState: progDocController.isPDInitialState(pdBBDD)
         });
         // TODO: cuando se añadan las otras funciones hay que ponerlas aquí
         // para comprobar si la pd se puede marcar como lista para que Jefatura de Estudios la cierre
@@ -115,7 +101,7 @@ exports.gestionProgDoc = async function(req, res, next) {
         }
       }
     });
-    // puede haber planes sin pd, como los nuevos planes u otras cosas
+    // puede haber planes sin pd, como los nuevos planes
     res.locals.planEstudios.forEach(plan => {
       const existentePD = pds.find(obj => obj.PlanEstudioId === plan.codigo);
       if (existentePD) {
@@ -161,6 +147,7 @@ exports.gestionProgDoc = async function(req, res, next) {
         abririncidenciapath: `${req.baseUrl}/abrirIncidenciaProgDoc`,
         cerrarincidenciapath: `${req.baseUrl}/cerrarIncidenciaProgDoc`,
         reabrirpath: `${req.baseUrl}/reabrirProgDoc`,
+        eliminarpath: `${req.baseUrl}/eliminarProgDoc`,
         submenu: req.session.submenu,
         menu: req.session.menu,
         planID: req.session.planID
@@ -386,4 +373,23 @@ exports.cerrarProgDoc2 = async function(req, res, next) {
   }
 };
 
-exports.borrarPdsWithErrores = borrarPdsWithErrores;
+
+// eliminar toda la informacion de una progdoc
+exports.eliminarProgDoc = async function (req, res, next){
+  try {
+    if (!res.locals.permisoDenegado) {
+      const pdID = req.session.pdID;
+      await progDocController.borrarPd(pdID);
+      req.session.save(() => {
+        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+      });
+    } else {
+      req.session.save(() => {
+        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+      });
+    }
+  } catch (error) {
+    console.log('Error:', error);
+    next(error);
+  }
+}

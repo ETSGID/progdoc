@@ -1617,6 +1617,65 @@ router.post(
   abrirProgDoc2Controller.cerrarProgDoc2
 );
 
+router.post(
+  '/eliminarProgDoc',
+  (req, res, next) => {
+    // es el unico caso en el que debo hacer esto aqui pq no está guardada en sesión
+    // y lo necesito para los permisos
+    // eslint-disable-next-line prefer-destructuring
+    req.session.pdID = req.body.pdIdentificador.split('-')[1];
+    // solo se pueden borrar progdocs con nada aprobado o progdocs en incidencia
+    res.locals.rols.push({
+      rol: enumsPD.rols.JefeEstudios,
+      PlanEstudioCodigo: null,
+      DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
+      condiciones: [
+        {
+          condicion: ['estadoProfesores', req.session.departamentoID],
+          resultado: estados.estadoProfesor.abierto
+        },
+        {
+          condicion: ['estadoTribunales', req.session.departamentoID],
+          resultado: estados.estadoTribunal.abierto
+        },
+        {
+          condicion: ['estadoHorarios'],
+          resultado: estados.estadoHorario.abierto
+        },
+        {
+          condicion: ['estadoExamenes'],
+          resultado: estados.estadoExamen.abierto
+        },
+        {
+          condicion: ['estadoCalendario'],
+          resultado: estados.estadoCalendario.abierto
+        },
+        {
+          condicion: ['estadoProGDoc'],
+          resultado: estados.estadoProgDoc.abierto
+        }
+      ]
+    });
+    res.locals.rols.push({
+      rol: enumsPD.rols.JefeEstudios,
+      PlanEstudioCodigo: null,
+      DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
+      condiciones: [
+        {
+          condicion: ['estadoProGDoc'],
+          resultado: estados.estadoProgDoc.incidencia
+        }
+      ]
+    });
+    next();
+  },
+  planController.getPlanes,
+  rolController.comprobarRols,
+  abrirProgDoc2Controller.eliminarProgDoc
+);
+
 // consultarRoles
 router.get(
   '/consultar/roles',

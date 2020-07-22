@@ -10,7 +10,7 @@ const grupoController = require('./grupo_controller');
 
 
 // para obtener las notas definidas para el grupo completo no ligadas a asignatura
-async function getNotasGruposSinAsignatura(gruposBBDD) {
+const getNotasGruposSinAsignatura = async function (gruposBBDD) {
   // eslint-disable-next-line no-useless-catch
   try {
     // eslint-disable-next-line no-param-reassign

@@ -12,7 +12,7 @@ const funciones = require('../funciones');
 const progDocController = require('./progDoc_controller');
 const planController = require('./plan_controller');
 
-async function getFranjasExamenes(pdID) {
+const getFranjasExamenes = async function (pdID) {
   // eslint-disable-next-line no-useless-catch
   try {
     const franjasExamen = [];
@@ -762,7 +762,7 @@ exports.generateCsvExamens = async function(req, res, next) {
   }
 };
 
-function isExamenInFranjas(examen, franjas) {
+const isExamenInFranjas =  function (examen, franjas) {
   const duracion = +examen.duracion;
   const horaInicial = moment.duration(examen.horaInicio);
   const horaFinal = moment.duration(horaInicial).add(duracion, 'm');

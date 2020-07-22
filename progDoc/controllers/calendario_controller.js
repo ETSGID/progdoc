@@ -7,7 +7,7 @@ const enumsPD = require('../enumsPD');
 const Sequelize = require('sequelize');
 const op = Sequelize.Op;
 
-function comprobarColor(buffer_eventos, eventos, dia) {
+const comprobarColor = function (buffer_eventos, eventos, dia) {
   let code = -1;
   const nuevo_buffer = [];
   const dia_objetoFecha = new Date(dia);
@@ -32,11 +32,11 @@ function comprobarColor(buffer_eventos, eventos, dia) {
   return [code, nuevo_buffer];
 }
 
-function bisiesto(year) {
+const bisiesto = function (year) {
   return year % 100 === 0 ? year % 400 === 0 : year % 4 === 0;
 }
 
-function generarArrayDias(dic_eventos, ano) {
+const generarArrayDias  = function (dic_eventos, ano) {
   /* Primero generamos un array de enteros que sean todos los dias del año */
   const uno_septiembre = new Date(parseInt(ano, 10), 8, 1);
   const dia_de_semana = uno_septiembre.getDay();

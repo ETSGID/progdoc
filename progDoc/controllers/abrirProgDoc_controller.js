@@ -15,7 +15,7 @@ const enumsPD = require('../enumsPD');
  * Función para abrir una nueva programación docente
  *  Traslada los datos de la del periodo anterior coincidente
  */
-exports.abrirNuevaProgDoc = async function(req, res, next) {
+exports.abrirNuevaProgDoc = async function (req, res, next) {
   try {
     // cargar nuevos planes y departamentos en el sistema
     await apiUpmController.updatePlanesAndDeparts();
@@ -894,18 +894,7 @@ exports.abrirNuevaProgDoc = async function(req, res, next) {
       // si se produce un error en el proceso se borra todo el progreso que se hizo
       // TODO hacerlo con transacciones
       console.log('Error:', error);
-      await models.sequelize.query(
-        `DELETE FROM public."ProgramacionDocentes" p  
-        WHERE p."identificador" = :pdId1; 
-        DELETE FROM public."Grupos" g WHERE g."ProgramacionDocenteId" is null; 
-        DELETE FROM public."Asignaturas" asign WHERE asign."ProgramacionDocenteIdentificador" is null; 
-        DELETE FROM public."AsignacionProfesors" a WHERE a."GrupoId" is null;
-        DELETE FROM public."Examens" e WHERE e."AsignaturaIdentificador" is null;
-        DELETE FROM public."FranjaExamens" f WHERE f."ProgramacionDocenteId" is null;
-        DELETE FROM public."ConjuntoActividadParcials" c WHERE c."ProgramacionDocenteId" is null;
-        DELETE FROM public."ActividadParcials" act WHERE act."ConjuntoActividadParcialId" is null;`,
-        { replacements: { pdId1: res.locals.identificador } }
-      );
+      await progDocController.borrarPd(res.locals.identificador);
       next(error);
     } catch (err) {
       next(err);
@@ -918,7 +907,7 @@ Función para abrir incidencia o reabierto.
 Abrir copia de progdoc
 No traslada fechas al año siguiente
 */
-exports.abrirCopiaProgDoc = async function(req, res, next) {
+exports.abrirCopiaProgDoc = async function (req, res, next) {
   const pdIDanterior = req.body.pdIdentificador.split('-')[1];
   const tipoPD = progDocController.getTipoPd(pdIDanterior);
   const plan = progDocController.getPlanPd(pdIDanterior);
@@ -1313,41 +1302,10 @@ exports.abrirCopiaProgDoc = async function(req, res, next) {
       // si se produce un error en el proceso se borra todo el progreso que se hizo
       // TODO hacerlo con transacciones
       console.log('Error:', error);
-      await models.sequelize.query(
-        `DELETE FROM public."ProgramacionDocentes" p  
-        WHERE p."identificador" = :pdId1; 
-        DELETE FROM public."Grupos" g WHERE g."ProgramacionDocenteId" is null; 
-        DELETE FROM public."Asignaturas" asign WHERE 
-        asign."ProgramacionDocenteIdentificador" is null; 
-        DELETE FROM public."AsignacionProfesors" a WHERE a."GrupoId" is null;
-        DELETE FROM public."Examens" e WHERE e."AsignaturaIdentificador" is null;
-        DELETE FROM public."FranjaExamens" f WHERE f."ProgramacionDocenteId" is null;
-        DELETE FROM public."ConjuntoActividadParcials" c WHERE c."ProgramacionDocenteId" is null;
-        DELETE FROM public."ActividadParcials" act WHERE act."ConjuntoActividadParcialId" is null;`,
-        { replacements: { pdId1: res.locals.identificador } }
-      );
+      await progDocController.borrarPd(res.locals.identificador);
       next(error);
     } catch (err) {
       next(err);
     }
   }
 };
-
-/*
-DELETE FROM public."ProgramacionDocentes"
-WHERE identificador = 'PD_09AR_201819_I_v2';
-delete  FROM public."Grupos"
-WHERE "ProgramacionDocenteId" is null;
-delete  FROM public."Asignaturas"
-WHERE "ProgramacionDocenteIdentificador" is null;
-delete  FROM public."AsignacionProfesors"
-WHERE "GrupoId" is null;
-delete FROM public."Examens" e
-WHERE e."AsignaturaIdentificador" is null;
-delete FROM public."FranjaExamens" f
-WHERE f."ProgramacionDocenteId" is null;
-DELETE FROM public."ConjuntoActividadParcials" c
-WHERE c."ProgramacionDocenteId" is null;
-DELETE FROM public."ActividadParcials" act
-WHERE act."ConjuntoActividadParcialId" is null
-*/

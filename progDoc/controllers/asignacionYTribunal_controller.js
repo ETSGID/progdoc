@@ -15,19 +15,8 @@ const planController = require('./plan_controller');
 const personaYProfesorController = require('./personaYProfesor_controller');
 const grupoController = require('./grupo_controller');
 
-// funcion para ver el estado de profesores/tribunales si cumple uno el resto lo marca como cumplido
-function comprobarEstadoCumpleUno(estado, objeto) {
-  for (const variable in objeto) {
-    if (Object.prototype.hasOwnProperty.call(objeto, variable)) {
-      if (objeto[variable] === estado) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
 
-async function getAsignacion(
+const getAsignacion = async function(
   ProgramacionDocenteIdentificador,
   DepartamentoResponsable,
   profesores,
@@ -187,11 +176,11 @@ exports.getAsignaciones = async function(req, res, next) {
     // hay que comprobar que no sea una url de consultar.
     // eslint-disable-next-line no-use-before-define
   } else if (
-    !comprobarEstadoCumpleUno(
+    !progDocController.comprobarEstadoCumpleUno(
       estados.estadoProfesor.abierto,
       res.locals.progDoc['ProgramacionDocentes.estadoProfesores']
     ) &&
-    !comprobarEstadoCumpleUno(
+    !progDocController.comprobarEstadoCumpleUno(
       estados.estadoProfesor.aprobadoResponsable,
       res.locals.progDoc['ProgramacionDocentes.estadoProfesores']
     ) &&
@@ -715,11 +704,11 @@ exports.getTribunales = async function(req, res, next) {
       onlyProfesor: true
     });
   } else if (
-    !comprobarEstadoCumpleUno(
+    !progDocController.comprobarEstadoCumpleUno(
       estados.estadoTribunal.abierto,
       res.locals.progDoc['ProgramacionDocentes.estadoTribunales']
     ) &&
-    !comprobarEstadoCumpleUno(
+    !progDocController.comprobarEstadoCumpleUno(
       estados.estadoTribunal.aprobadoResponsable,
       res.locals.progDoc['ProgramacionDocentes.estadoTribunales']
     ) &&

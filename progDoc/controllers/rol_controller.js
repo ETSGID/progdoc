@@ -8,7 +8,7 @@ const enumsPD = require('../enumsPD');
 
 const op = Sequelize.Op;
 
-async function getRolsPersona(personaId) {
+const getRolsPersona = async function (personaId) {
   // eslint-disable-next-line no-useless-catch
   try {
     if (personaId) {

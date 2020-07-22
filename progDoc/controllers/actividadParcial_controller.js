@@ -125,7 +125,7 @@ exports.getActividadParcial = async function(req, res, next) {
 obtener todas las actividades parciales y los distitnos conjuntos de actividades parciales.
 pdID es un array porque pueden ser varias.
 */
-async function getAllActividadParcial(pdID) {
+const getAllActividadParcial = async function(pdID) {
   const conjuntoActividadesParcial = [];
   if (pdID) {
     // eslint-disable-next-line no-useless-catch

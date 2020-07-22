@@ -1,7 +1,7 @@
 const models = require('../models');
 const funciones = require('../funciones');
 
-async function getPeople(onlyProfesor) {
+const getPeople = async function (onlyProfesor) {
   const profesores = [];
   const required = onlyProfesor === true;
   // eslint-disable-next-line no-useless-catch
@@ -37,7 +37,7 @@ async function getPeople(onlyProfesor) {
   }
 }
 
-async function getPersonCorreo(onlyProfesor, correo) {
+const getPersonCorreo = async function (onlyProfesor, correo) {
   const required = onlyProfesor === true;
   // eslint-disable-next-line no-useless-catch
   try {
@@ -61,7 +61,7 @@ async function getPersonCorreo(onlyProfesor, correo) {
   }
 }
 
-async function getPeoplePagination(onlyProfesor, page, limit) {
+const getPeoplePagination = async function (onlyProfesor, page, limit) {
   const offset = 0 + (page - 1) * limit;
   const required = onlyProfesor === true;
   // eslint-disable-next-line no-useless-catch

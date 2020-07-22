@@ -108,7 +108,7 @@ exports.convertCommaToPointDecimal = function(n) {
 };
 
 // convierte de YYYY-MM-DD a DD/MM/YYYY
-function formatFecha(fecha) {
+const formatFecha = function(fecha) {
   try {
     return `${fecha.split('-')[2]}/${fecha.split('-')[1]}/${
       fecha.split('-')[0]
@@ -121,7 +121,7 @@ function formatFecha(fecha) {
 exports.formatFecha = formatFecha;
 
 // convierte de DD/MM/YYYY a YYYY-MM-DD
-function formatFecha2(fecha) {
+const formatFecha2 = function(fecha) {
   try {
     return `${fecha.split('/')[2]}-${fecha.split('/')[1]}-${
       fecha.split('/')[0]
