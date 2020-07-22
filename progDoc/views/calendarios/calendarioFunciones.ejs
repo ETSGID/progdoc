@@ -8,7 +8,7 @@
             todayHighlight: false,
             autoclose: true,
             format: "yyyy-mm-dd",
-            clearBtn: true,
+            clearBtn: false,
             startDate: "<%-ano%>-09-01",
             endDate: "<%-String(parseInt(ano) + 1)%>-08-30",
             toggleActive: true,
@@ -57,7 +57,7 @@
                 todayHighlight: true,
                 autoclose: true,
                 format: "yyyy-mm-dd",
-                clearBtn: true,
+                clearBtn: false,
                 startDate: "<%-ano%>-09-01",
                 endDate: "<%-String(parseInt(ano) + 1)%>-08-30",
                 orientation: "auto",
@@ -545,7 +545,7 @@
                 }
         }else{
             document.getElementById("div-eventoNombre").style.display = "none";
-            if(evento.editable === 0){
+            if(evento.editable === 0 && evento.identificadorEventoPlan === 0){
                 document.getElementById("divBotones").style.display = "none";        
             }else{
                 document.getElementById("divBotones").style.display = "block";  
@@ -567,7 +567,7 @@
         }
 
         if (calendarioGeneral){
-            if(evento.editable === 0){
+            if(evento.editable === 0 && evento.identificadorEventoPlan === 0){
                 document.getElementById("editableCheck").checked = false;
             }else{
                 document.getElementById("editableCheck").checked = true;
@@ -587,7 +587,7 @@
             todayHighlight: true,
             autoclose: true,
             format: "yyyy-mm-dd",
-            clearBtn: true,
+            clearBtn: false,
             startDate: "<%-ano%>-09-01",
             endDate: "<%-String(parseInt(ano) + 1)%>-08-30",
             orientation: "auto",
@@ -613,7 +613,7 @@
                 todayHighlight: true,
                 autoclose: true,
                 format: "yyyy-mm-dd",
-                clearBtn: true,
+                clearBtn: false,
                 startDate: "<%-ano%>-09-01",
                 endDate: "<%-String(parseInt(ano) + 1)%>-08-30",
                 orientation: "auto",

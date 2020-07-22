@@ -92,11 +92,6 @@ exports.comprobarRols = async function (req, res, next) {
       );
       if (rolExistente) {
         let cumple = true;
-        if (rolExistente.rol === 'JefeEstudios') {
-          req.isJefeDeEstudios = true;
-        } else {
-          req.isJefeDeEstudios = false;
-        }
         if (Array.isArray(r.condiciones)) {
           for (let i = 0; i < r.condiciones.length; i++) {
             const condic = r.condiciones[i].condicion;

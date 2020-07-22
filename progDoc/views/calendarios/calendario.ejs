@@ -8,33 +8,33 @@
     <%}else{%>
         <input type="hidden" value="<%=ano%>" id="anoSeleccionado"> 
         <div class="">       
-            <h2>Calendario común
-                
-                <%- include ./popoverEvents.ejs %>
-                <%
-                const enabled = estado === 0 ? '': 'disabled';
-                const titleButtonCalendar = estado === 0 ? 'Pulse para añadir un evento' : 'El calendario ya está trasladado, no puede editarlo a menos que lo retraiga'
-                const titleButtonEvent = estado === 0 ? 'Pulse para editar un evento' : 'El calendario ya está trasladado, no puede editarlo a menos que lo retraiga'
-                %>
-                <% if(estado === 0){ %>
-                    <button type='button' class="btn btn-primary"  title="Pulse para trasladar el calendario común a cada plan"  onclick="trasladar(<%=ano%>, 1)">Trasladar</button>
-                <% }else{ %>
-                    <small>Este calendario <b>ya ha sido trasladado a todos los planes.</b> Si desea modificar el calendario general debe retraer el estado del calendario y volver a trasladarlo a los planes.</small>
-                    <button type='button' class="btn btn-primary"  title="Pulse para retraer el estado del calendario y poder modificar el calendario general"  onclick="trasladar(<%=ano%>, 0)">Retraer</button>
-                <% } %>
-                <% if(vacio === true) { %>
-                    <button type="button" class="btn btn-default"  title="Pulse para copiar eventos del año anterior"  onclick="copiar(<%=ano%>)"  >Copiar eventos</button>
-                <% }else{ %>
-                    <button type="button" class="btn btn-default"  title="Para copiar eventos del año anterior no debe haber ningún evento asignado" disabled >Copiar eventos</button>
-                <% } %>
-                <br>
-                <% if(ano == ano1) { %>
-                    <small style="color:red">Este calendario es el del año actual, no del siguiente.</small>
-                <% } %>
-                <% if(estado === 0){ %>
-                    <small>Hasta que no traslade los eventos del calendario general al resto de los planes los coordinadores no podrán editar el calnedario.</small>
-                <% } %>
-            </h2>
+            <h2>Calendario común </h2>
+            <p>Permite cumplimentar el <b>calendario general</b> usado como base para el calendario específico de cada plan.</p>
+            <%- include ./popoverEvents.ejs %>
+            <%
+            const enabled = estado === 0 ? '': 'disabled';
+            const titleButtonCalendar = estado === 0 ? 'Pulse para añadir un evento' : 'El calendario ya está trasladado, no puede editarlo a menos que lo retraiga'
+            const titleButtonEvent = estado === 0 ? 'Pulse para editar un evento' : 'El calendario ya está trasladado, no puede editarlo a menos que lo retraiga'
+            %>
+            <% if(estado === 0){ %>
+                <button type='button' class="btn btn-primary"  title="Pulse para trasladar el calendario común a cada plan"  onclick="trasladar(<%=ano%>, 1)">Trasladar</button>
+            <% }else{ %>
+                <small>Este calendario <b>ya ha sido trasladado a todos los planes.</b> Si desea modificar el calendario general debe retraer el estado del calendario y volver a trasladarlo a los planes.</small>
+                <button type='button' class="btn btn-primary"  title="Pulse para retraer el estado del calendario y poder modificar el calendario general"  onclick="trasladar(<%=ano%>, 0)">Retraer</button>
+            <% } %>
+            <% if(vacio === true) { %>
+                <button type="button" class="btn btn-default"  title="Pulse para copiar eventos del año anterior"  onclick="copiar(<%=ano%>)"  >Copiar eventos</button>
+            <% }else{ %>
+                <button type="button" class="btn btn-default"  title="Para copiar eventos del año anterior no debe haber ningún evento asignado" disabled >Copiar eventos</button>
+            <% } %>
+            <br>
+            <% if(ano == ano1) { %>
+                <small style="color:red">Este calendario es el del año actual, no del siguiente.</small>
+            <% } %>
+            <% if(estado === 0){ %>
+                <small>Hasta que no traslade los eventos del calendario general al resto de los planes los coordinadores no podrán editar el calnedario.</small>
+            <% } %>
+
             
         </div>
              

@@ -51,13 +51,15 @@ exports.eventoGeneral = {
   Editable: 1
 };
 
+//ordenados por importancia de mayor a menor
 exports.eventosTipo = {
   ajuste: 1,
   examenes: 2,
   especial: 3,
   tft: 4,
   festivo: 5,
-  otro: 6
+  otro: 6, 
+  eliminado: 7
 };
 
 exports.coloresEvento = {
@@ -67,7 +69,8 @@ exports.coloresEvento = {
   3: 'red',
   4: 'LightSkyBlue',
   5: 'grey',
-  6: 'Orange'
+  6: 'Orange',
+  7: 'white'
 };
 
 exports.diasDeSemana = {

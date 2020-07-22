@@ -10,7 +10,7 @@
         <div class="">       
             <h2>Calendario por titulación 
                 <%- include ./popoverEvents.ejs %>
-                <small>En esta interfaz puedes definir eventos editables por titulación.</small>     
+                <small>En esta interfaz se pueden definir eventos editables por titulación.</small>     
             </h2>   
         </div>
         
@@ -100,8 +100,16 @@
                                 
                                 <% for( var j=0 ; j < array_eventos.length ; j++){ %>
                                     <% var json_stringify = JSON.stringify(array_eventos[j]) %>
-                                    <input type="hidden" value="<%= json_stringify%>" id="data-<%= array_eventos[j].mensaje %>">
-                                    <button style="text-align: left;" onclick="eventoAntiguoBoton(<%=json_stringify%>)"><%= array_eventos[j].mensaje %></button>
+                                    <!--Se pueden marcar como editables o no editables aquellos en los que el evento general no es editable-->
+                                    <% if (array_eventos[j].editable === 0) { %>
+                                        <input type="hidden" value="<%= json_stringify%>" id="data-<%= array_eventos[j].mensaje %>">
+                                        <button style="text-align: left;" onclick="eventoAntiguoBoton(<%=json_stringify%>)"><%= array_eventos[j].mensaje %></button>
+                                    <% } else if(!array_eventos[j].mensaje.includes('eliminado//')) { %>
+                                        <span title="Este evento no se puede actualizar ya que el evento general ya es editable"><%= array_eventos[j].mensaje %></span>
+                                    <% } else { %>
+                                        <!--Los eventos eleminados no se muestran-->
+                                    <% } %>
+                                    
                                 <% }%>
                             </span>
                         </td>
@@ -232,8 +240,8 @@
             modal.find('.modal-title').text("Modificar la propiedad de editabilidad para <%-planID%>");
             
 
-            
-            if(evento.editable === 0){
+            // Si el original no es editable y no existe ya un evento específico
+            if(evento.editable === 0 && evento.identificadorEventoPlan === '0'){
                 document.getElementById("editableCheck").checked = false;
                 
             }else{

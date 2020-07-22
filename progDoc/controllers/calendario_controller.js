@@ -14,7 +14,8 @@ function comprobarColor(buffer_eventos, eventos, dia) {
   for (const i in buffer_eventos) {
     if (new Date(buffer_eventos[i].fechaFin) >= dia_objetoFecha) {
       nuevo_buffer.push(buffer_eventos[i]);
-      if (enumsPD.eventosTipo[buffer_eventos[i].tipo] % 6 > code % 6) {
+      // se queda con el color del evento con mayor tipo
+      if (enumsPD.eventosTipo[buffer_eventos[i].tipo] % Object.keys(enumsPD.eventosTipo).length > code % Object.keys(enumsPD.eventosTipo).length) {
         code = enumsPD.eventosTipo[buffer_eventos[i].tipo];
       }
     }
@@ -23,7 +24,8 @@ function comprobarColor(buffer_eventos, eventos, dia) {
     if (eventos[i].fechaFin !== 'Evento de dia') {
       nuevo_buffer.push(eventos[i]);
     }
-    if (enumsPD.eventosTipo[eventos[i].tipo] % 6 > code % 6) {
+    // se queda con el color del evento con mayor tipo
+    if (enumsPD.eventosTipo[eventos[i].tipo] % Object.keys(enumsPD.eventosTipo).length > code % Object.keys(enumsPD.eventosTipo).length) {
       code = enumsPD.eventosTipo[eventos[i].tipo];
     }
   }
@@ -327,7 +329,6 @@ exports.getCalendario = async function (req, res, next) {
       vacio = false;
     }
     array_datos = generarArrayDias(req.dic_eventos, ano);
-    // onsole.log(ano_actual)
     let general = 'false';
     if (req.query.planID === undefined) {
       general = 'true';
@@ -567,7 +568,7 @@ exports.getCalendarioPDF = async function (req, res, next) {
 };
 
 /**
- * Esta funcion se encarga perparar un diccionario con los eventos en formato JSON para enviarlos al front-end
+ * Esta funcion se encarga perparar un diccionario con los eventos generales (comunes) en formato JSON para enviarlos al front-end
  * Estructura:
  *  {
  *      nombre: "Evento_nombre",
@@ -583,14 +584,7 @@ exports.getCalendarioPDF = async function (req, res, next) {
  */
 exports.eventosDiccionario = async function (req, res, next) {
   try {
-    let dic_eventos = {};
-    if (req.dic_eventos !== undefined) {
-      dic_eventos = req.dic_eventos;
-    }
-    let editados = [];
-    if (req.editados !== undefined) {
-      editados = req.editados;
-    }
+    let dic_eventos = req.dic_eventos || {};
     const { ano } = req;
     const condicionesDeBusqueda = {
       fechaInicio: {
@@ -599,23 +593,27 @@ exports.eventosDiccionario = async function (req, res, next) {
         lt: Date.parse(`${String(parseInt(ano) + 1)}-09-01`)
       }
     };
-    if (
-      req.query.planID !== undefined &&
-      req.originalUrl.includes('/gestion/calendario')
-    ) {
-      condicionesDeBusqueda.editable = 0;
-    }
     const events = await models.EventoGeneral.findAll({
       where: condicionesDeBusqueda,
       raw: true
     });
     events.forEach(e => {
       let nombre = e.evento;
-      if (editados.includes(e.identificador)) {
-        return;
+      // en caso de que exista un evento especifico de plan no se coge el general
+      // se debe actualizar con el evento general para ver si el general era editable
+      for (fechaInicioEvento in dic_eventos) {
+        const eventoEditado = dic_eventos[fechaInicioEvento].find(
+          obj => obj.identificador === e.identificador
+        )
+        if (eventoEditado) {
+          eventoEditado.editable = e.editable;
+          return;
+        }
       }
       let tipo = '';
-      if (nombre.includes('festivo//')) {
+      if (nombre.includes('eliminado//')) {
+        tipo = 'eliminado';
+      } else if (nombre.includes('festivo//')) {
         tipo = 'festivo';
         nombre = nombre.slice(9, nombre.length);
       } else if (nombre.includes('examenes//')) {
@@ -677,7 +675,7 @@ exports.eventosDiccionario = async function (req, res, next) {
 };
 
 /**
- * Esta funcion se encarga perparar un diccionario con los eventos en formato JSON para enviarlos al front-end
+ * Esta funcion se encarga perparar un diccionario con los eventos de un plan en formato JSON para enviarlos al front-end
  * Estructura:
  *  {
  *      nombre: "Evento_nombre",
@@ -694,7 +692,6 @@ exports.eventosDiccionario = async function (req, res, next) {
 exports.eventosPlanDiccionario = async function (req, res, next) {
   try {
     const dic_eventos = {};
-    const editados = [];
     const { planID } = req.query;
     if (planID === undefined || planID === 'General') {
       next();
@@ -712,20 +709,13 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
         raw: true
       });
       events.forEach(e => {
-        if (req.isJefeDeEstudios && e.EventoGeneralId === null) {
-          return;
-        }
-        editados.push(e.EventoGeneralId);
         let nombre = e.evento;
-        try {
-          // los eventos generales eliminados
-          // en un calendario de un plan no se devuelven
-          if (nombre.substring(0, 11) === 'eliminado//') {
-            return;
-          }
-        } catch (error) { }
         let tipo = '';
-        if (nombre.includes('festivo//')) {
+        // los eventos generales eliminados
+        // en un calendario de un plan se devuelven con el nombre eliminado//
+        if (nombre.includes('eliminado//')) {
+          tipo = 'eliminado';
+        } else if (nombre.includes('festivo//')) {
           tipo = 'festivo';
           nombre = nombre.slice(9, nombre.length);
         } else if (nombre.includes('examenes//')) {
@@ -768,6 +758,7 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
           fechaInicio: e.fechaInicio,
           fechaFin,
           color: e.color,
+          // por defecto se pone en editable los especificos de plan
           editable: enumsPD.eventoGeneral.Editable,
           mensaje: ` ${mensaje}`,
           tipo,
@@ -781,7 +772,6 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
         }
       });
       req.dic_eventos = dic_eventos;
-      req.editados = editados;
       next();
     }
   } catch (error) {
@@ -968,7 +958,7 @@ exports.postEventoPlan = async function (req, res, next) {
     const { planID } = req.session;
     let eventoGeneralId = req.query.identificador;
     const nombre = req.query.evento;
-    const { fechaInicio } = req.query;
+    let { fechaInicio } = req.query;
     let { fechaFin } = req.query;
     const meses = [
       ' ',
@@ -985,19 +975,24 @@ exports.postEventoPlan = async function (req, res, next) {
       'Noviembre',
       'Diciembre'
     ];
+
+    const evento = {
+      evento: nombre,
+      color: undefined
+    }
+    if (fechaInicio) {
+      fechaInicio = moment(fechaInicio, 'YYYY-MM-DD');
+      evento['fechaInicio'] = fechaInicio
+    }
     if (fechaFin !== undefined) {
       fechaFin = moment(fechaFin, 'YYYY-MM-DD');
+      evento['fechaFin'] = fechaFin
     }
     // update eventoPlan no asociado a evento general
     if (eventoGeneralId === 'null') {
-      const evento = {
-        evento: nombre,
-        color: undefined,
-        fechaInicio: moment(fechaInicio, 'YYYY-MM-DD'),
-        fechaFin,
-        PlanEstudioId: planID,
-        EventoGeneralId: null
-      };
+      evento['PlanEstudioId'] = planID;
+      evento['EventoGeneralId'] = null;
+
       await models.EventoPlan.update(evento, {
         where: { identificador: parseInt(req.query.identificadorEventoPlan) }
       });
@@ -1005,27 +1000,15 @@ exports.postEventoPlan = async function (req, res, next) {
       res.json({ estado: 'exito' });
     } else if (eventoGeneralId === '0') {
       // create eventoPlan no asociado a evento general
-      const evento = {
-        evento: nombre,
-        color: undefined,
-        fechaInicio: moment(fechaInicio, 'YYYY-MM-DD'),
-        fechaFin,
-        PlanEstudioId: planID,
-        EventoGeneralId: null
-      };
+      evento['PlanEstudioId'] = planID;
+      evento['EventoGeneralId'] = null;
       await models.EventoPlan.findCreateFind({ where: evento });
       // res.status(409);
       res.json({ estado: 'exito' });
     } else {
       // create or update evento asociado a general 
-      const evento = {
-        evento: nombre,
-        color: undefined,
-        fechaInicio: moment(fechaInicio, 'YYYY-MM-DD'),
-        fechaFin,
-        PlanEstudioId: planID,
-        EventoGeneralId: eventoGeneralId
-      };
+      evento['PlanEstudioId'] = planID;
+      evento['EventoGeneralId'] = eventoGeneralId;
       await models.EventoPlan.destroy({
         where: {
           PlanEstudioId: planID,
