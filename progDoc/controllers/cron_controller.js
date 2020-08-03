@@ -7,7 +7,7 @@ const calendarioController = require('./calendario_controller');
 //
 // eslint-disable-next-line no-new
 new CronJob(
-  '*/10 * * * * *',
+  '0 0 0 * * *',
   async () => {
     await apiUpmController.updatePlanesAndDeparts();
     await progDocController.borrarPdsWithErrores();
