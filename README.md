@@ -1,51 +1,146 @@
 # Progdoc
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Tabla de contenidos**
+
+- [Descripción](#descripci%C3%B3n)
+- [Consideraciones previas](#consideraciones-previas)
+- [Puertos](#puertos)
+- [Bases de datos](#bases-de-datos)
+  - [Requisitos de las bases de datos](#requisitos-de-las-bases-de-datos)
+  - [Inicialización de la base de datos *(pending)*](#inicializaci%C3%B3n-de-la-base-de-datos-pending)
+  - [Restore datos](#restore-datos)
+- [Almacenamiento de ficheros (pdfs y csv)](#almacenamiento-de-ficheros-pdfs-y-csv)
+  - [Requisitos de almacenamiento de ficheros](#requisitos-de-almacenamiento-de-ficheros)
+  - [Gestor de archivos](#gestor-de-archivos)
+- [Gestión de roles](#gesti%C3%B3n-de-roles)
+- [Configuración de entornos](#configuraci%C3%B3n-de-entornos)
+  - [Producción](#producci%C3%B3n)
+    - [docker-compose.override.yml](#docker-composeoverrideyml)
+    - [Variables de entorno (DEV=false,PRUEBAS=false, DOCKER=true)](#variables-de-entorno-devfalsepruebasfalse-dockertrue)
+    - [Ejecución](#ejecuci%C3%B3n)
+  - [Pruebas: host27](#pruebas-host27)
+    - [docker-compose.override.yml](#docker-composeoverrideyml-1)
+    - [Variables de entorno (DEV=false,PRUEBAS=true, DOCKER=true)](#variables-de-entorno-devfalsepruebastrue-dockertrue)
+    - [Ejecución](#ejecuci%C3%B3n-1)
+    - [Generar imagen para producción](#generar-imagen-para-producci%C3%B3n)
+  - [Localhost](#localhost)
+    - [Variables de entorno (DEV=true, PRUEBAS=false, DOCKER=false)](#variables-de-entorno-devtrue-pruebasfalse-dockerfalse)
+    - [Ejecución](#ejecuci%C3%B3n-2)
+- [Enlaces relevantes](#enlaces-relevantes)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Descripción
-Aplicación del portal de profesores para crear/ver/modificar las programaciones docentes de los planes de la ETSIT
+Servicio que permite consultar y planificar el curso académico actual y siguiente de todos los planes impartidos en la escuela. La aplicación está accesible desde el [portal del PDI en la página de la ETSIT](https://portal.etsit.upm.es/pdi/)
 
-## Ficheros
-Dentro de la carpeta  se encuentra todos los ficheros necesarios para el correcto despliegue de la aplicación. Posteriormente se comentarán en detalle.
+## Consideraciones previas
+En la [Wiki general](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/home) de los proyectos se incluye alguna información de utilidad:
+- Mapeo de puertos proxy inverso de la ETSIT: [Entorno de desarrollo, pruebas, producción y local](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/Entorno-de-desarrollo,-pruebas,-producci%C3%B3n-y-local).
+- Servicios y servidor CAS: [Entorno de desarrollo, pruebas, producción y local](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/Entorno-de-desarrollo,-pruebas,-producci%C3%B3n-y-local).
+- Conexión con el servidor CAS: [CAS, Central Authentication Service](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/CAS,-Central-Authentication-Service).
+- Campos devueltos por el CAS: [CAS, Central Authentication Service](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/CAS,-Central-Authentication-Service).
 
 
-## Variables de entorno en producción (DEV=false,PRUEBAS=false, DOCKER=true)
+## Puertos
+El puerto en el que corre la aplicación dentro del contenedor es el `3000` (Ver fichero `progDoc/file.env`). Por defecto este puerto se mapea en el `docker-compose-yml` al puerto `3000` del host. Para cambiarlo, modificar el primero de los dos puertos, es decir `"HOST:CONTAINER"`. 
 
-Son necesariuos tres archivos para configurar el entorno
+## Bases de datos
+Existen dos bases de datos una para almacenar las sesiones y otra con la información de la aplicación.
+
+### Requisitos de las bases de datos
+
+En **producción** deben realizarse copias de seguridad de la base de datos que contiene la información. Lo ideal es tener las siguientes copias:
+
+- Copia diaria completa de los datos que requieran respaldo.
+- Almacenar las copias diarias de los últimos siete días borrando las anteriores.
+- Almacenar una copia mensual de los últimos doce meses.
+- Almacenar una copia anual del último año.
+
+Con esta estrategia se evita que el número de copias aumente con el paso del tiempo. En este caso será constante y contará con 20 copias (7 diarias, 12 mensuales, 1 anual).
+
+### Inicialización de la base de datos *(pending)*
+** La primera vez que se ejecute el proyecto ** es necesario generar el esqueleto de la base de datos y rellenar alguna información adicional. Para ello se usarán las migraciones y seeders
+
+### Restore datos
+
+```shell
+#para importar la base de datos es necesario acceder a la base de datos y copiar el fichero con la bbdd
+psql -U [userpostgres] -h localhost  [database] < [file.sql]
+
+#file.sql puede contener toda la base de datos, el esquema o solo los datos. En docker se debe borrar el volumen dbdata de la bbdd ya que sino seguirá la versión anterior.
+```
+
+## Almacenamiento de ficheros (pdfs y csv)
+Los pdfs se almacenan en el volumen progdoc:/storage/progdoc
+Si se desea cambiar la carpeta: `/storage/progdoc/` debe hacerse tanto en `progDoc.env` como en `docker-compose.yml`
+Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/progdoc/pdfs/`
+
+### Requisitos de almacenamiento de ficheros
+En **producción** deben realizarse copias de seguridad del sistema de ficheros de la aplicación.
+
+### Gestor de archivos
+La configuración del gestor de archivos se realiza en el fichero de confguración `/progDoc/public/config/filemanager.config.json` y en concreto en la línea `"connectorUrl"` debe indicarse el `contexto` + `"archivos/filemanager"`.
+A modo de ejemplo `"connectorUrl": "/pdi/progdoc/archivos/filemanager"`
+
+
+## Gestión de roles
+En desarrollo se puede utilizar` USER_DEV` para simular cualquier ROL
+Además en desarrollo/pruebas si se crea el user Admin en la tabla roles y deja realizar todas las acciones
+Otra opción en desarrollo es meter en la base de datos a la persona y asignarle el rol deseado.
+Por ejemplo:
+
+```
+UPDATE public."Rols" SET "PersonaId"= 282 WHERE identificador=1;
+INSERT INTO public."Rols"(rol, "PersonaId") VALUES ('Admin', 282);
+
+```
+
+## Configuración de entornos
+
+### Producción
+
+El despliegue en producción es gestionado por el **GICO**.
+
+#### docker-compose.override.yml
+
+Ejemplo de configuración de docker. Complementa a la configuración del `docker-compose.yml`. En este ejemplo existen **dos** servicios: `dbsession` y `progdoc`. La base de datos con la información de las programaciones docentes no está alojada en un contenedor.
 
 `docker-compose.override.yml`
 
 ```
 version: '3'
-
 services:
-  dbsession:
-    container_name: gestiondoc_dbsession
-    env_file:
-      - ../config/gestionDoc/gestionDocSession.env
   progdoc:
-    build: 
-      context: .
+    image: git.etsit.upm.es:4567/grupointegraciondigital/gestiondoc:stable
     env_file:
       - ../config/gestionDoc/gestionDoc.env
-
 volumes:
   dbdata:
 ```
+
+#### Variables de entorno (DEV=false,PRUEBAS=false, DOCKER=true)
+
+Son necesariuos **dos** archivos para configurar el entorno.
+
+
 `gestionDoc.env`
 
 ```
 
-POSTGRES_DB=progdoc
-DB_USERNAME=user db con información
-DB_PASSWORD=xxxx
-DB_HOST=host en la que esta la bbdd el puerto es 5432 (el de postgres). Ejemplo: localhost
+POSTGRES_DB=programacion_docente
+DB_USERNAME=progdoc_user
+DB_PASSWORD=progdoc
+DB_HOST=db
 POSTGRESSESION_DB=progdocsession
-DBSESSION_USERNAME=user db de sesiones
-DBSESSION_PASSWORD=xxxx
-SERVICE=url servicio sin contexto ejemplo:https://pruebas.etsit.upm.es 
-CAS=url servidor cas: ejemplo:https://repo.etsit.upm.es/cas-upm
-SESSION_SECRET=Secreto_para_las_sesiones
-CONTEXT=/progdoc/ debe empezar con barra y terminar con barra
-PATH_PDF=/storage/progdoc/ debe terminar con barra
+DBSESSION_USERNAME=progdoc_user
+DBSESSION_PASSWORD=progdoc
+SERVICE=https://pruebas.etsit.upm.es #url servicio sin contexto
+CAS=https://siupruebas.upm.es/cas #url servidor cas
+SESSION_SECRET=xxxx
+CONTEXT=/pdi/progdoc
+PATH_PDF=/storage/progdoc
 DEV=false
 PRUEBAS=false
 DOCKER=true
@@ -57,24 +152,34 @@ PORT=3000
 
 ```
 POSTGRES_DB=progdocsession
-POSTGRES_USER=user db de sesiones
-POSTGRES_PASSWORD=xxxx
+POSTGRES_USER=progdoc_user
+POSTGRES_PASSWORD=progdoc
 ```
 
-Se proporciona un Dockerfile para la imagen que alojará el servidor, un script para la puesta en marcha de las bases de datos y el servidor, y un `docker-compose.yml` para el despliegue de toda la aplicación. 
-Dentro de la carpeta `progDoc`, está el código de la aplicación.
 
-## Variables de entorno en pruebas (DEV=false,PRUEBAS=true, DOCKER=true)
+#### Ejecución
+Una vez configuradas las variables de entorno y el puerto correctamente, para desplegar la aplicación se utiliza la imagen con etiqueta `stable` subida al gitlab: 
 
-Son necesariuos cuatro archivos para configurar el entorno
+```
+git.etsit.upm.es:4567/grupointegraciondigital/gestiondoc:stable
+```
+
+```
+# Arrancar los contenedores llamando a los ficheros de configuracón creados en la carpeta externa al proyecto
+docker-compose up -d
+```
+
+### Pruebas: host27
+
+#### docker-compose.override.yml
+
+Ejemplo de configuración de docker. Complementa a la configuración del `docker-compose.yml`. En este ejemplo existen **tres** servicios: `db`, `dbsession` y `progdoc`. La base de datos con la información de las programaciones docentes no está alojada en un contenedor.
 
 `docker-compose.override.yml`
 
 ```
 version: '3'
-
 services:
-
   db:
     container_name: gestiondoc_db
     image: postgres:9.6
@@ -90,6 +195,7 @@ services:
   progdoc:
     build: 
       context: .
+#    image: git.etsit.upm.es:4567/grupointegraciondigital/gestiondoc:stable
     depends_on:
       - db
     env_file:
@@ -98,22 +204,26 @@ services:
 volumes:
   dbdata:
 ```
+
+#### Variables de entorno (DEV=false,PRUEBAS=true, DOCKER=true)
+
+Son necesariuos **tres** archivos para configurar el entorno
+
 `gestionDoc.env`
 
 ```
-
 POSTGRES_DB=programacion_docente
 DB_USERNAME=progdoc_user
 DB_PASSWORD=progdoc
-DB_HOST=db (obligatoriamente)
+DB_HOST=db
 POSTGRESSESION_DB=progdocsession
 DBSESSION_USERNAME=progdoc_user
 DBSESSION_PASSWORD=progdoc
-SERVICE=url servicio sin contexto ejemplo:https://pruebas.etsit.upm.es 
-CAS=url servidor cas: ejemplo:https://repo.etsit.upm.es/cas-upm
-SESSION_SECRET=Secreto_para_las_sesiones
-CONTEXT=/progdoc/ debe empezar con barra y terminar con barra
-PATH_PDF=/storage/progdoc/ debe terminar con barra
+SERVICE=https://pruebas.etsit.upm.es #url servicio sin contexto
+CAS=https://siupruebas.upm.es/cas #url servidor cas
+SESSION_SECRET=xxxx
+CONTEXT=/pdi/progdoc
+PATH_PDF=/storage/progdoc
 DEV=false
 PRUEBAS=true
 DOCKER=true
@@ -126,7 +236,6 @@ PORT=3000
 POSTGRES_DB=programacion_docente
 POSTGRES_USER=progdoc_user
 POSTGRES_PASSWORD=progdoc
-
 ```
 `gestionDocSession.env`
 
@@ -136,10 +245,38 @@ POSTGRES_USER=progdoc_user
 POSTGRES_PASSWORD=progdoc
 ```
 
-Se proporciona un Dockerfile para la imagen que alojará el servidor, un script para la puesta en marcha de las bases de datos y el servidor, y un `docker-compose.yml` para el despliegue de toda la aplicación. 
-Dentro de la carpeta `progDoc`, está el código de la aplicación. 
-## Variables de entorno en desarrollo (DEV=true, PRUEBAS=false, DOCKER=false)
-En `progDoc/file.env` se define el modelo a seguir para configurar el .env (incluído en el `.gitignore`)
+
+#### Ejecución
+Una vez configuradas las variables de entorno y el puerto correctamente, para desplegar la aplicación, hay que ir al directorio `progDoc`, y desde ahí ejecutar el siguiente comando:
+
+
+```
+# Construir el proyecto llamando a los ficheros de configuración creados en la carpeta externa al proyecto
+docker-compose build
+
+# Arrancar los contenedores llamando a los ficheros de configuracón creados en la carpeta externa al proyecto
+docker-compose up -d
+
+```
+
+Alternativamente
+```
+docker-compose up -d --build
+```
+
+#### Generar imagen para producción
+
+- La versión debe especifiarse además de en la imagen en el `package.json`
+- Actualizar el [CHANGELOG.md](./CHANGELOG.md)
+- Generar las imágenes y subirlas a gitlab. Para ello se deben seguir las instrucciones especificadas en la [wiki general](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/Docker#container-registry-gitlab)
+
+
+### Localhost
+
+En localhost **no existe** la autenticación a través del servidor CAS, por esa razón hay que especificar el usuario que se desea utilizar: `USER_DEV` y `USER_DEV_ROLS`
+
+#### Variables de entorno (DEV=true, PRUEBAS=false, DOCKER=false)
+En `progDoc/file.env` se define el modelo a seguir para configurar el .env (incluído en el `.gitignore` para así no exponer datos sensibles)
 ```shell
 POSTGRES_DB=programacion_docente
 POSTGRESSESION_DB=progdocsession
@@ -148,8 +285,6 @@ DB_PASSWORD=1234
 DBSESSION_USERNAME=progdoc_user
 DB_HOST=localhost
 DBSESSION_PASSWORD=1234
-SERVICE=http://localhost:3000
-CAS=https://repo.etsit.upm.es/cas-upm
 SESSION_SECRET=Secreto_para_las_sesiones
 PATH_PDF=/storage/progdoc/
 CONTEXT=/pdi/progdoc/
@@ -158,65 +293,12 @@ DEV=true
 PRUEBAS=false
 DOCKER=false
 USER_DEV=javier.conde.diaz@alumnos.upm.es
-USER_DEV_ROLS=FA
+USER_DEV_ROLS=FA #employee type
 DEBUG=
 ```
 En desarrollo no se utiliza **DOCKER** para la aplicación WEB. Es necesario tener una base de datos **POSTGRESQL** instalada en el entorno o puede usarse un contenedor DOCKER para las bases de datos **exportando** el puerto 5432
 
-## Puertos
-El puerto en el que corre la aplicación dentro del contenedor es el `3000` (Ver fichero `progDoc/file.env`). Por defecto este puerto se mapea en el `docker-compose-yml` al puerto `3000` del host. Para cambiarlo, modificar el primero de los dos puertos, es decir `"HOST:CONTAINER"`. 
-
-## Bases de datos
-Existen dos bases de datos una para almacenar las sesiones y otra con la información de la aplicación. Por ahora la conexión es a travéś de una red privada.
-Deben configurarse los archivos donde se le pase las variables de entorno para la creación y conexión de la aplicación
-
-## Almacenamiento de pdfs y csv
-Los pdfs se almacenan en el volumen progdoc:/storage/progdoc
-Si se desea cambiar la carpeta: `/storage/progdoc/` debe hacerse tanto en `progDoc.env` como en `docker-compose.yml`
-Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/progdoc/pdfs/`
-
-## Gestor de archivos
-La configuración del gestor de archivos se realiza en el fichero de confguración `/progDoc/public/config/filemanager.config.json` y en concreto en la línea `"connectorUrl"` debe indicarse el `contexto` + `"archivos/filemanager"`.
-A modo de ejemplo `"connectorUrl": "/pdi/progdoc/archivos/filemanager"`
-
-## Ejecución en producción
-Una vez configuradas las variables de entorno y el puerto correctamente, para desplegar la aplicación, hay que ir al directorio `progDoc`, y desde ahí ejecutar el siguiente comando:
-
-
-```
-# Construir el proyecto llamando a los ficheros de configuración creados en la carpeta externa al proyecto
-docker-compose build
-
-# Arrancar los contenedores llamando a los ficheros de configuracón creados en la carpeta externa al proyecto
-docker-compose up -d
-
-#para importar la base de datos. Necesario entrar en el contenedor de la base de datos o tener un clinete de la bbdd en el host.
-psql -U [userpostgres] -h localhost  [database] < [file.sql]
-
-file.sql puede contener toda la base de datos, el esquema o solo los datos.
-En docker se debe borrar el volumen dbdata de la bbdd ya que sino seguirá la versión anterior.
-```
-
-## Ejecución en pruebas
-Una vez configuradas las variables de entorno y el puerto correctamente, para desplegar la aplicación, hay que ir al directorio `progDoc`, y desde ahí ejecutar el siguiente comando:
-
-
-```
-# Construir el proyecto llamando a los ficheros de configuración creados en la carpeta externa al proyecto
-docker-compose build
-
-# Arrancar los contenedores llamando a los ficheros de configuracón creados en la carpeta externa al proyecto
-docker-compose up -d
-
-#para importar la base de datos. Necesario entrar en el contenedor de la base de datos o tener un clinete de la bbdd en el host.
-psql -U [userpostgres] -h localhost  [database] < [file.sql]
-
-file.sql puede contener toda la base de datos, el esquema o solo los datos.
-En docker se debe borrar el volumen dbdata de la bbdd ya que sino seguirá la versión anterior.
-
-```
-
-## Ejecución en desarrollo
+#### Ejecución
 Una vez configuradas las variables de entorno y el puerto correctamente, para desplegar la aplicación, hay que ir al directorio `progDoc`, y desde ahí ejecutar los siguientes comandos:
 
 
@@ -229,30 +311,11 @@ npm install
 # Arrancar la aplicación web
 npm start
 
-#para importar la base de datos. Necesario entrar en el contenedor de la base de datos o tener un clinete de la bbdd en el host.
-psql -U [userpostgres] -h localhost  [database] < [file.sql]
-
-file.sql puede contener toda la base de datos, el esquema o solo los datos.
-En docker se debe borrar el volumen dbdata de la bbdd ya que sino seguirá la versión anterior.
-
 ```
 
-## Nota adicional
-El fichero `progDoc/script.sh`, se ejecuta cuando termina de arrancar el contenedor que aloja el servidor para migrar y reimportar la base de datos. Posteriormente arranca el servidor. En este proceso se hace un sleep de 30 segundos para esperar a que las bases de datos terminen de arrancar. En caso de fallo, alargar este sleep. 
-
-## Gestión de roles
-En desarrollo se puede utilizar USER_DEV para simular cualquier ROL
-Además en desarrollo/pruebas si se crea el user Admin en la tabla roles y deja realizar todas las acciones
-Otra opción en desarrollo es meter en la base de datos a la persona y asignarle el rol deseado.
-Por ejemplo:
-
-```
-UPDATE public."Rols" SET "PersonaId"= 282 WHERE identificador=1;
-INSERT INTO public."Rols"(rol, "PersonaId") VALUES ('Admin', 282);
-
-```
 
 ## Enlaces relevantes
-[Variables de entorno desde `docer-compose.ym`](https://docs.docker.com/compose/environment-variables/)
 [Contenedor postgres](https://hub.docker.com/_/postgres/)
 [Problemas con variables de entorno en el contenedor postgres](https://github.com/docker-library/postgres/issues/203)
+[Api UPM](https://www.upm.es/apiupm/index.html)
+[Wiki general](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/home)
