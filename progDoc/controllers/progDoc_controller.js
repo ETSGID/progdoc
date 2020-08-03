@@ -411,7 +411,7 @@ exports.getProgramacionDocentesAnteriores = async function (
   }
 };
 
-// te da las ultimas programaciones docentes de los planes pasados como array
+// devuelve las ultimas programaciones docentes de los planes pasados como array
 // planes el codigo del plan
 // tipoPD: 1S,2S no acepta I
 // ano: 201819
@@ -477,15 +477,35 @@ exports.getAllProgramacionDocentes = async function (planes, tipoPD, ano) {
   }
 };
 
+// devuelve las programaciones docentes mas antiguas (2 o más años)
+const getAntiguasProgramacionDocentes = async function () {
+  try {
+    return await models.ProgramacionDocente.findAll({
+      attributes: [
+        'identificador'
+      ],
+      where: {
+        anoAcademico: {
+          [op.lt]: (new Date().getFullYear() - 2).toString()
+        }
+      },
+      raw: true
+    });
+  } catch (error) {
+    // se propaga el error lo captura el middleware
+    throw error;
+  }
+}
+
 
 /*
 borra todos las programaciones docentes con errores que no deberia haberlas
 y lo relacionado con las mismas
 */
-const borrarPdsWithErrores = async function() {
-  try{
+const borrarPdsWithErrores = async function () {
+  try {
     await models.sequelize
-    .query(`DELETE FROM public."ProgramacionDocentes" p  WHERE p."estadoProGDoc" = -1; 
+      .query(`DELETE FROM public."ProgramacionDocentes" p  WHERE p."estadoProGDoc" = -1; 
         DELETE FROM public."Grupos" g WHERE g."ProgramacionDocenteId" is null; 
         DELETE FROM public."Asignaturas" asign WHERE asign."ProgramacionDocenteIdentificador" is null; 
         DELETE FROM public."AsignacionProfesors" a WHERE a."GrupoId" is null;
@@ -493,14 +513,14 @@ const borrarPdsWithErrores = async function() {
         DELETE FROM public."FranjaExamens" f WHERE f."ProgramacionDocenteId" is null;
         DELETE FROM public."ConjuntoActividadParcials" c WHERE c."ProgramacionDocenteId" is null;
         DELETE FROM public."ActividadParcials" act WHERE act."ConjuntoActividadParcialId" is null;`);
-  }catch (error) {
+  } catch (error) {
     // se propaga el error lo captura el middleware. Es critica para abrir progdoc
     throw error;
   }
 };
 
 // borra toda la informacion de una programacion docente
-const borrarPd = async function(pdID) {
+const borrarPd = async function (pdID) {
   try {
     const dir = `${PATH_PDF}/pdfs/${getAnoPd(pdID)}/${getPlanPd(pdID)}/${getTipoPd(pdID)}/${getVersionPdNormalized(pdID)}`
     await models.sequelize.query(
@@ -516,9 +536,23 @@ const borrarPd = async function(pdID) {
       { replacements: { pdId: pdID } }
     );
     await rimraf.sync(dir);
-  }catch (error) {
+  } catch (error) {
     // se propaga el error lo captura el middleware. Es critica para abrir progdoc
     throw error;
+  }
+}
+
+/**
+ * Borrar las pds antiguas
+ */
+const borrarPdsAntiguas = async function () {
+  try {
+    const pds = await getAntiguasProgramacionDocentes();
+    for (const pd of pds) {
+      await borrarPd(pd.identificador);
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
@@ -536,3 +570,4 @@ exports.CumpleTodos = CumpleTodos;
 exports.comprobarEstadoCumpleUno = comprobarEstadoCumpleUno;
 exports.borrarPdsWithErrores = borrarPdsWithErrores;
 exports.borrarPd = borrarPd;
+exports.borrarPdsAntiguas = borrarPdsAntiguas;

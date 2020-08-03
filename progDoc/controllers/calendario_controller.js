@@ -1256,3 +1256,31 @@ exports.copiarEventos = async function (req, res, next) {
     }
   }
 };
+
+
+/**
+ * Borra los calendarios antiguos
+ */
+exports.borrarCalendarioAntiguos = async function () {
+  try {
+    let date = moment().subtract(3, 'years').format('YYYY-MM-DD');
+    // borra eventos de plan
+    await models.EventoPlan.destroy({
+      where: {
+        fechaInicio: {
+          [op.lt]: date
+        } 
+      }
+    });
+    // borra eventos generales
+    await models.EventoGeneral.destroy({
+      where: {
+        fechaInicio: {
+          [op.lt]: date
+        } 
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
