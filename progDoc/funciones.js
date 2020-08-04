@@ -2,7 +2,7 @@ const moment = require('moment');
 const fs = require('fs');
 const path = require('path');
 
-exports.primerasMayusc = function(texto) {
+exports.primerasMayusc = texto => {
   const re = /(^|[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ])(?:([a-záéíóúüñ])|([A-ZÁÉÍÓÚÜÑ]))|([A-ZÁÉÍÓÚÜÑ]+)/gu;
   return texto.replace(
     re,
@@ -22,7 +22,7 @@ exports.primerasMayusc = function(texto) {
 un plan es un objeto {codigo:"09AQ",nombre:"MUIT", nombreCompleto:"Master en ..."}
 nombre puede ser null
 */
-exports.sortPlanes = function(a, b) {
+exports.sortPlanes = (a, b) => {
   const aNombre = a.nombre === null ? a.codigo : a.nombre;
   const bNombre = b.nombre === null ? b.codigo : b.nombre;
   if (aNombre < bNombre) return 1;
@@ -33,14 +33,14 @@ exports.sortPlanes = function(a, b) {
 /* ordena los departamentos por codigo ascendente
 un plan es un objeto {codigo:"D520",nombre:"Departaento...."}
 */
-exports.sortDepartamentos = function(a, b) {
+exports.sortDepartamentos = (a, b) => {
   if (a.codigo < b.codigo) return -1;
   if (a.codigo > b.codigo) return 1;
   return 0;
 };
 
 /* ordena los roles por departamentos */
-exports.sortRolesporDepartamento = function(a, b) {
+exports.sortRolesporDepartamento = (a, b) => {
   if (a.DepartamentoCodigo < b.DepartamentoCodigo) return -1;
   if (a.DepartamentoCodigo > b.DepartamentoCodigo) return 1;
   return 0;
@@ -49,7 +49,7 @@ exports.sortRolesporDepartamento = function(a, b) {
 /* ordena los profesores por nombreCorregido ascendente
 un profesor tendrá entre sus atributos {nombreCorregido: "apellido apellido, nombre" ...}
 */
-exports.sortProfesorCorregido = function(a, b) {
+exports.sortProfesorCorregido = (a, b) => {
   if (a.nombreCorregido < b.nombreCorregido) return -1;
   if (a.nombreCorregido > b.nombreCorregido) return 1;
   return 0;
@@ -58,7 +58,7 @@ exports.sortProfesorCorregido = function(a, b) {
 /* ordena las asignaturas por curos y después acronimo o nombre si no la tienen ascendente
 un profesor tendrá entre sus atributos {nombreCorregido: "apellido apellido, nombre" ...}
 */
-exports.sortAsignaturasCursoNombre = function(a, b) {
+exports.sortAsignaturasCursoNombre = (a, b) => {
   const aNombre = a.acronimo === null ? a.nombre : a.acronimo;
   const bNombre = b.acronimo === null ? b.nombre : b.acronimo;
   if (a.curso > b.curso) return 1;
@@ -69,13 +69,13 @@ exports.sortAsignaturasCursoNombre = function(a, b) {
 };
 /* ordena las asignaturas por codigo
  */
-exports.sortAsignaturasCodigo = function(a, b) {
+exports.sortAsignaturasCodigo = (a, b) => {
   if (a.codigo > b.codigo) return 1;
   if (a.codigo < b.codigo) return -1;
   return 0;
 };
 
-exports.isEmpty = function(obj) {
+exports.isEmpty = obj => {
   const { hasOwnProperty } = Object.prototype;
   // null and undefined are "empty"
   if (obj == null) return true;
@@ -101,14 +101,14 @@ exports.isEmpty = function(obj) {
 };
 
 // convierte de formato 4,5 a 4.5 el separador de decimales en números
-exports.convertCommaToPointDecimal = function(n) {
+exports.convertCommaToPointDecimal = n => {
   // eslint-disable-next-line no-param-reassign
   n = n.replace(/\./g, '').replace(',', '.');
   return n;
 };
 
 // convierte de YYYY-MM-DD a DD/MM/YYYY
-const formatFecha = function(fecha) {
+const formatFecha = fecha => {
   try {
     return `${fecha.split('-')[2]}/${fecha.split('-')[1]}/${
       fecha.split('-')[0]
@@ -116,12 +116,12 @@ const formatFecha = function(fecha) {
   } catch (error) {
     return null;
   }
-}
+};
 
 exports.formatFecha = formatFecha;
 
 // convierte de DD/MM/YYYY a YYYY-MM-DD
-const formatFecha2 = function(fecha) {
+const formatFecha2 = fecha => {
   try {
     return `${fecha.split('/')[2]}-${fecha.split('/')[1]}-${
       fecha.split('/')[0]
@@ -129,11 +129,11 @@ const formatFecha2 = function(fecha) {
   } catch (error) {
     return null;
   }
-}
+};
 exports.formatFecha2 = formatFecha2;
 
 // crea una fecha pasandola con formato dd/mm/yyyy
-exports.nuevaDateFormat = function(fecha) {
+exports.nuevaDateFormat = fecha => {
   try {
     const ano = fecha.split('/')[2];
     const mes = fecha.split('/')[1];
@@ -147,7 +147,7 @@ exports.nuevaDateFormat = function(fecha) {
 // le pasas una fecha y te devuelve el dia más proximo de dentro de un año que caiga
 // la fecha se pasa como YYYY-MM-DD
 // el mismo dia de la semana
-exports.addYear = function(fechaActual) {
+exports.addYear = fechaActual => {
   // eslint-disable-next-line no-param-reassign
   fechaActual = formatFecha(fechaActual);
   try {
@@ -180,7 +180,7 @@ exports.addYear = function(fechaActual) {
  * ¡¡las fechas al llamar a este método deberán estar ordenadas de manera creciente!!
  * */
 
-exports.addYear2 = function(fechaActual, fechaAnterior, offset) {
+exports.addYear2 = (fechaActual, fechaAnterior, offset) => {
   // eslint-disable-next-line no-param-reassign
   fechaActual = formatFecha(fechaActual);
   // eslint-disable-next-line no-param-reassign
@@ -219,7 +219,7 @@ exports.addYear2 = function(fechaActual, fechaAnterior, offset) {
 };
 
 // devuelve el siguiente año al pasarle con formato 201920 y devolveria 202021
-exports.siguienteAnoAcademico = function(anoActual) {
+exports.siguienteAnoAcademico = anoActual => {
   const year = Number(anoActual.substr(0, 4));
   const siguiente = year + 1;
   const siguiente2 = year + 2;

@@ -1,7 +1,7 @@
 const models = require('../models');
 
 // te devuelve todos los departamentos que hay en el sistmea
-exports.getAllDepartamentos = async function() {
+exports.getAllDepartamentos = async () => {
   // eslint-disable-next-line no-useless-catch
   try {
     const deps = await models.Departamento.findAll({

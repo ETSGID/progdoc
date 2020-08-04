@@ -1,7 +1,7 @@
 const models = require('../models');
 
 // te devuelve todos los cursos que existen
-exports.getCursos = async function(pdID) {
+exports.getCursos = async pdID => {
   if (pdID) {
     const cursos = [];
     // eslint-disable-next-line no-useless-catch

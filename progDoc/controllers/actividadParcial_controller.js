@@ -5,21 +5,21 @@ const funciones = require('../funciones');
 const estados = require('../estados');
 const enumsPD = require('../enumsPD');
 
-
 const op = Sequelize.Op;
 const progDocController = require('./progDoc_controller');
 const asignaturaController = require('./asignatura_controller');
 const grupoController = require('./grupo_controller');
 const cursoController = require('./curso_controller');
 
-exports.getActividadParcial = async function(req, res, next) {
+exports.getActividadParcial = async (req, res, next) => {
   req.session.submenu = 'Actividades';
   const { pdID } = req.session;
   let grupos;
   let asignaturas;
-  const view = req.session.menuBar === enumsPD.menuBar.consultar
-    ? 'actividades/actividadesConsultar'
-    : 'actividades/actividadesCumplimentar';
+  const view =
+    req.session.menuBar === enumsPD.menuBar.consultar
+      ? 'actividades/actividadesConsultar'
+      : 'actividades/actividadesCumplimentar';
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
     res.render(view, {
       existe: 'Programación docente no abierta',
@@ -115,7 +115,7 @@ exports.getActividadParcial = async function(req, res, next) {
         moment
       });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   }
@@ -125,7 +125,7 @@ exports.getActividadParcial = async function(req, res, next) {
 obtener todas las actividades parciales y los distitnos conjuntos de actividades parciales.
 pdID es un array porque pueden ser varias.
 */
-const getAllActividadParcial = async function(pdID) {
+const getAllActividadParcial = async pdID => {
   const conjuntoActividadesParcial = [];
   if (pdID) {
     // eslint-disable-next-line no-useless-catch
@@ -217,10 +217,10 @@ const getAllActividadParcial = async function(pdID) {
   } else {
     return null;
   }
-}
+};
 
 // post
-exports.aprobarActividades = async function(req, res, next) {
+exports.aprobarActividades = async (req, res, next) => {
   const { pdID } = req.session;
   const date = new Date();
   let estadoCalendario;
@@ -261,13 +261,13 @@ exports.aprobarActividades = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
 // recibe la info de una actividad nueva y la crea en la asignatura y grupo correspondiente
-exports.guardarActividad = async function(req, res) {
+exports.guardarActividad = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     const actividadToAnadir = {};
     // sino tiene asignaturaId se trata de una actividad de grupo
@@ -299,7 +299,7 @@ exports.guardarActividad = async function(req, res) {
         actividadUpdate: actividadToAnadir
       });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({
         success: false,
         msg: 'Ha habido un error la acción no se ha podido completar'
@@ -314,7 +314,7 @@ exports.guardarActividad = async function(req, res) {
 recibe la info de una actividad existente y la actualiza en la asignatura tipo
 y descripcion correspondiente.
 */
-exports.updateActividad = async function(req, res) {
+exports.updateActividad = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     const actividadToUpdate = {};
     // sino tiene asignaturaId se trata de una actividad de grupo
@@ -344,7 +344,7 @@ exports.updateActividad = async function(req, res) {
         actividadUpdate: actividadToUpdate
       });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({
         success: false,
         msg: 'Ha habido un error la acción no se ha podido completar'
@@ -356,7 +356,7 @@ exports.updateActividad = async function(req, res) {
 };
 
 // recibe la info de una actividad existente y la elimina
-exports.eliminarActividad = async function(req, res) {
+exports.eliminarActividad = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       await models.ActividadParcial.destroy({
@@ -364,7 +364,7 @@ exports.eliminarActividad = async function(req, res) {
       });
       res.json({ success: true });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({
         success: false,
         msg: 'Ha habido un error la acción no se ha podido completar'
@@ -376,7 +376,7 @@ exports.eliminarActividad = async function(req, res) {
 };
 
 // recibe la info de un conjuntoActividadParcial y la crea
-exports.crearConjuntoActividadParcial = async function(req, res, next) {
+exports.crearConjuntoActividadParcial = async (req, res, next) => {
   if (!res.locals.permisoDenegado) {
     const conjuntoActividadParcialToAnadir = {};
     conjuntoActividadParcialToAnadir.curso = Number(req.body.curso);
@@ -402,7 +402,7 @@ exports.crearConjuntoActividadParcial = async function(req, res, next) {
         res.redirect(`${req.baseUrl}/cumplimentar/actividades`);
       });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {
@@ -413,7 +413,7 @@ exports.crearConjuntoActividadParcial = async function(req, res, next) {
 };
 
 // recibe la info de un conjuntoActividadParcial existente y la actualiza
-exports.actualizarConjuntoActividadParcial = async function(req, res, next) {
+exports.actualizarConjuntoActividadParcial = async (req, res, next) => {
   if (!res.locals.permisoDenegado) {
     const conjuntoActividadParcialToUpdate = {};
     conjuntoActividadParcialToUpdate.notaInicial = req.body.notaInicial;
@@ -452,7 +452,7 @@ exports.actualizarConjuntoActividadParcial = async function(req, res, next) {
         res.redirect(`${req.baseUrl}/cumplimentar/actividades`);
       });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {
@@ -463,7 +463,7 @@ exports.actualizarConjuntoActividadParcial = async function(req, res, next) {
 };
 
 // recibe la info de un conjuntoActividadParcial
-exports.eliminarConjuntoActividadParcial = async function(req, res) {
+exports.eliminarConjuntoActividadParcial = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       await models.ConjuntoActividadParcial.destroy({
@@ -474,7 +474,7 @@ exports.eliminarConjuntoActividadParcial = async function(req, res) {
       });
       res.json({ success: true });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({
         success: false,
         msg: 'Ha habido un error la acción no se ha podido completar'

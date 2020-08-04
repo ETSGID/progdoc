@@ -1,6 +1,6 @@
 // Definicion del modelo PlanEstudio:
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const PlanEstudio = sequelize.define(
     'PlanEstudio',
     {

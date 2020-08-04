@@ -1,13 +1,13 @@
 /* global CONTEXT */
 /* eslint-disable camelcase */
 const moment = require('moment');
+const Sequelize = require('sequelize');
 const models = require('../models');
 const enumsPD = require('../enumsPD');
 
-const Sequelize = require('sequelize');
 const op = Sequelize.Op;
 
-const comprobarColor = function (buffer_eventos, eventos, dia) {
+const comprobarColor = (buffer_eventos, eventos, dia) => {
   let code = -1;
   const nuevo_buffer = [];
   const dia_objetoFecha = new Date(dia);
@@ -15,28 +15,38 @@ const comprobarColor = function (buffer_eventos, eventos, dia) {
     if (new Date(buffer_eventos[i].fechaFin) >= dia_objetoFecha) {
       nuevo_buffer.push(buffer_eventos[i]);
       // se queda con el color del evento con mayor tipo
-      if (enumsPD.eventosTipo[buffer_eventos[i].tipo] % Object.keys(enumsPD.eventosTipo).length > code % Object.keys(enumsPD.eventosTipo).length) {
+      if (
+        enumsPD.eventosTipo[buffer_eventos[i].tipo] %
+          Object.keys(enumsPD.eventosTipo).length >
+        code % Object.keys(enumsPD.eventosTipo).length
+      ) {
         code = enumsPD.eventosTipo[buffer_eventos[i].tipo];
       }
     }
   }
   for (const i in eventos) {
-    if (eventos[i].fechaFin !== 'Evento de dia') {
-      nuevo_buffer.push(eventos[i]);
-    }
-    // se queda con el color del evento con mayor tipo
-    if (enumsPD.eventosTipo[eventos[i].tipo] % Object.keys(enumsPD.eventosTipo).length > code % Object.keys(enumsPD.eventosTipo).length) {
-      code = enumsPD.eventosTipo[eventos[i].tipo];
+    if (Object.prototype.hasOwnProperty.call(eventos, i)) {
+      if (eventos[i].fechaFin !== 'Evento de dia') {
+        nuevo_buffer.push(eventos[i]);
+      }
+      // se queda con el color del evento con mayor tipo
+      if (
+        enumsPD.eventosTipo[eventos[i].tipo] %
+          Object.keys(enumsPD.eventosTipo).length >
+        code % Object.keys(enumsPD.eventosTipo).length
+      ) {
+        code = enumsPD.eventosTipo[eventos[i].tipo];
+      }
     }
   }
   return [code, nuevo_buffer];
-}
+};
 
-const bisiesto = function (year) {
+const bisiesto = year => {
   return year % 100 === 0 ? year % 400 === 0 : year % 4 === 0;
-}
+};
 
-const generarArrayDias  = function (dic_eventos, ano) {
+const generarArrayDias = (dic_eventos, ano) => {
   /* Primero generamos un array de enteros que sean todos los dias del año */
   const uno_septiembre = new Date(parseInt(ano, 10), 8, 1);
   const dia_de_semana = uno_septiembre.getDay();
@@ -141,164 +151,167 @@ const generarArrayDias  = function (dic_eventos, ano) {
     }
     if (array_numeros[i] === undefined) {
       array_calendario.push(undefined);
-      continue;
-    }
-    const num = array_numeros[i];
-    if (num === 1) {
-      contador_meses += 1;
-      if (contador_meses === 5) {
-        // eslint-disable-next-line no-param-reassign
-        ano += 1;
-        offset_mes = -4;
-      }
-    }
-    numero = String(num).length === 1 ? `0${String(num)}` : String(num);
-    mes = meses[contador_meses];
-    mes_codigo =
-      String(contador_meses + offset_mes).length === 1
-        ? `0${String(contador_meses + offset_mes)}`
-        : String(contador_meses + offset_mes);
-    codigo = `${ano}-${mes_codigo}-${numero}`;
-    eventos = dic_eventos[codigo] === undefined ? [] : dic_eventos[codigo];
-    // eventos de un dia
-    if (contar) {
-      // noContar=true si ese dia no se cuenta como dia en el que se da clase normal. Se usa para dic_dias
-      let noContar = false;
-      for (var j = 0; j < eventos.length; j++) {
-        const evento = eventos[j];
-        if (evento.nombre === 'Fin del periodo lectivo') {
-          contar = false;
-          noContar = true;
-          in_periodo_lectivo = false;
-          dic_dias[dia] += 1;
-        }
-        if (evento.nombre === 'Final del primer cuatrimestre') {
-          contar = false;
-          noContar = true;
-          dic_dias[dia] += 1;
-          dic_dias_1 = dic_dias;
-          contador_semanas = 1;
-          dic_dias = {
-            0: 0,
-            1: 0,
-            2: 0,
-            3: 0,
-            4: 0,
-            5: 0,
-            6: 0
-          };
-          in_periodo_lectivo = false;
-        }
-        if (evento.tipo === 'festivo') {
-          noContar = true;
-          if (evento.fechaFin !== 'Evento de dia') {
-            // periodos de vacaciones
-            contar = false;
-            if (evento.nombre === 'Periodo festivo de navidades') {
-            } else {
-              vacaciones_offset =
-                (Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio)) /
-                86400000;
-            }
-          }
-        }
-        try {
-          // dias especiales (por ejemplo dia de Lunes un Martes)
-          if (evento.nombre.substring(0, 6) === 'Día de') {
-            if (evento.nombre.length === 12) {
-              noContar = true;
-              dic_dias[enumsPD.diasDeSemana.Lunes] += 1;
-            } else if (evento.nombre.length === 13) {
-              noContar = true;
-              if (evento.nombre.substring(7, 13) === 'Martes') {
-                dic_dias[enumsPD.diasDeSemana.Martes] += 1;
-              } else {
-                dic_dias[enumsPD.diasDeSemana.Jueves] += 1;
-              }
-            } else if (evento.nombre.length === 14) {
-              noContar = true;
-              dic_dias[enumsPD.diasDeSemana.Viernes] += 1;
-            } else if (evento.nombre.length === 16) {
-              noContar = true;
-              dic_dias[enumsPD.diasDeSemana.Miercoles] += 1;
-            }
-          }
-        } catch (error) { }
-        if (noContar) {
-        }
-      }
-      if (noContar) {
-      } else {
-        dic_dias[dia] += 1;
-      }
     } else {
-      // Podría ocurrir que el final de un semestre lectivo esté puesto en periodo de vacaciones. Por eso se debe comprobar aquí
-      for (var j = 0; j < eventos.length; j++) {
-        const evento = eventos[j];
-        if (evento.nombre === 'Fin del periodo lectivo') {
-          contar = false;
-          noContar = true;
-          in_periodo_lectivo = false;
-          break;
-        }
-        if (evento.nombre === 'Final del primer cuatrimestre') {
-          contar = false;
-          noContar = true;
-          dic_dias_1 = dic_dias;
-          contador_semanas = 1;
-          dic_dias = {
-            0: 0,
-            1: 0,
-            2: 0,
-            3: 0,
-            4: 0,
-            5: 0,
-            6: 0
-          };
-          in_periodo_lectivo = false;
-          break;
+      const num = array_numeros[i];
+      if (num === 1) {
+        contador_meses += 1;
+        if (contador_meses === 5) {
+          // eslint-disable-next-line no-param-reassign
+          ano += 1;
+          offset_mes = -4;
         }
       }
-      if (vacaciones_offset > 1) {
-        vacaciones_offset -= 1;
-      } else if (vacaciones_offset === 1) {
-        vacaciones_offset = 0;
-        contar = true;
-      } else if (eventos.length !== 0) {
-        for (var j = 0; j < eventos.length; j++) {
+      const numero = String(num).length === 1 ? `0${String(num)}` : String(num);
+      const mes = meses[contador_meses];
+      const mes_codigo =
+        String(contador_meses + offset_mes).length === 1
+          ? `0${String(contador_meses + offset_mes)}`
+          : String(contador_meses + offset_mes);
+      const codigo = `${ano}-${mes_codigo}-${numero}`;
+      const eventos =
+        dic_eventos[codigo] === undefined ? [] : dic_eventos[codigo];
+      // eventos de un dia
+      if (contar) {
+        // noContar=true si ese dia no se cuenta como dia en el que se da clase normal. Se usa para dic_dias
+        let noContar = false;
+        for (let j = 0; j < eventos.length; j++) {
           const evento = eventos[j];
-
-          if (
-            evento.nombre === 'Inicio de las clases' ||
-            evento.nombre === 'Comienzo del segundo cuatrimestre'
-          ) {
-            in_periodo_lectivo = true;
-            contar = true;
+          if (evento.nombre === 'Fin del periodo lectivo') {
+            contar = false;
+            noContar = true;
+            in_periodo_lectivo = false;
             dic_dias[dia] += 1;
           }
+          if (evento.nombre === 'Final del primer cuatrimestre') {
+            contar = false;
+            noContar = true;
+            dic_dias[dia] += 1;
+            dic_dias_1 = dic_dias;
+            contador_semanas = 1;
+            dic_dias = {
+              0: 0,
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0,
+              6: 0
+            };
+            in_periodo_lectivo = false;
+          }
+          if (evento.tipo === 'festivo') {
+            noContar = true;
+            if (evento.fechaFin !== 'Evento de dia') {
+              // periodos de vacaciones
+              contar = false;
+              if (evento.nombre !== 'Periodo festivo de navidades') {
+                vacaciones_offset =
+                  (Date.parse(evento.fechaFin) -
+                    Date.parse(evento.fechaInicio)) /
+                  86400000;
+              }
+            }
+          }
+          try {
+            // dias especiales (por ejemplo dia de Lunes un Martes)
+            if (evento.nombre.substring(0, 6) === 'Día de') {
+              if (evento.nombre.length === 12) {
+                noContar = true;
+                dic_dias[enumsPD.diasDeSemana.Lunes] += 1;
+              } else if (evento.nombre.length === 13) {
+                noContar = true;
+                if (evento.nombre.substring(7, 13) === 'Martes') {
+                  dic_dias[enumsPD.diasDeSemana.Martes] += 1;
+                } else {
+                  dic_dias[enumsPD.diasDeSemana.Jueves] += 1;
+                }
+              } else if (evento.nombre.length === 14) {
+                noContar = true;
+                dic_dias[enumsPD.diasDeSemana.Viernes] += 1;
+              } else if (evento.nombre.length === 16) {
+                noContar = true;
+                dic_dias[enumsPD.diasDeSemana.Miercoles] += 1;
+              }
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }
+        if (!noContar) {
+          dic_dias[dia] += 1;
+        }
+      } else {
+        // Podría ocurrir que el final de un semestre lectivo esté puesto en periodo de vacaciones. Por eso se debe comprobar aquí
+        for (let j = 0; j < eventos.length; j++) {
+          const evento = eventos[j];
+          if (evento.nombre === 'Fin del periodo lectivo') {
+            contar = false;
+            in_periodo_lectivo = false;
+            break;
+          }
+          if (evento.nombre === 'Final del primer cuatrimestre') {
+            contar = false;
+            dic_dias_1 = dic_dias;
+            contador_semanas = 1;
+            dic_dias = {
+              0: 0,
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0,
+              6: 0
+            };
+            in_periodo_lectivo = false;
+            break;
+          }
+        }
+        if (vacaciones_offset > 1) {
+          vacaciones_offset -= 1;
+        } else if (vacaciones_offset === 1) {
+          vacaciones_offset = 0;
+          contar = true;
+        } else if (eventos.length !== 0) {
+          for (let j = 0; j < eventos.length; j++) {
+            const evento = eventos[j];
+
+            if (
+              evento.nombre === 'Inicio de las clases' ||
+              evento.nombre === 'Comienzo del segundo cuatrimestre'
+            ) {
+              in_periodo_lectivo = true;
+              contar = true;
+              dic_dias[dia] += 1;
+            }
+          }
         }
       }
+      dia = (dia + 1) % 7;
+      const comprobarColorArray = comprobarColor(
+        buffer_eventos,
+        eventos,
+        codigo
+      );
+      let color = 'white';
+      if (comprobarColorArray[0] !== -1) {
+        color = enumsPD.coloresEvento[comprobarColorArray[0]];
+      }
+      // eslint-disable-next-line prefer-destructuring
+      buffer_eventos = comprobarColorArray[1];
+      const objeto = {
+        numero,
+        mes,
+        mes_codigo,
+        codigo,
+        ano,
+        eventos,
+        color
+      };
+      array_calendario.push(objeto);
     }
-    dia = (dia + 1) % 7;
-    const comprobarColorArray = comprobarColor(buffer_eventos, eventos, codigo);
-    let color = 'white';
-    if (comprobarColorArray[0] !== -1) {
-      color = enumsPD.coloresEvento[comprobarColorArray[0]];
-    }
-    buffer_eventos = comprobarColorArray[1];
-    objeto = {
-      numero,
-      mes,
-      mes_codigo,
-      codigo,
-      ano,
-      eventos,
-      color
-    };
-    array_calendario.push(objeto);
   }
   return [array_calendario, array_numeros, dic_dias_1, dic_dias, semanas];
-}
+};
 
 /**
  * Esta funcion se encarga de generar el calendario y renderizar la página con el calendario.
@@ -320,7 +333,7 @@ const generarArrayDias  = function (dic_eventos, ano) {
  * @param {*} next
  */
 
-exports.getCalendario = async function (req, res, next) {
+exports.getCalendario = async (req, res, next) => {
   try {
     const { ano } = req;
     req.session.ano = req.ano_mostrar;
@@ -328,19 +341,19 @@ exports.getCalendario = async function (req, res, next) {
     if (Object.entries(req.dic_eventos).length !== 0) {
       vacio = false;
     }
-    array_datos = generarArrayDias(req.dic_eventos, ano);
+    const array_datos = generarArrayDias(req.dic_eventos, ano);
     let general = 'false';
     if (req.query.planID === undefined) {
       general = 'true';
     }
     let ano_actual = new Date().toString().split(' ')[3];
     if (new Date().getMonth() < 8) {
-      ano_actual = String(parseInt(ano_actual) - 1);
+      ano_actual = String(parseInt(ano_actual, 10) - 1);
     }
     if (general === 'true') {
       const resultado = await models.Calendario.findAll({
         where: {
-          ano: parseInt(ano)
+          ano: parseInt(ano, 10)
         },
         raw: true
       });
@@ -362,7 +375,7 @@ exports.getCalendario = async function (req, res, next) {
           dic_diasSemana_1: array_datos[2],
           dic_diasSemana_2: array_datos[3],
           ano1: ano_actual,
-          ano2: String(parseInt(ano_actual) + 1),
+          ano2: String(parseInt(ano_actual, 10) + 1),
           ano: req.ano_mostrar,
           estado: 0,
           semanas: array_datos[4],
@@ -381,7 +394,7 @@ exports.getCalendario = async function (req, res, next) {
           dic_diasSemana_1: array_datos[2],
           dic_diasSemana_2: array_datos[3],
           ano1: ano_actual,
-          ano2: String(parseInt(ano_actual) + 1),
+          ano2: String(parseInt(ano_actual, 10) + 1),
           ano: req.ano_mostrar,
           estado: resultado[0].estado,
           semanas: array_datos[4],
@@ -391,7 +404,7 @@ exports.getCalendario = async function (req, res, next) {
     } else {
       const resultado = await models.Calendario.findAll({
         where: {
-          ano: parseInt(ano)
+          ano: parseInt(ano, 10)
         },
         raw: true
       });
@@ -411,7 +424,7 @@ exports.getCalendario = async function (req, res, next) {
           calendario: array_datos[1],
           array_dias: array_datos[0],
           ano1: ano_actual,
-          ano2: String(parseInt(ano_actual) + 1),
+          ano2: String(parseInt(ano_actual, 10) + 1),
           ano: req.ano_mostrar,
           estado: resultado[0].estado,
           semanas: array_datos[4]
@@ -427,7 +440,7 @@ exports.getCalendario = async function (req, res, next) {
           calendario: array_datos[1],
           array_dias: array_datos[0],
           ano1: ano_actual,
-          ano2: String(parseInt(ano_actual) + 1),
+          ano2: String(parseInt(ano_actual, 10) + 1),
           ano: req.ano_mostrar,
           estado: resultado[0].estado,
           semanas: array_datos[4]
@@ -435,11 +448,11 @@ exports.getCalendario = async function (req, res, next) {
       }
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
-exports.getCalendarioPlanConsultar = async function (req, res, next) {
+exports.getCalendarioPlanConsultar = async (req, res, next) => {
   try {
     req.calendario = {};
     const { ano } = req;
@@ -459,14 +472,10 @@ exports.getCalendarioPlanConsultar = async function (req, res, next) {
       return;
     }
     req.session.ano = req.ano_mostrar;
-    array_datos = generarArrayDias(req.dic_eventos, ano);
-    let ano_actual = new Date().toString().split(' ')[3];
-    if (new Date().getMonth() < 8) {
-      ano_actual = String(parseInt(ano_actual) - 1);
-    }
+    const array_datos = generarArrayDias(req.dic_eventos, ano);
     const resultado = await models.Calendario.findAll({
       where: {
-        ano: parseInt(ano)
+        ano: parseInt(ano, 10)
       },
       raw: true
     });
@@ -513,7 +522,7 @@ exports.getCalendarioPlanConsultar = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
@@ -524,19 +533,15 @@ exports.getCalendarioPlanConsultar = async function (req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.getCalendarioPDF = async function (req, res, next) {
+exports.getCalendarioPDF = async (req, res, next) => {
   try {
     req.calendario = {};
     if (res.locals.progDoc) {
       const { ano } = req;
-      array_datos = generarArrayDias(req.dic_eventos, ano);
-      let ano_actual = new Date().toString().split(' ')[3];
-      if (new Date().getMonth() < 8) {
-        ano_actual = String(parseInt(ano_actual) - 1);
-      }
+      const array_datos = generarArrayDias(req.dic_eventos, ano);
       const resultado = await models.Calendario.findAll({
         where: {
-          ano: parseInt(ano)
+          ano: parseInt(ano, 10)
         },
         raw: true
       });
@@ -549,8 +554,7 @@ exports.getCalendarioPDF = async function (req, res, next) {
         req.calendario.estado = 0;
         next();
       } else {
-        req.calendario.calendario = array_datos[1];
-        req.calendario.array_dias = array_datos[0];
+        [req.calendario.array_dias, req.calendario.calendario] = array_datos;
         if (resultado[0].estado === 0) {
           req.calendario.estado = 0;
         } else {
@@ -562,7 +566,7 @@ exports.getCalendarioPDF = async function (req, res, next) {
       next();
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
@@ -582,15 +586,15 @@ exports.getCalendarioPDF = async function (req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.eventosDiccionario = async function (req, res, next) {
+exports.eventosDiccionario = async (req, res, next) => {
   try {
-    let dic_eventos = req.dic_eventos || {};
+    const dic_eventos = req.dic_eventos || {};
     const { ano } = req;
     const condicionesDeBusqueda = {
       fechaInicio: {
         // Solamente se coge los eventos de ese año
         gte: Date.parse(`${ano}-09-01`),
-        lt: Date.parse(`${String(parseInt(ano) + 1)}-09-01`)
+        lt: Date.parse(`${String(parseInt(ano, 10) + 1)}-09-01`)
       }
     };
     const events = await models.EventoGeneral.findAll({
@@ -601,13 +605,17 @@ exports.eventosDiccionario = async function (req, res, next) {
       let nombre = e.evento;
       // en caso de que exista un evento especifico de plan no se coge el general
       // se debe actualizar con el evento general para ver si el general era editable
-      for (fechaInicioEvento in dic_eventos) {
-        const eventoEditado = dic_eventos[fechaInicioEvento].find(
-          obj => obj.identificador === e.identificador
-        )
-        if (eventoEditado) {
-          eventoEditado.editable = e.editable;
-          return;
+      for (const fechaInicioEvento in dic_eventos) {
+        if (
+          Object.prototype.hasOwnProperty.call(dic_eventos, fechaInicioEvento)
+        ) {
+          const eventoEditado = dic_eventos[fechaInicioEvento].find(
+            obj => obj.identificador === e.identificador
+          );
+          if (eventoEditado) {
+            eventoEditado.editable = e.editable;
+            return;
+          }
         }
       }
       let tipo = '';
@@ -634,20 +642,22 @@ exports.eventosDiccionario = async function (req, res, next) {
       } else {
         tipo = 'otro';
       }
+      let mensaje = '';
+      let fechaFin;
       if (e.fechaFin === null) {
-        var mensaje = `${e.fechaInicio.split('-')[2]}: ${nombre}`;
-        var fechaFin = 'Evento de dia';
+        mensaje = `${e.fechaInicio.split('-')[2]}: ${nombre}`;
+        fechaFin = 'Evento de dia';
       } else {
         if (e.fechaInicio.split('-')[1] === e.fechaFin.split('-')[1]) {
-          var mensaje = `${e.fechaInicio.split('-')[2]}-${
+          mensaje = `${e.fechaInicio.split('-')[2]}-${
             e.fechaFin.split('-')[2]
-            }: ${nombre}`;
+          }: ${nombre}`;
         } else {
-          var mensaje = `${e.fechaInicio.split('-')[2]}/${
+          mensaje = `${e.fechaInicio.split('-')[2]}/${
             e.fechaInicio.split('-')[1]
-            }-${e.fechaFin.split('-')[2]}/${e.fechaFin.split('-')[1]}: ${nombre}`;
+          }-${e.fechaFin.split('-')[2]}/${e.fechaFin.split('-')[1]}: ${nombre}`;
         }
-        var { fechaFin } = e;
+        fechaFin = e.fechaFin;
       }
       const objeto_evento = {
         identificador: e.identificador,
@@ -669,7 +679,7 @@ exports.eventosDiccionario = async function (req, res, next) {
     req.dic_eventos = dic_eventos;
     next();
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
@@ -689,7 +699,7 @@ exports.eventosDiccionario = async function (req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.eventosPlanDiccionario = async function (req, res, next) {
+exports.eventosPlanDiccionario = async (req, res, next) => {
   try {
     const dic_eventos = {};
     const { planID } = req.query;
@@ -702,7 +712,7 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
           fechaInicio: {
             // Solamente se coge los eventos de ese año
             gte: Date.parse(`${ano}-09-01`),
-            lt: Date.parse(`${String(parseInt(ano) + 1)}-09-01`)
+            lt: Date.parse(`${String(parseInt(ano, 10) + 1)}-09-01`)
           },
           PlanEstudioId: planID
         },
@@ -736,22 +746,24 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
         } else {
           tipo = 'otro';
         }
+        let mensaje = '';
+        let fechaFin;
         if (e.fechaFin === null) {
-          var mensaje = `${e.fechaInicio.split('-')[2]}: ${nombre}`;
-          var fechaFin = 'Evento de dia';
+          mensaje = `${e.fechaInicio.split('-')[2]}: ${nombre}`;
+          fechaFin = 'Evento de dia';
         } else {
           if (e.fechaInicio.split('-')[1] === e.fechaFin.split('-')[1]) {
-            var mensaje = `${e.fechaInicio.split('-')[2]}-${
+            mensaje = `${e.fechaInicio.split('-')[2]}-${
               e.fechaFin.split('-')[2]
-              }: ${nombre}`;
+            }: ${nombre}`;
           } else {
-            var mensaje = `${e.fechaInicio.split('-')[2]}/${
+            mensaje = `${e.fechaInicio.split('-')[2]}/${
               e.fechaInicio.split('-')[1]
-              }-${e.fechaFin.split('-')[2]}/${
+            }-${e.fechaFin.split('-')[2]}/${
               e.fechaFin.split('-')[1]
-              }: ${nombre}`;
+            }: ${nombre}`;
           }
-          var { fechaFin } = e;
+          fechaFin = e.fechaFin;
         }
         const objeto_evento = {
           nombre,
@@ -775,7 +787,7 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
       next();
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
@@ -786,7 +798,7 @@ exports.eventosPlanDiccionario = async function (req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.anoDeTrabajo = function (req, res, next) {
+exports.anoDeTrabajo = (req, res, next) => {
   // Lo primero que hace el codigo es ver si se le ha metido el año como query
   let { ano } = req.query;
 
@@ -804,6 +816,7 @@ exports.anoDeTrabajo = function (req, res, next) {
 
     // En caso negativo, se obtiene el año actual (el de comienzo del curso, ej:19/20 --> 2019)
     else if (req.session.ano === undefined) {
+      // eslint-disable-next-line prefer-destructuring
       ano = new Date().toString().split(' ')[3];
       req.ano_mostrar = ano;
     } else {
@@ -823,7 +836,7 @@ exports.anoDeTrabajo = function (req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-exports.anoDeTrabajoPDF = function (req, res, next) {
+exports.anoDeTrabajoPDF = (req, res, next) => {
   /*
     let planID = req.session.pdID;
     let ano = planID.split("_")[2].substring(0,4);
@@ -848,8 +861,8 @@ exports.anoDeTrabajoPDF = function (req, res, next) {
   next();
 };
 
-//create or update eventoGeneral
-exports.postEventoGeneral = async function (req, res, next) {
+// create or update eventoGeneral
+exports.postEventoGeneral = async (req, res, next) => {
   try {
     let { fechaFin } = req.query;
     if (fechaFin !== undefined) {
@@ -868,7 +881,7 @@ exports.postEventoGeneral = async function (req, res, next) {
       fechaFin,
       editable
     };
-    //si no existe se crea
+    // si no existe se crea
     if (req.query.identificador === '0') {
       await models.EventoGeneral.findCreateFind({ where: evento });
       // res.status(409);
@@ -881,12 +894,12 @@ exports.postEventoGeneral = async function (req, res, next) {
       res.json({ estado: 'exito' });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-exports.deleteEventoGeneral = async function (req, res, next) {
+exports.deleteEventoGeneral = async (req, res, next) => {
   try {
     // borra el evento de los planes especificos
     // que habian sido borrados antes
@@ -897,7 +910,7 @@ exports.deleteEventoGeneral = async function (req, res, next) {
         evento: { [op.like]: 'eliminado//%' }
       }
     });
-    //borra el evento general
+    // borra el evento general
     await models.EventoGeneral.destroy({
       where: {
         identificador: req.query.identificador
@@ -905,14 +918,14 @@ exports.deleteEventoGeneral = async function (req, res, next) {
     });
     res.json({ estado: 'exito' });
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
 // EN REALIDAD SE GUARDA COMO ELIMINADO EN LA BBDD
 // cuando se elimina un evento general en un calendario particular
-exports.deleteEventoPlan = async function (req, res, next) {
+exports.deleteEventoPlan = async (req, res, next) => {
   try {
     const { planID } = req.session;
     const eventoGeneralId = req.query.identificador;
@@ -948,67 +961,53 @@ exports.deleteEventoPlan = async function (req, res, next) {
       res.json({ estado: 'exito' });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
-//create or edit eventoPlan
-exports.postEventoPlan = async function (req, res, next) {
+// create or edit eventoPlan
+exports.postEventoPlan = async (req, res, next) => {
   try {
     const { planID } = req.session;
-    let eventoGeneralId = req.query.identificador;
+    const eventoGeneralId = req.query.identificador;
     const nombre = req.query.evento;
     let { fechaInicio } = req.query;
     let { fechaFin } = req.query;
-    const meses = [
-      ' ',
-      'Enero',
-      'Febrero',
-      'Marzo',
-      'Abril',
-      'Mayo',
-      'Junio',
-      'Julio',
-      'Agosto',
-      'Septiembre',
-      'Octubre',
-      'Noviembre',
-      'Diciembre'
-    ];
-
     const evento = {
       evento: nombre,
       color: undefined
-    }
+    };
     if (fechaInicio) {
       fechaInicio = moment(fechaInicio, 'YYYY-MM-DD');
-      evento['fechaInicio'] = fechaInicio
+      evento.fechaInicio = fechaInicio;
     }
     if (fechaFin !== undefined) {
       fechaFin = moment(fechaFin, 'YYYY-MM-DD');
-      evento['fechaFin'] = fechaFin
+      evento.fechaFin = fechaFin;
     }
     // update eventoPlan no asociado a evento general
     if (eventoGeneralId === 'null') {
-      evento['PlanEstudioId'] = planID;
-      evento['EventoGeneralId'] = null;
+      evento.PlanEstudioId = planID;
+      evento.EventoGeneralId = null;
 
       await models.EventoPlan.update(evento, {
-        where: { identificador: parseInt(req.query.identificadorEventoPlan) }
+        where: {
+          identificador: parseInt(req.query.identificadorEventoPlan, 10)
+        }
       });
       // res.status(409);
       res.json({ estado: 'exito' });
     } else if (eventoGeneralId === '0') {
       // create eventoPlan no asociado a evento general
-      evento['PlanEstudioId'] = planID;
-      evento['EventoGeneralId'] = null;
+      evento.PlanEstudioId = planID;
+      evento.EventoGeneralId = null;
       await models.EventoPlan.findCreateFind({ where: evento });
       // res.status(409);
       res.json({ estado: 'exito' });
     } else {
-      // create or update evento asociado a general 
-      evento['PlanEstudioId'] = planID;
-      evento['EventoGeneralId'] = eventoGeneralId;
+      // create or update evento asociado a general
+      evento.PlanEstudioId = planID;
+      evento.EventoGeneralId = eventoGeneralId;
       await models.EventoPlan.destroy({
         where: {
           PlanEstudioId: planID,
@@ -1020,16 +1019,16 @@ exports.postEventoPlan = async function (req, res, next) {
       res.json({ estado: 'exito' });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-exports.trasladarGeneral = async function (req, res, next) {
+exports.trasladarGeneral = async (req, res, next) => {
   try {
     const { ano } = req.query;
     let { newEstado } = req.query;
-    newEstado = parseInt(newEstado);
+    newEstado = parseInt(newEstado, 10);
     if (ano === undefined) {
       res.status(400);
       res.json({
@@ -1041,22 +1040,21 @@ exports.trasladarGeneral = async function (req, res, next) {
         estado: 'quiere pasar el calendario a un estado incorrecto'
       });
     } else {
-
       await models.Calendario.update(
         { estado: newEstado },
-        { where: { ano: parseInt(ano) } }
+        { where: { ano: parseInt(ano, 10) } }
       );
       res.json({
         estado: 'exito'
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-exports.getCalendarioPlan = async function (req, res, next) {
+exports.getCalendarioPlan = async (req, res, next) => {
   try {
     const { ano } = req;
     if (ano === null) {
@@ -1074,14 +1072,10 @@ exports.getCalendarioPlan = async function (req, res, next) {
       });
       return;
     }
-    array_datos = generarArrayDias(req.dic_eventos, ano);
-    let ano_actual = new Date().toString().split(' ')[3];
-    if (new Date().getMonth() < 8) {
-      ano_actual = String(parseInt(ano_actual) - 1);
-    }
+    const array_datos = generarArrayDias(req.dic_eventos, ano);
     const resultado = await models.Calendario.findAll({
       where: {
-        ano: parseInt(ano)
+        ano: parseInt(ano, 10)
       },
       raw: true
     });
@@ -1116,12 +1110,12 @@ exports.getCalendarioPlan = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-exports.editablePlan = async function (req, res, next) {
+exports.editablePlan = async (req, res, next) => {
   try {
     const { planID } = req.session;
     const { identificador } = req.query;
@@ -1158,12 +1152,12 @@ exports.editablePlan = async function (req, res, next) {
       res.json({ estado: 'exito' });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-exports.copiarEventos = async function (req, res, next) {
+exports.copiarEventos = async (req, res) => {
   const { ano } = req.query;
   if (ano === undefined) {
     res.status(400);
@@ -1173,11 +1167,10 @@ exports.copiarEventos = async function (req, res, next) {
   } else {
     let transaction;
     try {
-      const { ano } = req.query;
       const condicionesDeBusqueda = {
         fechaInicio: {
           // Solamente se coge los eventos de ese año
-          gte: Date.parse(`${String(parseInt(ano) - 1)}-09-01`),
+          gte: Date.parse(`${String(parseInt(ano, 10) - 1)}-09-01`),
           lt: Date.parse(`${ano}-09-01`)
         }
       };
@@ -1187,24 +1180,30 @@ exports.copiarEventos = async function (req, res, next) {
         transaction,
         raw: true
       });
+      const promises = [];
       // forEach no funciona con bucle de awaits por ser funcional
       for (let i = 0; i < eventosGeneral.length; i++) {
         const e = eventosGeneral[i];
         const nombre = e.evento;
         if (nombre.includes('festivo//')) {
-          e.fechaInicio = moment(e.fechaInicio).add(1, 'year').format('YYYY-MM-DD')
+          e.fechaInicio = moment(e.fechaInicio)
+            .add(1, 'year')
+            .format('YYYY-MM-DD');
 
           if (e.fechaFin !== null) {
-            e.fechaFin = moment(e.fechaFin).add(1, 'year').format('YYYY-MM-DD')
+            e.fechaFin = moment(e.fechaFin)
+              .add(1, 'year')
+              .format('YYYY-MM-DD');
           }
           delete e.identificador;
-          await models.EventoGeneral.findOrCreate({ where: e, transaction });
-        } else if (nombre.includes('especial//')) {
+          promises.push(
+            models.EventoGeneral.findOrCreate({ where: e, transaction })
+          );
         } else {
           let { fechaInicio } = e;
           let { fechaFin } = e;
           if (e.fechaFin === null) {
-            let nuevaFecha = moment(fechaInicio).add(1, 'year')
+            let nuevaFecha = moment(fechaInicio).add(1, 'year');
             if (nuevaFecha.day() === 0) {
               nuevaFecha = nuevaFecha.add(1, 'day');
             } else if (nuevaFecha.day() === 6) {
@@ -1214,13 +1213,15 @@ exports.copiarEventos = async function (req, res, next) {
             fechaInicio = nuevaFecha;
             e.fechaInicio = fechaInicio.format('YYYY-MM-DD');
             delete e.identificador;
-            await models.EventoGeneral.findOrCreate({
-              where: e,
-              transaction
-            });
+            promises.push(
+              models.EventoGeneral.findOrCreate({
+                where: e,
+                transaction
+              })
+            );
           } else {
-            let nuevaFecha = moment(fechaInicio).add(1, 'year')
-            let nuevaFechaFin = moment(fechaFin).add(1, 'year')
+            let nuevaFecha = moment(fechaInicio).add(1, 'year');
+            let nuevaFechaFin = moment(fechaFin).add(1, 'year');
             if (nuevaFecha.day() === 0) {
               nuevaFecha = nuevaFecha.add(1, 'day');
               nuevaFechaFin = nuevaFechaFin.add(1, 'day');
@@ -1235,20 +1236,23 @@ exports.copiarEventos = async function (req, res, next) {
             e.fechaInicio = fechaInicio.format('YYYY-MM-DD');
             e.fechaFin = fechaFin.format('YYYY-MM-DD');
             delete e.identificador;
-            await models.EventoGeneral.findOrCreate({
-              where: e,
-              transaction
-            });
+            promises.push(
+              models.EventoGeneral.findOrCreate({
+                where: e,
+                transaction
+              })
+            );
           }
         }
       }
+      await Promise.all(promises);
       // commit
       await transaction.commit();
       res.json({ estado: 'exito' });
     } catch (error) {
       // Rollback transaction only if the transaction object is defined
       if (transaction) await transaction.rollback();
-      console.log(error);
+      console.error(error);
       res.status(500);
       res.json({
         error: 'Ha ocurrido un error'
@@ -1257,19 +1261,20 @@ exports.copiarEventos = async function (req, res, next) {
   }
 };
 
-
 /**
  * Borra los calendarios antiguos
  */
-exports.borrarCalendarioAntiguos = async function () {
+exports.borrarCalendarioAntiguos = async () => {
   try {
-    let date = moment().subtract(3, 'years').format('YYYY-MM-DD');
+    const date = moment()
+      .subtract(3, 'years')
+      .format('YYYY-MM-DD');
     // borra eventos de plan
     await models.EventoPlan.destroy({
       where: {
         fechaInicio: {
           [op.lt]: date
-        } 
+        }
       }
     });
     // borra eventos generales
@@ -1277,10 +1282,10 @@ exports.borrarCalendarioAntiguos = async function () {
       where: {
         fechaInicio: {
           [op.lt]: date
-        } 
+        }
       }
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
-}
+};

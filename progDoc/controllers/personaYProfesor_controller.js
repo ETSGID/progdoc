@@ -1,7 +1,7 @@
 const models = require('../models');
 const funciones = require('../funciones');
 
-const getPeople = async function (onlyProfesor) {
+const getPeople = async onlyProfesor => {
   const profesores = [];
   const required = onlyProfesor === true;
   // eslint-disable-next-line no-useless-catch
@@ -35,9 +35,9 @@ const getPeople = async function (onlyProfesor) {
     // se propaga el error lo captura el middleware
     throw error;
   }
-}
+};
 
-const getPersonCorreo = async function (onlyProfesor, correo) {
+const getPersonCorreo = async (onlyProfesor, correo) => {
   const required = onlyProfesor === true;
   // eslint-disable-next-line no-useless-catch
   try {
@@ -59,9 +59,9 @@ const getPersonCorreo = async function (onlyProfesor, correo) {
     // se propaga el error lo captura el middleware
     throw error;
   }
-}
+};
 
-const getPeoplePagination = async function (onlyProfesor, page, limit) {
+const getPeoplePagination = async (onlyProfesor, page, limit) => {
   const offset = 0 + (page - 1) * limit;
   const required = onlyProfesor === true;
   // eslint-disable-next-line no-useless-catch
@@ -84,9 +84,9 @@ const getPeoplePagination = async function (onlyProfesor, page, limit) {
     // se propaga el error lo captura el middleware
     throw error;
   }
-}
+};
 
-exports.getPersonas = async function () {
+exports.getPersonas = async () => {
   // eslint-disable-next-line no-useless-catch
   try {
     const personas = await getPeople(false);
@@ -97,7 +97,7 @@ exports.getPersonas = async function () {
   }
 };
 
-exports.getPersonasPagination = async function (req, res, next) {
+exports.getPersonasPagination = async (req, res, next) => {
   req.session.submenu = 'Personal';
   // eslint-disable-next-line no-useless-catch
   try {
@@ -126,7 +126,7 @@ exports.getPersonasPagination = async function (req, res, next) {
 };
 
 // get profesores
-exports.getProfesores = async function () {
+exports.getProfesores = async () => {
   // eslint-disable-next-line no-useless-catch
   try {
     const profesores = await getPeople(true);
@@ -139,7 +139,7 @@ exports.getProfesores = async function () {
 
 // anadir un profesor o persona
 // TODO cambiar y usar la de abajo
-exports.anadirProfesor = async function (req, res) {
+exports.anadirProfesor = async (req, res) => {
   try {
     let id = '';
     const nuevaPersona = await models.Persona.findOrCreate({
@@ -159,13 +159,13 @@ exports.anadirProfesor = async function (req, res) {
     }
     res.json({ success: true, identificador: id });
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     res.json({ success: false });
   }
 };
 
 // anadir un profesor o persona
-exports.anadirPersonaAndProfesor = async function (req, res) {
+exports.anadirPersonaAndProfesor = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       const [persona, created] = await models.Persona.findOrCreate({
@@ -194,16 +194,19 @@ exports.anadirPersonaAndProfesor = async function (req, res) {
         });
       }
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({ success: false });
     }
   } else {
-    res.json({ success: false, msg: 'No tiene permiso para realizar esta acción' });
+    res.json({
+      success: false,
+      msg: 'No tiene permiso para realizar esta acción'
+    });
   }
 };
 
 // update un profesor o persona
-exports.updatePersonaAndProfesor = async function (req, res) {
+exports.updatePersonaAndProfesor = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       const { id } = req.params;
@@ -252,16 +255,19 @@ exports.updatePersonaAndProfesor = async function (req, res) {
         });
       }
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({ success: false });
     }
   } else {
-    res.json({ success: false, msg: 'No tiene permiso para realizar esta acción' });
+    res.json({
+      success: false,
+      msg: 'No tiene permiso para realizar esta acción'
+    });
   }
 };
 
 // delete un profesor y persona
-exports.deletePersonaAndProfesor = async function (req, res) {
+exports.deletePersonaAndProfesor = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       const { id } = req.params;
@@ -296,11 +302,14 @@ exports.deletePersonaAndProfesor = async function (req, res) {
         });
       }
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({ success: false });
     }
   } else {
-    res.json({ success: false, msg: 'No tiene permiso para realizar esta acción' });
+    res.json({
+      success: false,
+      msg: 'No tiene permiso para realizar esta acción'
+    });
   }
 };
 

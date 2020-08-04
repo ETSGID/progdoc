@@ -15,14 +15,13 @@ const planController = require('./plan_controller');
 const personaYProfesorController = require('./personaYProfesor_controller');
 const grupoController = require('./grupo_controller');
 
-
-const getAsignacion = async function(
+const getAsignacion = async (
   ProgramacionDocenteIdentificador,
   DepartamentoResponsable,
   profesores,
   pdID,
   gruposBBDD
-) {
+) => {
   const asignacions = [];
   // eslint-disable-next-line no-useless-catch
   try {
@@ -150,16 +149,17 @@ const getAsignacion = async function(
     // se propaga el error lo captura el middleware
     throw error;
   }
-}
+};
 
 // GET /respDoc/:pdID/:departamentoID
-exports.getAsignaciones = async function(req, res, next) {
+exports.getAsignaciones = async (req, res, next) => {
   req.session.submenu = 'Profesores';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.session.menuBar === enumsPD.menuBar.consultar
-      ? 'asignacionProfesores/asignacionesConsultar'
-      : 'asignacionProfesores/asignacionesCumplimentar';
+    const view =
+      req.session.menuBar === enumsPD.menuBar.consultar
+        ? 'asignacionProfesores/asignacionesConsultar'
+        : 'asignacionProfesores/asignacionesCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
@@ -216,9 +216,10 @@ exports.getAsignaciones = async function(req, res, next) {
     );
     let profesores;
     if (!departamentoExisteEnElPlan) {
-      const view = req.session.menuBar === enumsPD.menuBar.consultar
-        ? 'asignacionProfesores/asignacionesConsultar'
-        : 'asignacionProfesores/asignacionesCumplimentar';
+      const view =
+        req.session.menuBar === enumsPD.menuBar.consultar
+          ? 'asignacionProfesores/asignacionesConsultar'
+          : 'asignacionProfesores/asignacionesCumplimentar';
       res.render(view, {
         existe:
           'El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior',
@@ -236,9 +237,10 @@ exports.getAsignaciones = async function(req, res, next) {
         planEstudios: res.locals.planEstudios
       });
     } else if (res.locals.permisoDenegado) {
-      const view = req.session.menuBar === enumsPD.menuBar.consultar
-        ? 'asignacionProfesores/asignacionesConsultar'
-        : 'asignacionProfesores/asignacionesCumplimentar';
+      const view =
+        req.session.menuBar === enumsPD.menuBar.consultar
+          ? 'asignacionProfesores/asignacionesConsultar'
+          : 'asignacionProfesores/asignacionesCumplimentar';
       res.render(view, {
         permisoDenegado: res.locals.permisoDenegado || null,
         asignacion: null,
@@ -268,9 +270,10 @@ exports.getAsignaciones = async function(req, res, next) {
         const nuevopath = `${req.baseUrl}/respdoc/editAsignacion`;
         // se usa cambiopath para cambiar a la asignacions de profesores por grupo o comun
         const cambiopath = `${req.baseUrl}/respdoc/editAsignacion/cambioModo`;
-        const view = req.session.menuBar === enumsPD.menuBar.consultar
-          ? 'asignacionProfesores/asignacionesConsultar'
-          : 'asignacionProfesores/asignacionesCumplimentar';
+        const view =
+          req.session.menuBar === enumsPD.menuBar.consultar
+            ? 'asignacionProfesores/asignacionesConsultar'
+            : 'asignacionProfesores/asignacionesCumplimentar';
         res.render(view, {
           profesores,
           asignacion: asignacions,
@@ -293,14 +296,14 @@ exports.getAsignaciones = async function(req, res, next) {
           planEstudios: res.locals.planEstudios
         });
       } catch (error) {
-        console.log('Error:', error);
+        console.error('Error:', error);
         next(error);
       }
     }
   }
 };
 
-exports.editAsignacion = async function(req, res, next) {
+exports.editAsignacion = async (req, res, next) => {
   req.session.submenu = 'Profesores2';
   const { pdID } = req.session;
   const { departamentoID } = req.session;
@@ -342,7 +345,7 @@ exports.editAsignacion = async function(req, res, next) {
         onlyProfesor: true
       });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {
@@ -364,7 +367,7 @@ tambien cambia el estado a asignatura a "N" para indicar este modo
 cuando quieres cambiar de grupo comun a individual solo cambia el parametro estado a "S"
 deja todos los profesores en todos los grupos.
 */
-exports.changeModeAsignacion = async function(req, res, next) {
+exports.changeModeAsignacion = async (req, res, next) => {
   const { pdID } = req.session;
   const { departamentoID } = req.session;
   let gruposBBDD;
@@ -428,7 +431,7 @@ exports.changeModeAsignacion = async function(req, res, next) {
         res.redirect(`${req.baseUrl}/respDoc/profesores`);
       });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {
@@ -439,7 +442,7 @@ exports.changeModeAsignacion = async function(req, res, next) {
 };
 
 // POST respDoc/guardarAsignacion
-exports.guardarAsignacion = async function(req, res, next) {
+exports.guardarAsignacion = async (req, res, next) => {
   const whereEliminar = {};
   const identificador = Number(req.body.asignaturaId);
   const { pdID } = req.session;
@@ -514,7 +517,7 @@ exports.guardarAsignacion = async function(req, res, next) {
                 obj['AsignacionProfesors.identificador'] === asignacions
             );
             if (!asig || !asig['AsignacionProfesors.ProfesorId']) {
-              console.log('Intenta cambiar una nota o un horario');
+              console.error('Intenta cambiar una nota o un horario');
             } else if (asig.estado === 'N') {
               // si esta la opcion de grupo comun
               // se deben coger todas las asignaciones de profesor de dicha asignatura
@@ -619,13 +622,13 @@ exports.guardarAsignacion = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
 // post respDoc/aprobarAsignacion:pdID
-exports.aprobarAsignacion = async function(req, res, next) {
+exports.aprobarAsignacion = async (req, res, next) => {
   const { pdID } = req.session;
   const { departamentoID } = req.session;
   const date = new Date();
@@ -675,19 +678,20 @@ exports.aprobarAsignacion = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
 // GET respDoc/tribunales:pdID/:departamentoID
-exports.getTribunales = async function(req, res, next) {
+exports.getTribunales = async (req, res, next) => {
   req.session.submenu = 'Tribunales';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.session.menuBar === enumsPD.menuBar.consultar
-      ? 'tribunales/tribunalesConsultar'
-      : 'tribunales/tribunalesCumplimentar';
+    const view =
+      req.session.menuBar === enumsPD.menuBar.consultar
+        ? 'tribunales/tribunalesConsultar'
+        : 'tribunales/tribunalesCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
@@ -760,9 +764,10 @@ exports.getTribunales = async function(req, res, next) {
         obj => obj.codigo === departamentoID
       );
       if (!departamentoExisteEnElPlan) {
-        const view = req.session.menuBar === enumsPD.menuBar.consultar
-          ? 'tribunales/tribunalesConsultar'
-          : 'tribunales/tribunalesCumplimentar';
+        const view =
+          req.session.menuBar === enumsPD.menuBar.consultar
+            ? 'tribunales/tribunalesConsultar'
+            : 'tribunales/tribunalesCumplimentar';
         res.render(view, {
           existe:
             'El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior',
@@ -782,9 +787,10 @@ exports.getTribunales = async function(req, res, next) {
           onlyProfesor: true
         });
       } else if (res.locals.permisoDenegado) {
-        const view = req.session.menuBar === enumsPD.menuBar.consultar
-          ? 'tribunales/tribunalesConsultar'
-          : 'tribunales/tribunalesCumplimentar';
+        const view =
+          req.session.menuBar === enumsPD.menuBar.consultar
+            ? 'tribunales/tribunalesConsultar'
+            : 'tribunales/tribunalesCumplimentar';
         res.render(view, {
           permisoDenegado: res.locals.permisoDenegado || null,
           profesores: null,
@@ -883,9 +889,10 @@ exports.getTribunales = async function(req, res, next) {
             asignaturasAntiguas.push(as);
           }
         });
-        const view = req.session.menuBar === enumsPD.menuBar.consultar
-          ? 'tribunales/tribunalesConsultar'
-          : 'tribunales/tribunalesCumplimentar';
+        const view =
+          req.session.menuBar === enumsPD.menuBar.consultar
+            ? 'tribunales/tribunalesConsultar'
+            : 'tribunales/tribunalesCumplimentar';
         const nuevopath = `${req.baseUrl}/respdoc/guardarTribunales`;
         const cancelarpath = `${req.baseUrl}/respdoc/tribunales?planID=${req.session.planID}&departamentoID=${DepartamentoResponsable}`;
         res.render(view, {
@@ -914,14 +921,14 @@ exports.getTribunales = async function(req, res, next) {
         });
       }
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   }
 };
 
 // POST respDoc/guardarTribunales
-exports.guardarTribunales = async function(req, res, next) {
+exports.guardarTribunales = async (req, res, next) => {
   const { departamentoID } = req.session;
   const { pdID } = req.session;
   let toActualizar = req.body.actualizar;
@@ -951,7 +958,7 @@ exports.guardarTribunales = async function(req, res, next) {
           !asig.DepartamentoResponsable ||
           asig.DepartamentoResponsable !== departamentoID
         ) {
-          console.log('Ha intentado cambiar una asignatura que no puede');
+          console.error('Ha intentado cambiar una asignatura que no puede');
         } else {
           const profesorIdentificador = element.split('_')[1]
             ? element.split('_')[1]
@@ -987,7 +994,7 @@ exports.guardarTribunales = async function(req, res, next) {
       await Promise.all(promises);
       next();
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {
@@ -996,7 +1003,7 @@ exports.guardarTribunales = async function(req, res, next) {
 };
 
 // get
-exports.reenviar = function(req, res) {
+exports.reenviar = (req, res) => {
   req.session.save(() => {
     res.redirect(
       `${req.baseUrl}/respDoc/tribunales?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
@@ -1004,7 +1011,7 @@ exports.reenviar = function(req, res) {
   });
 };
 // post respDoc/aprobarTribunales:pdID
-exports.aprobarTribunales = async function(req, res, next) {
+exports.aprobarTribunales = async (req, res, next) => {
   const { pdID } = req.session;
   const { departamentoID } = req.session;
   const date = new Date();
@@ -1052,12 +1059,12 @@ exports.aprobarTribunales = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-const generateCsvCoordinadores = async function(pdID, definitivo) {
+const generateCsvCoordinadores = async (pdID, definitivo) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const plan = progDocController.getPlanPd(pdID);
@@ -1136,12 +1143,12 @@ const generateCsvCoordinadores = async function(pdID, definitivo) {
   }
 };
 
-exports.generateCsvCoordinadoresRouter = async function(req, res, next) {
+exports.generateCsvCoordinadoresRouter = async (req, res, next) => {
   try {
     await generateCsvCoordinadores(req.session.pdID, req.definitivo);
     next();
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };

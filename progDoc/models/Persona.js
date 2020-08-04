@@ -1,6 +1,6 @@
 // Definicion del modelo Persona:
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const Persona = sequelize.define(
     'Persona',
     {

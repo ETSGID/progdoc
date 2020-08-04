@@ -1,7 +1,7 @@
 const planController = require('../controllers/plan_controller');
 
 // GET planes de una PD
-exports.getPlanesPD = async function(req, res, next) {
+exports.getPlanesPD = async (req, res, next) => {
   const resp = {};
   let respError;
   try {
@@ -14,7 +14,7 @@ exports.getPlanesPD = async function(req, res, next) {
       res.json(respError);
     } else res.json(resp);
   } catch (error) {
-    console.log(`API error: ${error.message}`);
+    console.error(`API error: ${error.message}`);
     next(error);
   }
 };

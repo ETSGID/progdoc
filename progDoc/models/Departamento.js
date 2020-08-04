@@ -1,6 +1,6 @@
 // Definicion del modelo Departamento:
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const Departamento = sequelize.define(
     'Departamento',
     {

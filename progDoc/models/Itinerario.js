@@ -1,6 +1,6 @@
 // Definicion del modelo Itinerario:
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const Itinerario = sequelize.define(
     'Itinerario',
     {

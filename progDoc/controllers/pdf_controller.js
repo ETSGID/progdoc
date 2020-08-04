@@ -14,7 +14,7 @@ const cursoController = require('./curso_controller');
 
 const op = Sequelize.Op;
 
-const configPdf = function (draft, planNombre, pdId) {
+const configPdf = (draft, planNombre, pdId) => {
   const base = path.resolve('public'); //  just relative path to absolute path
   const styleHeader = 'margin:0; font-size: 6pt; text-align: center';
   const heightHeader = '35mm';
@@ -25,12 +25,14 @@ const configPdf = function (draft, planNombre, pdId) {
   const borrador = draft ? '(Borrador),' : '';
   let textoHeader = '';
   if (planNombre) {
-    textoHeader += `<p style="${styleHeader}">${planNombre.toUpperCase()}</p>`
+    textoHeader += `<p style="${styleHeader}">${planNombre.toUpperCase()}</p>`;
   }
   textoHeader += `<p style="${styleHeader}">E.T.S. Ingenieros de Telecomunicación</p>
-  <p style="${styleHeader}">`
+  <p style="${styleHeader}">`;
   if (pdId) {
-    textoHeader += ` Versión ${progDocController.getVersionPdNormalizedWithoutV(pdId)}, `
+    textoHeader += ` Versión ${progDocController.getVersionPdNormalizedWithoutV(
+      pdId
+    )}, `;
   }
   textoHeader += ` ${borrador}
     ${moment()
@@ -68,7 +70,7 @@ const configPdf = function (draft, planNombre, pdId) {
 // tipoPDF puede ser pdfDraftGenerado si es pintar un draft o pdfCerrado
 // calendario se le pasa la informacion de calendario
 // eslint-disable-next-line consistent-return
-const generatePDFFile = async function (pdID, tipoPDF, calendario) {
+const generatePDFFile = async (pdID, tipoPDF, calendario) => {
   const promises = [];
   const promises2 = [];
   const cursosConGrupos = [];
@@ -368,9 +370,9 @@ const generatePDFFile = async function (pdID, tipoPDF, calendario) {
           // debo convertir la fecha a formato dd/mm/yyyy
           nuevoExamen.fecha = `${
             asignaturaConExamen['Examens.fecha'].split('-')[2]
-            }/${asignaturaConExamen['Examens.fecha'].split('-')[1]}/${
+          }/${asignaturaConExamen['Examens.fecha'].split('-')[1]}/${
             asignaturaConExamen['Examens.fecha'].split('-')[0]
-            }`;
+          }`;
           nuevoExamen.horaInicio = asignaturaConExamen['Examens.horaInicio'];
           nuevoExamen.duracion = asignaturaConExamen['Examens.duracion'];
           p.examenes.push(nuevoExamen);
@@ -477,7 +479,7 @@ const generatePDFFile = async function (pdID, tipoPDF, calendario) {
           },
           (err, str) => {
             if (err) {
-              console.log('error');
+              console.error('error');
               reject(err);
             } else {
               resolve(str);
@@ -499,10 +501,10 @@ const generatePDFFile = async function (pdID, tipoPDF, calendario) {
           },
           (err, str) => {
             if (err) {
-              console.log('error');
+              console.error('error');
               reject(err);
             } else {
-              // console.log("éxito!");
+              // console.error("éxito!");
               resolve(str);
             }
           }
@@ -584,14 +586,15 @@ const generatePDFFile = async function (pdID, tipoPDF, calendario) {
       fileName
     };
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
   }
-}
+};
 
-exports.generarPDF = async function (req, res, next) {
-  const view = req.session.menuBar === enumsPD.menuBar.consultar
-    ? 'pdfs/pdfDraftGenerado'
-    : 'pdfCerrado';
+exports.generarPDF = async (req, res, next) => {
+  const view =
+    req.session.menuBar === enumsPD.menuBar.consultar
+      ? 'pdfs/pdfDraftGenerado'
+      : 'pdfCerrado';
   if (view === 'pdfs/pdfDraftGenerado') {
     req.session.submenu = 'PDF';
   }
@@ -617,32 +620,31 @@ exports.generarPDF = async function (req, res, next) {
       const pdfDatos = await generatePDFFile(pdID, view, req.calendario);
       // eslint-disable-next-line
       pdf.create(pdfDatos.html, pdfDatos.configPdfOptions).toFile(pdfDatos.ruta, (err, resp) => {
-        if (err) return console.log(err);
-        switch (view) {
-          case 'pdfs/pdfDraftGenerado':
-            res.render(view, {
-              file: pdfDatos.file,
-              planID: req.session.planID,
-              planEstudios: res.locals.planEstudios,
-              pdID,
-              menu: req.session.menu,
-              submenu: req.session.submenu
-            });
-            break;
-          case 'pdfCerrado':
-            next();
-            break;
-          default:
-            next();
-            break;
-        }
-      });
+          if (err) return console.error(err);
+          switch (view) {
+            case 'pdfs/pdfDraftGenerado':
+              res.render(view, {
+                file: pdfDatos.file,
+                planID: req.session.planID,
+                planEstudios: res.locals.planEstudios,
+                pdID,
+                menu: req.session.menu,
+                submenu: req.session.submenu
+              });
+              break;
+            case 'pdfCerrado':
+              next();
+              break;
+            default:
+              next();
+              break;
+          }
+        });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   }
 };
-
 
 exports.configPdf = configPdf;

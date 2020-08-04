@@ -75,7 +75,7 @@ app.use(
 app.use(path.join(CONTEXT, 'api'), routerApi);
 // exit del cas el primero para que no entre en bucle. El cas es el encargado de eliminar la sesión
 if (DEV === 'true') {
-  app.get(path.join(CONTEXT, 'logout'), (req, res, next) => {
+  app.get(path.join(CONTEXT, 'logout'), (req, res) => {
     req.session.destroy();
     res.redirect(CONTEXT);
   });
@@ -172,7 +172,7 @@ app.use(async (req, res, next) => {
         res.redirect(CONTEXT);
       });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {

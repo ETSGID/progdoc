@@ -1,6 +1,6 @@
 // Definicion del modelo Grupo:
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const Grupo = sequelize.define(
     'Grupo',
     {

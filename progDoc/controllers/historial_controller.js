@@ -1,4 +1,4 @@
-exports.getHistorial = function(req, res) {
+exports.getHistorial = (req, res) => {
   res.render('menus/historial', {
     menu: req.session.menu,
     planID: req.session.planID,

@@ -2,13 +2,14 @@ const estados = require('../estados');
 const departamentoController = require('./departamento_controller');
 const enumsPD = require('../enumsPD');
 
-exports.getEstado = async function(req, res, next) {
+exports.getEstado = async (req, res, next) => {
   req.session.submenu = 'Estado';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.session.menuBar === enumsPD.menuBar.consultar
-      ? 'estados/estadoConsultar'
-      : 'estados/estadoCumplimentar';
+    const view =
+      req.session.menuBar === enumsPD.menuBar.consultar
+        ? 'estados/estadoConsultar'
+        : 'estados/estadoCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
@@ -36,9 +37,10 @@ exports.getEstado = async function(req, res, next) {
       }
       // si no estaba inicializada la inicializo.
       req.session.departamentoID = departamentoID;
-      const view = req.session.menuBar === enumsPD.menuBar.consultar
-        ? 'estados/estadoConsultar'
-        : 'estados/estadoCumplimentar';
+      const view =
+        req.session.menuBar === enumsPD.menuBar.consultar
+          ? 'estados/estadoConsultar'
+          : 'estados/estadoCumplimentar';
       const departamentos = await departamentoController.getAllDepartamentos();
       res.render(view, {
         permisoDenegado: res.locals.permisoDenegado || null,
@@ -60,7 +62,7 @@ exports.getEstado = async function(req, res, next) {
         verEstado: true
       });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   }

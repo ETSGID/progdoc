@@ -8,7 +8,7 @@ const enumsPD = require('../enumsPD');
 
 const op = Sequelize.Op;
 
-const getRolsPersona = async function (personaId) {
+const getRolsPersona = async personaId => {
   // eslint-disable-next-line no-useless-catch
   try {
     if (personaId) {
@@ -36,9 +36,9 @@ const getRolsPersona = async function (personaId) {
     // se propaga el error lo captura el middleware
     throw error;
   }
-}
+};
 
-exports.getRolsPersonaView = async function (req, res, next) {
+exports.getRolsPersonaView = async (req, res, next) => {
   try {
     req.session.user.rols = await getRolsPersona(req.session.user.PersonaId);
     res.render('index', {
@@ -46,13 +46,13 @@ exports.getRolsPersonaView = async function (req, res, next) {
       rolsDelegados: enumsPD.delegacion
     });
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
 // comprueba el rol o si es delegado de dicho rol en función del estado de la PD pasada
-exports.comprobarRols = async function (req, res, next) {
+exports.comprobarRols = async (req, res, next) => {
   try {
     req.session.user.rols = await getRolsPersona(req.session.user.PersonaId);
     const { rols } = req.session.user;
@@ -101,7 +101,7 @@ exports.comprobarRols = async function (req, res, next) {
                 if (
                   !pd ||
                   `${pd[`ProgramacionDocentes.${condic[0]}`]}` !==
-                  `${r.condiciones[i].resultado}`
+                    `${r.condiciones[i].resultado}`
                 ) {
                   cumple = false;
                 }
@@ -111,7 +111,7 @@ exports.comprobarRols = async function (req, res, next) {
                 if (
                   !pd ||
                   `${pd[`ProgramacionDocentes.${condic[0]}`][condic[1]]}` !==
-                  `${r.condiciones[i].resultado}`
+                    `${r.condiciones[i].resultado}`
                 ) {
                   cumple = false;
                 }
@@ -139,14 +139,14 @@ exports.comprobarRols = async function (req, res, next) {
     res.locals.rolsCoincidentes = rolsCoincidentes;
     next();
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
 // puede acceder todo el mundo
 // comprobar roles para pintar menu
-exports.comprobarRolYPersona = async function (req, res, next) {
+exports.comprobarRolYPersona = async (req, res, next) => {
   const role = req.session.user.employeetype;
   if (role.includes('F') || role.includes('L')) {
     req.session.portal = 'pas';
@@ -159,7 +159,7 @@ exports.comprobarRolYPersona = async function (req, res, next) {
 };
 
 // funcion de getRoles para directores de departamentos jefe de estudios y subdirector de posgrado
-exports.getRoles = async function (req, res, next) {
+exports.getRoles = async (req, res, next) => {
   req.session.submenu = 'Roles';
   const responsablesDocentes = [];
   let profesores;
@@ -233,13 +233,13 @@ exports.getRoles = async function (req, res, next) {
       onlyProfesor: false
     });
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
 // query para guardar los cambios del sistema
-exports.guardarRoles = async function (req, res, next) {
+exports.guardarRoles = async (req, res, next) => {
   // si no tiene permiso o no hay rol
   if (
     !res.locals.permisoDenegado ||
@@ -290,7 +290,7 @@ exports.guardarRoles = async function (req, res, next) {
       }
       next();
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {
@@ -298,7 +298,7 @@ exports.guardarRoles = async function (req, res, next) {
   }
 };
 
-exports.redir = function (req, res) {
+exports.redir = (req, res) => {
   req.session.save(() => {
     res.redirect(`${req.baseUrl}/gestionRoles`);
   });

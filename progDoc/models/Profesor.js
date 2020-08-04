@@ -1,6 +1,6 @@
 // Definicion del modelo Profesor:
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const Profesor = sequelize.define(
     'Profesor',
     {

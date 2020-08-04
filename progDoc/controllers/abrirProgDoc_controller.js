@@ -15,7 +15,7 @@ const enumsPD = require('../enumsPD');
  * Función para abrir una nueva programación docente
  *  Traslada los datos de la del periodo anterior coincidente
  */
-exports.abrirNuevaProgDoc = async function (req, res, next) {
+exports.abrirNuevaProgDoc = async (req, res, next) => {
   try {
     // cargar nuevos planes y departamentos en el sistema
     await apiUpmController.updatePlanesAndDeparts();
@@ -893,7 +893,7 @@ exports.abrirNuevaProgDoc = async function (req, res, next) {
     try {
       // si se produce un error en el proceso se borra todo el progreso que se hizo
       // TODO hacerlo con transacciones
-      console.log('Error:', error);
+      console.error('Error:', error);
       await progDocController.borrarPd(res.locals.identificador);
       next(error);
     } catch (err) {
@@ -907,7 +907,7 @@ Función para abrir incidencia o reabierto.
 Abrir copia de progdoc
 No traslada fechas al año siguiente
 */
-exports.abrirCopiaProgDoc = async function (req, res, next) {
+exports.abrirCopiaProgDoc = async (req, res, next) => {
   const pdIDanterior = req.body.pdIdentificador.split('-')[1];
   const tipoPD = progDocController.getTipoPd(pdIDanterior);
   const plan = progDocController.getPlanPd(pdIDanterior);
@@ -1301,7 +1301,7 @@ exports.abrirCopiaProgDoc = async function (req, res, next) {
     try {
       // si se produce un error en el proceso se borra todo el progreso que se hizo
       // TODO hacerlo con transacciones
-      console.log('Error:', error);
+      console.error('Error:', error);
       await progDocController.borrarPd(res.locals.identificador);
       next(error);
     } catch (err) {

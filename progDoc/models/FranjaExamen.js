@@ -1,7 +1,7 @@
 // Definicion del modelo FranjaExamen:
 const enumsPD = require('../enumsPD');
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const FranjaExamen = sequelize.define(
     'FranjaExamen',
     {

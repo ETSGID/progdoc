@@ -3,63 +3,64 @@ const Sequelize = require('sequelize');
 const rimraf = require('rimraf');
 
 const models = require('../models');
+
 const op = Sequelize.Op;
 const estados = require('../estados');
 const funciones = require('../funciones');
 
 // devuelve el tipo de la PD a partir del id
 // PD_09TT_201819_I_v1
-const getPlanPd = function (pdID) {
+const getPlanPd = pdID => {
   return pdID ? pdID.split('_')[1] : null;
 };
 
 // devuelve el ano de la PD a partir del id
 // PD_09TT_201819_I_v1
-const getAnoPd = function (pdID) {
+const getAnoPd = pdID => {
   return pdID ? pdID.split('_')[2] : null;
 };
 
 // devuelve el tipo de la PD a partir del id
 // PD_09TT_201819_I_v1
-const getTipoPd = function (pdID) {
+const getTipoPd = pdID => {
   return pdID ? pdID.split('_')[3] : null;
 };
 
 // devuelve el version de la PD a partir del id: v1
 // PD_09TT_201819_I_v1
-const getVersionPd = function (pdID) {
+const getVersionPd = pdID => {
   return pdID ? pdID.split('_')[4] : null;
-}
+};
 
 // devuelve la version de la PD a partir del id normalizada: v001
-const getVersionPdNormalized = function (pdID) {
+const getVersionPdNormalized = pdID => {
   const v = getVersionPdNumber(pdID);
   return v ? `v${v.toString().padStart(3, '0')}` : null;
-}
+};
 
-const getVersionPdNormalizedWithoutV = function (pdID) {
+const getVersionPdNormalizedWithoutV = pdID => {
   const v = getVersionPdNumber(pdID);
   return v ? `${v.toString().padStart(3, '0')}` : null;
-}
+};
 
 // devuelve el numero version de la PD a partir del id 1
 // PD_09TT_201819_I_v1
-const getVersionPdNumber = function (pdID) {
+const getVersionPdNumber = pdID => {
   const v = getVersionPd(pdID);
   return v ? Number(v.split('v')[1]) : null;
-}
+};
 // devuelve el id de PD con version normalizada: PD_09TT_201819_I_v001
-const getProgramacionDocenteIdNormalized = function (pdID) {
+const getProgramacionDocenteIdNormalized = pdID => {
   if (pdID) {
     const pdIDArray = pdID.split('_');
     pdIDArray.splice(4, 1, getVersionPdNormalized(pdID));
     return pdIDArray.join('_');
   }
   return null;
-}
+};
 
 // devuelve el id de PD con version normalizada y acronimo: PD_GITST_09TT_201819_I_v001
-const getProgramacionDocenteIdNormalizedAcronimo = function (pdID, acronimo) {
+const getProgramacionDocenteIdNormalizedAcronimo = (pdID, acronimo) => {
   if (pdID && acronimo) {
     const pdIDNormalizedArray = getProgramacionDocenteIdNormalized(pdID).split(
       '_'
@@ -70,7 +71,7 @@ const getProgramacionDocenteIdNormalizedAcronimo = function (pdID, acronimo) {
   return pdID;
 };
 
-const getProgramacionDocenteById = async function (pdID) {
+const getProgramacionDocenteById = async pdID => {
   if (pdID) {
     // eslint-disable-next-line no-useless-catch
     try {
@@ -96,17 +97,17 @@ const getProgramacionDocenteById = async function (pdID) {
   }
 };
 
-const CumpleTodos = function (estado, objeto) {
+const CumpleTodos = (estado, objeto) => {
   for (const variable in objeto) {
     if (objeto[variable] !== estado) {
       return false;
     }
   }
   return true;
-}
+};
 
 // funcion para ver el estado de profesores/tribunales si cumple uno el resto lo marca como cumplido
-const comprobarEstadoCumpleUno = function (estado, objeto) {
+const comprobarEstadoCumpleUno = (estado, objeto) => {
   for (const variable in objeto) {
     if (Object.prototype.hasOwnProperty.call(objeto, variable)) {
       if (objeto[variable] === estado) {
@@ -115,12 +116,10 @@ const comprobarEstadoCumpleUno = function (estado, objeto) {
     }
   }
   return false;
-}
-
-
+};
 
 // te devuelve la programacion docente sobre la que puede tocar una persona
-exports.getProgramacionDocente = async function (req, res, next) {
+exports.getProgramacionDocente = async (req, res, next) => {
   let { planID } = req.query;
   if (!planID) {
     planID = req.session.planID;
@@ -233,15 +232,15 @@ exports.getProgramacionDocente = async function (req, res, next) {
       next();
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-
 // se le pasa una programacion docente y dice si puede marcarse como lista
-const isPDListaBoolean = function (progdoc) {
-  return progdoc.estadoProGDoc === estados.estadoProgDoc.abierto &&
+const isPDListaBoolean = progdoc => {
+  return (
+    progdoc.estadoProGDoc === estados.estadoProgDoc.abierto &&
     CumpleTodos(
       estados.estadoProfesor.aprobadoDirector,
       progdoc.estadoProfesores
@@ -254,11 +253,12 @@ const isPDListaBoolean = function (progdoc) {
     progdoc.estadoExamenes === estados.estadoExamen.aprobadoCoordinador &&
     // calendario de actividades
     progdoc.estadoCalendario === estados.estadoCalendario.aprobadoCoordinador
-}
+  );
+};
 
 // TODO: cuando se añadan las otras funciones hay que ponerlas aquí
 // para comprobar si la pd se puede marcar como lista para que Jefatura de Estudios la cierre
-exports.isPDLista = async function (progID, thenFunction) {
+exports.isPDLista = async (progID, thenFunction) => {
   // eslint-disable-next-line no-useless-catch
   try {
     let nuevoEstado;
@@ -286,35 +286,31 @@ exports.isPDLista = async function (progID, thenFunction) {
 // TODO: cuando se añadan las otras funciones hay que ponerlas aquí
 // para comprobar si no se ha aprobado nada de la programacion docente
 // o si es una incidencia
-exports.isPDInitialState = function (progdoc) {
-  return (progdoc.estadoProGDoc === estados.estadoProgDoc.abierto &&
-    CumpleTodos(
-      estados.estadoProfesor.abierto,
-      progdoc.estadoProfesores
-    ) &&
-    CumpleTodos(
-      estados.estadoTribunal.abierto,
-      progdoc.estadoTribunales
-    ) &&
-    progdoc.estadoHorarios === estados.estadoHorario.abierto &&
-    progdoc.estadoExamenes === estados.estadoExamen.abierto &&
-    // calendario de actividades
-    progdoc.estadoCalendario === estados.estadoCalendario.abierto
-  ) || progdoc.estadoProGDoc === estados.estadoProgDoc.incidencia
-}
+exports.isPDInitialState = progdoc => {
+  return (
+    (progdoc.estadoProGDoc === estados.estadoProgDoc.abierto &&
+      CumpleTodos(estados.estadoProfesor.abierto, progdoc.estadoProfesores) &&
+      CumpleTodos(estados.estadoTribunal.abierto, progdoc.estadoTribunales) &&
+      progdoc.estadoHorarios === estados.estadoHorario.abierto &&
+      progdoc.estadoExamenes === estados.estadoExamen.abierto &&
+      // calendario de actividades
+      progdoc.estadoCalendario === estados.estadoCalendario.abierto) ||
+    progdoc.estadoProGDoc === estados.estadoProgDoc.incidencia
+  );
+};
 
 /*
 da las ultimas pds existentes para el plan, tipoPD y ano
 en caso de pasar la pdIDNoIncluir obvia esa, se utiliza para el pdf
 estadoPD en caso de que se quiera el estado de la programación docente, si no a null
 */
-exports.getProgramacionDocentesAnteriores = async function (
+exports.getProgramacionDocentesAnteriores = async (
   plan,
   tipoPD,
   ano,
   pdIDNoIncluir,
   estadoPD
-) {
+) => {
   let s1 = false;
   let s2 = false;
   let I = false;
@@ -415,7 +411,7 @@ exports.getProgramacionDocentesAnteriores = async function (
 // planes el codigo del plan
 // tipoPD: 1S,2S no acepta I
 // ano: 201819
-exports.getAllProgramacionDocentes = async function (planes, tipoPD, ano) {
+exports.getAllProgramacionDocentes = async (planes, tipoPD, ano) => {
   const programacionDocentesPlan = {};
   planes.forEach(p => {
     programacionDocentesPlan[p] = [];
@@ -446,23 +442,23 @@ exports.getAllProgramacionDocentes = async function (planes, tipoPD, ano) {
     });
     for (const progdoc of progdocs) {
       const pdsPlanes = programacionDocentesPlan[progdoc.PlanEstudioId];
-      if (pdsPlanes.length > 0) {
-        continue;
-      }
-      /*
-      el segundo elemento del if es para que coja la pd anterior o igual por si se quiere modificar
-      una cuando ya se abrio otra mas nueva
-      */
-      if (tipoPD === '1S' && ano >= progdoc.identificador.split('_')[2]) {
-        if (progdoc.semestre === '1S' || progdoc.semestre === 'I') {
+      if (!pdsPlanes.length > 0) {
+        /*
+        el segundo elemento del if es para que coja la pd anterior o igual por si se quiere modificar
+        una cuando ya se abrio otra mas nueva
+        */
+        if (
+          tipoPD === '1S' &&
+          ano >= progdoc.identificador.split('_')[2] &&
+          (progdoc.semestre === '1S' || progdoc.semestre === 'I')
+        ) {
           pdsPlanes.push(progdoc);
-          continue;
-        }
-      }
-      if (tipoPD === '2S' && ano >= progdoc.identificador.split('_')[2]) {
-        if (progdoc.semestre === '2S' || progdoc.semestre === 'I') {
+        } else if (
+          tipoPD === '2S' &&
+          ano >= progdoc.identificador.split('_')[2] &&
+          (progdoc.semestre === '2S' || progdoc.semestre === 'I')
+        ) {
           pdsPlanes.push(progdoc);
-          continue;
         }
       }
     }
@@ -478,12 +474,11 @@ exports.getAllProgramacionDocentes = async function (planes, tipoPD, ano) {
 };
 
 // devuelve las programaciones docentes mas antiguas (2 o más años)
-const getAntiguasProgramacionDocentes = async function () {
+const getAntiguasProgramacionDocentes = async () => {
+  // eslint-disable-next-line no-useless-catch
   try {
     return await models.ProgramacionDocente.findAll({
-      attributes: [
-        'identificador'
-      ],
+      attributes: ['identificador'],
       where: {
         anoAcademico: {
           [op.lt]: (new Date().getFullYear() - 2).toString()
@@ -495,14 +490,14 @@ const getAntiguasProgramacionDocentes = async function () {
     // se propaga el error lo captura el middleware
     throw error;
   }
-}
-
+};
 
 /*
 borra todos las programaciones docentes con errores que no deberia haberlas
 y lo relacionado con las mismas
 */
-const borrarPdsWithErrores = async function () {
+const borrarPdsWithErrores = async () => {
+  // eslint-disable-next-line no-useless-catch
   try {
     await models.sequelize
       .query(`DELETE FROM public."ProgramacionDocentes" p  WHERE p."estadoProGDoc" = -1; 
@@ -520,9 +515,12 @@ const borrarPdsWithErrores = async function () {
 };
 
 // borra toda la informacion de una programacion docente
-const borrarPd = async function (pdID) {
+const borrarPd = async pdID => {
+  // eslint-disable-next-line no-useless-catch
   try {
-    const dir = `${PATH_PDF}/pdfs/${getAnoPd(pdID)}/${getPlanPd(pdID)}/${getTipoPd(pdID)}/${getVersionPdNormalized(pdID)}`
+    const dir = `${PATH_PDF}/pdfs/${getAnoPd(pdID)}/${getPlanPd(
+      pdID
+    )}/${getTipoPd(pdID)}/${getVersionPdNormalized(pdID)}`;
     await models.sequelize.query(
       `DELETE FROM public."ProgramacionDocentes" p  
       WHERE p."identificador" = :pdId; 
@@ -540,21 +538,23 @@ const borrarPd = async function (pdID) {
     // se propaga el error lo captura el middleware. Es critica para abrir progdoc
     throw error;
   }
-}
+};
 
 /**
  * Borrar las pds antiguas
  */
-const borrarPdsAntiguas = async function () {
+const borrarPdsAntiguas = async () => {
   try {
     const pds = await getAntiguasProgramacionDocentes();
+    const results = [];
     for (const pd of pds) {
-      await borrarPd(pd.identificador);
+      results.push(borrarPd(pd.identificador));
     }
+    await Promise.all(results);
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
-}
+};
 
 exports.getPlanPd = getPlanPd;
 exports.getAnoPd = getAnoPd;

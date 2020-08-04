@@ -10,7 +10,7 @@ const op = Sequelize.Op;
 // profesorCorreo es el correo del profesor
 // anoAcademico 201819
 // semestre 1S 2S no permite I
-exports.getProfesorAsignaturas = async function(req, res, next) {
+exports.getProfesorAsignaturas = async (req, res, next) => {
   const planes = [];
   const planesCompletos = [];
   let profesor = null;
@@ -109,7 +109,7 @@ exports.getProfesorAsignaturas = async function(req, res, next) {
       res.json(respError);
     }
   } catch (error) {
-    console.log(`API error: ${error.message}`);
+    console.error(`API error: ${error.message}`);
     next(error);
   }
 };

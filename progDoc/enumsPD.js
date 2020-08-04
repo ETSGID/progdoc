@@ -36,7 +36,7 @@ exports.delegacion = {
 exports.permisions = {
   consultar: 'consultar',
   cumplimentar: 'cumplimentar'
-}
+};
 
 // type of menu
 exports.menuBar = {
@@ -44,21 +44,21 @@ exports.menuBar = {
   cumplimentar: 'cumplimentar',
   gestion: 'gestion',
   historial: 'historial'
-}
+};
 
 exports.eventoGeneral = {
   NoEditable: 0,
   Editable: 1
 };
 
-//ordenados por importancia de mayor a menor
+// ordenados por importancia de mayor a menor
 exports.eventosTipo = {
   ajuste: 1,
   examenes: 2,
   especial: 3,
   tft: 4,
   festivo: 5,
-  otro: 6, 
+  otro: 6,
   eliminado: 7
 };
 

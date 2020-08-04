@@ -1,6 +1,6 @@
 // Definicion del modelo ConjuntoActividadParcial:
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const ConjuntoActividadParcial = sequelize.define(
     'ConjuntoActividadParcial',
     {

@@ -8,9 +8,8 @@ const funciones = require('../funciones');
 const progDocController = require('../controllers/progDoc_controller');
 const grupoController = require('./grupo_controller');
 
-
 // para obtener las notas definidas para el grupo completo no ligadas a asignatura
-const getNotasGruposSinAsignatura = async function (gruposBBDD) {
+const getNotasGruposSinAsignatura = async gruposBBDD => {
   // eslint-disable-next-line no-useless-catch
   try {
     // eslint-disable-next-line no-param-reassign
@@ -48,16 +47,17 @@ const getNotasGruposSinAsignatura = async function (gruposBBDD) {
     // se propaga el error lo captura el middleware
     throw error;
   }
-}
+};
 
 // GET /respDoc/:pdID/:departamentoID/Horario
-exports.getHorario = async function(req, res, next) {
+exports.getHorario = async (req, res, next) => {
   req.session.submenu = 'Horarios';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.session.menuBar === enumsPD.menuBar.consultar
-      ? 'horarios/horariosConsultar'
-      : 'horarios/horariosCumplimentar';
+    const view =
+      req.session.menuBar === enumsPD.menuBar.consultar
+        ? 'horarios/horariosConsultar'
+        : 'horarios/horariosCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
@@ -357,9 +357,10 @@ exports.getHorario = async function(req, res, next) {
         });
         const cancelarpath = `${req.baseUrl}/coordinador/horarios?planID=${req.session.planID}`;
         const nuevopath = `${req.baseUrl}/coordinador/guardarHorarios`;
-        const view = req.session.menuBar === enumsPD.menuBar.consultar
-          ? 'horarios/horariosConsultar'
-          : 'horarios/horariosCumplimentar';
+        const view =
+          req.session.menuBar === enumsPD.menuBar.consultar
+            ? 'horarios/horariosConsultar'
+            : 'horarios/horariosCumplimentar';
         res.render(view, {
           asignacionsHorario,
           nuevopath,
@@ -381,13 +382,13 @@ exports.getHorario = async function(req, res, next) {
         });
       }
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   }
 };
 
-exports.guardarHorarios = async function(req, res) {
+exports.guardarHorarios = async (req, res) => {
   const whereEliminar = {};
   const { pdID } = req.session;
   const toEliminar = req.body.eliminarAsignacions;
@@ -412,8 +413,7 @@ exports.guardarHorarios = async function(req, res) {
       if (toEliminar) {
         whereEliminar.identificador = [];
         toEliminar.forEach(element => {
-          let asignacion;
-          asignacion = Number(element.asignacion);
+          const asignacion = Number(element.asignacion);
           // comprobar que borra una asignacion de la asignatura y no cualquier otra
           const asig = asignaturaAsignacions.find(
             obj =>
@@ -421,7 +421,7 @@ exports.guardarHorarios = async function(req, res) {
               obj['AsignacionProfesors.identificador'] === asignacion
           );
           if (!asig || !asig['AsignacionProfesors.Dia']) {
-            console.log('Intenta cambiar una nota o un profesor');
+            console.error('Intenta cambiar una nota o un profesor');
           } else {
             whereEliminar.identificador.push(asignacion);
           }
@@ -450,7 +450,7 @@ exports.guardarHorarios = async function(req, res) {
               obj.identificador === nuevaEntrada.AsignaturaId
           );
           if (!asig) {
-            console.log('Ha intentado cambiar una asignatura que no puede');
+            console.error('Ha intentado cambiar una asignatura que no puede');
           } else {
             queryToAnadir.push(nuevaEntrada);
           }
@@ -461,7 +461,7 @@ exports.guardarHorarios = async function(req, res) {
       await Promise.all(promises);
       res.json({ success: true });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({
         success: false,
         msg: 'Ha habido un error la acción no se ha podido completar'
@@ -472,7 +472,7 @@ exports.guardarHorarios = async function(req, res) {
   }
 };
 // recibe la info de una nota nueva y la crea en la asignatura y grupo correspondiente
-exports.guardarNota = async function(req, res) {
+exports.guardarNota = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       const notaToAnadir = {};
@@ -488,7 +488,7 @@ exports.guardarNota = async function(req, res) {
       notaToAnadir.identificador = n.identificador;
       res.json({ success: true, accion: 'create', notaUpdate: notaToAnadir });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({
         success: false,
         msg: 'Ha habido un error la acción no se ha podido completar'
@@ -500,7 +500,7 @@ exports.guardarNota = async function(req, res) {
 };
 
 // recibe la info de una nota existente y la actualiza en la asignatura y grupo correspondiente
-exports.updateNota = async function(req, res) {
+exports.updateNota = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       const notaToUpdate = {};
@@ -515,7 +515,7 @@ exports.updateNota = async function(req, res) {
       });
       res.json({ success: true, accion: 'update', notaUpdate: notaToUpdate });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({
         success: false,
         msg: 'Ha habido un error la acción no se ha podido completar'
@@ -526,7 +526,7 @@ exports.updateNota = async function(req, res) {
   }
 };
 // recibe la info de una nota existente y la elimina
-exports.eliminarNota = async function(req, res) {
+exports.eliminarNota = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       await models.AsignacionProfesor.destroy({
@@ -534,7 +534,7 @@ exports.eliminarNota = async function(req, res) {
       });
       res.json({ success: true });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({
         success: false,
         msg: 'Ha habido un error la acción no se ha podido completar'
@@ -546,7 +546,7 @@ exports.eliminarNota = async function(req, res) {
 };
 
 // get
-exports.reenviar = function(req, res) {
+exports.reenviar = (req, res) => {
   req.session.save(() => {
     res.redirect(
       `${req.baseUrl}/coordinador/horarios?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
@@ -554,7 +554,7 @@ exports.reenviar = function(req, res) {
   });
 };
 // post
-exports.aprobarHorarios = async function(req, res, next) {
+exports.aprobarHorarios = async (req, res, next) => {
   const { pdID } = req.session;
   const date = new Date();
   let estadoHorarios;
@@ -591,7 +591,7 @@ exports.aprobarHorarios = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };

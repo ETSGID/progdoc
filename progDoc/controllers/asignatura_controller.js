@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const models = require('../models');
 
 // recuperar las asignaturas de una progdoc
-exports.getAsignaturasProgDoc = async function(pdID) {
+exports.getAsignaturasProgDoc = async pdID => {
   if (pdID) {
     // eslint-disable-next-line no-useless-catch
     try {
@@ -41,7 +41,7 @@ exports.getAsignaturasProgDoc = async function(pdID) {
 
 // se pasa el tipoPD (1S, 2S o I) y el semestre de asignatura (1S, 1S-2S, A ...)
 // devuelve si para semestre1 debaría estar en la PD (true) y lo mismo con semestre2
-exports.getSemestresAsignaturainPD = function(tipoPD, semestre) {
+exports.getSemestresAsignaturainPD = (tipoPD, semestre) => {
   let s1;
   let s2;
   switch (tipoPD) {
@@ -78,7 +78,7 @@ exports.getSemestresAsignaturainPD = function(tipoPD, semestre) {
 };
 
 // recuperar las asignaturas de una progdoc
-exports.getCoordinadoresAsignaturasProgDoc = async function (pdID) {
+exports.getCoordinadoresAsignaturasProgDoc = async pdID => {
   if (pdID) {
     // eslint-disable-next-line no-useless-catch
     try {
@@ -105,13 +105,13 @@ exports.getCoordinadoresAsignaturasProgDoc = async function (pdID) {
           {
             model: models.Profesor,
             as: 'Coordinador',
-             // left join
+            // left join
             required: false,
             include: [
               {
                 model: models.Persona,
                 // left join
-                required: false,
+                required: false
               }
             ]
           }

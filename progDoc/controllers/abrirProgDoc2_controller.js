@@ -5,8 +5,7 @@ const progDocController = require('./progDoc_controller');
 
 const funciones = require('../funciones');
 
-
-exports.gestionProgDoc = async function(req, res, next) {
+exports.gestionProgDoc = async (req, res, next) => {
   req.session.submenu = 'AbrirCerrar';
   let pds = [];
   /*
@@ -154,14 +153,14 @@ exports.gestionProgDoc = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
 // se completa con lo que hay en el controller de abrirProgDoc_controller
 // TODO a medida que aparezcan mas funciones hay que inicializar sus estados aquí
-exports.abrirProgDoc = async function(req, res, next) {
+exports.abrirProgDoc = async (req, res, next) => {
   const estadoProfesores = {};
   const estadoTribunales = {};
   const nuevaEntrada = {};
@@ -199,12 +198,12 @@ exports.abrirProgDoc = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 // obtener la pd que se va a cerrar
-exports.cerrarProgDoc = async function(req, res, next) {
+exports.cerrarProgDoc = async (req, res, next) => {
   try {
     if (!res.locals.permisoDenegado) {
       const pdID = req.body.pdIdentificador.split('-')[1];
@@ -226,12 +225,12 @@ exports.cerrarProgDoc = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 // TODO a medida que aparezcan mas funciones hay que inicializar sus estados aquí
-exports.abrirIncidenciaProgDoc = async function(req, res, next) {
+exports.abrirIncidenciaProgDoc = async (req, res, next) => {
   try {
     if (!res.locals.permisoDenegado) {
       const estadoProfesores = {};
@@ -270,11 +269,11 @@ exports.abrirIncidenciaProgDoc = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
-exports.cerrarIncidenciaProgDoc = async function(req, res, next) {
+exports.cerrarIncidenciaProgDoc = async (req, res, next) => {
   try {
     if (!res.locals.permisoDenegado) {
       const pdID = req.body.pdIdentificador.split('-')[1];
@@ -298,12 +297,12 @@ exports.cerrarIncidenciaProgDoc = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-exports.reabrirProgDoc = async function(req, res, next) {
+exports.reabrirProgDoc = async (req, res, next) => {
   /*
   debe quitar de la sesión el pdID que puse antes para ver los permisos
   por si hay algun error y no se reabre.
@@ -347,13 +346,13 @@ exports.reabrirProgDoc = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
 // cerrar la progdoc
-exports.cerrarProgDoc2 = async function(req, res, next) {
+exports.cerrarProgDoc2 = async (req, res, next) => {
   try {
     const pdID = res.locals.progDoc.identificador;
     await models.ProgramacionDocente.update(
@@ -368,17 +367,16 @@ exports.cerrarProgDoc2 = async function(req, res, next) {
       res.redirect(`${req.baseUrl}/AbrirCerrar`);
     });
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-
 // eliminar toda la informacion de una progdoc
-exports.eliminarProgDoc = async function (req, res, next){
+exports.eliminarProgDoc = async (req, res, next) => {
   try {
     if (!res.locals.permisoDenegado) {
-      const pdID = req.session.pdID;
+      const { pdID } = req.session;
       await progDocController.borrarPd(pdID);
       req.session.save(() => {
         res.redirect(`${req.baseUrl}/AbrirCerrar`);
@@ -389,7 +387,7 @@ exports.eliminarProgDoc = async function (req, res, next){
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
-}
+};

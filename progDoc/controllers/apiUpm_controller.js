@@ -21,7 +21,7 @@ const getDepartamentosApiUpm = async () => {
     );
   } catch (error) {
     // no se propaga el error porque puede haber fallos en api upm y esta no es critica
-    console.log(error);
+    console.error(error);
     return { data: [] };
   }
 };
@@ -33,12 +33,12 @@ const getPlanesApiUpm = async () => {
     );
   } catch (error) {
     // no se propaga el error porque puede haber fallos en api upm y esta no es critica
-    console.log(error);
+    console.error(error);
     return { data: [] };
   }
 };
 
-exports.updatePlanesAndDeparts = async function() {
+exports.updatePlanesAndDeparts = async () => {
   const nuevosDepartamentos = [];
   const nuevosPlanes = [];
   const promises = [];
@@ -80,7 +80,7 @@ exports.updatePlanesAndDeparts = async function() {
     await models.PlanEstudio.bulkCreate(nuevosPlanes);
   } catch (error) {
     // no haces un next(error) pq quieres que siga funcionando aunque api upm falle en este punto
-    console.log('Error:', error);
+    console.error('Error:', error);
   }
 };
 
@@ -94,12 +94,12 @@ exports.updatePlanesAndDeparts = async function() {
  * @retruns {String} codigoDepartamento o null con el codigo del departamento responsable
  */
 
-const addDepartamentoResponsable = function(
+const addDepartamentoResponsable = (
   apiDepartamentos,
   departamentosBBDD,
   nombreCompletoPlan,
   codigoTipoAsignatura
-) {
+) => {
   let departamentoResponsable = null;
   if (apiDepartamentos.length === 0) {
     if (

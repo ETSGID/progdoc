@@ -1,6 +1,6 @@
 // Definicion del modelo ActividadParcial:
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const ActividadParcial = sequelize.define(
     'ActividadParcial',
     {

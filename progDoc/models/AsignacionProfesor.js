@@ -1,6 +1,6 @@
 // Definicion del modelo AsignacionProfesor:
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const AsignacionProfesor = sequelize.define(
     'AsignacionProfesor',
     {

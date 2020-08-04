@@ -1,6 +1,6 @@
 // Definicion del modelo Asignatura:
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const Asignatura = sequelize.define(
     'Asignatura',
     {

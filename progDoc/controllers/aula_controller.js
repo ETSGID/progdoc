@@ -23,14 +23,17 @@ const paletaColores = [
 ];
 
 // le pasas un string y lo convierte en un int de 32 bits
-// eslint-disable-next-line func-names
-const hashCode = function(s) {
-  // eslint-disable-next-line
-  return s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0);
+const hashCode = s => {
+  return s.split('').reduce((a, b) => {
+    // eslint-disable-next-line
+    a = (a << 5) - a + b.charCodeAt(0);
+    // eslint-disable-next-line
+    return a & a;
+  }, 0);
 };
 
 // te da todos los grupos de las programciones docentes pasadas como array
-const getAllGruposConAula = async function (progDocs) {
+const getAllGruposConAula = async progDocs => {
   const gruposPorProgramacionDocente = {};
   // eslint-disable-next-line no-useless-catch
   try {
@@ -53,7 +56,7 @@ const getAllGruposConAula = async function (progDocs) {
     // se propaga el error lo captura el middleware
     throw error;
   }
-}
+};
 
 /**
  * Esta funcion se encarga de obtener los grupos que hay en cada aula
@@ -64,7 +67,7 @@ const getAllGruposConAula = async function (progDocs) {
  * @param {*} next
  */
 
-exports.getAulas = async function(req, res, next) {
+exports.getAulas = async (req, res, next) => {
   req.session.submenu = 'Aulas';
   let anoSeleccionado = req.body.ano || req.query.ano;
   const cuatrimestreSeleccionado =
@@ -327,14 +330,14 @@ exports.getAulas = async function(req, res, next) {
       html += '</body></html>';
       let file = `aulas_${anoCodigo}_${cuatrimestreSeleccionado}.pdf`;
       file = `${anoCodigo}/aulas/${file}`;
-      // console.log("the fileç: ", file);
+      // console.error("the fileç: ", file);
       const ruta = `${PATH_PDF}/pdfs/${file}`;
       const configPdfOptions = configPdf(false, null, null);
       // save file
       // eslint-disable-next-line no-unused-vars
       pdf.create(html, configPdfOptions).toFile(ruta, (err, resp) => {
         if (err) {
-          console.log(err);
+          console.error(err);
           res.json({
             success: false,
             msg: 'Ha habido un error la acción no se ha podido completar'
@@ -344,7 +347,7 @@ exports.getAulas = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     if (!req.body.generarPdf) {
       next(error);
     } else {

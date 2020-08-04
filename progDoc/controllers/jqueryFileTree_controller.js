@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 
 // eslint-disable-next-line no-underscore-dangle
-const _getDirList = function(req, res) {
+const _getDirList = (req, res) => {
   let dir = path.resolve(req.body.dir); // lo convierte ruta absoluta
   // evito que me accedan a zona restringida, solo se puede entrar a la carpeta acordada
   if (!dir.includes(PATH_PDF)) {
@@ -46,7 +46,7 @@ const _getDirList = function(req, res) {
     r += rFiles;
     r += '</ul>';
   } catch (e) {
-    console.log(e);
+    console.error(e);
     r += 'No puede cargar el directorio';
     r += '</ul>';
   }

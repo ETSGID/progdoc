@@ -12,7 +12,7 @@ const funciones = require('../funciones');
 const progDocController = require('./progDoc_controller');
 const planController = require('./plan_controller');
 
-const getFranjasExamenes = async function (pdID) {
+const getFranjasExamenes = async pdID => {
   // eslint-disable-next-line no-useless-catch
   try {
     const franjasExamen = [];
@@ -88,17 +88,17 @@ const getFranjasExamenes = async function (pdID) {
     // se propaga el error lo captura el middleware
     throw error;
   }
-}
+};
 
 // funcion que devuelve las franjas de examenes pasandole la pdID
-exports.getFranjas = async function(req, res, next) {
+exports.getFranjas = async (req, res, next) => {
   if (req.session.pdID) {
     try {
       const franjasExamen = await getFranjasExamenes(req.session.pdID);
       res.locals.franjasExamen = franjasExamen;
       next();
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {
@@ -107,7 +107,7 @@ exports.getFranjas = async function(req, res, next) {
 };
 
 // eslint-disable-next-line consistent-return
-exports.getExamenes = async function(req, res, next) {
+exports.getExamenes = async (req, res, next) => {
   const asignacionsExamen = []; // asignaciones existentes
   if (req.session.pdID) {
     try {
@@ -308,7 +308,7 @@ exports.getExamenes = async function(req, res, next) {
         next();
       }
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {
@@ -316,15 +316,16 @@ exports.getExamenes = async function(req, res, next) {
   }
 };
 
-exports.getExamenesView = function(req, res) {
+exports.getExamenesView = (req, res) => {
   req.session.submenu = 'Examenes';
   /* si no hay progDoc o no hay departamentosResponsables de dicha progDoc.
   Ojo también comprueba que no esté en incidencia para el JE
   */
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-    const view = req.session.menuBar === enumsPD.menuBar.consultar
-      ? 'examenes/examenesConsultar'
-      : 'examenes/examenesCumplimentar';
+    const view =
+      req.session.menuBar === enumsPD.menuBar.consultar
+        ? 'examenes/examenesConsultar'
+        : 'examenes/examenesCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
@@ -345,9 +346,10 @@ exports.getExamenesView = function(req, res) {
     const cancelarpath = `${req.baseUrl}/coordinador/examenes?planID=${req.session.planID}`;
     const selectExamenespath = `${req.baseUrl}/coordinador/franjasexamenes?planID=${req.session.planID}`;
     const nuevopath = `${req.baseUrl}/coordinador/guardarExamenes`;
-    const view = req.session.menuBar === enumsPD.menuBar.consultar
-      ? 'examenes/examenesConsultar'
-      : 'examenes/examenesCumplimentar';
+    const view =
+      req.session.menuBar === enumsPD.menuBar.consultar
+        ? 'examenes/examenesConsultar'
+        : 'examenes/examenesCumplimentar';
     res.render(view, {
       asignacionsExamen: res.locals.asignacionsExamen,
       franjasExamen: res.locals.franjasExamen,
@@ -373,7 +375,7 @@ exports.getExamenesView = function(req, res) {
 };
 
 // GET /respDoc/:pdID/Examenes
-exports.getFranjasView = function(req, res) {
+exports.getFranjasView = (req, res) => {
   req.session.submenu = 'Examenes2';
   const view = 'examenes/franjasExamenesCumplimentar';
   /*
@@ -418,7 +420,7 @@ exports.getFranjasView = function(req, res) {
   }
 };
 
-exports.guardarExamenes = async function(req, res, next) {
+exports.guardarExamenes = async (req, res, next) => {
   const whereEliminar = {};
   const { pdID } = req.session;
   const promises = [];
@@ -457,7 +459,7 @@ exports.guardarExamenes = async function(req, res, next) {
               obj.identificador === nuevaEntrada.AsignaturaIdentificador
           );
           if (!asig) {
-            console.log('Quiere añadir un examen que no es suyo');
+            console.error('Quiere añadir un examen que no es suyo');
           } else {
             queryToAnadir.push(nuevaEntrada);
           }
@@ -477,7 +479,7 @@ exports.guardarExamenes = async function(req, res, next) {
               identificador && obj['Examens.identificador'] === identificador
           );
           if (!asig) {
-            console.log('Quiere actulaizar un examen que no es suyo');
+            console.error('Quiere actulaizar un examen que no es suyo');
           } else {
             promises.push(
               models.Examen.update(
@@ -505,7 +507,7 @@ exports.guardarExamenes = async function(req, res, next) {
       await Promise.all(promises);
       next();
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {
@@ -513,7 +515,7 @@ exports.guardarExamenes = async function(req, res, next) {
   }
 };
 
-exports.guardarFranjasExamenes = async function(req, res, next) {
+exports.guardarFranjasExamenes = async (req, res, next) => {
   const whereEliminar = {};
   const { pdID } = req.session;
   const promises = [];
@@ -597,13 +599,13 @@ exports.guardarFranjasExamenes = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
 // get
-exports.reenviarExamenes = function(req, res) {
+exports.reenviarExamenes = (req, res) => {
   req.session.save(() => {
     res.redirect(
       `${req.baseUrl}/coordinador/examenes?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
@@ -611,12 +613,12 @@ exports.reenviarExamenes = function(req, res) {
   });
 };
 
-exports.reenviarExamenesAjax = function(req, res) {
+exports.reenviarExamenesAjax = (req, res) => {
   res.json({ success: true });
 };
 
 // post
-exports.aprobarExamenes = async function(req, res, next) {
+exports.aprobarExamenes = async (req, res, next) => {
   const { pdID } = req.session;
   const date = new Date();
   let estadoExamenes;
@@ -649,12 +651,12 @@ exports.aprobarExamenes = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-exports.generateCsvExamens = async function(req, res, next) {
+exports.generateCsvExamens = async (req, res, next) => {
   try {
     const plan = progDocController.getPlanPd(req.session.pdID);
     const planInfo = await planController.getPlanInfo(plan);
@@ -757,12 +759,12 @@ exports.generateCsvExamens = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-const isExamenInFranjas =  function (examen, franjas) {
+const isExamenInFranjas = (examen, franjas) => {
   const duracion = +examen.duracion;
   const horaInicial = moment.duration(examen.horaInicio);
   const horaFinal = moment.duration(horaInicial).add(duracion, 'm');
@@ -783,7 +785,7 @@ const isExamenInFranjas =  function (examen, franjas) {
     }
   }
   return false;
-}
+};
 
 exports.getFranjasExamenes = getFranjasExamenes;
 exports.isExamenInFranjas = isExamenInFranjas;

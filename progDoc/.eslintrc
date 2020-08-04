@@ -16,7 +16,7 @@
     "parserOptions": {
         "ecmaVersion": 2018
     },
-    "ignorePatterns": ["public/js/libraries/", "node_modules/"],
+    "ignorePatterns": ["public/js/libraries/", "node_modules/", "views/"],
     "rules": {
         "prettier/prettier": ["error"],
         "no-await-in-loop": 1,
@@ -24,6 +24,7 @@
         "no-continue": 1,
         "guard-for-in": 1,
         "no-restricted-syntax": 0,
-        "no-use-before-define": 0
+        "no-use-before-define": 0,
+        "no-console": ["error", { "allow": ["warn", "error"] }]
     }
 }

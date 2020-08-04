@@ -1,6 +1,6 @@
 // Definicion del modelo Rol:
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const Rol = sequelize.define(
     'Rol',
     {

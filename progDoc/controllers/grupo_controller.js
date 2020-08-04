@@ -4,11 +4,12 @@ const estados = require('../estados');
 const enumsPD = require('../enumsPD');
 const funciones = require('../funciones');
 
-exports.getGrupos = async function(req, res, next) {
+exports.getGrupos = async (req, res, next) => {
   req.session.submenu = 'Grupos';
-  const view = req.session.menuBar === enumsPD.menuBar.consultar
-    ? 'grupos/gruposConsultar'
-    : 'grupos/gruposJE';
+  const view =
+    req.session.menuBar === enumsPD.menuBar.consultar
+      ? 'grupos/gruposConsultar'
+      : 'grupos/gruposJE';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
     res.render(view, {
@@ -103,14 +104,14 @@ exports.getGrupos = async function(req, res, next) {
         pdID
       });
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   }
 };
 
 // migrar a getGruposNuevo
-exports.getGrupos2 = async function(pdID) {
+exports.getGrupos2 = async pdID => {
   if (pdID) {
     // eslint-disable-next-line no-useless-catch
     try {
@@ -133,7 +134,7 @@ exports.getGrupos2 = async function(pdID) {
   }
 };
 
-exports.EliminarGruposJE = async function(req, res, next) {
+exports.EliminarGruposJE = async (req, res, next) => {
   let toEliminar = req.body.eliminar;
   if (toEliminar && !res.locals.permisoDenegado) {
     try {
@@ -165,7 +166,7 @@ exports.EliminarGruposJE = async function(req, res, next) {
       });
       next();
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {
@@ -173,7 +174,7 @@ exports.EliminarGruposJE = async function(req, res, next) {
   }
 };
 
-exports.ActualizarGruposJE = async function(req, res, next) {
+exports.ActualizarGruposJE = async (req, res, next) => {
   let toActualizar = req.body.actualizar;
   const promises = [];
   try {
@@ -211,12 +212,12 @@ exports.ActualizarGruposJE = async function(req, res, next) {
     await Promise.all(promises);
     next();
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-exports.AnadirGruposJE = async function(req, res, next) {
+exports.AnadirGruposJE = async (req, res, next) => {
   const { planID } = req.session;
   const { pdID } = req.body;
   let toAnadir = req.body.anadir;
@@ -254,7 +255,7 @@ exports.AnadirGruposJE = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };

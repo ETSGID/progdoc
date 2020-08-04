@@ -4,7 +4,8 @@ const funciones = require('../funciones');
 
 const op = Sequelize.Op;
 
-const getPlanInfo = async function(planId) {
+const getPlanInfo = async planId => {
+  // eslint-disable-next-line no-useless-catch
   try {
     const planBBDD = await models.PlanEstudio.findById(planId, {
       raw: true
@@ -17,7 +18,7 @@ const getPlanInfo = async function(planId) {
 };
 
 // un plan es activo cuando tiene nombre == acronimo asignado
-const getPlanesFunction = async function(onlyActive) {
+const getPlanesFunction = async onlyActive => {
   // eslint-disable-next-line no-useless-catch
   try {
     const filtro = {};
@@ -39,12 +40,12 @@ const getPlanesFunction = async function(onlyActive) {
     throw error;
   }
 };
-exports.getPlanes = async function(req, res, next) {
+exports.getPlanes = async (req, res, next) => {
   try {
     res.locals.planEstudios = await getPlanesFunction(true);
     next();
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };

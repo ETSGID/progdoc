@@ -5,7 +5,7 @@ const asignaturaController = require('./asignatura_controller');
 const departamentoController = require('./departamento_controller');
 const planController = require('./plan_controller');
 
-exports.getAcronimos = async function(req, res, next) {
+exports.getAcronimos = async (req, res, next) => {
   req.session.submenu = 'Acronimos';
   // se obtienen todos los planes, incluidos los que no se muestran
   // no se muestran normalmente los planes sin acronimo
@@ -59,13 +59,13 @@ exports.getAcronimos = async function(req, res, next) {
       });
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
 // guardar acrónimos departamento
-exports.actualizarAcronimos = async function(req, res, next) {
+exports.actualizarAcronimos = async (req, res, next) => {
   const { planID } = req.session;
   let toActualizar = req.body.actualizar;
   const promises = [];
@@ -120,7 +120,7 @@ exports.actualizarAcronimos = async function(req, res, next) {
       res.redirect(`${req.baseUrl}/gestion/acronimos?planID=${planID}`);
     });
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };

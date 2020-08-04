@@ -10,7 +10,7 @@ const enumsPD = require('../enumsPD');
 // se debe pasar como parámetros el plan, semestre, anoAcademico, y curso (opcional)
 // sino se pasa curso se devuelven todos los cursos,
 // lo mismo si no se pasa semestre o si el semestre es I
-exports.getAsignaturasPD = async function(req, res, next) {
+exports.getAsignaturasPD = async (req, res, next) => {
   let pdID1 = 'no programacion';
   let pdID2 = 'no programacion';
   const filtro = {};
@@ -98,7 +98,7 @@ exports.getAsignaturasPD = async function(req, res, next) {
       res.json(respError);
     } else res.json(resp);
   } catch (error) {
-    console.log(`API error: ${error.message}`);
+    console.error(`API error: ${error.message}`);
     next(error);
   }
 };
@@ -107,7 +107,7 @@ exports.getAsignaturasPD = async function(req, res, next) {
 // donde progDocID es el identificador de la progDoc en la bbdd
 // se debe pasar como parámetros el plan, semestre, anoAcademico, y codigo asignaturas
 // separadas por comas
-exports.getAsignaturasHorario = async function(req, res, next) {
+exports.getAsignaturasHorario = async (req, res, next) => {
   let pdID1 = 'no programacion';
   let pdID2 = 'no programacion';
   const filtro = {};
@@ -253,7 +253,7 @@ exports.getAsignaturasHorario = async function(req, res, next) {
       res.json(respError);
     } else res.json(resp);
   } catch (error) {
-    console.log(`API error: ${error.message}`);
+    console.error(`API error: ${error.message}`);
     next(error);
   }
 };
@@ -262,7 +262,7 @@ exports.getAsignaturasHorario = async function(req, res, next) {
 // donde progDocID es el identificador de la progDoc en la bbdd
 // se debe pasar como parámetros el plan, semestre, anoAcademico, y codigo asignaturas
 // separadas por comas
-exports.getAsignaturasExamen = async function(req, res, next) {
+exports.getAsignaturasExamen = async (req, res, next) => {
   let pdID1 = 'no programacion';
   let pdID2 = 'no programacion';
   const filtro = {};
@@ -396,7 +396,7 @@ exports.getAsignaturasExamen = async function(req, res, next) {
       res.json(respError);
     } else res.json(resp);
   } catch (error) {
-    console.log(`API error: ${error.message}`);
+    console.error(`API error: ${error.message}`);
     next(error);
   }
 };
@@ -407,7 +407,7 @@ exports.getAsignaturasExamen = async function(req, res, next) {
 // semestre 1S 2S I
 // codigoAsignatura es codigo de la asignatura
 // devuelve los profesores que dan una asignatura
-exports.getGruposAsignatura = async function(req, res, next) {
+exports.getGruposAsignatura = async (req, res, next) => {
   let semestreGrupo = '%%';
   let pdID1 = 'no programacion';
   let pdID2 = 'no programacion';
@@ -510,7 +510,7 @@ exports.getGruposAsignatura = async function(req, res, next) {
       res.json(respError);
     } else res.json(resp);
   } catch (error) {
-    console.log(`API error: ${error.message}`);
+    console.error(`API error: ${error.message}`);
     next(error);
   }
 };

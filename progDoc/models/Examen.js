@@ -1,7 +1,7 @@
 // Definicion del modelo Examen:
 const enumsPD = require('../enumsPD');
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const Examen = sequelize.define(
     'Examen',
     {

@@ -9,7 +9,7 @@ const departamentoController = require('./departamento_controller');
 const grupoController = require('./grupo_controller');
 const apiUpmController = require('./apiUpm_controller');
 
-exports.getGestionPlanes = async function(req, res, next) {
+exports.getGestionPlanes = async (req, res, next) => {
   req.session.submenu = 'Planes';
   const actualizarpath = `${req.baseUrl}/gestion/actualizarPlanApi`;
   const cambioEstadopath = `${req.baseUrl}/gestion/cambiarEstadoProgDoc`;
@@ -62,12 +62,12 @@ exports.getGestionPlanes = async function(req, res, next) {
       verEstado: false
     });
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     next(error);
   }
 };
 
-exports.updateAsignaturasApiUpm = async function(req, res, next) {
+exports.updateAsignaturasApiUpm = async (req, res, next) => {
   // actualizar departamentos en el sistema
   await apiUpmController.updatePlanesAndDeparts();
   const { pdID } = req.session;
@@ -527,7 +527,7 @@ exports.updateAsignaturasApiUpm = async function(req, res, next) {
         next();
       }
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       next(error);
     }
   } else {
@@ -535,7 +535,7 @@ exports.updateAsignaturasApiUpm = async function(req, res, next) {
   }
 };
 
-exports.updateEstadoProgDoc = async function(req, res) {
+exports.updateEstadoProgDoc = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       const nuevaEntrada = {};
@@ -571,7 +571,7 @@ exports.updateEstadoProgDoc = async function(req, res) {
       );
       progDocController.isPDLista(pdID, res.json({ success: true }));
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error:', error);
       res.json({
         success: false,
         msg:
