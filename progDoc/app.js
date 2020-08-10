@@ -103,7 +103,7 @@ if (DEV === 'true') {
     // employeetype puede ser un string o un array pq luego se convierte a array
     req.session.user.employeetype = process.env.USER_DEV_ROLS || ['F', 'A'];
     req.session.user.mail = process.env.USER_DEV || 'ejemplo@upm.es';
-    req.session.user.uid = 'ejemplo';
+    req.session.user.uid = process.env.USER_DEV || 'ejemplo';
     req.session.user.cn = 'FERNANDO FERNANDEZ FERNANDEZ';
     req.session.user.givenname = 'FERNANDO';
     res.locals.session = req.session;

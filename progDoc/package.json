@@ -7,7 +7,10 @@
     "lint": "eslint ./",
     "lint:fix": "eslint ./ --fix",
     "seeders": "./node_modules/.bin/sequelize  db:seed:all --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB",
-    "seeders:undo": "./node_modules/.bin/sequelize db:seed:undo:all --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB"
+    "seeders:undo": "./node_modules/.bin/sequelize db:seed:undo:all --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB",
+    "migrations": "./node_modules/.bin/sequelize  db:migrate --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB",
+    "migrations:undo": "./node_modules/.bin/sequelize  db:migrate:undo --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB",
+    "migrations:undo:all": "./node_modules/.bin/sequelize  db:migrate:undo:all --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB"
   },
   "dependencies": {
     "axios": "^0.18.1",

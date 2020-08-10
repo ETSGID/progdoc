@@ -9,7 +9,7 @@
 - [Puertos](#puertos)
 - [Bases de datos](#bases-de-datos)
   - [Requisitos de las bases de datos](#requisitos-de-las-bases-de-datos)
-  - [Inicialización de la base de datos *(pending)*](#inicializaci%C3%B3n-de-la-base-de-datos-pending)
+  - [Inicialización de la base de datos](#inicializaci%C3%B3n-de-la-base-de-datos)
   - [Restore datos](#restore-datos)
 - [Almacenamiento de ficheros (pdfs y csv)](#almacenamiento-de-ficheros-pdfs-y-csv)
   - [Requisitos de almacenamiento de ficheros](#requisitos-de-almacenamiento-de-ficheros)
@@ -28,6 +28,7 @@
   - [Localhost](#localhost)
     - [Variables de entorno (DEV=true, PRUEBAS=false, DOCKER=false)](#variables-de-entorno-devtrue-pruebasfalse-dockerfalse)
     - [Ejecución](#ejecuci%C3%B3n-2)
+- [Estilo del código](#estilo-del-c%C3%B3digo)
 - [Enlaces relevantes](#enlaces-relevantes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -60,10 +61,28 @@ En **producción** deben realizarse copias de seguridad de la base de datos que 
 
 Con esta estrategia se evita que el número de copias aumente con el paso del tiempo. En este caso será constante y contará con 20 copias (7 diarias, 12 mensuales, 1 anual).
 
-### Inicialización de la base de datos *(pending)*
-** La primera vez que se ejecute el proyecto ** es necesario generar el esqueleto de la base de datos y rellenar alguna información adicional. Para ello se usarán las migraciones y seeders
+### Inicialización de la base de datos
+** La primera vez que se ejecute el proyecto ** es necesario generar el esqueleto de la base de datos y rellenar alguna información adicional. Para ello se usarán las migraciones y seeders. Las migraciones y los seeders se ejecutan automáticamente al inicializar el proyecto con docker. Además existen los siguientes scripts definidos en el `package.json`:
+
+```shell
+#./node_modules/.bin/sequelize  db:seed:all --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB
+npm run seeders
+
+ #./node_modules/.bin/sequelize db:seed:undo:all --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB
+ npm run seeders:undo
+ 
+ #./node_modules/.bin/sequelize  db:migrate --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB
+npm run migrations
+
+#./node_modules/.bin/sequelize  db:migrate:undo --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB
+npm run migrations:undo
+
+#./node_modules/.bin/sequelize  db:migrate:undo:all --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB
+npm run migrations:undo:all
+```
 
 ### Restore datos
+
 
 ```shell
 #para importar la base de datos es necesario acceder a la base de datos y copiar el fichero con la bbdd
@@ -71,6 +90,7 @@ psql -U [userpostgres] -h localhost  [database] < [file.sql]
 
 #file.sql puede contener toda la base de datos, el esquema o solo los datos. En docker se debe borrar el volumen dbdata de la bbdd ya que sino seguirá la versión anterior.
 ```
+Dependiendo del caso será necesario eliminar las migraciones y/o los seeders antes de restaurarla ya que puede dar fallos si ya existen las tablas y las intenta volver a crear o sí los seeders ya han creado los datos e intenta volver a crearlos.
 
 ## Almacenamiento de ficheros (pdfs y csv)
 Los pdfs se almacenan en el volumen progdoc:/storage/progdoc
@@ -311,6 +331,16 @@ npm install
 # Arrancar la aplicación web
 npm start
 
+```
+
+## Estilo del código
+El proyecto está configurado para utilizar la guía de estilos de `airbnb` usando `eslint`. Existen dos scripts para comprobar la sintaxis y el estilo del código en el `package.json`
+```shell
+#eslint ./
+npm run lint
+
+#eslint ./ --fix
+npm run lint:fix
 ```
 
 

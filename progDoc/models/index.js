@@ -227,7 +227,6 @@ Grupo.belongsToMany(ConjuntoActividadParcial, {
 });
 
 // If you want to create de schema
-// sequelize.sync();
 sequelizeSession.sync();
 
 // Exportamos modelos
