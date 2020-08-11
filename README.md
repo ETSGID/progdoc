@@ -94,7 +94,7 @@ Dependiendo del caso será necesario eliminar las migraciones y/o los seeders an
 ## Almacenamiento de ficheros (pdfs y csv)
 Los pdfs se almacenan en el volumen `progdoc:/storage/progdoc`
 Si se desea cambiar la carpeta: `/storage/progdoc/` debe hacerse tanto en `progDoc.env` como en `docker-compose.yml`
-Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/progdoc/pdfs/`.
+Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/progdoc/pdfs/`. **Deben utilizarse rutas absolutas para configurar la variable de entorno**
 
 ### Requisitos de almacenamiento de ficheros
 En **producción** deben realizarse copias de seguridad del sistema de ficheros de la aplicación.
