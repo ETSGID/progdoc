@@ -7,7 +7,9 @@ module.exports = {
         references: {
           model: 'ConjuntoActividadParcials',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       GrupoId: {
         type: Sequelize.INTEGER,
@@ -15,7 +17,9 @@ module.exports = {
         references: {
           model: 'Grupos',
           key: 'grupoId'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       }
     });
   },

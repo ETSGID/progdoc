@@ -32,7 +32,9 @@ module.exports = {
         references: {
           model: 'ProgramacionDocentes',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       }
     });
   },

@@ -23,21 +23,27 @@ module.exports = {
         references: {
           model: 'Profesors',
           key: 'ProfesorId'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       AsignaturaId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Asignaturas',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       GrupoId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Grupos',
           key: 'grupoId'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       }
     });
   },

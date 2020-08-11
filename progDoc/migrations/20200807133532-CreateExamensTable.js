@@ -37,7 +37,9 @@ module.exports = {
         references: {
           model: 'Asignaturas',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       }
     });
   },

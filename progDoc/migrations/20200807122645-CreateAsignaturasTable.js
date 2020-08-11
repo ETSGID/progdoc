@@ -53,56 +53,72 @@ module.exports = {
         references: {
           model: 'Departamentos',
           key: 'codigo'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       CoordinadorAsignatura: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Profesors',
           key: 'ProfesorId'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       ProgramacionDocenteIdentificador: {
         type: Sequelize.STRING,
         references: {
           model: 'ProgramacionDocentes',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       ItinerarioIdentificador: {
         type: Sequelize.STRING,
         references: {
           model: 'Itinerarios',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       PresidenteTribunalAsignatura: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Profesors',
           key: 'ProfesorId'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       VocalTribunalAsignatura: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Profesors',
           key: 'ProfesorId'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       SecretarioTribunalAsignatura: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Profesors',
           key: 'ProfesorId'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       SuplenteTribunalAsignatura: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Profesors',
           key: 'ProfesorId'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       }
     });
   },

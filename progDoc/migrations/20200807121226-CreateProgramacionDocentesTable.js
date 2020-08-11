@@ -80,7 +80,9 @@ module.exports = {
         references: {
           model: 'PlanEstudios',
           key: 'codigo'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       }
     });
   },

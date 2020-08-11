@@ -31,14 +31,18 @@ module.exports = {
         references: {
           model: 'ProgramacionDocentes',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       ItinerarioIdentificador: {
         type: Sequelize.STRING,
         references: {
           model: 'Itinerarios',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       }
     });
   },

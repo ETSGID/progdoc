@@ -7,14 +7,18 @@ module.exports = {
         references: {
           model: 'Personas',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       DepartamentoCodigo: {
         type: Sequelize.STRING,
         references: {
           model: 'Departamentos',
           key: 'codigo'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       }
     });
   },

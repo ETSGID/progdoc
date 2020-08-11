@@ -26,14 +26,18 @@ module.exports = {
         references: {
           model: 'ConjuntoActividadParcials',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       AsignaturaId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Asignaturas',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       }
     });
   },

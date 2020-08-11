@@ -23,14 +23,18 @@ module.exports = {
         references: {
           model: 'PlanEstudios',
           key: 'codigo'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       EventoGeneralId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'EventoGenerals',
           key: 'identificador'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       }
     });
   },
