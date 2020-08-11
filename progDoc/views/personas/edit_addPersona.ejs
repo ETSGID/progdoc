@@ -100,7 +100,7 @@ $('#formPersona').submit(function(event) {
   if(personaId !== "" && !isNaN(personaId)){
     if(confirm('Si modifica un profesor y ha desmarcado la casilla de "Marcar si es profesor" se perderá toda la información del profesor en el sistema: docencia, tribunales y coordinador de asignatura.')){
       $.ajax({
-      url: CONTEXT+'/personaAndProfesor/'+personaId,
+      url: CONTEXT+'/gestion/personal/'+personaId,
       method: 'PUT',
       dataType: "json",
       contentType: "application/json",
@@ -119,7 +119,7 @@ $('#formPersona').submit(function(event) {
     }
   }else{
     $.ajax({
-      url: CONTEXT+'/personaAndProfesor',
+      url: CONTEXT+'/gestion/personal',
       method: 'POST',
       dataType: "json",
       contentType: "application/json",

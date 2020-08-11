@@ -145,6 +145,8 @@ function Decidir(decision){
 function cambiarModo(id, cambiopath){
   let form2 = document.getElementById(id);
     form2.setAttribute('action', cambiopath);
+    //change method to post
+    form2.setAttribute('method', 'post');
     form2.submit();
 }
 

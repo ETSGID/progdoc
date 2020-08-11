@@ -11,9 +11,9 @@ const apiUpmController = require('./apiUpm_controller');
 
 exports.getGestionPlanes = async (req, res, next) => {
   req.session.submenu = 'Planes';
-  const actualizarpath = `${req.baseUrl}/gestion/actualizarPlanApi`;
-  const cambioEstadopath = `${req.baseUrl}/gestion/cambiarEstadoProgDoc`;
-  const path = `${req.baseUrl}/gestion/planes`;
+  const actualizarpath = `${req.baseUrl}/actualizarPlanApiUPM`;
+  const cambioEstadopath = `${req.baseUrl}/estado`;
+  const path = req.baseUrl;
   let estado = null;
   let pdID = null;
   if (
@@ -34,7 +34,7 @@ exports.getGestionPlanes = async (req, res, next) => {
     res.render('gestionPlanes/gestionPlanes', {
       estado,
       permisoDenegado: res.locals.permisoDenegado || null,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       planID: req.session.planID,
       planEstudios: res.locals.planEstudios,
@@ -128,7 +128,7 @@ exports.updateAsignaturasApiUpm = async (req, res, next) => {
         ],
         raw: true
       });
-      // asingaturas presentes en la bbdd
+      // asignaturas presentes en la bbdd
       asignaturasBBDD.forEach(asignBBDD => {
         const { identificador } = asignBBDD;
         const nuevaAsignatura = nuevasAsignaturas.find(

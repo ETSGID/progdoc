@@ -115,9 +115,9 @@ exports.getPersonasPagination = async (req, res, next) => {
       page,
       pages,
       personas,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
-      path: `${req.baseUrl}/Personal`
+      path: req.baseUrl
     });
   } catch (error) {
     // se propaga el error lo captura el middleware

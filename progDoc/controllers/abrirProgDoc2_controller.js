@@ -130,7 +130,7 @@ exports.gestionProgDoc = async (req, res, next) => {
     // si cambie alguna asignatura por el caso ese raro se deberá volver para obtener los datos.
     if (promises2.length > 0) {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+        res.redirect(req.baseUrl);
       });
     } else {
       res.render('gestionPlanes/abrirCerrarPds', {
@@ -141,14 +141,13 @@ exports.gestionProgDoc = async (req, res, next) => {
         estadosProgDoc: estados.estadoProgDoc,
         anos,
         consultarpath: `${req.baseUrl}/consultar`,
-        abrirpath: `${req.baseUrl}/abrirProgDoc`,
-        cerrarpath: `${req.baseUrl}/cerrarProgDoc`,
-        abririncidenciapath: `${req.baseUrl}/abrirIncidenciaProgDoc`,
-        cerrarincidenciapath: `${req.baseUrl}/cerrarIncidenciaProgDoc`,
-        reabrirpath: `${req.baseUrl}/reabrirProgDoc`,
-        eliminarpath: `${req.baseUrl}/eliminarProgDoc`,
+        abrirpath: `${req.baseUrl}/abrir`,
+        cerrarpath: `${req.baseUrl}/cerrar`,
+        abririncidenciapath: `${req.baseUrl}/abrirIncidencia`,
+        cerrarincidenciapath: `${req.baseUrl}/cerrarIncidencia`,
+        reabrirpath: `${req.baseUrl}/reabrir`,
+        eliminarpath: `${req.baseUrl}/eliminar`,
         submenu: req.session.submenu,
-        menu: req.session.menu,
         planID: req.session.planID
       });
     }
@@ -190,11 +189,11 @@ exports.abrirProgDoc = async (req, res, next) => {
         } /* where criteria */
       );
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+        res.redirect(req.baseUrl);
       });
     } else {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+        res.redirect(req.baseUrl);
       });
     }
   } catch (error) {
@@ -221,7 +220,7 @@ exports.cerrarProgDoc = async (req, res, next) => {
       next();
     } else {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+        res.redirect(req.baseUrl);
       });
     }
   } catch (error) {
@@ -261,11 +260,11 @@ exports.abrirIncidenciaProgDoc = async (req, res, next) => {
         } /* where criteria */
       );
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+        res.redirect(req.baseUrl);
       });
     } else {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+        res.redirect(req.baseUrl);
       });
     }
   } catch (error) {
@@ -293,7 +292,7 @@ exports.cerrarIncidenciaProgDoc = async (req, res, next) => {
       next();
     } else {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+        res.redirect(req.baseUrl);
       });
     }
   } catch (error) {
@@ -338,11 +337,11 @@ exports.reabrirProgDoc = async (req, res, next) => {
         } /* where criteria */
       );
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+        res.redirect(req.baseUrl);
       });
     } else {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+        res.redirect(req.baseUrl);
       });
     }
   } catch (error) {
@@ -364,7 +363,7 @@ exports.cerrarProgDoc2 = async (req, res, next) => {
       { where: { identificador: pdID } } /* where criteria */
     );
     req.session.save(() => {
-      res.redirect(`${req.baseUrl}/AbrirCerrar`);
+      res.redirect(req.baseUrl);
     });
   } catch (error) {
     console.error('Error:', error);
@@ -379,11 +378,11 @@ exports.eliminarProgDoc = async (req, res, next) => {
       const { pdID } = req.session;
       await progDocController.borrarPd(pdID);
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+        res.redirect(req.baseUrl);
       });
     } else {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/AbrirCerrar`);
+        res.redirect(req.baseUrl);
       });
     }
   } catch (error) {

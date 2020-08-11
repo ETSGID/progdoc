@@ -12,8 +12,8 @@ exports.getAcronimos = async (req, res, next) => {
   res.locals.planEstudios = await planController.getPlanesFunction(false);
   try {
     const departs = await departamentoController.getAllDepartamentos();
-    const nuevopath = `${req.baseUrl}/gestionAcronimos/guardarAcronimosJE`;
-    const cancelarpath = `${req.baseUrl}/gestion/acronimos?planID=${req.session.planID}`;
+    const nuevopath = req.baseUrl;
+    const cancelarpath = `${req.baseUrl}?planID=${req.session.planID}`;
     const asignaturasPorCursos = {};
     if (
       !res.locals.progDoc ||
@@ -27,7 +27,6 @@ exports.getAcronimos = async (req, res, next) => {
         existe:
           'Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada',
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
         planEstudios: res.locals.planEstudios,
@@ -47,7 +46,6 @@ exports.getAcronimos = async (req, res, next) => {
       });
       res.render('acronimos/acronimosJE', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
         planEstudios: res.locals.planEstudios,
@@ -117,7 +115,7 @@ exports.actualizarAcronimos = async (req, res, next) => {
   try {
     await Promise.all(promises);
     req.session.save(() => {
-      res.redirect(`${req.baseUrl}/gestion/acronimos?planID=${planID}`);
+      res.redirect(`${req.baseUrl}?planID=${planID}`);
     });
   } catch (error) {
     console.error('Error:', error);

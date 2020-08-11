@@ -15,7 +15,7 @@ exports.getGrupos = async (req, res, next) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentosResponsables: res.locals.departamentosResponsables,
@@ -34,7 +34,7 @@ exports.getGrupos = async (req, res, next) => {
       existe:
         'Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada',
       permisoDenegado: res.locals.permisoDenegado || null,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentosResponsables: res.locals.departamentosResponsables,
@@ -89,11 +89,11 @@ exports.getGrupos = async (req, res, next) => {
           }
         }
       });
-      const nuevopath = `${req.baseUrl}/gestionGrupos/guardarGruposJE`;
-      const cancelarpath = `${req.baseUrl}/gestionGrupos/getGrupos?planID=${req.session.planID}`;
+      const nuevopath = req.baseUrl;
+      const cancelarpath = `${req.baseUrl}?planID=${req.session.planID}`;
       res.render(view, {
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         nuevopath,
         cancelarpath,
@@ -247,11 +247,11 @@ exports.AnadirGruposJE = async (req, res, next) => {
       });
       await models.Grupo.bulkCreate(gruposToAnadir);
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/gestionGrupos/getGrupos?planID=${planID}`);
+        res.redirect(`${req.baseUrl}?planID=${planID}`);
       });
     } else {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/gestionGrupos/getGrupos?planID=${planID}`);
+        res.redirect(`${req.baseUrl}?planID=${planID}`);
       });
     }
   } catch (error) {

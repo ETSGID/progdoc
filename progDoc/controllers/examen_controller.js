@@ -329,7 +329,7 @@ exports.getExamenesView = (req, res) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
@@ -343,9 +343,9 @@ exports.getExamenesView = (req, res) => {
       estadoProgDoc: null
     });
   } else {
-    const cancelarpath = `${req.baseUrl}/coordinador/examenes?planID=${req.session.planID}`;
-    const selectExamenespath = `${req.baseUrl}/coordinador/franjasexamenes?planID=${req.session.planID}`;
-    const nuevopath = `${req.baseUrl}/coordinador/guardarExamenes`;
+    const cancelarpath = `${req.baseUrl}?planID=${req.session.planID}`;
+    const selectExamenespath = `${req.baseUrl}/franjas?planID=${req.session.planID}`;
+    const nuevopath = req.baseUrl;
     const view =
       req.session.menuBar === enumsPD.menuBar.consultar
         ? 'examenes/examenesConsultar'
@@ -355,13 +355,13 @@ exports.getExamenesView = (req, res) => {
       franjasExamen: res.locals.franjasExamen,
       periodosExamen: enumsPD.periodoPD,
       nuevopath,
-      aprobarpath: `${req.baseUrl}/coordiandor/aprobarExamenes`,
+      aprobarpath: `${req.baseUrl}/estado`,
       selectExamenespath,
       cancelarpath,
       planID: req.session.planID,
       pdID: req.session.pdID,
       cursos: res.locals.cursos,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       permisoDenegado: res.locals.permisoDenegado || null,
       estadosExamen: estados.estadoExamen,
@@ -374,7 +374,6 @@ exports.getExamenesView = (req, res) => {
   }
 };
 
-// GET /respDoc/:pdID/Examenes
 exports.getFranjasView = (req, res) => {
   req.session.submenu = 'Examenes2';
   const view = 'examenes/franjasExamenesCumplimentar';
@@ -386,7 +385,7 @@ exports.getFranjasView = (req, res) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
@@ -396,9 +395,9 @@ exports.getFranjasView = (req, res) => {
       pdID: null
     });
   } else {
-    const cancelarpath = `${req.baseUrl}/coordinador/franjasexamenes?planID=${req.session.planID}`;
-    const nuevopath = `${req.baseUrl}/coordinador/guardarFranjasExamenes`;
-    const selectExamenespath = `${req.baseUrl}/coordinador/examenes?planID=${req.session.planID}`;
+    const cancelarpath = `${req.baseUrl}/franjas?planID=${req.session.planID}`;
+    const nuevopath = `${req.baseUrl}/franjas`;
+    const selectExamenespath = `${req.baseUrl}?planID=${req.session.planID}`;
     res.render(view, {
       franjasExamen: res.locals.franjasExamen,
       periodosExamen: enumsPD.periodoPD,
@@ -407,7 +406,7 @@ exports.getFranjasView = (req, res) => {
       cancelarpath,
       planID: req.session.planID,
       pdID: req.session.pdID,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       permisoDenegado: res.locals.permisoDenegado || null,
       estadosExamen: estados.estadoExamen,
@@ -591,11 +590,11 @@ exports.guardarFranjasExamenes = async (req, res, next) => {
       }
       await Promise.all(promises);
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/coordinador/franjasExamenes`);
+        res.redirect(`${req.baseUrl}/franjas`);
       });
     } else {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/coordinador/franjasExamenes`);
+        res.redirect(`${req.baseUrl}/franjas`);
       });
     }
   } catch (error) {
@@ -608,7 +607,7 @@ exports.guardarFranjasExamenes = async (req, res, next) => {
 exports.reenviarExamenes = (req, res) => {
   req.session.save(() => {
     res.redirect(
-      `${req.baseUrl}/coordinador/examenes?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
+      `${req.baseUrl}?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
     );
   });
 };

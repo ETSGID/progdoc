@@ -13,7 +13,7 @@ exports.getEstado = async (req, res, next) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
@@ -44,7 +44,7 @@ exports.getEstado = async (req, res, next) => {
       const departamentos = await departamentoController.getAllDepartamentos();
       res.render(view, {
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         planID: req.session.planID,
         departamentoID: req.session.departamentoID,

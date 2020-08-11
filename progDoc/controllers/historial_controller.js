@@ -1,6 +1,5 @@
 exports.getHistorial = (req, res) => {
   res.render('menus/historial', {
-    menu: req.session.menu,
     planID: req.session.planID,
     departamentosResponsables: res.locals.departamentosResponsables,
     planEstudios: res.locals.planEstudios,

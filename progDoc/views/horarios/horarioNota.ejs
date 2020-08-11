@@ -92,10 +92,11 @@ function guardarNota(id){
  }
  let asignaturaNombreOAcronimo = asignatura.acronimo !== null ? asignatura.acronimo : asignatura.nombre;
  let text = document.getElementById("text_"+id).value;
- let path = notaId === false ? '/crearHorariosNota' : '/actualizarHorariosNota'
+ let path = notaId === false ? '' : '/'+ notaId;
+ let method = notaId === false ? 'POST' : 'PUT';
   $.ajax({
-        url: CONTEXT+'/coordinador'+path,
-        method: 'POST',
+        url: CONTEXT+'/cumplimentar/horarios/nota'+path,
+        method: method,
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({ nota: text, asignaturaId: asignaturaIdentificador, grupoId: grupo, notaId: notaId})
@@ -142,8 +143,8 @@ function guardarNota(id){
 function eliminarNota(id, notaId){
     notaId = Number(notaId)
     $.ajax({
-    url: CONTEXT+'/coordinador/eliminarHorariosNota',
-    method: 'POST',
+    url: CONTEXT+'/cumplimentar/horarios/nota/'+notaId,
+    method: 'DELETE',
     dataType: "json",
     contentType: "application/json",
     data: JSON.stringify({notaId: notaId})

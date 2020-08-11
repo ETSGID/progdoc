@@ -138,13 +138,14 @@ function guardarActividad(id){
         
  }
  let asignaturaNombreOAcronimo = asignatura.acronimo !== null ? asignatura.acronimo : asignatura.nombre;
- let path = actividadId === false ? '/crearActividad' : '/actualizarActividad'
+ let path = actividadId === false ? '' : '/' + actividadId;
+ let method = actividadId === false ? 'POST' : 'PUT';
  if(!moment(fecha, "DD/MM/YYYY").isValid()){
      alert("La actividad debe tener una fecha asociada")
  }else{
    $.ajax({
-        url: CONTEXT+'/coordinador'+path,
-        method: 'POST',
+        url: CONTEXT+'/cumplimentar/actividades/actividad'+ path,
+        method: method,
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({ conjuntoActividadParcialId: conjuntoActividadParcialId, actividadId: actividadId,
@@ -213,8 +214,8 @@ function guardarActividad(id){
 function eliminarActividad(id, actividadId){
     actividadId = Number(actividadId)
     $.ajax({
-    url: CONTEXT+'/coordinador/eliminarActividad',
-    method: 'POST',
+    url: CONTEXT+'/cumplimentar/actividades/actividad/'+actividadId,
+    method: 'DELETE',
     dataType: "json",
     contentType: "application/json",
     data: JSON.stringify({actividadId: actividadId})

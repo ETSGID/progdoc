@@ -366,7 +366,7 @@ exports.getCalendario = async (req, res, next) => {
         req.session.submenu = 'Calendario';
         res.render('calendarios/calendario', {
           permisoDenegado: res.locals.permisoDenegado || null,
-          menu: req.session.menu,
+
           submenu: req.session.submenu,
           planID: req.session.planID,
           general,
@@ -386,7 +386,7 @@ exports.getCalendario = async (req, res, next) => {
         res.render('calendarios/calendario', {
           permisoDenegado: res.locals.permisoDenegado || null,
           planID: req.session.planID,
-          menu: req.session.menu,
+
           submenu: req.session.submenu,
           general,
           calendario: array_datos[1],
@@ -417,7 +417,7 @@ exports.getCalendario = async (req, res, next) => {
         req.session.submenu = 'Calendario';
         res.render('calendarios/calendarioCumplimentarJefeDeEstudios', {
           permisoDenegado: res.locals.permisoDenegado || null,
-          menu: req.session.menu,
+
           submenu: req.session.submenu,
           general,
           planID: req.session.planID,
@@ -433,7 +433,7 @@ exports.getCalendario = async (req, res, next) => {
         req.session.submenu = 'Calendario';
         res.render('calendarios/calendarioCumplimentarJefeDeEstudios', {
           permisoDenegado: res.locals.permisoDenegado || null,
-          menu: req.session.menu,
+
           submenu: req.session.submenu,
           planID: req.session.planID,
           general,
@@ -461,7 +461,7 @@ exports.getCalendarioPlanConsultar = async (req, res, next) => {
       res.render('calendarios/calendarioConsultar', {
         CONTEXT,
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         planID: req.session.planID,
         calendario: null,
@@ -488,7 +488,7 @@ exports.getCalendarioPlanConsultar = async (req, res, next) => {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioConsultar', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         planID: req.session.planID,
         calendario: array_datos[1],
@@ -500,7 +500,7 @@ exports.getCalendarioPlanConsultar = async (req, res, next) => {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioConsultar', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         planID: req.session.planID,
         calendario: array_datos[1],
@@ -512,7 +512,7 @@ exports.getCalendarioPlanConsultar = async (req, res, next) => {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioConsultar', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         planID: req.session.planID,
         calendario: array_datos[1],
@@ -1062,7 +1062,7 @@ exports.getCalendarioPlan = async (req, res, next) => {
       res.render('calendarios/calendarioCumplimentar', {
         CONTEXT,
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         planID: req.session.planID,
         calendario: null,
@@ -1088,7 +1088,7 @@ exports.getCalendarioPlan = async (req, res, next) => {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioCumplimentar', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         planID: req.session.planID,
         calendario: array_datos[1],
@@ -1100,7 +1100,7 @@ exports.getCalendarioPlan = async (req, res, next) => {
       req.session.submenu = 'Calendario';
       res.render('calendarios/calendarioCumplimentar', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         planID: req.session.planID,
         calendario: array_datos[1],

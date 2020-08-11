@@ -71,10 +71,10 @@ function anadirConjuntoActividad(id,conjuntoActividadParcialId){
      <input class="form-group form-control dateActividad" value="${fFin}" name="date_fFin" id="date_fFin placeholder="${fFin}" type="text"/>
     </div>
   </p>
-  <button type="button" class="btn btn-default" onclick = "guardarConjuntoActividad('${actualizarConjuntoActividadParcialPath}')">
+  <button type="button" class="btn btn-default" onclick = "guardarConjuntoActividad('${conjuntoActividadParcialId}')">
   <span class="glyphicon glyphicon-ok"></span>
   </button> 
-  <button type="button" class="btn btn-default" onclick = "eliminarConjuntoActividad('${eliminarConjuntoActividadParcialPath}', '${conjuntoActividadParcialId}')">
+  <button type="button" class="btn btn-default" onclick = "eliminarConjuntoActividad('${conjuntoActividadParcialId}')">
   <span class="glyphicon glyphicon-trash"></span>
   </button>  
   </form>`      
@@ -104,7 +104,7 @@ function anadirConjuntoActividad(id,conjuntoActividadParcialId){
      <input class="form-group form-control dateActividad" value="${fFin}" name="date_fFin" id="date_fFin placeholder="${fFin}" type="text"/>
     </div>
   </p>
-  <button type="button" class="btn btn-default" onclick = "guardarConjuntoActividad('${crearConjuntoActividadParcialPath}')">
+  <button type="button" class="btn btn-default" onclick = "guardarConjuntoActividad(false)">
   <span class="glyphicon glyphicon-ok"></span>
   </button> 
   </form>`
@@ -145,18 +145,19 @@ function anadirConjuntoActividad(id,conjuntoActividadParcialId){
   $("#nuevoConjuntoActividadModal").modal();
 
 }
-function guardarConjuntoActividad(guardarPath){
-    let form = document.getElementById("formConjuntoActividadParcial");
-    form.setAttribute('action', guardarPath)
-    form.submit();    
+function guardarConjuntoActividad(conjuntoActividadParcialId){
+  let path = conjuntoActividadParcialId === false ? '' : '/' + conjuntoActividadParcialId;
+  let form = document.getElementById("formConjuntoActividadParcial");
+  form.setAttribute('action', CONTEXT + '/cumplimentar/actividades/conjuntoActividadParcial' + path)
+  form.submit();    
 }
 
-function eliminarConjuntoActividad(eliminarPath, conjuntoActividadParcialId){
+function eliminarConjuntoActividad(conjuntoActividadParcialId){
   conjuntoActividadParcialId = Number(conjuntoActividadParcialId)
   if(confirm("Una vez que borra el calendario ya no se podrá recupera ¿Seguro que quiere borrarlo?")){
     $.ajax({
-    url: eliminarPath,
-    method: 'POST',
+    url: CONTEXT + '/cumplimentar/actividades/conjuntoActividadParcial/' + conjuntoActividadParcialId,
+    method: 'DELETE',
     dataType: "json",
     contentType: "application/json",
     data: JSON.stringify({conjuntoActividadParcialId: conjuntoActividadParcialId})

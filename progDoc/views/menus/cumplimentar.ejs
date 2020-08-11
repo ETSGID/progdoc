@@ -72,15 +72,15 @@ function cambiarSubmenu(evt, submenu) {
         selectDepartamentoValue = departamento.value;
         }
     if(submenu === 'Profesores'){
-        let url = "<%=CONTEXT%>/respDoc/profesores?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        let url = "<%=CONTEXT%>/cumplimentar/profesores?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
         window.location.replace(url);
     }
     if (submenu === 'Tribunales'){
-        let url = "<%=CONTEXT%>/respDoc/tribunales?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        let url = "<%=CONTEXT%>/cumplimentar/tribunales?planID="+pAcronimo+"&departamentoID="+selectDepartamentoValue
         window.location.replace(url);
     }
     if (submenu === 'Horarios'){
-        let url = "<%=CONTEXT%>/coordinador/horarios?planID="+pAcronimo
+        let url = "<%=CONTEXT%>/cumplimentar/horarios?planID="+pAcronimo
         window.location.replace(url);
     }
     if (submenu === 'Actividades'){
@@ -88,19 +88,15 @@ function cambiarSubmenu(evt, submenu) {
         window.location.replace(url);
     }
     if (submenu === 'Examenes'){
-        let url = "<%=CONTEXT%>/coordinador/examenes?planID="+pAcronimo
+        let url = "<%=CONTEXT%>/cumplimentar/examenes?planID="+pAcronimo
         window.location.replace(url);
     }
     if (submenu === 'Estado'){
-        let url = "<%=CONTEXT%>/estado?planID="+pAcronimo
+        let url = "<%=CONTEXT%>/cumplimentar/estado?planID="+pAcronimo
         window.location.replace(url);
     }
     if (submenu === 'Calendario'){
         let url = "<%=CONTEXT%>/cumplimentar/calendario?planID="+pAcronimo
-        window.location.replace(url);
-    }
-    if (submenu === 'PDF'){
-        let url = "<%=CONTEXT%>/cumplimentar/PDF?planID="+pAcronimo
         window.location.replace(url);
     }
 

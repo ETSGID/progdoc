@@ -605,7 +605,7 @@ exports.generarPDF = async (req, res, next) => {
   ) {
     res.render(view, {
       existe: 'Programación docente no abierta',
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentosResponsables: res.locals.departamentosResponsables,
@@ -628,7 +628,7 @@ exports.generarPDF = async (req, res, next) => {
                 planID: req.session.planID,
                 planEstudios: res.locals.planEstudios,
                 pdID,
-                menu: req.session.menu,
+
                 submenu: req.session.submenu
               });
               break;

@@ -207,8 +207,8 @@ exports.getRoles = async (req, res, next) => {
     profesores = await personaYProfesorController.getPersonas();
     departs = await departamentoController.getAllDepartamentos();
     // aqui llamar a la funcion de sacar los nombres de cada id
-    const nuevopath = `${req.baseUrl}/gestionRoles/guardarRoles`;
-    const cancelarpath = `${req.baseUrl}/gestionRoles`;
+    const nuevopath = req.baseUrl;
+    const cancelarpath = req.baseUrl;
     const view =
       req.session.menuBar === enumsPD.menuBar.consultar
         ? 'roles/rolesConsultar'
@@ -226,7 +226,7 @@ exports.getRoles = async (req, res, next) => {
       departamentos: departs.sort(funciones.sortDepartamentos),
       planID: req.session.planID,
       planEstudios: res.locals.planEstudios,
-      menu: req.session.menu,
+
       departamentosResponsables: res.locals.departamentosResponsables,
       progDoc: res.locals.progDoc,
       // para añadir una persona al sistema no tiene por que ser un profesor.
@@ -300,7 +300,7 @@ exports.guardarRoles = async (req, res, next) => {
 
 exports.redir = (req, res) => {
   req.session.save(() => {
-    res.redirect(`${req.baseUrl}/gestionRoles`);
+    res.redirect(req.baseUrl);
   });
 };
 

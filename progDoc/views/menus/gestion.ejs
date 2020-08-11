@@ -83,21 +83,21 @@ if (elementPlan){
     pAcronimo = document.getElementById("plan").value
 }
 if(submenu === 'AbrirCerrar'){
-    let url = "<%=CONTEXT%>/AbrirCerrar"
+    let url = "<%=CONTEXT%>/gestion/estados"
     window.location.replace(url);
 }
 
 if(submenu === 'Personal'){
-    let url = "<%=CONTEXT%>/Personal"
+    let url = "<%=CONTEXT%>/gestion/personal"
     window.location.replace(url);
 }
 
 if (submenu === 'Grupos'){
-let url = "<%=CONTEXT%>/gestionGrupos/getGrupos?planID="+pAcronimo
+let url = "<%=CONTEXT%>/gestion/grupos?planID="+pAcronimo
 window.location.replace(url);
 } 
 if (submenu === 'Roles'){
-let url = "<%=CONTEXT%>/gestionRoles"
+let url = "<%=CONTEXT%>/gestion/roles"
 window.location.replace(url);
 }
 
@@ -110,7 +110,7 @@ let url = "<%=CONTEXT%>/gestion/calendario"
 window.location.replace(url);
 }
 if (submenu === 'Planes'){
-let url = "<%=CONTEXT%>/gestion/planes"
+let url = "<%=CONTEXT%>/gestion/plan"
 window.location.replace(url);
 }
 if (submenu === 'Aulas'){

@@ -39,7 +39,7 @@
     <button type="button" class="btn btn-default" onclick = "anadirConjuntoActividad('conjuntoActividad',<%=conjuntoActividadParcial.identificador%>)">
     <span class="glyphicon glyphicon-pencil"></span>
     </button>
-    <button type="button" class="btn btn-default" onclick = "eliminarConjuntoActividad('<%=eliminarConjuntoActividadParcialPath%>','<%=conjuntoActividadParcial.identificador%>')">
+    <button type="button" class="btn btn-default" onclick = "eliminarConjuntoActividad('<%=conjuntoActividadParcial.identificador%>')">
     <span class="glyphicon glyphicon-trash"></span>
     </button> 
     <button type="button" class="btn btn-default" onclick = "anadirActividad('actividad_<%=conjuntoActividadParcial.identificador%>',false,'act',null)">Añadir Actividad Parcial</button>
@@ -196,9 +196,6 @@ let getDia = <%-getDia%>
 let nuevaDateFormat = <%-nuevaDateFormat%>
 let formatHora = <%-formatHora%>
 let pdID = <%-JSON.stringify(pdID)%>
-let crearConjuntoActividadParcialPath = <%-JSON.stringify(crearConjuntoActividadParcialPath)%>
-let actualizarConjuntoActividadParcialPath = <%-JSON.stringify(actualizarConjuntoActividadParcialPath)%>
-let eliminarConjuntoActividadParcialPath = <%-JSON.stringify(eliminarConjuntoActividadParcialPath)%>
 let anoInicial = 2000+ Number(pdID.split("_")[2][2]+""+pdID.split("_")[2][3])
 let anoFinal = 2000+ Number(pdID.split("_")[2][4]+""+pdID.split("_")[2][5])
 //las fecha limite para poner las actividades

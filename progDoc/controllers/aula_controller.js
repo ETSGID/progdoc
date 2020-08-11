@@ -288,7 +288,7 @@ exports.getAulas = async (req, res, next) => {
       res.render('aulas/aulas', {
         CONTEXT,
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         planID: req.session.planID,
         aulas1,
@@ -298,7 +298,7 @@ exports.getAulas = async (req, res, next) => {
         ano1: String(ano1),
         ano2: String(ano2),
         anoSeleccionado: String(anoSeleccionado),
-        generarPdfpath: `${req.baseUrl}/gestion/aulas/generarPdf`
+        generarPdfpath: `${req.baseUrl}/pdf`
       });
     } else {
       const aulas = cuatrimestreSeleccionado === '1S' ? aulas1 : aulas2;

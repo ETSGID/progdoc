@@ -103,7 +103,7 @@
     function eliminarPersona(id){
         if(confirm('Si elmina a la persona del sistema se perderá toda la información relativa a ella: roles, docencia, tribunales y coordinadores')){
             $.ajax({
-            url: CONTEXT+'/personaAndProfesor/'+id,
+            url: CONTEXT+'/gestion/personal/'+id,
             method: 'DELETE',
             dataType: "json",
             contentType: "application/json",

@@ -32,15 +32,15 @@
          <i class="glyphicon glyphicon-chevron-down fa fa-caret-down" aria-hidden="true"></i>
       </button>
       <div class="dropdown-container">
-        <a id='element_ProgDocConsultar' href="<%=CONTEXT%>/Consultar">Consultar</a>
-        <a id='element_ProgDocCumplimentar' href="<%=CONTEXT%>/Cumplimentar">Cumplimentar</a>
-        <a id='element_ProgDocGestion' href="<%=CONTEXT%>/Gestion">Jefatura Estudios</a>
-        <a id='element_ProgDocHistorial' href="<%=CONTEXT%>/Historial">Historial</a>
+        <a id='element_ProgDocConsultar' href="<%=CONTEXT%>/consultar">Consultar</a>
+        <a id='element_ProgDocCumplimentar' href="<%=CONTEXT%>/cumplimentar">Cumplimentar</a>
+        <a id='element_ProgDocGestion' href="<%=CONTEXT%>/gestion">Jefatura Estudios</a>
+        <a id='element_ProgDocHistorial' href="<%=CONTEXT%>/historial">Historial</a>
         <a id='element_ProgDocAyuda' href="<%=CONTEXT%>/ayuda.pdf" download>Ayuda</a>
       </div>
-      <% if (locals.menu) { %>
-        <% for(var i=0; i< menu.length; i++){ %>
-          <input type="hidden" name="menu" value="<%=menu[i]%>">
+      <% if (locals.session.menu) { %>
+        <% for(var i=0; i< session.menu.length; i++){ %>
+          <input type="hidden" name="menu" value="<%=session.menu[i]%>">
         <% }%>
     
       <%} else {%>

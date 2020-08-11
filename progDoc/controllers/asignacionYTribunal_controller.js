@@ -151,7 +151,6 @@ const getAsignacion = async (
   }
 };
 
-// GET /respDoc/:pdID/:departamentoID
 exports.getAsignaciones = async (req, res, next) => {
   req.session.submenu = 'Profesores';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
@@ -164,7 +163,6 @@ exports.getAsignaciones = async (req, res, next) => {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
       profesores: null,
-      menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
@@ -195,7 +193,6 @@ exports.getAsignaciones = async (req, res, next) => {
         'Asignación de profesores ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
       permisoDenegado: res.locals.permisoDenegado || null,
       profesores: null,
-      menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
@@ -225,7 +222,6 @@ exports.getAsignaciones = async (req, res, next) => {
           'El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior',
         permisoDenegado: res.locals.permisoDenegado || null,
         profesores: null,
-        menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
         departamentoID: req.session.departamentoID,
@@ -245,7 +241,7 @@ exports.getAsignaciones = async (req, res, next) => {
         permisoDenegado: res.locals.permisoDenegado || null,
         asignacion: null,
         profesores: null,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         planID: req.session.planID,
         departamentoID: req.session.departamentoID,
@@ -267,9 +263,9 @@ exports.getAsignaciones = async (req, res, next) => {
           pdID,
           gruposBBDD
         );
-        const nuevopath = `${req.baseUrl}/respdoc/editAsignacion`;
+        const nuevopath = `${req.baseUrl}/asignatura`;
         // se usa cambiopath para cambiar a la asignacions de profesores por grupo o comun
-        const cambiopath = `${req.baseUrl}/respdoc/editAsignacion/cambioModo`;
+        const cambiopath = `${req.baseUrl}/asignatura/modo`;
         const view =
           req.session.menuBar === enumsPD.menuBar.consultar
             ? 'asignacionProfesores/asignacionesConsultar'
@@ -279,14 +275,14 @@ exports.getAsignaciones = async (req, res, next) => {
           asignacion: asignacions,
           nuevopath,
           cambiopath,
-          aprobarpath: `${req.baseUrl}/respDoc/aprobarAsignacion`,
+          aprobarpath: `${req.baseUrl}/estado`,
           planID: req.session.planID,
           estadoProfesores:
             res.locals.progDoc['ProgramacionDocentes.estadoProfesores'],
           estadoProgDoc:
             res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
           pdID,
-          menu: req.session.menu,
+
           submenu: req.session.submenu,
           permisoDenegado: res.locals.permisoDenegado || null,
           departamentoID: req.session.departamentoID,
@@ -329,11 +325,11 @@ exports.editAsignacion = async (req, res, next) => {
       res.render('asignacionProfesores/asignacionesCumplimentarAsignatura', {
         asign,
         pdID,
-        cancelarpath: `${req.baseUrl}/respDoc/profesores?planID=${req.session.planID}&departamentoID=${departamentoID}`,
-        nuevopath: `${req.baseUrl}/respDoc/guardarAsignacion`,
+        cancelarpath: `${req.baseUrl}?planID=${req.session.planID}&departamentoID=${departamentoID}`,
+        nuevopath: `${req.baseUrl}/asignatura`,
         planID: req.session.planID,
         departamentoID: req.session.departamentoID,
-        menu: req.session.menu,
+
         submenu: req.session.submenu,
         profesores,
         estadosProfesor: estados.estadoProfesor,
@@ -351,12 +347,12 @@ exports.editAsignacion = async (req, res, next) => {
   } else {
     req.session.save(() => {
       res.redirect(
-        `${req.baseUrl}/respDoc/profesores?pdID=${pdID}&departamentoID=${departamentoID}`
+        `${req.baseUrl}?pdID=${pdID}&departamentoID=${departamentoID}`
       );
     });
   }
 };
-// GET respDoc/editAsignacion/cambioModo
+
 /*
 cuando quieres cambiar de asignacions indivudal a comun
 el cambiar a grupo comun copia todos los profesores de forma no repetida (dentro del mismo grupo),
@@ -376,8 +372,8 @@ exports.changeModeAsignacion = async (req, res, next) => {
   let profesores;
   let asignacions;
   // por defecto es acronimo pero si no hay debe ser el nombre TODO: cambiar a codigo
-  const asignaturaIdentificador = Number(req.query.asignatura);
-  const { modo } = req.query;
+  const asignaturaIdentificador = Number(req.body.asignatura);
+  const { modo } = req.body;
   let asign;
   if (!res.locals.permisoDenegado) {
     try {
@@ -428,7 +424,7 @@ exports.changeModeAsignacion = async (req, res, next) => {
         { where: { identificador: asign.identificador } }
       );
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/respDoc/profesores`);
+        res.redirect(req.baseUrl);
       });
     } catch (error) {
       console.error('Error:', error);
@@ -436,12 +432,11 @@ exports.changeModeAsignacion = async (req, res, next) => {
     }
   } else {
     req.session.save(() => {
-      res.redirect(`${req.baseUrl}/respDoc/profesores`);
+      res.redirect(req.baseUrl);
     });
   }
 };
 
-// POST respDoc/guardarAsignacion
 exports.guardarAsignacion = async (req, res, next) => {
   const whereEliminar = {};
   const identificador = Number(req.body.asignaturaId);
@@ -609,7 +604,7 @@ exports.guardarAsignacion = async (req, res, next) => {
           await generateCsvCoordinadores(req.session.pdID);
           req.session.save(() => {
             res.redirect(
-              `${req.baseUrl}/respDoc/profesores?pdID=${pdID}&departamentoID=${departamentoID}&planID=${planID}`
+              `${req.baseUrl}?pdID=${pdID}&departamentoID=${departamentoID}&planID=${planID}`
             );
           });
         }
@@ -617,7 +612,7 @@ exports.guardarAsignacion = async (req, res, next) => {
     } else {
       req.session.save(() => {
         res.redirect(
-          `${req.baseUrl}/respDoc/profesores?pdID=${pdID}&departamentoID=${departamentoID}&planID=${planID}`
+          `${req.baseUrl}?pdID=${pdID}&departamentoID=${departamentoID}&planID=${planID}`
         );
       });
     }
@@ -627,7 +622,6 @@ exports.guardarAsignacion = async (req, res, next) => {
   }
 };
 
-// post respDoc/aprobarAsignacion:pdID
 exports.aprobarAsignacion = async (req, res, next) => {
   const { pdID } = req.session;
   const { departamentoID } = req.session;
@@ -664,17 +658,11 @@ exports.aprobarAsignacion = async (req, res, next) => {
       // generar csv
       await generateCsvCoordinadores(req.session.pdID);
       req.session.save(() => {
-        progDocController.isPDLista(
-          pdID,
-          res.redirect(`${req.baseUrl}/respDoc/profesores`)
-        );
+        progDocController.isPDLista(pdID, res.redirect(req.baseUrl));
       });
     } else {
       req.session.save(() => {
-        progDocController.isPDLista(
-          pdID,
-          res.redirect(`${req.baseUrl}/respDoc/profesores`)
-        );
+        progDocController.isPDLista(pdID, res.redirect(req.baseUrl));
       });
     }
   } catch (error) {
@@ -683,7 +671,6 @@ exports.aprobarAsignacion = async (req, res, next) => {
   }
 };
 
-// GET respDoc/tribunales:pdID/:departamentoID
 exports.getTribunales = async (req, res, next) => {
   req.session.submenu = 'Tribunales';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
@@ -696,7 +683,7 @@ exports.getTribunales = async (req, res, next) => {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
       profesores: null,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
@@ -728,7 +715,7 @@ exports.getTribunales = async (req, res, next) => {
         'Asignación de tribunales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
       permisoDenegado: res.locals.permisoDenegado || null,
       profesores: null,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
@@ -773,7 +760,7 @@ exports.getTribunales = async (req, res, next) => {
             'El departamento seleccionado no es responsable de ninguna asignatura del plan, por favor escoja otro departamento en el cuadro superior',
           permisoDenegado: res.locals.permisoDenegado || null,
           profesores: null,
-          menu: req.session.menu,
+
           submenu: req.session.submenu,
           planID: req.session.planID,
           departamentoID: req.session.departamentoID,
@@ -794,7 +781,7 @@ exports.getTribunales = async (req, res, next) => {
         res.render(view, {
           permisoDenegado: res.locals.permisoDenegado || null,
           profesores: null,
-          menu: req.session.menu,
+
           submenu: req.session.submenu,
           planID: req.session.planID,
           departamentoID: req.session.departamentoID,
@@ -893,14 +880,14 @@ exports.getTribunales = async (req, res, next) => {
           req.session.menuBar === enumsPD.menuBar.consultar
             ? 'tribunales/tribunalesConsultar'
             : 'tribunales/tribunalesCumplimentar';
-        const nuevopath = `${req.baseUrl}/respdoc/guardarTribunales`;
-        const cancelarpath = `${req.baseUrl}/respdoc/tribunales?planID=${req.session.planID}&departamentoID=${DepartamentoResponsable}`;
+        const nuevopath = req.baseUrl;
+        const cancelarpath = `${req.baseUrl}?planID=${req.session.planID}&departamentoID=${DepartamentoResponsable}`;
         res.render(view, {
           profesores,
           tribunales: asignaturas,
           tribunalesAntiguos: asignaturasAntiguas,
           nuevopath,
-          aprobarpath: `${req.baseUrl}/respDoc/aprobarTribunales`,
+          aprobarpath: `${req.baseUrl}/estado`,
           cancelarpath,
           planID: req.session.planID,
           estadoTribunales:
@@ -909,7 +896,7 @@ exports.getTribunales = async (req, res, next) => {
             res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
           pdID,
           submenu: req.session.submenu,
-          menu: req.session.menu,
+
           permisoDenegado: res.locals.permisoDenegado || null,
           departamentoID: req.session.departamentoID,
           departamentosResponsables: res.locals.departamentosResponsables,
@@ -927,7 +914,6 @@ exports.getTribunales = async (req, res, next) => {
   }
 };
 
-// POST respDoc/guardarTribunales
 exports.guardarTribunales = async (req, res, next) => {
   const { departamentoID } = req.session;
   const { pdID } = req.session;
@@ -1006,11 +992,11 @@ exports.guardarTribunales = async (req, res, next) => {
 exports.reenviar = (req, res) => {
   req.session.save(() => {
     res.redirect(
-      `${req.baseUrl}/respDoc/tribunales?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
+      `${req.baseUrl}?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
     );
   });
 };
-// post respDoc/aprobarTribunales:pdID
+
 exports.aprobarTribunales = async (req, res, next) => {
   const { pdID } = req.session;
   const { departamentoID } = req.session;
@@ -1045,17 +1031,11 @@ exports.aprobarTribunales = async (req, res, next) => {
         { where: { identificador: pdID } } /* where criteria */
       );
       req.session.save(() => {
-        progDocController.isPDLista(
-          pdID,
-          res.redirect(`${req.baseUrl}/respDoc/tribunales`)
-        );
+        progDocController.isPDLista(pdID, res.redirect(req.baseUrl));
       });
     } else {
       req.session.save(() => {
-        progDocController.isPDLista(
-          pdID,
-          res.redirect(`${req.baseUrl}/respDoc/tribunales`)
-        );
+        progDocController.isPDLista(pdID, res.redirect(req.baseUrl));
       });
     }
   } catch (error) {

@@ -32,7 +32,7 @@
                 <small style="color:red">Este calendario es el del año actual, no del siguiente.</small>
             <% } %>
             <% if(estado === 0){ %>
-                <small>Hasta que no traslade los eventos del calendario general al resto de los planes los coordinadores no podrán editar el calnedario.</small>
+                <small>Hasta que no traslade los eventos del calendario general al resto de los planes los coordinadores no podrán editar el calendario.</small>
             <% } %>
 
             
@@ -338,7 +338,7 @@
 
 
 function trasladar(ano, newEstado){
-    let url = "<%= CONTEXT %>/gestion/calendario/trasladarGeneral"
+    let url = "<%= CONTEXT %>/gestion/calendario/estado"
     url += "?ano=" + ano + "&newEstado=" + newEstado;
     let textConfirm = "";
     if (newEstado === 0){
@@ -364,7 +364,7 @@ function trasladar(ano, newEstado){
 function copiar(ano){
         if(confirm('Va a copiar los eventos del año pasado. \n'+
         'Esta acción no se podrá deshacer. ¿Está seguro de que quiere continuar?')){
-            let url = "<%= CONTEXT %>/gestion/calendario/copiarEventos"
+            let url = "<%= CONTEXT %>/gestion/calendario/copiar"
             url += "?ano=" + ano;
             $.ajax({
                 type: "POST",

@@ -24,7 +24,6 @@ exports.getActividadParcial = async (req, res, next) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
       planEstudios: res.locals.planEstudios,
@@ -37,9 +36,6 @@ exports.getActividadParcial = async (req, res, next) => {
       grupos: null,
       cursos: null,
       aprobarpath: null,
-      crearConjuntoActividadParcialPath: null,
-      actualizarConjuntoActividadParcialPath: null,
-      eliminarConjuntoActividadParcialPath: null,
       pdID: null,
       moment: null
     });
@@ -57,7 +53,6 @@ exports.getActividadParcial = async (req, res, next) => {
       estado:
         'Asignación de actividades parciales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
       permisoDenegado: res.locals.permisoDenegado || null,
-      menu: req.session.menu,
       submenu: req.session.submenu,
       planID: req.session.planID,
       planEstudios: res.locals.planEstudios,
@@ -70,9 +65,6 @@ exports.getActividadParcial = async (req, res, next) => {
       grupos: null,
       cursos: null,
       aprobarpath: null,
-      crearConjuntoActividadParcialPath: null,
-      actualizarConjuntoActividadParcialPath: null,
-      eliminarConjuntoActividadParcialPath: null,
       pdID: null,
       moment: null
     });
@@ -94,7 +86,6 @@ exports.getActividadParcial = async (req, res, next) => {
       */
       res.render(view, {
         permisoDenegado: res.locals.permisoDenegado || null,
-        menu: req.session.menu,
         submenu: req.session.submenu,
         planID: req.session.planID,
         planEstudios: res.locals.planEstudios,
@@ -107,10 +98,7 @@ exports.getActividadParcial = async (req, res, next) => {
         conjuntoActividadesParcial,
         grupos,
         cursos,
-        aprobarpath: `${req.baseUrl}/coordiandor/aprobarActividades`,
-        crearConjuntoActividadParcialPath: `${req.baseUrl}/coordiandor/crearConjuntoActividadParcial`,
-        actualizarConjuntoActividadParcialPath: `${req.baseUrl}/coordiandor/actualizarConjuntoActividadParcial`,
-        eliminarConjuntoActividadParcialPath: `${req.baseUrl}/coordiandor/eliminarConjuntoActividadParcial`,
+        aprobarpath: `${req.baseUrl}/estado`,
         pdID,
         moment
       });
@@ -250,14 +238,11 @@ exports.aprobarActividades = async (req, res, next) => {
         { where: { identificador: pdID } } /* where criteria */
       );
       req.session.save(() => {
-        progDocController.isPDLista(
-          pdID,
-          res.redirect(`${req.baseUrl}/cumplimentar/actividades`)
-        );
+        progDocController.isPDLista(pdID, res.redirect(req.baseUrl));
       });
     } else {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/cumplimentar/actividades`);
+        res.redirect(req.baseUrl);
       });
     }
   } catch (error) {
@@ -336,7 +321,7 @@ exports.updateActividad = async (req, res) => {
     actividadToUpdate.duracion = Number(req.body.duracion) || null;
     try {
       await models.ActividadParcial.update(actividadToUpdate, {
-        where: { identificador: req.body.actividadId }
+        where: { identificador: req.params.idd }
       });
       res.json({
         success: true,
@@ -360,7 +345,7 @@ exports.eliminarActividad = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       await models.ActividadParcial.destroy({
-        where: { identificador: req.body.actividadId }
+        where: { identificador: req.params.id }
       });
       res.json({ success: true });
     } catch (error) {
@@ -399,7 +384,7 @@ exports.crearConjuntoActividadParcial = async (req, res, next) => {
       );
       await nToAnadir.save();
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/cumplimentar/actividades`);
+        res.redirect(req.baseUrl);
       });
     } catch (error) {
       console.error('Error:', error);
@@ -407,7 +392,7 @@ exports.crearConjuntoActividadParcial = async (req, res, next) => {
     }
   } else {
     req.session.save(() => {
-      res.redirect(`${req.baseUrl}/cumplimentar/actividades`);
+      res.redirect(req.baseUrl);
     });
   }
 };
@@ -434,22 +419,22 @@ exports.actualizarConjuntoActividadParcial = async (req, res, next) => {
       // eslint-disable-next-line no-restricted-globals
       if (!isNaN(g)) {
         gruposToAnadir.push({
-          ConjuntoParcialId: req.body.conjuntoActividadParcialId,
+          ConjuntoParcialId: req.params.id,
           GrupoId: Number(g)
         });
       }
     });
     try {
       await models.ConjuntoActividadParcialGrupo.destroy({
-        where: { ConjuntoParcialId: req.body.conjuntoActividadParcialId }
+        where: { ConjuntoParcialId: req.params.id }
       });
       await models.ConjuntoActividadParcial.update(
         conjuntoActividadParcialToUpdate,
-        { where: { identificador: req.body.conjuntoActividadParcialId } }
+        { where: { identificador: req.params.id } }
       );
       await models.ConjuntoActividadParcialGrupo.bulkCreate(gruposToAnadir);
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/cumplimentar/actividades`);
+        res.redirect(req.baseUrl);
       });
     } catch (error) {
       console.error('Error:', error);
@@ -457,7 +442,7 @@ exports.actualizarConjuntoActividadParcial = async (req, res, next) => {
     }
   } else {
     req.session.save(() => {
-      res.redirect(`${req.baseUrl}/cumplimentar/actividades`);
+      res.redirect(req.baseUrl);
     });
   }
 };
@@ -467,7 +452,7 @@ exports.eliminarConjuntoActividadParcial = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       await models.ConjuntoActividadParcial.destroy({
-        where: { identificador: req.body.conjuntoActividadParcialId }
+        where: { identificador: req.params.id }
       });
       await models.ActividadParcial.destroy({
         where: { ConjuntoActividadParcialId: null }

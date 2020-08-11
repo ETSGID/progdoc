@@ -49,7 +49,6 @@ const getNotasGruposSinAsignatura = async gruposBBDD => {
   }
 };
 
-// GET /respDoc/:pdID/:departamentoID/Horario
 exports.getHorario = async (req, res, next) => {
   req.session.submenu = 'Horarios';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
@@ -61,7 +60,7 @@ exports.getHorario = async (req, res, next) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
@@ -82,7 +81,7 @@ exports.getHorario = async (req, res, next) => {
       estado:
         'Asignación de horarios ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
       permisoDenegado: res.locals.permisoDenegado || null,
-      menu: req.session.menu,
+
       submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
@@ -355,8 +354,8 @@ exports.getHorario = async (req, res, next) => {
             }
           }
         });
-        const cancelarpath = `${req.baseUrl}/coordinador/horarios?planID=${req.session.planID}`;
-        const nuevopath = `${req.baseUrl}/coordinador/guardarHorarios`;
+        const cancelarpath = `${req.baseUrl}?planID=${req.session.planID}`;
+        const nuevopath = req.baseUrl;
         const view =
           req.session.menuBar === enumsPD.menuBar.consultar
             ? 'horarios/horariosConsultar'
@@ -364,11 +363,11 @@ exports.getHorario = async (req, res, next) => {
         res.render(view, {
           asignacionsHorario,
           nuevopath,
-          aprobarpath: `${req.baseUrl}/coordiandor/aprobarHorarios`,
+          aprobarpath: `${req.baseUrl}/estado`,
           cancelarpath,
           planID: req.session.planID,
           pdID,
-          menu: req.session.menu,
+
           submenu: req.session.submenu,
           permisoDenegado: res.locals.permisoDenegado || null,
           estadosHorario: estados.estadoHorario,
@@ -511,7 +510,7 @@ exports.updateNota = async (req, res) => {
         : req.body.asignaturaId;
       notaToUpdate.Nota = req.body.nota;
       await models.AsignacionProfesor.update(notaToUpdate, {
-        where: { identificador: req.body.notaId }
+        where: { identificador: req.params.id }
       });
       res.json({ success: true, accion: 'update', notaUpdate: notaToUpdate });
     } catch (error) {
@@ -530,7 +529,7 @@ exports.eliminarNota = async (req, res) => {
   if (!res.locals.permisoDenegado) {
     try {
       await models.AsignacionProfesor.destroy({
-        where: { identificador: req.body.notaId }
+        where: { identificador: req.params.id }
       });
       res.json({ success: true });
     } catch (error) {
@@ -549,7 +548,7 @@ exports.eliminarNota = async (req, res) => {
 exports.reenviar = (req, res) => {
   req.session.save(() => {
     res.redirect(
-      `${req.baseUrl}/coordinador/horarios?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
+      `${req.baseUrl}?departamentoID=${req.session.departamentoID}&planID=${req.session.planID}`
     );
   });
 };
@@ -580,14 +579,11 @@ exports.aprobarHorarios = async (req, res, next) => {
         { where: { identificador: pdID } } /* where criteria */
       );
       req.session.save(() => {
-        progDocController.isPDLista(
-          pdID,
-          res.redirect(`${req.baseUrl}/coordinador/horarios`)
-        );
+        progDocController.isPDLista(pdID, res.redirect(req.baseUrl));
       });
     } else {
       req.session.save(() => {
-        res.redirect(`${req.baseUrl}/coordinador/horarios`);
+        res.redirect(req.baseUrl);
       });
     }
   } catch (error) {
