@@ -13,7 +13,6 @@
   - [Restore datos](#restore-datos)
 - [Almacenamiento de ficheros (pdfs y csv)](#almacenamiento-de-ficheros-pdfs-y-csv)
   - [Requisitos de almacenamiento de ficheros](#requisitos-de-almacenamiento-de-ficheros)
-  - [Gestor de archivos](#gestor-de-archivos)
 - [Gestión de roles](#gesti%C3%B3n-de-roles)
 - [Configuración de entornos](#configuraci%C3%B3n-de-entornos)
   - [Producción](#producci%C3%B3n)
@@ -93,16 +92,12 @@ psql -U [userpostgres] -h localhost  [database] < [file.sql]
 Dependiendo del caso será necesario eliminar las migraciones y/o los seeders antes de restaurarla ya que puede dar fallos si ya existen las tablas y las intenta volver a crear o sí los seeders ya han creado los datos e intenta volver a crearlos.
 
 ## Almacenamiento de ficheros (pdfs y csv)
-Los pdfs se almacenan en el volumen progdoc:/storage/progdoc
+Los pdfs se almacenan en el volumen `progdoc:/storage/progdoc`
 Si se desea cambiar la carpeta: `/storage/progdoc/` debe hacerse tanto en `progDoc.env` como en `docker-compose.yml`
-Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/progdoc/pdfs/`
+Si se meten los pdfs a mano deben meterse con la carpeta completa `pdfs` quedando `/storage/progdoc/pdfs/`.
 
 ### Requisitos de almacenamiento de ficheros
 En **producción** deben realizarse copias de seguridad del sistema de ficheros de la aplicación.
-
-### Gestor de archivos
-La configuración del gestor de archivos se realiza en el fichero de confguración `/progDoc/public/config/filemanager.config.json` y en concreto en la línea `"connectorUrl"` debe indicarse el `contexto` + `"archivos/filemanager"`.
-A modo de ejemplo `"connectorUrl": "/pdi/progdoc/archivos/filemanager"`
 
 
 ## Gestión de roles
