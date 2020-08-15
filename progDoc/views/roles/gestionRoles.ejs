@@ -1,6 +1,5 @@
 <!-- despliegue -->
 <script src="<%=CONTEXT%>/js/libraries/autocomplete.js"></script>
-<%- include ../menus/gestion.ejs %>
 <div class="contenido">
 <%if(locals.permisoDenegado && locals.permisoDenegado!== null){%>
   <p><%=permisoDenegado%></p>
@@ -198,11 +197,11 @@ return departamento
     <h3 style="display:inline;"><em>Roles específicos de titulación</em></h3>
     <select id="selectCoordinador" onChange="cambiarPDCoordinador()" >
         <% for(let i=0; i < planEstudios.length; i++) { 
-            if (planEstudios[i].nombre !== null && (planID !== planEstudios[i].codigo)){ %>
+            if (planEstudios[i].nombre !== null && (session.planID !== planEstudios[i].codigo)){ %>
         <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option>
-            <% }else if (planEstudios[i].nombre !== null && (planID === planEstudios[i].codigo)){ %>
+            <% }else if (planEstudios[i].nombre !== null && (session.planID === planEstudios[i].codigo)){ %>
         <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)" selected><%=planEstudios[i].nombre%></option>  
-            <%}else if (planEstudios[i].nombre === null && (planID !== planEstudios[i].codigo)) {%>
+            <%}else if (planEstudios[i].nombre === null && (session.planID !== planEstudios[i].codigo)) {%>
         <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].codigo%></option>
         <%}else{%>
         <option  id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>"  title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"selected><%=planEstudios[i].codigo%></option>
@@ -214,7 +213,7 @@ return departamento
             <% 
             rol = rolesEnum.CoordinadorTitulacion
             departamento = null
-            plan = planID
+            plan = session.planID
             rols = filterByRol(roles, rol, plan, departamento)
             r = rols.length > 0 ? rols[0] : {}
             index = 0;
@@ -271,7 +270,7 @@ return departamento
             <%
             rol = rolesEnum.ResponsableDocente
             departamento = null
-            plan = planID
+            plan = session.planID
             <!--Si hay progdoc coge los departamentos responsables sino coge lo que haya en la bbdd-->
             if(progDoc){
                 departamentosResponsables.forEach(function(d,index){

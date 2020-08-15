@@ -365,7 +365,6 @@ exports.getCalendario = async (req, res, next) => {
         await models.Calendario.findCreateFind({ where: objeto_ano });
         res.render('calendarios/calendario', {
           permisoDenegado: res.locals.permisoDenegado || null,
-          planID: req.session.planID,
           general,
           calendario: array_datos[1],
           array_dias: array_datos[0],
@@ -381,7 +380,6 @@ exports.getCalendario = async (req, res, next) => {
       } else {
         res.render('calendarios/calendario', {
           permisoDenegado: res.locals.permisoDenegado || null,
-          planID: req.session.planID,
           general,
           calendario: array_datos[1],
           array_dias: array_datos[0],
@@ -411,7 +409,6 @@ exports.getCalendario = async (req, res, next) => {
         res.render('calendarios/calendarioCumplimentarJefeDeEstudios', {
           permisoDenegado: res.locals.permisoDenegado || null,
           general,
-          planID: req.session.planID,
           calendario: array_datos[1],
           array_dias: array_datos[0],
           ano1: ano_actual,
@@ -423,7 +420,6 @@ exports.getCalendario = async (req, res, next) => {
       } else {
         res.render('calendarios/calendarioCumplimentarJefeDeEstudios', {
           permisoDenegado: res.locals.permisoDenegado || null,
-          planID: req.session.planID,
           general,
           calendario: array_datos[1],
           array_dias: array_datos[0],
@@ -448,7 +444,6 @@ exports.getCalendarioPlanConsultar = async (req, res, next) => {
       res.render('calendarios/calendarioConsultar', {
         CONTEXT,
         permisoDenegado: res.locals.permisoDenegado || null,
-        planID: req.session.planID,
         calendario: null,
         array_dias: null,
         ano: null,
@@ -472,7 +467,6 @@ exports.getCalendarioPlanConsultar = async (req, res, next) => {
       await models.Calendario.findCreateFind({ where: objeto_ano });
       res.render('calendarios/calendarioConsultar', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        planID: req.session.planID,
         calendario: array_datos[1],
         array_dias: array_datos[0],
         ano,
@@ -481,7 +475,6 @@ exports.getCalendarioPlanConsultar = async (req, res, next) => {
     } else if (resultado[0].estado === 0) {
       res.render('calendarios/calendarioConsultar', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        planID: req.session.planID,
         calendario: array_datos[1],
         array_dias: array_datos[0],
         ano,
@@ -490,7 +483,6 @@ exports.getCalendarioPlanConsultar = async (req, res, next) => {
     } else {
       res.render('calendarios/calendarioConsultar', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        planID: req.session.planID,
         calendario: array_datos[1],
         array_dias: array_datos[0],
         ano,
@@ -1037,7 +1029,6 @@ exports.getCalendarioPlan = async (req, res, next) => {
       res.render('calendarios/calendarioCumplimentar', {
         CONTEXT,
         permisoDenegado: res.locals.permisoDenegado || null,
-        planID: req.session.planID,
         calendario: null,
         array_dias: null,
         ano: null,
@@ -1060,7 +1051,6 @@ exports.getCalendarioPlan = async (req, res, next) => {
       await models.Calendario.findCreateFind({ where: objeto_ano });
       res.render('calendarios/calendarioCumplimentar', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        planID: req.session.planID,
         calendario: array_datos[1],
         array_dias: array_datos[0],
         ano,
@@ -1069,7 +1059,6 @@ exports.getCalendarioPlan = async (req, res, next) => {
     } else {
       res.render('calendarios/calendarioCumplimentar', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        planID: req.session.planID,
         calendario: array_datos[1],
         array_dias: array_datos[0],
         ano,

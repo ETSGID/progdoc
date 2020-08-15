@@ -101,7 +101,7 @@ exports.comprobarRols = async (req, res, next) => {
                 if (
                   !pd ||
                   `${pd[`ProgramacionDocentes.${condic[0]}`]}` !==
-                    `${r.condiciones[i].resultado}`
+                  `${r.condiciones[i].resultado}`
                 ) {
                   cumple = false;
                 }
@@ -111,7 +111,7 @@ exports.comprobarRols = async (req, res, next) => {
                 if (
                   !pd ||
                   `${pd[`ProgramacionDocentes.${condic[0]}`][condic[1]]}` !==
-                    `${r.condiciones[i].resultado}`
+                  `${r.condiciones[i].resultado}`
                 ) {
                   cumple = false;
                 }
@@ -222,7 +222,6 @@ exports.getRoles = async (req, res, next) => {
       cancelarpath,
       foco,
       departamentos: departs.sort(funciones.sortDepartamentos),
-      planID: req.session.planID,
       planEstudios: res.locals.planEstudios,
 
       departamentosResponsables: res.locals.departamentosResponsables,

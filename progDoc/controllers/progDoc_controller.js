@@ -120,20 +120,7 @@ const comprobarEstadoCumpleUno = (estado, objeto) => {
 
 // te devuelve la programacion docente sobre la que puede tocar una persona
 exports.getProgramacionDocente = async (req, res, next) => {
-  let { planID } = req.query;
-  if (!planID) {
-    planID = req.session.planID;
-  }
-  if (!planID) {
-    planID = '09TT';
-  }
-  let { departamentoID } = req.query;
-  if (!departamentoID) {
-    departamentoID = req.session.departamentoID;
-  }
   try {
-    req.session.planID = planID;
-    req.session.departamentoID = departamentoID;
     // separar con un if el rol en el que el where afecta
     const wherePD = [];
     // solo puede haber una abierta y una en incidencia como maximo en un plan
@@ -144,7 +131,10 @@ exports.getProgramacionDocente = async (req, res, next) => {
     // el planID si no existe acronimo sera el código, por eso el or
     const params = await models.PlanEstudio.findAll({
       attributes: ['nombre', 'codigo', 'nombreCompleto'],
-      where: Sequelize.or({ nombre: planID }, { codigo: planID }),
+      where: Sequelize.or(
+        { nombre: req.session.planID },
+        { codigo: req.session.planID }
+      ),
       include: [
         {
           model: models.ProgramacionDocente,
@@ -219,13 +209,6 @@ exports.getProgramacionDocente = async (req, res, next) => {
         res.locals.departamentosResponsables = depResponsables.sort(
           funciones.sortDepartamentos
         );
-        if (!departamentoID) {
-          if (depResponsables.length > 0) {
-            req.session.departamentoID = depResponsables[0].codigo;
-          } else {
-            req.session.departamentoID = null;
-          }
-        }
       }
       next();
     } else {

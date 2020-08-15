@@ -602,7 +602,6 @@ exports.generarPDF = async (req, res, next) => {
   ) {
     res.render(view, {
       existe: 'Programación docente no abierta',
-      planID: req.session.planID,
       departamentosResponsables: res.locals.departamentosResponsables,
       planEstudios: res.locals.planEstudios,
       grupos: null
@@ -620,7 +619,6 @@ exports.generarPDF = async (req, res, next) => {
             case 'pdfs/pdfDraftGenerado':
               res.render(view, {
                 file: pdfDatos.file,
-                planID: req.session.planID,
                 planEstudios: res.locals.planEstudios,
                 pdID
               });

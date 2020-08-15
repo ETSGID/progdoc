@@ -1,12 +1,11 @@
 <script src="<%=CONTEXT%>/js/libraries/autocomplete.js"></script>
-<%- include ../menus/cumplimentar.ejs %>
 <div class="contenido2">
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
 <%}else if(locals.existe && locals.existe !== null){%>
   <p><%=existe%></p>
 <%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
-  <% switch(estadoProfesores[departamentoID]){
+  <% switch(estadoProfesores[session.departamentoID]){
       case estadosProfesor.abierto : %>
         <p>Las asignaciones de profesores están siendo cubiertas por el responsable docente del departamento del plan de estudios</p>
         <% break;
@@ -42,7 +41,7 @@
         <% } %>
         <ul style="list-style-type:none">
           <li>
-        <% if(estadoProfesores[departamentoID] === estadosProfesor.abierto || estadoProgDoc === estadosProgDoc.incidencia ) {
+        <% if(estadoProfesores[session.departamentoID] === estadosProfesor.abierto || estadoProgDoc === estadosProgDoc.incidencia ) {
            let texto;
            let modo; 
            if(asignacion[i].estado === "N"){ texto = "Cambiar a asignación por grupos"; modo = "S"}

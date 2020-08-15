@@ -19,11 +19,14 @@ router.all('*', (req, res, next) => {
     planID = req.session.planID;
   }
   if (!planID) {
-    planID = '09TT';
+    planID = 'none';
   }
   let { departamentoID } = req.query;
   if (!departamentoID) {
     departamentoID = req.session.departamentoID;
+  }
+  if (!departamentoID) {
+    departamentoID = 'none';
   }
   req.session.planID = planID;
   req.session.departamentoID = departamentoID;
@@ -52,7 +55,16 @@ router.all('*', rolController.comprobarRolYPersona);
 
 // Unauthenticated clients will be redirected to the CAS login and then back to
 // this route once authenticated.
-router.get('/', rolController.getRolsPersonaView);
+router.get(
+  '/',
+  (req, res, next) => {
+    req.session.menu = [];
+    req.session.menuBar = null;
+    req.session.submenu = null;
+    next();
+  },
+  rolController.getRolsPersonaView
+);
 
 router.use('/consultar', routerConsultar);
 router.use('/cumplimentar', routerCumplimentar);

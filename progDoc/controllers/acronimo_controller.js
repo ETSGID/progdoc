@@ -26,7 +26,6 @@ exports.getAcronimos = async (req, res, next) => {
         existe:
           'Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada',
         permisoDenegado: res.locals.permisoDenegado || null,
-        planID: req.session.planID,
         planEstudios: res.locals.planEstudios,
         nuevopath,
         cancelarpath,
@@ -44,7 +43,6 @@ exports.getAcronimos = async (req, res, next) => {
       });
       res.render('acronimos/acronimosJE', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        planID: req.session.planID,
         planEstudios: res.locals.planEstudios,
         nuevopath,
         cancelarpath,

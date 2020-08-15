@@ -1,5 +1,4 @@
 <script src="<%=CONTEXT%>/js/libraries/autocomplete.js"></script>
-<%- include ../menus/cumplimentar.ejs %>
 <%- include ../../public/js/funciones.ejs %>
 <div id="hermanoNuevoProfesorForm" class="contenido2">
 <% if (locals.estado && locals.estado !== null) { %>
@@ -7,7 +6,7 @@
 <%}else if(locals.existe && locals.existe !== null){%>
   <p><%=existe%></p>
 <%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
-  <% switch(estadoTribunales[departamentoID]){
+  <% switch(estadoTribunales[session.departamentoID]){
       case estadosTribunal.abierto : %>
         <p>Los tribunales están siendo cubiertos por el responsable docente del departamento del plan de estudios</p>
         <% break;
@@ -30,7 +29,7 @@
     <li>Incidencia: Jefatura de Estudios</li>
   </ul>
 <%}else{
-  if(estadoTribunales[departamentoID] === estadosTribunal.abierto || estadoProgDoc === estadosProgDoc.incidencia) {%>
+  if(estadoTribunales[session.departamentoID] === estadosTribunal.abierto || estadoProgDoc === estadosProgDoc.incidencia) {%>
 <form id="formulario" autocomplete="off" action="<%= aprobarpath %>" method="post">
 <table class="table">
   <thead>

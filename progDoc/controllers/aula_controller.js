@@ -287,7 +287,6 @@ exports.getAulas = async (req, res, next) => {
       res.render('aulas/aulas', {
         CONTEXT,
         permisoDenegado: res.locals.permisoDenegado || null,
-        planID: req.session.planID,
         aulas1,
         aulas2,
         gruposPorAula1,

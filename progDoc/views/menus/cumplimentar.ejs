@@ -9,6 +9,7 @@
     <div class="row col-sm"  style="margin-left:0px">
         <% if (session.submenu !== "Profesores2") { %>
          <select id="selectPlan" onchange="cambiarPD()">
+            <option value="none" disabled>Plan...</option>
                 <% for(let i=0; i < planEstudios.length; i++) { 
                     if (planEstudios[i].nombre !== null){ %>
                     <option value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option> 
@@ -20,9 +21,10 @@
          <%}%>
          
 
-    <% if (locals.departamentoID && locals.departamentosResponsables && (session.submenu === "Profesores" || session.submenu === "Tribunales")) { %>
-     <input id='departamentoResponsable' type="hidden" value="<%=departamentoID%>">
+    <%if (session.departamentoID && locals.departamentosResponsables && (session.submenu === "Profesores" || session.submenu === "Tribunales")) { %>
+     <input id='departamentoResponsable' type="hidden" value="<%=session.departamentoID%>">
          <select id="selectDepartamento"  onchange="cambiarDepart()">
+            <option value='none' disabled>Depart...</option>
             <% for(let i=0; i < departamentosResponsables.length; i++) { 
                 if (departamentosResponsables[i].acronimo !== null){ %>
                     <option value="<%=departamentosResponsables[i].codigo%>" title="<%=departamentosResponsables[i].nombre%>"><%=departamentosResponsables[i].acronimo%></option> 
@@ -42,8 +44,8 @@
         <button id='Actividades' class="tablinks" onclick="cambiarSubmenu(event, 'Actividades')">Actividades</button>
         <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Exámenes</button>
     </div>
-    <% if (locals.planID) { %>
-     <input id='plan' type="hidden" value="<%=planID%>">
+    <% if (session.planID) { %>
+     <input id='plan' type="hidden" value="<%=session.planID%>">
   <%} else {%>
     <input id='plan' type="hidden">
   <%}%>
@@ -52,8 +54,8 @@
   <%} else {%>
     <input id='submenu' type="hidden">
   <%}%>
-  <% if (locals.departamentoID) { %>
-     <input id='departamento' type="hidden" value="<%=departamentoID%>">
+  <% if (session.departamentoID) { %>
+     <input id='departamento' type="hidden" value="<%=session.departamentoID%>">
   <%} else {%>
     <input id='departamento' type="hidden">
   <%}%>
@@ -124,18 +126,12 @@ function cambiarDepart(){
 document.getElementsByTagName('body')[0].onload = actualizarSelectyBarra();
 function actualizarSelectyBarra() {
     selectPlanValue = document.getElementById('plan').value
-    if(!selectPlanValue) {
-        selectPlanValue= "09TT"
-    }
     document.getElementById('selectPlan') ? document.getElementById('selectPlan').value = selectPlanValue : null;
 
     let departamento = document.getElementById('departamento');
     let selectDepartamento = document.getElementById('selectDepartamento');
     if(departamento && selectDepartamento){
         selectDepartamentoValue = departamento.value;
-        if(!selectDepartamentoValue){
-            selectDepartamentoValue = "D520"
-        }
         document.getElementById('selectDepartamento').value = selectDepartamentoValue;
     }
         

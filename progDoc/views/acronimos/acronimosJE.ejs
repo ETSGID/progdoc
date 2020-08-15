@@ -1,5 +1,4 @@
 
-<%- include ../menus/gestion.ejs %>
 <%- include ../../public/js/funciones.ejs %>
 <div class ="contenido2">
 <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
@@ -43,12 +42,13 @@
             </div>
             <h2 style="display:inline;">Plan</h2>
             <select id="selectPlan" onchange="cambiarPD()">
+                <option value="none" disabled>Plan...</option>
                 <% for(planEstudio of planEstudios) { 
-                    if (planEstudio.nombre !== null && (planID !== planEstudio.codigo)){ %>
+                    if (planEstudio.nombre !== null && (session.planID !== planEstudio.codigo)){ %>
                         <option id="<%=planEstudio.codigo%>" value="<%=planEstudio.codigo%>" title="<%=planEstudio.nombreCompleto%> (<%=planEstudio.codigo%>)"><%=planEstudio.nombre%></option>
-                    <% }else if (planEstudio.nombre !== null && (planID === planEstudio.codigo)){ %>
+                    <% }else if (planEstudio.nombre !== null && (session.planID === planEstudio.codigo)){ %>
                         <option id="<%=planEstudio.codigo%>" value="<%=planEstudio.codigo%>" title="<%=planEstudio.nombreCompleto%> (<%=planEstudio.codigo%>)" selected><%=planEstudio.nombre%></option>  
-                    <%}else if (planEstudio.nombre === null && (planID !== planEstudio.codigo)) {%>
+                    <%}else if (planEstudio.nombre === null && (session.planID !== planEstudio.codigo)) {%>
                         <option  id="<%=planEstudio.codigo%>" value="<%=planEstudio.codigo%>" title="<%=planEstudio.nombreCompleto%> (<%=planEstudio.codigo%>)"><%=planEstudio.codigo%></option>
                     <%}else{%>
                         <option  id="<%=planEstudio.codigo%>" value="<%=planEstudio.codigo%>"  title="<%=planEstudio.nombreCompleto%> (<%=planEstudio.codigo%>)"selected><%=planEstudio.codigo%></option>
@@ -58,8 +58,8 @@
             <% if ( session && session.pdID){ %>
             <span><%= session.pdID %></span>
             <%}%>
-                <input type="hidden" name='momentaneo' id='plan_<%=planID%>' value ='plan_<%=planID%>'>
-                <table class="table" id="tb_<%=planID%>">
+                <input type="hidden" name='momentaneo' id='plan_<%=session.planID%>' value ='plan_<%=session.planID%>'>
+                <table class="table" id="tb_<%=session.planID%>">
                     <thead>
                         <tr>
                         <th scope="col">Código</th>
@@ -67,8 +67,8 @@
                         <th scope="col">Acrónimo</th>
                         </tr>
                     </thead>
-                    <tbody id='body_tb_<%planID%>'>
-                        <%let plan = planEstudios.find(function (obj) { return obj.codigo === planID; });
+                    <tbody id='body_tb_<%session.planID%>'>
+                        <%let plan = planEstudios.find(function (obj) { return obj.codigo === session.planID; });
                         if(plan){ %>
                             <tr>
                                 <td>
@@ -82,7 +82,7 @@
                                 if (plan["nombre"] !== null && plan["nombre"].trim() !== "") {
                                 acronimo = plan["nombre"]
                                 }%>
-                                <input type="text" autocorrect="off" maxlength="8" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='plan_<%=planID%>' onchange="MarcarChangePlan('plan_<%=planID%>%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
+                                <input type="text" autocorrect="off" maxlength="8" placeholder="<%=acronimo%>" value="<%=acronimo%>" name='plan_<%=session.planID%>' onchange="MarcarChangePlan('plan_<%=session.planID%>%>')" onkeydown="if (event.keyCode == 13 || event.which == 13)  this.blur();">
                                 </td>
                             </tr>
 

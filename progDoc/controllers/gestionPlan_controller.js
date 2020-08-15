@@ -33,7 +33,6 @@ exports.getGestionPlanes = async (req, res, next) => {
     res.render('gestionPlanes/gestionPlanes', {
       estado,
       permisoDenegado: res.locals.permisoDenegado || null,
-      planID: req.session.planID,
       planEstudios: res.locals.planEstudios,
       actualizarpath,
       cambioEstadopath,

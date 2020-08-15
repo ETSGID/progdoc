@@ -1,5 +1,4 @@
 <!--Calendario General Jefe de Estudios-->
-<%- include ../menus/gestion.ejs %>
 <div class="contenido">
     <script src="<%=CONTEXT%>/js/libraries/datepicker.js"></script>
     <link rel='stylesheet' type="text/css" href='<%=CONTEXT%>/stylesheets/datepicker.css' />
@@ -319,9 +318,6 @@
             document.getElementById('selectPlanCalendario').value = "General";
         } else {
             let selectValue = document.getElementById('plan').value
-            if (!selectValue) {
-                selectValue = "09TT"
-            }
             let element2 = document.getElementById('selectPlanCalendario')
             if (element2) {
                 document.getElementById('selectPlanCalendario').value = selectValue;

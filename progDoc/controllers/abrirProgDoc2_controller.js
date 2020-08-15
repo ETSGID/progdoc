@@ -145,8 +145,7 @@ exports.gestionProgDoc = async (req, res, next) => {
         abririncidenciapath: `${req.baseUrl}/abrirIncidencia`,
         cerrarincidenciapath: `${req.baseUrl}/cerrarIncidencia`,
         reabrirpath: `${req.baseUrl}/reabrir`,
-        eliminarpath: `${req.baseUrl}/eliminar`,
-        planID: req.session.planID
+        eliminarpath: `${req.baseUrl}/eliminar`
       });
     }
   } catch (error) {

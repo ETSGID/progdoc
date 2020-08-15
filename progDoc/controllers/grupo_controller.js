@@ -14,7 +14,6 @@ exports.getGrupos = async (req, res, next) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      planID: req.session.planID,
       departamentosResponsables: res.locals.departamentosResponsables,
       planEstudios: res.locals.planEstudios,
       grupos: null
@@ -31,7 +30,6 @@ exports.getGrupos = async (req, res, next) => {
       existe:
         'Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada',
       permisoDenegado: res.locals.permisoDenegado || null,
-      planID: req.session.planID,
       departamentosResponsables: res.locals.departamentosResponsables,
       planEstudios: res.locals.planEstudios,
       grupos: null
@@ -90,7 +88,6 @@ exports.getGrupos = async (req, res, next) => {
         permisoDenegado: res.locals.permisoDenegado || null,
         nuevopath,
         cancelarpath,
-        planID: req.session.planID,
         departamentosResponsables: res.locals.departamentosResponsables,
         planEstudios: res.locals.planEstudios,
         grupos: cursosConGrupos,

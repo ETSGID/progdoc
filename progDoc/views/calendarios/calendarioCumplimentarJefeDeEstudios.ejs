@@ -1,6 +1,4 @@
 <!--Calendario Planes Jefe de Estudios designar eventos editables-->
-<%- include ../menus/gestion.ejs %>
-
 <div class="contenido">
 
     <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
@@ -237,7 +235,7 @@
             var modal = $('#eventoModal');
             document.getElementById("eventoAntiguo").value = JSON.stringify(evento);
 
-            modal.find('.modal-title').text("Modificar la propiedad de editabilidad para <%-planID%>");
+            modal.find('.modal-title').text("Modificar la propiedad de editabilidad para <%-session.planID%>");
             
 
             // Si el original no es editable y no existe ya un evento específico
@@ -273,9 +271,6 @@
                 document.getElementById('selectPlanCalendario').value = "General";
             }else{
                 let selectValue = document.getElementById('plan').value
-                if(!selectValue) {
-                    selectValue= "09TT"
-                }
                 let element2 = document.getElementById('selectPlanCalendario')
                 if (element2){
                     document.getElementById('selectPlanCalendario').value = selectValue;

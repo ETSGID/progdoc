@@ -23,7 +23,6 @@ exports.getActividadParcial = async (req, res, next) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      planID: req.session.planID,
       planEstudios: res.locals.planEstudios,
       estadoCalendario: null,
       estadosCalendario: null,
@@ -51,7 +50,6 @@ exports.getActividadParcial = async (req, res, next) => {
       estado:
         'Asignación de actividades parciales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
       permisoDenegado: res.locals.permisoDenegado || null,
-      planID: req.session.planID,
       planEstudios: res.locals.planEstudios,
       estadoCalendario: null,
       estadosCalendario: null,
@@ -83,7 +81,6 @@ exports.getActividadParcial = async (req, res, next) => {
       */
       res.render(view, {
         permisoDenegado: res.locals.permisoDenegado || null,
-        planID: req.session.planID,
         planEstudios: res.locals.planEstudios,
         estadoCalendario:
           res.locals.progDoc['ProgramacionDocentes.estadoCalendario'],

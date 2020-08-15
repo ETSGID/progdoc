@@ -4,10 +4,11 @@
     <p>Jefatura Estudios <% if ( session && session.pdID && (session.submenu === "Grupos")){ %>
     <%= session.pdID %>
     <%}%></p>
-    <%if (locals.planID && locals.planEstudios && (session.submenu === "Grupos" || session.submenu === "Planes")) { %>
+    <%if (session.planID && locals.planEstudios && (session.submenu === "Grupos" || session.submenu === "Planes")) { %>
     <div class="row col-sm"  style="margin-left:0px">
         <div clas="container">
             <select id="selectPlan" onchange="cambiarPD()">
+                <option value="none" disabled>Plan...</option>
                 <% for(let i=0; i < planEstudios.length; i++) { 
                     if (planEstudios[i].nombre !== null){ %>
                     <option value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option> 
@@ -53,8 +54,8 @@
         <button id='Aulas' class="tablinks" onclick="cambiarSubmenu(event, 'Aulas')">Aulas</button>
     </div>
 
-    <% if (locals.planID) { %>
-        <input id='plan' type="hidden" value="<%=planID%>">
+    <% if (session.planID) { %>
+        <input id='plan' type="hidden" value="<%=session.planID%>">
     <%} else {%>
         <input id='plan' type="hidden">
     <%}%>
@@ -134,9 +135,6 @@ window.location.replace(url);
 document.getElementsByTagName('body')[0].onload = actualizarSelectyBarra();
 function actualizarSelectyBarra() {
 selectPlanValue = document.getElementById('plan').value
-if(!selectPlanValue) {
-    selectPlanValue= "09TT"
-}
 let element2 = document.getElementById('selectPlan')
 if (element2){
     document.getElementById('selectPlan').value = selectPlanValue;

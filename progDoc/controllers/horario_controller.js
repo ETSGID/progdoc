@@ -59,8 +59,6 @@ exports.getHorario = async (req, res, next) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      planID: req.session.planID,
-      departamentoID: req.session.departamentoID,
       planEstudios: res.locals.planEstudios,
       asignacionsHorario: null
     });
@@ -78,8 +76,6 @@ exports.getHorario = async (req, res, next) => {
       estado:
         'Asignación de horarios ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
       permisoDenegado: res.locals.permisoDenegado || null,
-      planID: req.session.planID,
-      departamentoID: req.session.departamentoID,
       planEstudios: res.locals.planEstudios,
       estadoHorarios: res.locals.progDoc['ProgramacionDocentes.estadoHorarios'],
       asignacionsHorario: null
@@ -91,23 +87,6 @@ exports.getHorario = async (req, res, next) => {
       const asignaturas = []; // array con los acronimos de las asignaturas por separado
       let gruposBBDD;
       const { pdID } = req.session;
-      /*
-      sino se especifica departamento se queda con el primero del plan responsable.
-      Arriba comprobé que existe el departamento en la pos 0.
-      */
-      let departamentoID;
-      if (res.locals.departamentosResponsables.length > 0) {
-        departamentoID = req.session.departamentoID
-          ? req.session.departamentoID
-          : res.locals.departamentosResponsables[0].codigo;
-      } else {
-        departamentoID = req.session.departamentoID
-          ? req.session.departamentoID
-          : null;
-      }
-
-      // si no estaba inicializada la inicializo.
-      req.session.departamentoID = departamentoID;
       gruposBBDD = await grupoController.getGrupos2(pdID);
       const gruposBBDDConNotas = await getNotasGruposSinAsignatura(gruposBBDD);
       // eslint-disable-next-line no-use-before-define
@@ -360,7 +339,6 @@ exports.getHorario = async (req, res, next) => {
           nuevopath,
           aprobarpath: `${req.baseUrl}/estado`,
           cancelarpath,
-          planID: req.session.planID,
           pdID,
           permisoDenegado: res.locals.permisoDenegado || null,
           estadosHorario: estados.estadoHorario,
@@ -369,7 +347,6 @@ exports.getHorario = async (req, res, next) => {
             res.locals.progDoc['ProgramacionDocentes.estadoHorarios'],
           estadoProgDoc:
             res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
-          departamentoID: req.session.departamentoID,
           planEstudios: res.locals.planEstudios
         });
       }

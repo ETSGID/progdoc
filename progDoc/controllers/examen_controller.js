@@ -165,25 +165,6 @@ exports.getExamenes = async (req, res, next) => {
           break;
       }
       const cursos = []; // array con los cursos por separado
-      /*
-      sino se especifica departamento se queda con el primero del plan responsable.
-      Arriba comprobé que existe el departamento en la pos 0.
-      */
-      let departamentoID;
-      if (
-        res.locals.departamentosResponsables &&
-        res.locals.departamentosResponsables.length > 0
-      ) {
-        departamentoID = req.session.departamentoID
-          ? req.session.departamentoID
-          : res.locals.departamentosResponsables[0].codigo;
-      } else {
-        departamentoID = req.session.departamentoID
-          ? req.session.departamentoID
-          : null;
-      }
-      // si no estaba inicializada la inicializo.
-      req.session.departamentoID = departamentoID;
       // eslint-disable-next-line no-use-before-define
       return getAsignacionExamen(pdID);
       // eslint-disable-next-line no-inner-declarations
@@ -328,8 +309,6 @@ exports.getExamenesView = (req, res) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      planID: req.session.planID,
-      departamentoID: req.session.departamentoID,
       planEstudios: res.locals.planEstudios,
       asignacionsExamen: null,
       franjasExamen: null,
@@ -355,7 +334,6 @@ exports.getExamenesView = (req, res) => {
       aprobarpath: `${req.baseUrl}/estado`,
       selectExamenespath,
       cancelarpath,
-      planID: req.session.planID,
       pdID: req.session.pdID,
       cursos: res.locals.cursos,
       permisoDenegado: res.locals.permisoDenegado || null,
@@ -363,7 +341,6 @@ exports.getExamenesView = (req, res) => {
       estadosProgDoc: estados.estadoProgDoc,
       estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
       estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
-      departamentoID: req.session.departamentoID,
       planEstudios: res.locals.planEstudios
     });
   }
@@ -379,8 +356,6 @@ exports.getFranjasView = (req, res) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      planID: req.session.planID,
-      departamentoID: req.session.departamentoID,
       planEstudios: res.locals.planEstudios,
       franjasExamen: null,
       periodosExamen: null,
@@ -396,14 +371,12 @@ exports.getFranjasView = (req, res) => {
       nuevopath,
       selectExamenespath,
       cancelarpath,
-      planID: req.session.planID,
       pdID: req.session.pdID,
       permisoDenegado: res.locals.permisoDenegado || null,
       estadosExamen: estados.estadoExamen,
       estadosProgDoc: estados.estadoProgDoc,
       estadoExamenes: res.locals.progDoc['ProgramacionDocentes.estadoExamenes'],
       estadoProgDoc: res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'],
-      departamentoID: req.session.departamentoID,
       planEstudios: res.locals.planEstudios
     });
   }
