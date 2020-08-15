@@ -101,7 +101,7 @@ exports.comprobarRols = async (req, res, next) => {
                 if (
                   !pd ||
                   `${pd[`ProgramacionDocentes.${condic[0]}`]}` !==
-                  `${r.condiciones[i].resultado}`
+                    `${r.condiciones[i].resultado}`
                 ) {
                   cumple = false;
                 }
@@ -111,7 +111,7 @@ exports.comprobarRols = async (req, res, next) => {
                 if (
                   !pd ||
                   `${pd[`ProgramacionDocentes.${condic[0]}`][condic[1]]}` !==
-                  `${r.condiciones[i].resultado}`
+                    `${r.condiciones[i].resultado}`
                 ) {
                   cumple = false;
                 }
