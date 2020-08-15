@@ -9,6 +9,11 @@ const rolController = require('../../controllers/rol_controller');
 
 const enumsPD = require('../../enumsPD');
 
+router.all('*', (req, res, next) => {
+  req.session.submenu = enumsPD.menuBar.gestion.submenu.grupo;
+  next();
+});
+
 // GET grupos programacion docente
 router.get(
   '/',

@@ -592,12 +592,9 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
 
 exports.generarPDF = async (req, res, next) => {
   const view =
-    req.session.menuBar === enumsPD.menuBar.consultar
+    req.session.menuBar === enumsPD.menuBar.consultar.nombre
       ? 'pdfs/pdfDraftGenerado'
       : 'pdfCerrado';
-  if (view === 'pdfs/pdfDraftGenerado') {
-    req.session.submenu = 'PDF';
-  }
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (
     view === 'pdfs/pdfDraftGenerado' &&
@@ -605,8 +602,6 @@ exports.generarPDF = async (req, res, next) => {
   ) {
     res.render(view, {
       existe: 'Programación docente no abierta',
-
-      submenu: req.session.submenu,
       planID: req.session.planID,
       departamentosResponsables: res.locals.departamentosResponsables,
       planEstudios: res.locals.planEstudios,
@@ -627,9 +622,7 @@ exports.generarPDF = async (req, res, next) => {
                 file: pdfDatos.file,
                 planID: req.session.planID,
                 planEstudios: res.locals.planEstudios,
-                pdID,
-
-                submenu: req.session.submenu
+                pdID
               });
               break;
             case 'pdfCerrado':

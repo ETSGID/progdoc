@@ -21,7 +21,7 @@ router.all('*', (req, res, next) => {
   req.session.menu = [];
   req.session.menu.push('drop_ProgDoc');
   req.session.menu.push('element_ProgDocConsultar');
-  req.session.menuBar = enumsPD.menuBar.consultar;
+  req.session.menuBar = enumsPD.menuBar.consultar.nombre;
   next();
 });
 
@@ -34,6 +34,10 @@ router.get('/', (req, res) => {
 // GET estado programacion docente
 router.get(
   '/estado',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.estado;
+    next();
+  },
   planController.getPlanes,
   progDocController.getProgramacionDocente,
   estadoController.getEstado
@@ -42,17 +46,33 @@ router.get(
 // GET roles
 router.get(
   '/roles',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.rol;
+    next();
+  },
   planController.getPlanes,
   progDocController.getProgramacionDocente,
   rolController.getRoles
 );
 
 // GET aulas
-router.get('/aulas', planController.getPlanes, aulaController.getAulas);
+router.get(
+  '/aulas',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.aula;
+    next();
+  },
+  planController.getPlanes,
+  aulaController.getAulas
+);
 
 // GET grupos programacion docente
 router.get(
   '/grupos',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.grupo;
+    next();
+  },
   planController.getPlanes,
   progDocController.getProgramacionDocente,
   grupoController.getGrupos
@@ -61,6 +81,10 @@ router.get(
 // GET calendario programacion docente
 router.get(
   '/calendario',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.calendario;
+    next();
+  },
   planController.getPlanes,
   progDocController.getProgramacionDocente,
   calendarioController.anoDeTrabajo,
@@ -72,6 +96,10 @@ router.get(
 // GET profesores programacion docente
 router.get(
   '/profesores',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.profesor;
+    next();
+  },
   planController.getPlanes,
   progDocController.getProgramacionDocente,
   asignacionYTribunalController.getAsignaciones
@@ -80,6 +108,10 @@ router.get(
 // GET tribunales programacion docente
 router.get(
   '/tribunales',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.tribunal;
+    next();
+  },
   planController.getPlanes,
   progDocController.getProgramacionDocente,
   asignacionYTribunalController.getTribunales
@@ -88,6 +120,10 @@ router.get(
 // GET horarios programacion docente
 router.get(
   '/horarios',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.horario;
+    next();
+  },
   planController.getPlanes,
   progDocController.getProgramacionDocente,
   horarioController.getHorario
@@ -96,6 +132,10 @@ router.get(
 // GET actividades programacion docente
 router.get(
   '/actividades',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.actividad;
+    next();
+  },
   planController.getPlanes,
   progDocController.getProgramacionDocente,
   actividadParcialController.getActividadParcial
@@ -104,6 +144,10 @@ router.get(
 // GET examenes programacion docente
 router.get(
   '/examenes',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.examen;
+    next();
+  },
   planController.getPlanes,
   progDocController.getProgramacionDocente,
   examenController.getFranjas,
@@ -114,6 +158,10 @@ router.get(
 // GET PDF programacion docente
 router.get(
   '/PDF',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.pdf;
+    next();
+  },
   planController.getPlanes,
   progDocController.getProgramacionDocente,
   calendarioController.anoDeTrabajoPDF,

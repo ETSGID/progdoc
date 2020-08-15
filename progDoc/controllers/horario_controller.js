@@ -50,18 +50,15 @@ const getNotasGruposSinAsignatura = async gruposBBDD => {
 };
 
 exports.getHorario = async (req, res, next) => {
-  req.session.submenu = 'Horarios';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
     const view =
-      req.session.menuBar === enumsPD.menuBar.consultar
+      req.session.menuBar === enumsPD.menuBar.consultar.nombre
         ? 'horarios/horariosConsultar'
         : 'horarios/horariosCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-
-      submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
       planEstudios: res.locals.planEstudios,
@@ -75,14 +72,12 @@ exports.getHorario = async (req, res, next) => {
       estados.estadoProgDoc.abierto ||
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
         estados.estadoProgDoc.listo) &&
-    req.session.menuBar !== enumsPD.menuBar.consultar
+    req.session.menuBar !== enumsPD.menuBar.consultar.nombre
   ) {
     res.render('horarios/horariosCumplimentar', {
       estado:
         'Asignación de horarios ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
       permisoDenegado: res.locals.permisoDenegado || null,
-
-      submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
       planEstudios: res.locals.planEstudios,
@@ -357,7 +352,7 @@ exports.getHorario = async (req, res, next) => {
         const cancelarpath = `${req.baseUrl}?planID=${req.session.planID}`;
         const nuevopath = req.baseUrl;
         const view =
-          req.session.menuBar === enumsPD.menuBar.consultar
+          req.session.menuBar === enumsPD.menuBar.consultar.nombre
             ? 'horarios/horariosConsultar'
             : 'horarios/horariosCumplimentar';
         res.render(view, {
@@ -367,8 +362,6 @@ exports.getHorario = async (req, res, next) => {
           cancelarpath,
           planID: req.session.planID,
           pdID,
-
-          submenu: req.session.submenu,
           permisoDenegado: res.locals.permisoDenegado || null,
           estadosHorario: estados.estadoHorario,
           estadosProgDoc: estados.estadoProgDoc,

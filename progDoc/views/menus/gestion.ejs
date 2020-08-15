@@ -1,10 +1,10 @@
 <body>
 <%- include ../../public/js/funcionesMenu.ejs %>
 <div class="myHeader">
-    <p>Jefatura Estudios <% if ( session && session.pdID && (locals.submenu === "Grupos")){ %>
+    <p>Jefatura Estudios <% if ( session && session.pdID && (session.submenu === "Grupos")){ %>
     <%= session.pdID %>
     <%}%></p>
-    <%if (locals.planID && locals.planEstudios && (locals.submenu === "Grupos" || locals.submenu === "Planes")) { %>
+    <%if (locals.planID && locals.planEstudios && (session.submenu === "Grupos" || session.submenu === "Planes")) { %>
     <div class="row col-sm"  style="margin-left:0px">
         <div clas="container">
             <select id="selectPlan" onchange="cambiarPD()">
@@ -18,7 +18,7 @@
             </select>
         </div>
     </div>
-    <%}else if(locals.submenu === "Calendario"){%>
+    <%}else if(session.submenu === "Calendario"){%>
         
         <select id="selectano" onchange="cambiarano()">
 
@@ -58,8 +58,8 @@
     <%} else {%>
         <input id='plan' type="hidden">
     <%}%>
-    <% if (locals.submenu) { %>
-        <input id='submenu' type="hidden" value="<%=submenu%>">
+    <% if (session.submenu) { %>
+        <input id='submenu' type="hidden" value="<%=session.submenu%>">
     <%} else {%>
     <input id='submenu' type="hidden">
     <%}%>
@@ -142,9 +142,6 @@ if (element2){
     document.getElementById('selectPlan').value = selectPlanValue;
 }     
 let submenu = document.getElementById('submenu').value
-if(!submenu) {
-    submenu= "AbrirCerrar"
-}
 document.getElementById(submenu).style.display = "block";
 document.getElementById(submenu).className += " active";
 }

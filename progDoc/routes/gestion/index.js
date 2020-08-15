@@ -16,7 +16,7 @@ router.all('*', (req, res, next) => {
   req.session.menu = [];
   req.session.menu.push('drop_ProgDoc');
   req.session.menu.push('element_ProgDocGestion');
-  req.session.menuBar = enumsPD.menuBar.gestion;
+  req.session.menuBar = enumsPD.menuBar.gestion.nombre;
   next();
 });
 

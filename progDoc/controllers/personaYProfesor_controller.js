@@ -98,7 +98,6 @@ exports.getPersonas = async () => {
 };
 
 exports.getPersonasPagination = async (req, res, next) => {
-  req.session.submenu = 'Personal';
   // eslint-disable-next-line no-useless-catch
   try {
     const page = Number(req.query.page) || 1;
@@ -115,8 +114,6 @@ exports.getPersonasPagination = async (req, res, next) => {
       page,
       pages,
       personas,
-
-      submenu: req.session.submenu,
       path: req.baseUrl
     });
   } catch (error) {

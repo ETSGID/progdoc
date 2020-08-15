@@ -10,6 +10,11 @@ const gestionPlanController = require('../../controllers/gestionPlan_controller'
 const estados = require('../../estados');
 const enumsPD = require('../../enumsPD');
 
+router.all('*', (req, res, next) => {
+  req.session.submenu = enumsPD.menuBar.gestion.submenu.plan;
+  next();
+});
+
 // GET plan
 router.get(
   '/',

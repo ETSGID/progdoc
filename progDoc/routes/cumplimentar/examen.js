@@ -10,6 +10,11 @@ const examenController = require('../../controllers/examen_controller');
 const estados = require('../../estados');
 const enumsPD = require('../../enumsPD');
 
+router.all('*', (req, res, next) => {
+  req.session.submenu = enumsPD.menuBar.cumplimentar.submenu.examen;
+  next();
+});
+
 // GET examenes programacion docente
 router.get(
   '/',
@@ -69,6 +74,7 @@ router.get(
   '/franjas',
   progDocController.getProgramacionDocente,
   (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.cumplimentar.submenu.examen2;
     res.locals.rols.push({
       rol: enumsPD.rols.CoordinadorTitulacion,
       PlanEstudioCodigo: req.session.planID,

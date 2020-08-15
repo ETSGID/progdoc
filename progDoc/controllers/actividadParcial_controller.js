@@ -12,19 +12,17 @@ const grupoController = require('./grupo_controller');
 const cursoController = require('./curso_controller');
 
 exports.getActividadParcial = async (req, res, next) => {
-  req.session.submenu = 'Actividades';
   const { pdID } = req.session;
   let grupos;
   let asignaturas;
   const view =
-    req.session.menuBar === enumsPD.menuBar.consultar
+    req.session.menuBar === enumsPD.menuBar.consultar.nombre
       ? 'actividades/actividadesConsultar'
       : 'actividades/actividadesCumplimentar';
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-      submenu: req.session.submenu,
       planID: req.session.planID,
       planEstudios: res.locals.planEstudios,
       estadoCalendario: null,
@@ -47,13 +45,12 @@ exports.getActividadParcial = async (req, res, next) => {
       estados.estadoProgDoc.abierto ||
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] ===
         estados.estadoProgDoc.listo) &&
-    req.session.menuBar !== enumsPD.menuBar.consultar
+    req.session.menuBar !== enumsPD.menuBar.consultar.nombre
   ) {
     res.render(view, {
       estado:
         'Asignación de actividades parciales ya se realizó. Debe esperar a que se acabe de cumplimentar la programación docente y Jefatura de Estudios la apruebe',
       permisoDenegado: res.locals.permisoDenegado || null,
-      submenu: req.session.submenu,
       planID: req.session.planID,
       planEstudios: res.locals.planEstudios,
       estadoCalendario: null,
@@ -86,7 +83,6 @@ exports.getActividadParcial = async (req, res, next) => {
       */
       res.render(view, {
         permisoDenegado: res.locals.permisoDenegado || null,
-        submenu: req.session.submenu,
         planID: req.session.planID,
         planEstudios: res.locals.planEstudios,
         estadoCalendario:

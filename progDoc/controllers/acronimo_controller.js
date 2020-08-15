@@ -6,7 +6,6 @@ const departamentoController = require('./departamento_controller');
 const planController = require('./plan_controller');
 
 exports.getAcronimos = async (req, res, next) => {
-  req.session.submenu = 'Acronimos';
   // se obtienen todos los planes, incluidos los que no se muestran
   // no se muestran normalmente los planes sin acronimo
   res.locals.planEstudios = await planController.getPlanesFunction(false);
@@ -27,7 +26,6 @@ exports.getAcronimos = async (req, res, next) => {
         existe:
           'Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada',
         permisoDenegado: res.locals.permisoDenegado || null,
-        submenu: req.session.submenu,
         planID: req.session.planID,
         planEstudios: res.locals.planEstudios,
         nuevopath,
@@ -46,7 +44,6 @@ exports.getAcronimos = async (req, res, next) => {
       });
       res.render('acronimos/acronimosJE', {
         permisoDenegado: res.locals.permisoDenegado || null,
-        submenu: req.session.submenu,
         planID: req.session.planID,
         planEstudios: res.locals.planEstudios,
         nuevopath,

@@ -160,7 +160,6 @@ exports.comprobarRolYPersona = async (req, res, next) => {
 
 // funcion de getRoles para directores de departamentos jefe de estudios y subdirector de posgrado
 exports.getRoles = async (req, res, next) => {
-  req.session.submenu = 'Roles';
   const responsablesDocentes = [];
   let profesores;
   let cargos;
@@ -210,7 +209,7 @@ exports.getRoles = async (req, res, next) => {
     const nuevopath = req.baseUrl;
     const cancelarpath = req.baseUrl;
     const view =
-      req.session.menuBar === enumsPD.menuBar.consultar
+      req.session.menuBar === enumsPD.menuBar.consultar.nombre
         ? 'roles/rolesConsultar'
         : 'roles/gestionRoles';
     // foco al cambiar de plan desde la view para que vuelva a ese punto
@@ -221,7 +220,6 @@ exports.getRoles = async (req, res, next) => {
       profesores,
       nuevopath,
       cancelarpath,
-      submenu: req.session.submenu,
       foco,
       departamentos: departs.sort(funciones.sortDepartamentos),
       planID: req.session.planID,

@@ -6,7 +6,6 @@ const progDocController = require('./progDoc_controller');
 const funciones = require('../funciones');
 
 exports.gestionProgDoc = async (req, res, next) => {
-  req.session.submenu = 'AbrirCerrar';
   let pds = [];
   /*
   las susceptibles a incidencia son las anteriores. Lo importante es el orden.
@@ -147,7 +146,6 @@ exports.gestionProgDoc = async (req, res, next) => {
         cerrarincidenciapath: `${req.baseUrl}/cerrarIncidencia`,
         reabrirpath: `${req.baseUrl}/reabrir`,
         eliminarpath: `${req.baseUrl}/eliminar`,
-        submenu: req.session.submenu,
         planID: req.session.planID
       });
     }

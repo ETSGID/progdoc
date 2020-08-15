@@ -14,6 +14,11 @@ const calendarioController = require('../../controllers/calendario_controller');
 const estados = require('../../estados');
 const enumsPD = require('../../enumsPD');
 
+router.all('*', (req, res, next) => {
+  req.session.submenu = enumsPD.menuBar.gestion.submenu.estado;
+  next();
+});
+
 // GET estado programaciones docentes
 router.get(
   '/',

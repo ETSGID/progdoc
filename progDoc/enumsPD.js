@@ -40,10 +40,52 @@ exports.permisions = {
 
 // type of menu
 exports.menuBar = {
-  consultar: 'consultar',
-  cumplimentar: 'cumplimentar',
-  gestion: 'gestion',
-  historial: 'historial'
+  consultar: {
+    nombre: 'consultar',
+    submenu: {
+      estado: 'Estado',
+      rol: 'Roles',
+      aula: 'Aulas',
+      grupo: 'Grupos',
+      calendario: 'Calendario',
+      profesor: 'Profesores',
+      tribunal: 'Tribunales',
+      horario: 'Horarios',
+      actividad: 'Actividades',
+      examen: 'Examenes',
+      pdf: 'PDF'
+    }
+  },
+  cumplimentar: {
+    nombre: 'cumplimentar',
+    submenu: {
+      estado: 'Estado',
+      calendario: 'Calendario',
+      profesor: 'Profesores',
+      profesor2: 'Profesores2',
+      tribunal: 'Tribunales',
+      horario: 'Horarios',
+      actividad: 'Actividades',
+      examen: 'Examenes',
+      examen2: 'Examenes2'
+    }
+  },
+  gestion: {
+    nombre: 'gestion',
+    submenu: {
+      estado: 'AbrirCerrar',
+      calendario: 'Calendario',
+      grupo: 'Grupos',
+      personal: 'Personal',
+      rol: 'Roles',
+      acronimo: 'Acronimos',
+      plan: 'Planes',
+      aula: 'Aulas'
+    }
+  },
+  historial: {
+    nombre: 'historial'
+  }
 };
 
 exports.eventoGeneral = {

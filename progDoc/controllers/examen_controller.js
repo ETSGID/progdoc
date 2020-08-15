@@ -317,20 +317,17 @@ exports.getExamenes = async (req, res, next) => {
 };
 
 exports.getExamenesView = (req, res) => {
-  req.session.submenu = 'Examenes';
   /* si no hay progDoc o no hay departamentosResponsables de dicha progDoc.
   Ojo también comprueba que no esté en incidencia para el JE
   */
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
     const view =
-      req.session.menuBar === enumsPD.menuBar.consultar
+      req.session.menuBar === enumsPD.menuBar.consultar.nombre
         ? 'examenes/examenesConsultar'
         : 'examenes/examenesCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-
-      submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
       planEstudios: res.locals.planEstudios,
@@ -347,7 +344,7 @@ exports.getExamenesView = (req, res) => {
     const selectExamenespath = `${req.baseUrl}/franjas?planID=${req.session.planID}`;
     const nuevopath = req.baseUrl;
     const view =
-      req.session.menuBar === enumsPD.menuBar.consultar
+      req.session.menuBar === enumsPD.menuBar.consultar.nombre
         ? 'examenes/examenesConsultar'
         : 'examenes/examenesCumplimentar';
     res.render(view, {
@@ -361,8 +358,6 @@ exports.getExamenesView = (req, res) => {
       planID: req.session.planID,
       pdID: req.session.pdID,
       cursos: res.locals.cursos,
-
-      submenu: req.session.submenu,
       permisoDenegado: res.locals.permisoDenegado || null,
       estadosExamen: estados.estadoExamen,
       estadosProgDoc: estados.estadoProgDoc,
@@ -375,7 +370,6 @@ exports.getExamenesView = (req, res) => {
 };
 
 exports.getFranjasView = (req, res) => {
-  req.session.submenu = 'Examenes2';
   const view = 'examenes/franjasExamenesCumplimentar';
   /*
   si no hay progDoc o no hay departamentosResponsables de dicha progDoc.
@@ -385,8 +379,6 @@ exports.getFranjasView = (req, res) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-
-      submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
       planEstudios: res.locals.planEstudios,
@@ -406,8 +398,6 @@ exports.getFranjasView = (req, res) => {
       cancelarpath,
       planID: req.session.planID,
       pdID: req.session.pdID,
-
-      submenu: req.session.submenu,
       permisoDenegado: res.locals.permisoDenegado || null,
       estadosExamen: estados.estadoExamen,
       estadosProgDoc: estados.estadoProgDoc,

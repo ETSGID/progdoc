@@ -17,7 +17,7 @@
                 }%>
          </select>
          
-    <% if (locals.departamentoID && locals.departamentosResponsables && (locals.submenu === "Profesores" || locals.submenu === "Tribunales")) { %>
+    <% if (locals.departamentoID && locals.departamentosResponsables && (session.submenu === "Profesores" || session.submenu === "Tribunales")) { %>
      <input id='departamentoResponsable' type="hidden" value="<%=departamentoID%>">
          <select id="selectDepartamento"  onchange="cambiarDepart()">
             <% for(let i=0; i < departamentosResponsables.length; i++) { 
@@ -48,8 +48,8 @@
   <%} else {%>
     <input id='plan' type="hidden">
   <%}%>
-    <% if (locals.submenu) { %>
-     <input id='submenu' type="hidden" value="<%=submenu%>">
+    <% if (session.submenu) { %>
+     <input id='submenu' type="hidden" value="<%=session.submenu%>">
   <%} else {%>
     <input id='submenu' type="hidden">
   <%}%>
@@ -157,9 +157,6 @@ function actualizarSelectyBarra() {
     }
         
     let submenu = document.getElementById('submenu').value
-    if(!submenu) {
-        submenu= "Estado"
-    }
     document.getElementById(submenu).style.display = "block";
     document.getElementById(submenu).className += " active";
 }

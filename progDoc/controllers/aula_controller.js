@@ -68,7 +68,6 @@ const getAllGruposConAula = async progDocs => {
  */
 
 exports.getAulas = async (req, res, next) => {
-  req.session.submenu = 'Aulas';
   let anoSeleccionado = req.body.ano || req.query.ano;
   const cuatrimestreSeleccionado =
     req.body.cuatrimestre || 'Primer cuatrimestre';
@@ -288,8 +287,6 @@ exports.getAulas = async (req, res, next) => {
       res.render('aulas/aulas', {
         CONTEXT,
         permisoDenegado: res.locals.permisoDenegado || null,
-
-        submenu: req.session.submenu,
         planID: req.session.planID,
         aulas1,
         aulas2,

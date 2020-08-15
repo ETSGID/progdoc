@@ -10,6 +10,12 @@ const rolController = require('../../controllers/rol_controller');
 const estados = require('../../estados');
 const enumsPD = require('../../enumsPD');
 
+router.all('*', (req, res, next) => {
+  req.session.submenu = enumsPD.menuBar.cumplimentar.submenu.tribunal;
+  next();
+});
+
+
 // GET tribunales programacion docente
 router.get(
   '/',

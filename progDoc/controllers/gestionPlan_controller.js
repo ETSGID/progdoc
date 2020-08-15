@@ -10,7 +10,6 @@ const grupoController = require('./grupo_controller');
 const apiUpmController = require('./apiUpm_controller');
 
 exports.getGestionPlanes = async (req, res, next) => {
-  req.session.submenu = 'Planes';
   const actualizarpath = `${req.baseUrl}/actualizarPlanApiUPM`;
   const cambioEstadopath = `${req.baseUrl}/estado`;
   const path = req.baseUrl;
@@ -34,8 +33,6 @@ exports.getGestionPlanes = async (req, res, next) => {
     res.render('gestionPlanes/gestionPlanes', {
       estado,
       permisoDenegado: res.locals.permisoDenegado || null,
-
-      submenu: req.session.submenu,
       planID: req.session.planID,
       planEstudios: res.locals.planEstudios,
       actualizarpath,

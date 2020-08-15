@@ -5,9 +5,8 @@ const enumsPD = require('../enumsPD');
 const funciones = require('../funciones');
 
 exports.getGrupos = async (req, res, next) => {
-  req.session.submenu = 'Grupos';
   const view =
-    req.session.menuBar === enumsPD.menuBar.consultar
+    req.session.menuBar === enumsPD.menuBar.consultar.nombre
       ? 'grupos/gruposConsultar'
       : 'grupos/gruposJE';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
@@ -15,8 +14,6 @@ exports.getGrupos = async (req, res, next) => {
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-
-      submenu: req.session.submenu,
       planID: req.session.planID,
       departamentosResponsables: res.locals.departamentosResponsables,
       planEstudios: res.locals.planEstudios,
@@ -28,14 +25,12 @@ exports.getGrupos = async (req, res, next) => {
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] &&
     estados.estadoProgDoc.incidencia !==
       res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] &&
-    req.session.menuBar !== enumsPD.menuBar.consultar
+    req.session.menuBar !== enumsPD.menuBar.consultar.nombre
   ) {
     res.render('grupos/gruposJE', {
       existe:
         'Programación docente no abierta. Debe abrir una nueva o cerrar la actual si está preparada para ser cerrada',
       permisoDenegado: res.locals.permisoDenegado || null,
-
-      submenu: req.session.submenu,
       planID: req.session.planID,
       departamentosResponsables: res.locals.departamentosResponsables,
       planEstudios: res.locals.planEstudios,
@@ -93,8 +88,6 @@ exports.getGrupos = async (req, res, next) => {
       const cancelarpath = `${req.baseUrl}?planID=${req.session.planID}`;
       res.render(view, {
         permisoDenegado: res.locals.permisoDenegado || null,
-
-        submenu: req.session.submenu,
         nuevopath,
         cancelarpath,
         planID: req.session.planID,

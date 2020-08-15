@@ -7,7 +7,7 @@
     <% } %>
     </p>
     <div class="row col-sm"  style="margin-left:0px">
-        <% if (locals.submenu !== "Profesores2") { %>
+        <% if (session.submenu !== "Profesores2") { %>
          <select id="selectPlan" onchange="cambiarPD()">
                 <% for(let i=0; i < planEstudios.length; i++) { 
                     if (planEstudios[i].nombre !== null){ %>
@@ -20,7 +20,7 @@
          <%}%>
          
 
-    <% if (locals.departamentoID && locals.departamentosResponsables && (locals.submenu === "Profesores" || locals.submenu === "Tribunales")) { %>
+    <% if (locals.departamentoID && locals.departamentosResponsables && (session.submenu === "Profesores" || session.submenu === "Tribunales")) { %>
      <input id='departamentoResponsable' type="hidden" value="<%=departamentoID%>">
          <select id="selectDepartamento"  onchange="cambiarDepart()">
             <% for(let i=0; i < departamentosResponsables.length; i++) { 
@@ -47,8 +47,8 @@
   <%} else {%>
     <input id='plan' type="hidden">
   <%}%>
-    <% if (locals.submenu) { %>
-     <input id='submenu' type="hidden" value="<%=submenu%>">
+    <% if (session.submenu) { %>
+     <input id='submenu' type="hidden" value="<%=session.submenu%>">
   <%} else {%>
     <input id='submenu' type="hidden">
   <%}%>
@@ -143,9 +143,6 @@ function actualizarSelectyBarra() {
     //para pintar profesores cuando este en asignacionProfesoresCumplimentar
     if(submenu ==="Profesores2"){
         submenu="Profesores"
-    }
-    if(!submenu) {
-        submenu= "Estado"
     }
     document.getElementById(submenu).style.display = "block";
     document.getElementById(submenu).className += " active";

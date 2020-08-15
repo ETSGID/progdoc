@@ -3,18 +3,15 @@ const departamentoController = require('./departamento_controller');
 const enumsPD = require('../enumsPD');
 
 exports.getEstado = async (req, res, next) => {
-  req.session.submenu = 'Estado';
   // si no hay progDoc o no hay departamentosResponsables de dicha progDoc
   if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
     const view =
-      req.session.menuBar === enumsPD.menuBar.consultar
+      req.session.menuBar === enumsPD.menuBar.consultar.nombre
         ? 'estados/estadoConsultar'
         : 'estados/estadoCumplimentar';
     res.render(view, {
       existe: 'Programación docente no abierta',
       permisoDenegado: res.locals.permisoDenegado || null,
-
-      submenu: req.session.submenu,
       planID: req.session.planID,
       departamentoID: req.session.departamentoID,
       planEstudios: res.locals.planEstudios,
@@ -38,14 +35,12 @@ exports.getEstado = async (req, res, next) => {
       // si no estaba inicializada la inicializo.
       req.session.departamentoID = departamentoID;
       const view =
-        req.session.menuBar === enumsPD.menuBar.consultar
+        req.session.menuBar === enumsPD.menuBar.consultar.nombre
           ? 'estados/estadoConsultar'
           : 'estados/estadoCumplimentar';
       const departamentos = await departamentoController.getAllDepartamentos();
       res.render(view, {
         permisoDenegado: res.locals.permisoDenegado || null,
-
-        submenu: req.session.submenu,
         planID: req.session.planID,
         departamentoID: req.session.departamentoID,
         planEstudios: res.locals.planEstudios,

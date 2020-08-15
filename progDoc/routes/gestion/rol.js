@@ -8,6 +8,11 @@ const rolController = require('../../controllers/rol_controller');
 
 const enumsPD = require('../../enumsPD');
 
+router.all('*', (req, res, next) => {
+  req.session.submenu = enumsPD.menuBar.gestion.submenu.rol;
+  next();
+});
+
 // GET roles
 router.get(
   '/',

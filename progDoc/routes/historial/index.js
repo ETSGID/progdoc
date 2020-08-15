@@ -12,7 +12,7 @@ router.all('*', (req, res, next) => {
   req.session.menu = [];
   req.session.menu.push('drop_ProgDoc');
   req.session.menu.push('element_ProgDocHistorial');
-  req.session.menuBar = enumsPD.menuBar.historial;
+  req.session.menuBar = enumsPD.menuBar.historial.nombre;
   next();
 });
 

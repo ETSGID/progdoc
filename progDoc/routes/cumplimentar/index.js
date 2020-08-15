@@ -1,6 +1,7 @@
 const express = require('express');
 
 const router = express.Router();
+const routerEstado = require('./estado');
 const routerCalendario = require('./calendario');
 const routerProfesor = require('./profesor');
 const routerTribunal = require('./tribunal');
@@ -8,17 +9,13 @@ const routerHorario = require('./horario');
 const routerActividad = require('./actividad');
 const routerExamen = require('./examen');
 
-const progDocController = require('../../controllers/progDoc_controller');
-const planController = require('../../controllers/plan_controller');
-const estadoController = require('../../controllers/estado_controller');
-
 const enumsPD = require('../../enumsPD');
 
 router.all('*', (req, res, next) => {
   req.session.menu = [];
   req.session.menu.push('drop_ProgDoc');
   req.session.menu.push('element_ProgDocCumplimentar');
-  req.session.menuBar = enumsPD.menuBar.cumplimentar;
+  req.session.menuBar = enumsPD.menuBar.cumplimentar.nombre;
   next();
 });
 
@@ -28,13 +25,8 @@ router.get('/', (req, res) => {
   });
 });
 
-// GET estado programacion docente
-router.get(
-  '/estado',
-  planController.getPlanes,
-  progDocController.getProgramacionDocente,
-  estadoController.getEstado
-);
+// Estado programacion docente
+router.use('/estado', routerEstado);
 
 // Calendario
 router.use('/calendario', routerCalendario);
