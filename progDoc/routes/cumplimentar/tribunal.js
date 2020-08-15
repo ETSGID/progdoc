@@ -15,7 +15,6 @@ router.all('*', (req, res, next) => {
   next();
 });
 
-
 // GET tribunales programacion docente
 router.get(
   '/',
