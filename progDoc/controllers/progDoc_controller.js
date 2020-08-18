@@ -6,7 +6,7 @@ const models = require('../models');
 
 const op = Sequelize.Op;
 const estados = require('../estados');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 
 // devuelve el tipo de la PD a partir del id
 // PD_09TT_201819_I_v1
@@ -207,7 +207,7 @@ exports.getProgramacionDocente = async (req, res, next) => {
       });
       if (depResponsables.length >= 0) {
         res.locals.departamentosResponsables = depResponsables.sort(
-          funciones.sortDepartamentos
+          helpers.sortDepartamentos
         );
       }
       next();
@@ -239,7 +239,7 @@ const isPDListaBoolean = progdoc => {
   );
 };
 
-// TODO: cuando se añadan las otras funciones hay que ponerlas aquí
+// TODO: cuando se añadan las otras helpers hay que ponerlas aquí
 // para comprobar si la pd se puede marcar como lista para que Jefatura de Estudios la cierre
 exports.isPDLista = async (progID, thenFunction) => {
   // eslint-disable-next-line no-useless-catch
@@ -266,7 +266,7 @@ exports.isPDLista = async (progID, thenFunction) => {
   }
 };
 
-// TODO: cuando se añadan las otras funciones hay que ponerlas aquí
+// TODO: cuando se añadan las otras helpers hay que ponerlas aquí
 // para comprobar si no se ha aprobado nada de la programacion docente
 // o si es una incidencia
 exports.isPDInitialState = progdoc => {

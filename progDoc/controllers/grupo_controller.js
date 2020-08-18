@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const models = require('../models');
 const estados = require('../estados');
 const enumsPD = require('../enumsPD');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 
 exports.getGrupos = async (req, res, next) => {
   const view =
@@ -140,10 +140,10 @@ exports.EliminarGruposJE = async (req, res, next) => {
         whereEliminar.grupoId.push(grupoId);
         whereEliminar2.GrupoId.push(grupoId);
       });
-      if (funciones.isEmpty(whereEliminar)) {
+      if (helpers.isEmpty(whereEliminar)) {
         whereEliminar.identificador = 'Identificador erróneo';
       }
-      if (funciones.isEmpty(whereEliminar2)) {
+      if (helpers.isEmpty(whereEliminar2)) {
         whereEliminar2.identificador = 'Identificador erróneo';
       }
       // antes de borrarlo de grupos voy a borrarlo de las asignaciones

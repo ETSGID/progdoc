@@ -8,7 +8,7 @@ const models = require('../models');
 const op = Sequelize.Op;
 const estados = require('../estados');
 const enumsPD = require('../enumsPD');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 const progDocController = require('./progDoc_controller');
 const planController = require('./plan_controller');
 
@@ -230,7 +230,7 @@ exports.getExamenes = async (req, res, next) => {
                 a.examen.duracion = null;
                 a.examen.aulas = [];
                 p.asignaturas.push(a);
-                p.asignaturas.sort(funciones.sortAsignaturasCursoNombre);
+                p.asignaturas.sort(helpers.sortAsignaturasCursoNombre);
               }
             }
           }
@@ -458,7 +458,7 @@ exports.guardarExamenes = async (req, res, next) => {
           const identificador = Number(element.identificador);
           whereEliminar.identificador.push(identificador);
         });
-        if (funciones.isEmpty(whereEliminar)) {
+        if (helpers.isEmpty(whereEliminar)) {
           whereEliminar.identificador = 'Identificador erróneo';
         }
         const promise1 = models.Examen.destroy({
@@ -543,7 +543,7 @@ exports.guardarFranjasExamenes = async (req, res, next) => {
           const identificador = Number(element.split('_')[0]);
           whereEliminar.identificador.push(identificador);
         });
-        if (funciones.isEmpty(whereEliminar)) {
+        if (helpers.isEmpty(whereEliminar)) {
           whereEliminar.identificador = 'Identificador erróneo';
         }
         const promise1 = models.FranjaExamen.destroy({
@@ -706,7 +706,7 @@ exports.generateCsvExamens = async (req, res, next) => {
               req.session.pdID
             )}${folder2}.csv`;
             const ruta = dir + fileName;
-            funciones.ensureDirectoryExistence(ruta);
+            helpers.ensureDirectoryExistence(ruta);
             const csv = json2csv(data, opts);
             await fs.writeFile(ruta, csv);
           })

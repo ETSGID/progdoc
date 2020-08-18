@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const models = require('../models');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 
 const op = Sequelize.Op;
 
@@ -34,7 +34,7 @@ const getPlanesFunction = async onlyActive => {
       where: filtro,
       raw: true
     });
-    return planesBBDD.sort(funciones.sortPlanes);
+    return planesBBDD.sort(helpers.sortPlanes);
   } catch (error) {
     // se propaga el error lo captura el middleware
     throw error;

@@ -4,7 +4,7 @@ const Sequelize = require('sequelize');
 const moment = require('moment');
 const pdf = require('html-pdf');
 const ejs = require('ejs');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 const enumsPD = require('../enumsPD');
 const models = require('../models');
 const progDocController = require('./progDoc_controller');
@@ -136,7 +136,7 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
     pdsAnterioresAno = await progDocController.getProgramacionDocentesAnteriores(
       progDocController.getPlanPd(pdID),
       progDocController.getTipoPd(pdID),
-      funciones.anteriorAnoAcademico(progDocController.getAnoPd(pdID)),
+      helpers.anteriorAnoAcademico(progDocController.getAnoPd(pdID)),
       pdID,
       null
     );
@@ -442,7 +442,7 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
       const correo = profesor.email;
       const profesorId = profesor.identificador;
       const { identificador } = profesor;
-      nombre = funciones.primerasMayusc(nombre);
+      nombre = helpers.primerasMayusc(nombre);
       const prof = {
         nombre,
         correo,

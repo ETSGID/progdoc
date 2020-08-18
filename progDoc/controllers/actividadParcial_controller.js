@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const moment = require('moment');
 const models = require('../models');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 const estados = require('../estados');
 const enumsPD = require('../enumsPD');
 
@@ -140,10 +140,10 @@ const getAllActividadParcial = async pdID => {
           conjuntoActividadParcial.notaInicial = c.notaInicial;
           conjuntoActividadParcial.curso = c.curso;
           conjuntoActividadParcial.semestre = c.semestre;
-          conjuntoActividadParcial.fechaInicio = funciones.formatFecha(
+          conjuntoActividadParcial.fechaInicio = helpers.formatFecha(
             c.fechaInicio
           );
-          conjuntoActividadParcial.fechaFin = funciones.formatFecha(c.fechaFin);
+          conjuntoActividadParcial.fechaFin = helpers.formatFecha(c.fechaFin);
           conjuntoActividadParcial.ProgramacionDocenteId =
             c.ProgramacionDocenteId;
           conjuntoActividadParcial.grupos = [];
@@ -184,7 +184,7 @@ const getAllActividadParcial = async pdID => {
         actividad.horaInicio = act['ActividadParcials.horaInicio'];
         actividad.duracion = act['ActividadParcials.duracion'];
         actividad.descripcion = act['ActividadParcials.descripcion'];
-        actividad.fecha = funciones.formatFecha(act['ActividadParcials.fecha']);
+        actividad.fecha = helpers.formatFecha(act['ActividadParcials.fecha']);
         actividad.tipo = act['ActividadParcials.tipo'];
         actividad.asignaturaId = act['ActividadParcials.AsignaturaId'];
         conjuntoActividadParcial.actividades.push(actividad);
