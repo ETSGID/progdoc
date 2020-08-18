@@ -699,22 +699,10 @@ exports.getTribunales = async (req, res, next) => {
   } else {
     const { pdID } = req.session;
     const asignaturas = [];
-    const asignaturasAntiguas = [];
     const whereAsignaturas = [];
     const { departamentoID } = req.session;
     try {
-      const pdsAnteriores = await progDocController.getProgramacionDocentesAnteriores(
-        progDocController.getPlanPd(pdID),
-        progDocController.getTipoPd(pdID),
-        progDocController.getAnoPd(pdID),
-        pdID,
-        null
-      );
       whereAsignaturas.push(pdID);
-      // voy a obtener el identificador del plan y de paso preparo el where para asignaturas
-      for (let i = 0; i < pdsAnteriores.length; i++) {
-        whereAsignaturas.push(pdsAnteriores[i].identificador);
-      }
       const departamentoExisteEnElPlan = res.locals.departamentosResponsables.find(
         obj => obj.codigo === departamentoID
       );
@@ -826,14 +814,6 @@ exports.getTribunales = async (req, res, next) => {
           asigni.tribunalId = asigni.identificador;
           if (asigni.ProgramacionDocenteIdentificador === pdID) {
             asignaturas.push(asigni);
-          } else {
-            const as = {};
-            as.codigo = asigni.codigo;
-            as.presidente = asigni.presidenteNombre;
-            as.vocal = asigni.vocalNombre;
-            as.secretario = asigni.secretarioNombre;
-            as.suplente = asigni.suplenteNombre;
-            asignaturasAntiguas.push(as);
           }
         });
         const view =
@@ -845,7 +825,6 @@ exports.getTribunales = async (req, res, next) => {
         res.render(view, {
           profesores,
           tribunales: asignaturas,
-          tribunalesAntiguos: asignaturasAntiguas,
           nuevopath,
           aprobarpath: `${req.baseUrl}/estado`,
           cancelarpath,

@@ -39,33 +39,45 @@ const configPdf = (draft, planNombre, pdId) => {
       .locale('es')
       .format('LL')}
     </p>`;
+  /*
+    las imagenes que use en el encabezado o footer no funcionan muy bien
+    si tratas de cargarlas de alguna url no se ven o si usas las imagenes
+    locales tampoco
+    */
+  const header = `
+<img src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg" style='width:30mm;height:20mm; float:left;'>
+<div style="padding-top:5mm">
+${textoHeader}
+</div>
+<div style="clear:both"></div>
+${draftStyle}`;
 
-  return {
-    format: 'A4', // allowed units: A3, A4, A5, Legal, Letter, Tabloid
-    base: `file://${base}/`, // you have to set 'file://' Ahí puedo ya referenciar a todos por ejemplo una imagen images/imagen.png, o un css
-    orientation: 'portrait', // portrait or landscape
-    paginationOffset: 1, // Override the initial pagination number
-    header: {
-      height: heightHeader,
-      contents: `
-      <img src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg" alt="Politécnica" style="width:30mm;height:20mm; float:left;">
-      <div style="padding-top:5mm">
-      ${textoHeader}
-      </div>
-      <div style="clear:both"></div>
-      ${draftStyle}`
-    },
-    footer: {
-      height: heightFooter,
-      contents: {
-        first: ' ',
-        default:
-          '<span style="color: #444; font-size: 8pt;">{{page}}/{{pages}}</span>' // fallback value
+  const footer = ``;
+
+  return [
+    {
+      format: 'A4', // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+      base: `file://${base}/`, // you have to set 'file://' Ahí puedo ya referenciar a todos por ejemplo una imagen images/imagen.png, o un css
+      orientation: 'portrait', // portrait or landscape
+      paginationOffset: 1, // Override the initial pagination number
+      header: {
+        height: heightHeader
+      },
+      footer: {
+        height: heightFooter,
+        contents: {
+          first: ' ',
+          default:
+            '<span style="color: #444; font-size: 8pt;">{{page}}/{{pages}}</span>' // fallback value
+        }
       }
-    }
-  };
+    },
+    header,
+    footer
+  ];
 };
 
+// Funcion que genera un pdf de la programacion docente
 // pdID el identificador de pd
 // tipoPDF puede ser pdfDraftGenerado si es pintar un draft o pdfCerrado
 // calendario se le pasa la informacion de calendario
@@ -77,11 +89,15 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
   const grupos = [];
   const profesores = [];
   const asignaturas = [];
+  // asignaturas de la anterior version de la programacion docente
   const asignaturasViejas = [];
+  // asignaturas de la ultima version del curso anterior
+  const asignaturasViejasAno = [];
   const asignacionsExamen = [];
   let planAcronimo;
   let planNombre;
   let pdsAnteriores = [];
+  let pdsAnterioresAno = [];
   let anoFinal;
   let semestre;
   const plan = progDocController.getPlanPd(pdID);
@@ -110,16 +126,27 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
     pd.anoAcademico = pd['ProgramacionDocentes.anoAcademico'];
     pd.semestre = progDocController.getTipoPd(pdID);
     pdsAnteriores = await progDocController.getProgramacionDocentesAnteriores(
-      pdID.split('_')[1],
-      pdID.split('_')[3],
-      pdID.split('_')[2],
+      progDocController.getPlanPd(pdID),
+      progDocController.getTipoPd(pdID),
+      progDocController.getAnoPd(pdID),
+      pdID,
+      null
+    );
+    // Sino se incluye devolverá la ultima version del anio pasado
+    pdsAnterioresAno = await progDocController.getProgramacionDocentesAnteriores(
+      progDocController.getPlanPd(pdID),
+      progDocController.getTipoPd(pdID),
+      funciones.anteriorAnoAcademico(progDocController.getAnoPd(pdID)),
       pdID,
       null
     );
     const whereAsignaturas = [];
     whereAsignaturas.push(pdID);
-    // voy a obtener el identificador del plan y de paso preparo el where para asignaturas
+    // obtener el identificador del plan y preparar el where para asignaturas
     for (const pdAnterior of pdsAnteriores) {
+      whereAsignaturas.push(pdAnterior.identificador);
+    }
+    for (const pdAnterior of pdsAnterioresAno) {
       whereAsignaturas.push(pdAnterior.identificador);
     }
     switch (semestre) {
@@ -355,7 +382,6 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
           x => x.identificador === asignaturaConExamen.identificador
         );
         if (!as) {
-          // TODO solo pasar las cosas que me interesan
           asignaturas.push(asignaturaConExamen);
         }
         const periodoExamen = asignaturaConExamen['Examens.periodo'];
@@ -378,16 +404,35 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
           p.examenes.push(nuevoExamen);
         }
       } else {
-        const as = asignaturasViejas.find(
-          x =>
-            x.identificador === asignaturaConExamen.identificador &&
-            x.curso === asignaturaConExamen.curso &&
-            x.creditos === asignaturaConExamen.creditos &&
-            x.semestre === asignaturaConExamen.semestre
-        );
-        if (!as) {
-          // TODO solo pasar las cosas que me interesan
-          asignaturasViejas.push(asignaturaConExamen);
+        // asignaturas viejas
+        // si pdsAnteriores coincide con pdsAnterioresAnio se incluye en ambas
+        if (
+          pdsAnteriores.find(
+            pdAnterior =>
+              pdAnterior.identificador ===
+              asignaturaConExamen.ProgramacionDocenteIdentificador
+          )
+        ) {
+          const as = asignaturasViejas.find(
+            x => x.identificador === asignaturaConExamen.identificador
+          );
+          if (!as) {
+            asignaturasViejas.push(asignaturaConExamen);
+          }
+        }
+        if (
+          pdsAnterioresAno.find(
+            pdAnterior =>
+              pdAnterior.identificador ===
+              asignaturaConExamen.ProgramacionDocenteIdentificador
+          )
+        ) {
+          const as = asignaturasViejasAno.find(
+            x => x.identificador === asignaturaConExamen.identificador
+          );
+          if (!as) {
+            asignaturasViejasAno.push(asignaturaConExamen);
+          }
         }
       }
     });
@@ -413,6 +458,7 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
           {
             asignaturas,
             asignaturasViejas,
+            asignaturasViejasAno,
             cursosConGrupos,
             profesores,
             calendario: calendario.calendario || [],
@@ -512,6 +558,12 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
       })
     );
     const datos = await Promise.all(promises2);
+    // si incluye palabra draft incluye el estilo de draft
+    const [configPdfOptions, header, footer] = configPdf(
+      tipoPDF.toLowerCase().includes('draft'),
+      planNombre,
+      pdID
+    );
     /*
     ojo el css del header y el footer no puede ir en el fichero
     pq no carga debe ir en el propio html
@@ -521,39 +573,40 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
                     </head>
                         `;
     html += ` <style>
-                        .draft{
-                            position:absolute;
-                            z-index:0;
-                            background:white;
-                            display:block;
-                            min-height:100%; 
-                            min-width:100%;
-                            margin-top: 20%;
-                            color:yellow;
-                        }
-                        .draftText{
-                        text-align:left;
-                        color:lightgrey;
-                        font-size:140px;
-                        transform:rotate(-45deg);
-                        -webkit-transform:rotate(-45deg);
-                        }
-                        </style>
-                        <body>
-                     `;
+                .draft{
+                    position:absolute;
+                    z-index:0;
+                    background:white;
+                    display:block;
+                    min-height:100%; 
+                    min-width:100%;
+                    margin-top: 20%;
+                    color:yellow;
+                }
+                .draftText{
+                text-align:left;
+                color:lightgrey;
+                font-size:140px;
+                transform:rotate(-45deg);
+                -webkit-transform:rotate(-45deg);
+                }
+                </style>`;
+
+    html += `<body>
+              <div id="pageHeader">
+                ${header}
+              </div>
+              <div id="pageContent">
+            `;
     datos.forEach(d => {
       html += d;
     });
-    /*
-    las imagenes que use en el encabezado o footer debo cargarlas antes
-    y deben ser obtenidas de una url pq lo que te carga la dirección local es
-    después del footer.
-    html += `<img src="images/politecnica.jpg" alt="Politécnica" width="50" height="33">`
-    */
-    html +=
-      '<img style="display:none" src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg">';
-
-    html += '</body></html>';
+    html += `</div>
+            <div id="pageFooter">
+            ${footer}
+          </div>
+          </body>
+        </html>`;
     let folder = '/';
     let folder2 = '';
     if (tipoPDF.toLowerCase().includes('draft')) {
@@ -571,12 +624,6 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
       pdID
     )}/${progDocController.getVersionPdNormalized(pdID)}${folder}${fileName}`;
     const ruta = `${PATH_PDF}/pdfs/${file}`;
-    // si incluye palabra draft incluye el estilo de draft
-    const configPdfOptions = configPdf(
-      tipoPDF.toLowerCase().includes('draft'),
-      planNombre,
-      pdID
-    );
 
     return {
       html,

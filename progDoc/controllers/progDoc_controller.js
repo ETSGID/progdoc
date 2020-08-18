@@ -283,9 +283,14 @@ exports.isPDInitialState = progdoc => {
 };
 
 /*
-da las ultimas pds existentes para el plan, tipoPD y ano
-en caso de pasar la pdIDNoIncluir obvia esa, se utiliza para el pdf
-estadoPD en caso de que se quiera el estado de la programación docente, si no a null
+Devuelve la/las ultimas pds existentes para el plan, tipoPD y ano
+Devuelve la version anterior y en caso de que no exista la del anio anterior
+Si tipo es I devuelve la I anterior o la 1S y 2S anterior
+Si tipo es 1S devuelve la I o 1S anterior
+Si tipo es 2S devuelve la I o 2S anterior
+ano 202021 por ejemplo
+en caso de pasar la pdIDNoIncluir obvia esa a la hora de buscar, se utiliza para el pdf
+estadoPD en caso de que se quiera buscar programación docente por estado, si no a null
 */
 exports.getProgramacionDocentesAnteriores = async (
   plan,
@@ -330,19 +335,19 @@ exports.getProgramacionDocentesAnteriores = async (
        el segundo elemento del if es para que me coja la pd anterior o igual por si quiero
        modificar una cuando ya abri otra mas nueva
       */
-      if (tipoPD === '1S' && ano >= progdoc.identificador.split('_')[2]) {
+      if (tipoPD === '1S' && ano >= getAnoPd(progdoc.identificador)) {
         if (progdoc.semestre === '1S' || progdoc.semestre === 'I') {
           pds.push(progdoc);
           break;
         }
       }
-      if (tipoPD === '2S' && ano >= progdoc.identificador.split('_')[2]) {
+      if (tipoPD === '2S' && ano >= getAnoPd(progdoc.identificador)) {
         if (progdoc.semestre === '2S' || progdoc.semestre === 'I') {
           pds.push(progdoc);
           break;
         }
       }
-      if (tipoPD === 'I' && ano >= progdoc.identificador.split('_')[2]) {
+      if (tipoPD === 'I' && ano >= getAnoPd(progdoc.identificador)) {
         if (progdoc.semestre === 'I' && I === false) {
           pds.push(progdoc);
           I = true;
@@ -351,7 +356,7 @@ exports.getProgramacionDocentesAnteriores = async (
           if (
             progdoc.semestre === '1S' &&
             s1 === false &&
-            ano >= progdoc.identificador.split('_')[2]
+            ano >= getAnoPd(progdoc.identificador)
           ) {
             pds.push(progdoc);
             s1 = true;
@@ -359,7 +364,7 @@ exports.getProgramacionDocentesAnteriores = async (
           if (
             progdoc.semestre === '2S' &&
             s2 === false &&
-            ano >= progdoc.identificador.split('_')[2]
+            ano >= getAnoPd(progdoc.identificador)
           ) {
             pds.push(progdoc);
             s2 = true;

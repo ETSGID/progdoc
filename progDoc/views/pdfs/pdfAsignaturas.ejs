@@ -12,9 +12,11 @@
   );
 return found;
 }%>
-<% let getViejaAsignatura = function (asign){
-  let found = asignaturasViejas.find(function (obj) { return (obj.codigo === asign.codigo && obj.curso === asign.curso && obj.creditos === asign.creditos && obj.semestre === asign.semestre) });
-  return found;
+<% let getViejaAsignaturas = function (asign){
+  return [
+    asignaturasViejas.find(function (obj) { return (obj.codigo === asign.codigo && obj.curso === asign.curso && obj.creditos === asign.creditos && obj.semestre === asign.semestre) }),
+    asignaturasViejasAno.find(function (obj) { return (obj.codigo === asign.codigo && obj.curso === asign.curso && obj.creditos === asign.creditos && obj.semestre === asign.semestre) })
+  ]
 }%>
 <% let getNombre = function (identificador){
     let persona = profesores.find(function (obj) { return obj.identificador === identificador; });
@@ -48,7 +50,7 @@ return found;
         </thead>
         <tbody>
         <% for (let k=0; k< asignaturasEncontradas.length; k++){ 
-          let asignVieja = getViejaAsignatura(asignaturasEncontradas[k])
+          let [asignVieja, asignViejaAno] = getViejaAsignaturas(asignaturasEncontradas[k])
           if(!asignVieja && asignaturasViejas.length !== 0 ){%>
             <tr class="nuevaAsignatura">
           <%}else{%>
@@ -61,30 +63,40 @@ return found;
             <td><%=asignaturasEncontradas[k].creditos%></td>
             <%if(asignVieja && asignaturasEncontradas[k].CoordinadorAsignatura !== asignVieja.CoordinadorAsignatura){%>
               <td class="cuidado">
+            <%} else if (asignViejaAno && asignaturasEncontradas[k].CoordinadorAsignatura !== asignViejaAno.CoordinadorAsignatura){%>
+              <td class="cuidado2">
             <%}else{%>
               <td>
             <%}%>
             <%=getNombre(asignaturasEncontradas[k].CoordinadorAsignatura)%></td>
             <%if(asignVieja && asignaturasEncontradas[k].PresidenteTribunalAsignatura !== asignVieja.PresidenteTribunalAsignatura){%>
               <td class="cuidado">
+            <%} else if (asignViejaAno && asignaturasEncontradas[k].PresidenteTribunalAsignatura !== asignViejaAno.PresidenteTribunalAsignatura){%>
+              <td class="cuidado2">
             <%}else{%>
               <td>
             <%}%>
             <%=getNombre(asignaturasEncontradas[k].PresidenteTribunalAsignatura)%></td>
             <%if(asignVieja && asignaturasEncontradas[k].VocalTribunalAsignatura !== asignVieja.VocalTribunalAsignatura){%>
               <td class="cuidado">
+            <%} else if (asignViejaAno && asignaturasEncontradas[k].VocalTribunalAsignatura !== asignViejaAno.VocalTribunalAsignatura){%>
+              <td class="cuidado2">
             <%}else{%>
               <td>
             <%}%>
             <%=getNombre(asignaturasEncontradas[k].VocalTribunalAsignatura)%></td>
             <%if(asignVieja && asignaturasEncontradas[k].SecretarioTribunalAsignatura !== asignVieja.SecretarioTribunalAsignatura){%>
               <td class="cuidado">
+            <%} else if (asignViejaAno && asignaturasEncontradas[k].SecretarioTribunalAsignatura !== asignViejaAno.SecretarioTribunalAsignatura){%>
+              <td class="cuidado2">
             <%}else{%>
               <td>
             <%}%>
             <%=getNombre(asignaturasEncontradas[k].SecretarioTribunalAsignatura)%></td>
             <%if(asignVieja && asignaturasEncontradas[k].SuplenteTribunalAsignatura !== asignVieja.SuplenteTribunalAsignatura){%>
               <td class="cuidado">
+            <%} else if (asignViejaAno && asignaturasEncontradas[k].SuplenteTribunalAsignatura !== asignViejaAno.SuplenteTribunalAsignatura){%>
+              <td class="cuidado2">
             <%}else{%>
               <td>
             <%}%>

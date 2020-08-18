@@ -316,19 +316,28 @@ exports.getAulas = async (req, res, next) => {
           }
         );
       });
+      const [configPdfOptions, header, footer] = configPdf(false, null, null);
       let html = `<html><head>
             <link rel='stylesheet' href='stylesheets/pdf.css' />
         </head>
             `;
+      html += `<body>
+            <div id="pageHeader">
+              ${header}
+            </div>
+            <div id="pageContent">
+          `;
       html += htmlCode;
-      html +=
-        '<img style="display:none" src="https://www.portalparados.es/wp-content/uploads/universidad-politecnica-madrid.jpg">';
-      html += '</body></html>';
+      html += `</div>
+            <div id="pageFooter">
+            ${footer}
+          </div>
+          </body>
+        </html>`;
       let file = `aulas_${anoCodigo}_${cuatrimestreSeleccionado}.pdf`;
       file = `${anoCodigo}/aulas/${file}`;
       // console.error("the fileç: ", file);
       const ruta = `${PATH_PDF}/pdfs/${file}`;
-      const configPdfOptions = configPdf(false, null, null);
       // save file
       // eslint-disable-next-line no-unused-vars
       pdf.create(html, configPdfOptions).toFile(ruta, (err, resp) => {

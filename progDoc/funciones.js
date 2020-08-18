@@ -226,6 +226,14 @@ exports.siguienteAnoAcademico = anoActual => {
   return `${siguiente}${siguiente2.toString().substr(-2)}`;
 };
 
+// devuelve el anterior año al pasarle con formato 201920 y devolveria 201819
+exports.anteriorAnoAcademico = anoActual => {
+  const year = Number(anoActual.substr(0, 4));
+  const anterior = year - 1;
+  const anterior2 = year;
+  return `${anterior}${anterior2.toString().substr(-2)}`;
+};
+
 exports.ensureDirectoryExistence = function probar(filePath, notCreate) {
   const dirname = path.dirname(filePath);
   // sync para evitar condiciones de bloqueo
