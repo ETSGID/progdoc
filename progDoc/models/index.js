@@ -7,8 +7,6 @@ const Sequelize = require('sequelize');
 //    DATABASE_URL = postgres://user:passwd@host:port/database
 // eslint-disable-next-line no-unneeded-ternary
 const logs = DEV === 'true' ? false : false;
-let sequelize;
-let sequelizeSession;
 const DB_USERNAME = process.env.DB_USERNAME || 'progdoc';
 const DB_PASSWORD = process.env.DB_PASSWORD || 'progdoc';
 const DB_HOST = process.env.DB_HOST || 'db';
@@ -16,25 +14,21 @@ const POSTGRES_DB = process.env.POSTGRES_DB || 'progdoc';
 const DBSESSION_USERNAME = process.env.DBSESSION_USERNAME || 'progdoc';
 const DBSESSION_PASSWORD = process.env.DBSESSION_PASSWORD || 'progdoc';
 const POSTGRESSESION_DB = process.env.POSTGRESSESION_DB || 'progdocsession';
-if (DOCKER === 'true') {
-  sequelize = new Sequelize(
-    `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:5432/${POSTGRES_DB}`,
-    { logging: logs }
-  );
-  sequelizeSession = new Sequelize(
-    `postgres://${DBSESSION_USERNAME}:${DBSESSION_PASSWORD}@dbsession:5432/${POSTGRESSESION_DB}`,
-    { logging: logs }
-  );
-} else {
-  sequelize = new Sequelize(
-    `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:5432/${POSTGRES_DB}`,
-    { logging: logs }
-  );
-  sequelizeSession = new Sequelize(
-    `postgres://${DBSESSION_USERNAME}:${DBSESSION_PASSWORD}@${DB_HOST}:5432/${POSTGRESSESION_DB}`,
-    { logging: logs }
-  );
-}
+const sequelize = new Sequelize(POSTGRES_DB, DB_USERNAME, DB_PASSWORD, {
+  host: DB_HOST,
+  dialect: 'postgres',
+  logging: logs
+});
+const sequelizeSession = new Sequelize(
+  POSTGRESSESION_DB,
+  DBSESSION_USERNAME,
+  DBSESSION_PASSWORD,
+  {
+    host: DOCKER === 'true' ? 'dbsession' : DB_HOST,
+    dialect: 'postgres',
+    logging: logs
+  }
+);
 
 // Importar la definicion de las tablas
 const Departamento = sequelize.import(path.join(__dirname, 'Departamento'));
