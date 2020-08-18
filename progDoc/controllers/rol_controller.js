@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const models = require('../models');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 const progDocController = require('./progDoc_controller');
 const departamentoController = require('./departamento_controller');
 const personaYProfesorController = require('./personaYProfesor_controller');
@@ -215,13 +215,13 @@ exports.getRoles = async (req, res, next) => {
     // foco al cambiar de plan desde la view para que vuelva a ese punto
     const foco = !!req.query.foco;
     res.render(view, {
-      roles: cargos.sort(funciones.sortRolesporDepartamento),
+      roles: cargos.sort(helpers.sortRolesporDepartamento),
       rolesEnum: enumsPD.rols,
       profesores,
       nuevopath,
       cancelarpath,
       foco,
-      departamentos: departs.sort(funciones.sortDepartamentos),
+      departamentos: departs.sort(helpers.sortDepartamentos),
       planEstudios: res.locals.planEstudios,
 
       departamentosResponsables: res.locals.departamentosResponsables,

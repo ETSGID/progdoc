@@ -20,10 +20,10 @@ global.PRUEBAS = process.env.PRUEBAS || 'false';
 global.DOCKER = process.env.DOCKER || 'true';
 
 const app = require('../app');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 
 const ruta = path.join(PATH_PDF, 'pdfs', 'files');
-funciones.ensureDirectoryExistence(ruta);
+helpers.ensureDirectoryExistence(ruta);
 /**
  * Get port from environment and store in Express.
  */

@@ -8,7 +8,7 @@ const models = require('../models');
 const op = Sequelize.Op;
 const estados = require('../estados');
 const enumsPD = require('../enumsPD');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 const progDocController = require('./progDoc_controller');
 const asignaturaController = require('./asignatura_controller');
 const planController = require('./plan_controller');
@@ -140,7 +140,7 @@ const getAsignacion = async (
           p.nombreCorregido = profi.nombreCorregido;
           p.asignacion = asigni['AsignacionProfesors.identificador'];
           grupo.profesors.push(p);
-          grupo.profesors.sort(funciones.sortProfesorCorregido);
+          grupo.profesors.sort(helpers.sortProfesorCorregido);
         }
       }
     });
@@ -508,7 +508,7 @@ exports.guardarAsignacion = async (req, res, next) => {
               whereEliminar.identificador.push(asignacions);
             }
           });
-          if (funciones.isEmpty(whereEliminar)) {
+          if (helpers.isEmpty(whereEliminar)) {
             whereEliminar.identificador = 'Identificador erróneo';
           }
           await models.AsignacionProfesor.destroy({
@@ -1049,7 +1049,7 @@ const generateCsvCoordinadores = async (pdID, definitivo) => {
       pdID
     )}_${progDocController.getVersionPdNormalized(pdID)}${folder2}.csv`;
     const ruta = dir + fileName;
-    funciones.ensureDirectoryExistence(ruta);
+    helpers.ensureDirectoryExistence(ruta);
     const csv = json2csv(data, opts);
     await fs.writeFile(ruta, csv);
   } catch (error) {

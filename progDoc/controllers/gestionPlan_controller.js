@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const models = require('../models');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 const estados = require('../estados');
 
 const op = Sequelize.Op;
@@ -167,8 +167,8 @@ exports.updateAsignaturasApiUpm = async (req, res, next) => {
             as.nombreIngles = apiAsignatura.nombre_ingles;
             const creditosCambio =
               asignBBDD.creditos !==
-              funciones.convertCommaToPointDecimal(apiAsignatura.credects);
-            as.creditos = funciones.convertCommaToPointDecimal(
+              helpers.convertCommaToPointDecimal(apiAsignatura.credects);
+            as.creditos = helpers.convertCommaToPointDecimal(
               apiAsignatura.credects
             );
             switch (apiAsignatura.codigo_tipo_asignatura) {
@@ -394,7 +394,7 @@ exports.updateAsignaturasApiUpm = async (req, res, next) => {
             nuevaAsign.DepartamentoResponsable = depResponsable;
             // por defecto los profesores se asignan por grupo comun
             nuevaAsign.estado = 'N';
-            nuevaAsign.creditos = funciones.convertCommaToPointDecimal(
+            nuevaAsign.creditos = helpers.convertCommaToPointDecimal(
               apiAsignEncontrada.credects
             );
             nuevaAsign.ProgramacionDocenteIdentificador = pdID;

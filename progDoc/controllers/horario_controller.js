@@ -4,7 +4,7 @@ const models = require('../models');
 const op = Sequelize.Op;
 const estados = require('../estados');
 const enumsPD = require('../enumsPD');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 const progDocController = require('../controllers/progDoc_controller');
 const grupoController = require('./grupo_controller');
 
@@ -395,7 +395,7 @@ exports.guardarHorarios = async (req, res) => {
             whereEliminar.identificador.push(asignacion);
           }
         });
-        if (funciones.isEmpty(whereEliminar)) {
+        if (helpers.isEmpty(whereEliminar)) {
           whereEliminar.identificador = 'Identificador erróneo';
         }
         const promise1 = models.AsignacionProfesor.destroy({

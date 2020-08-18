@@ -1,5 +1,5 @@
 const models = require('../models');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 const estados = require('../estados');
 const asignaturaController = require('./asignatura_controller');
 const departamentoController = require('./departamento_controller');
@@ -29,7 +29,7 @@ exports.getAcronimos = async (req, res, next) => {
         planEstudios: res.locals.planEstudios,
         nuevopath,
         cancelarpath,
-        departamentos: departs.sort(funciones.sortDepartamentos),
+        departamentos: departs.sort(helpers.sortDepartamentos),
         asignaturas: null
       });
     } else {
@@ -47,7 +47,7 @@ exports.getAcronimos = async (req, res, next) => {
         nuevopath,
         cancelarpath,
         asignaturas: asignaturasPorCursos,
-        departamentos: departs.sort(funciones.sortDepartamentos),
+        departamentos: departs.sort(helpers.sortDepartamentos),
         pdID
       });
     }

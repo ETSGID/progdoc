@@ -3,7 +3,7 @@ const models = require('../models');
 const estados = require('../estados');
 const progDocController = require('./progDoc_controller');
 
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 
 exports.gestionProgDoc = async (req, res, next) => {
   let pds = [];
@@ -38,13 +38,13 @@ exports.gestionProgDoc = async (req, res, next) => {
           estadoProGDoc: pdBBDD.estadoProGDoc,
           reabierto: pdBBDD.reabierto,
           anoAcademico: pdBBDD.anoAcademico,
-          siguienteAnoAcademico: funciones.siguienteAnoAcademico(
+          siguienteAnoAcademico: helpers.siguienteAnoAcademico(
             pdBBDD.anoAcademico
           ),
           semestre: pdBBDD.semestre,
           isPDInitialState: progDocController.isPDInitialState(pdBBDD)
         });
-        // TODO: cuando se añadan las otras funciones hay que ponerlas aquí
+        // TODO: cuando se añadan las otras helpers hay que ponerlas aquí
         // para comprobar si la pd se puede marcar como lista para que Jefatura de Estudios la cierre
         // si manualmente cambia algo de las otras partes para que al acceder a JE cambie
         if (
@@ -155,7 +155,7 @@ exports.gestionProgDoc = async (req, res, next) => {
 };
 
 // se completa con lo que hay en el controller de abrirProgDoc_controller
-// TODO a medida que aparezcan mas funciones hay que inicializar sus estados aquí
+// TODO a medida que aparezcan mas helpers hay que inicializar sus estados aquí
 exports.abrirProgDoc = async (req, res, next) => {
   const estadoProfesores = {};
   const estadoTribunales = {};
@@ -225,7 +225,7 @@ exports.cerrarProgDoc = async (req, res, next) => {
     next(error);
   }
 };
-// TODO a medida que aparezcan mas funciones hay que inicializar sus estados aquí
+// TODO a medida que aparezcan mas helpers hay que inicializar sus estados aquí
 exports.abrirIncidenciaProgDoc = async (req, res, next) => {
   try {
     if (!res.locals.permisoDenegado) {

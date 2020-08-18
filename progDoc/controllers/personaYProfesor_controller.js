@@ -1,5 +1,5 @@
 const models = require('../models');
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 
 const getPeople = async onlyProfesor => {
   const profesores = [];
@@ -19,7 +19,7 @@ const getPeople = async onlyProfesor => {
     profesores2.forEach(profesor => {
       const nombre = `${profesor.apellido} ${profesor.nombre}`;
       let nombreCorregido = `${profesor.apellido}, ${profesor.nombre}`;
-      nombreCorregido = funciones.primerasMayusc(nombreCorregido);
+      nombreCorregido = helpers.primerasMayusc(nombreCorregido);
       const correo = profesor.email;
       const { identificador } = profesor;
       const prof = {

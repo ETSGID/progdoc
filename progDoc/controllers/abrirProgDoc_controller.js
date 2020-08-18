@@ -4,7 +4,7 @@ const moment = require('moment');
 const models = require('../models');
 
 const op = Sequelize.Op;
-const funciones = require('../funciones');
+const helpers = require('../lib/helpers');
 const progDocController = require('./progDoc_controller');
 const departamentoController = require('./departamento_controller');
 const actividadParcialController = require('./actividadParcial_controller');
@@ -247,7 +247,7 @@ exports.abrirNuevaProgDoc = async (req, res, next) => {
         if (apiAsignatura.nombre_ingles !== '')
           asignBBDD.nombreIngles = apiAsignatura.nombre_ingles;
         // api upm a veces los créditos los separa con puntos y a veces con comas
-        asignBBDD.creditos = funciones.convertCommaToPointDecimal(
+        asignBBDD.creditos = helpers.convertCommaToPointDecimal(
           apiAsignatura.credects
         );
         const { tipo } = asignBBDD;
@@ -537,7 +537,7 @@ exports.abrirNuevaProgDoc = async (req, res, next) => {
           // por defecto los profesores se asignan común
           // (los mismos para todos los grupos) si es una nueva asignatura
           nuevaAsign.estado = 'N';
-          nuevaAsign.creditos = funciones.convertCommaToPointDecimal(
+          nuevaAsign.creditos = helpers.convertCommaToPointDecimal(
             apiAsignEncontrada.credects
           );
           nuevaAsign.ProgramacionDocenteIdentificador =
@@ -610,7 +610,7 @@ exports.abrirNuevaProgDoc = async (req, res, next) => {
         const nuevoExamen = {};
         if (
           moment(
-            funciones.formatFecha(ex['Examens.fecha']),
+            helpers.formatFecha(ex['Examens.fecha']),
             'DD/MM/YYYY'
           ).isValid()
         ) {
@@ -619,7 +619,7 @@ exports.abrirNuevaProgDoc = async (req, res, next) => {
           si concide AsignaturaId con algún código.
           */
           nuevoExamen.AsignaturaIdentificador = `${ex.codigo}_a`;
-          [nuevoExamen.fecha, offsetFinde] = funciones.addYear2(
+          [nuevoExamen.fecha, offsetFinde] = helpers.addYear2(
             ex['Examens.fecha'],
             anteriorFecha,
             offsetFinde
@@ -811,11 +811,11 @@ exports.abrirNuevaProgDoc = async (req, res, next) => {
       newConjuntoActividadParcial.curso = c.curso;
       newConjuntoActividadParcial.semestre = c.semestre;
       // se le añade un año a la fecha que se toma como referencia
-      newConjuntoActividadParcial.fechaInicio = funciones.addYear(
-        funciones.formatFecha2(c.fechaInicio)
+      newConjuntoActividadParcial.fechaInicio = helpers.addYear(
+        helpers.formatFecha2(c.fechaInicio)
       );
-      newConjuntoActividadParcial.fechaFin = funciones.addYear(
-        funciones.formatFecha2(c.fechaFin)
+      newConjuntoActividadParcial.fechaFin = helpers.addYear(
+        helpers.formatFecha2(c.fechaFin)
       );
       newConjuntoActividadParcial.ProgramacionDocenteId = nuevaPd.identificador;
       newConjuntoActividadParcial.ActividadParcials = [];
@@ -832,8 +832,8 @@ exports.abrirNuevaProgDoc = async (req, res, next) => {
           newActividad.duracion = actParcial.duracion;
           newActividad.descripcion = actParcial.descripcion;
           // añade un año a la fecha del año anterior
-          newActividad.fecha = funciones.addYear(
-            funciones.formatFecha2(actParcial.fecha)
+          newActividad.fecha = helpers.addYear(
+            helpers.formatFecha2(actParcial.fecha)
           );
           newActividad.tipo = actParcial.tipo;
           newActividad.AsignaturaId = asignaturaConActividad
@@ -1244,10 +1244,10 @@ exports.abrirCopiaProgDoc = async (req, res, next) => {
       newConjuntoActividadParcial.notaInicial = c.notaInicial;
       newConjuntoActividadParcial.curso = c.curso;
       newConjuntoActividadParcial.semestre = c.semestre;
-      newConjuntoActividadParcial.fechaInicio = funciones.formatFecha2(
+      newConjuntoActividadParcial.fechaInicio = helpers.formatFecha2(
         c.fechaInicio
       );
-      newConjuntoActividadParcial.fechaFin = funciones.formatFecha2(c.fechaFin);
+      newConjuntoActividadParcial.fechaFin = helpers.formatFecha2(c.fechaFin);
       newConjuntoActividadParcial.ProgramacionDocenteId = nuevaPd.identificador;
       newConjuntoActividadParcial.ActividadParcials = [];
       c.actividades.forEach(actParcial => {
@@ -1259,7 +1259,7 @@ exports.abrirCopiaProgDoc = async (req, res, next) => {
           newActividad.horaInicio = actParcial.horaInicio;
           newActividad.duracion = actParcial.duracion;
           newActividad.descripcion = actParcial.descripcion;
-          newActividad.fecha = funciones.formatFecha2(actParcial.fecha);
+          newActividad.fecha = helpers.formatFecha2(actParcial.fecha);
           newActividad.tipo = actParcial.tipo;
           newActividad.AsignaturaId = asignaturaConActividad
             ? asignaturaConActividad.idNuevo
