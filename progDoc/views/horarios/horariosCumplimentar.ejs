@@ -466,9 +466,10 @@ async function mostrar(id){
         div.innerHTML = '<select name="selValue" id="select_'+id+'" class="selectpicker" title="Nada seleccionado" multiple>'+options+'</select>'
         let nuevo = div.firstChild;
         parent.appendChild(nuevo);
-        $("#select_" + id).selectpicker('render');
-        $("#select_" + id).selectpicker('val', asignacions);
-        $("#select_" + id).selectpicker('toggle');
+        $("#select_" + id).selectpicker('val', asignacions)
+        $("#select_" + id).on('loaded.bs.select', function () {
+           $(this).selectpicker('toggle');
+        })
                 
         $("#select_" + id).on('hidden.bs.select', function (sel) {
             //necesario en algunos navegadores

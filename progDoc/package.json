@@ -15,6 +15,7 @@
   "dependencies": {
     "axios": "^0.18.1",
     "body-parser": "^1.18.2",
+    "bootstrap": "^3.4.1",
     "bootstrap-select": "^1.13.18",
     "cas-authentication": "git+https://github.com/javicond3/cas-authentication.git",
     "connect-session-sequelize": "^6.0.0",
@@ -30,6 +31,7 @@
     "git": "^0.1.5",
     "html-pdf": "^2.2.0",
     "http-errors": "~1.6.2",
+    "jquery": "^3.5.1",
     "json2csv": "^4.3.5",
     "method-override": "^2.3.10",
     "moment": "^2.22.2",
