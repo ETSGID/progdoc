@@ -18,9 +18,6 @@ module.exports = (sequelize, DataTypes) => {
       curso: {
         type: DataTypes.INTEGER
       },
-      aula: {
-        type: DataTypes.STRING
-      },
       idioma: {
         type: DataTypes.ENUM('ES', 'EN') // español o ingles
       },

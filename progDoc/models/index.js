@@ -35,6 +35,7 @@ const Departamento = sequelize.import(path.join(__dirname, 'Departamento'));
 const Asignatura = sequelize.import(path.join(__dirname, 'Asignatura'));
 const Examen = sequelize.import(path.join(__dirname, 'Examen'));
 const Grupo = sequelize.import(path.join(__dirname, 'Grupo'));
+const Aula = sequelize.import(path.join(__dirname, 'Aula'));
 const Persona = sequelize.import(path.join(__dirname, 'Persona'));
 const PlanEstudio = sequelize.import(path.join(__dirname, 'PlanEstudio'));
 const Profesor = sequelize.import(path.join(__dirname, 'Profesor'));
@@ -112,6 +113,12 @@ ProgramacionDocente.belongsTo(PlanEstudio, { foreignKey: 'PlanEstudioId' });
 // Relacion 1 a N Programacion Docente y Asignatura
 ProgramacionDocente.hasMany(Asignatura);
 Asignatura.belongsTo(ProgramacionDocente);
+
+// -----AULAS-----//
+
+// Relación 1 a N entre Aula y Grupo
+Aula.hasMany(Grupo, { foreignKey: 'aula' })
+Grupo.belongsTo(Aula, { foreignKey: 'aula' })
 
 // -----ROLES-----//
 
@@ -229,6 +236,7 @@ exports.AsignacionProfesor = AsignacionProfesor; // exportar definición de tabl
 exports.Persona = Persona; // exportar definición de tabla Persona
 exports.Departamento = Departamento; // exportar definición de tabla Departamento
 exports.Asignatura = Asignatura; // exportar definición de tabla Asignatura
+exports.Aula = Aula; // exportar definción de tabla Aula
 exports.Grupo = Grupo; // exportar definición de tabla Grupo
 exports.PlanEstudio = PlanEstudio; // exportar definición de tabla PlanEstudio
 exports.ProgramacionDocente = ProgramacionDocente; // exportar tabla ProgramacionDocente

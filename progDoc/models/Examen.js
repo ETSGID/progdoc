@@ -20,9 +20,6 @@ module.exports = (sequelize, DataTypes) => {
       duracion: {
         type: DataTypes.FLOAT
       },
-      aulas: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
-      },
       // los periodos pueden ser ordinario o extraordinario y se separan tambien por semestre
       // TODO cuando se defina el calendario se podrá acotar,
       // lo único que igual hay que llamar a la clave como
