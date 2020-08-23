@@ -314,7 +314,7 @@ exports.updateActividad = async (req, res) => {
     actividadToUpdate.duracion = Number(req.body.duracion) || null;
     try {
       await models.ActividadParcial.update(actividadToUpdate, {
-        where: { identificador: req.params.idd }
+        where: { identificador: req.params.id }
       });
       res.json({
         success: true,
