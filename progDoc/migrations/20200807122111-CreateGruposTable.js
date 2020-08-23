@@ -46,8 +46,19 @@ module.exports = {
       }
     });
   },
-
-  down: queryInterface => {
-    return queryInterface.dropTable('Grupos');
+  down: async queryInterface => {
+    const t = await queryInterface.sequelize.transaction();
+    try {
+      await queryInterface.dropTable('Grupos', { transaction: t });
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS "enum_Grupos_idioma";',
+        { transaction: t }
+      );
+      await t.commit();
+    } catch (error) {
+      console.error(error);
+      await t.rollback();
+      throw error;
+    }
   }
 };

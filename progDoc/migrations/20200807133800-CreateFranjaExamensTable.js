@@ -39,7 +39,19 @@ module.exports = {
     });
   },
 
-  down: queryInterface => {
-    return queryInterface.dropTable('FranjaExamens');
+  down: async queryInterface => {
+    const t = await queryInterface.sequelize.transaction();
+    try {
+      await queryInterface.dropTable('FranjaExamens', { transaction: t });
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS "enum_FranjaExamens_periodo";',
+        { transaction: t }
+      );
+      await t.commit();
+    } catch (error) {
+      console.error(error);
+      await t.rollback();
+      throw error;
+    }
   }
 };

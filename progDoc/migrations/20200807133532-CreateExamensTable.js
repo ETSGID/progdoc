@@ -44,7 +44,19 @@ module.exports = {
     });
   },
 
-  down: queryInterface => {
-    return queryInterface.dropTable('Examens');
+  down: async queryInterface => {
+    const t = await queryInterface.sequelize.transaction();
+    try {
+      await queryInterface.dropTable('Examens', { transaction: t });
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS "enum_Examens_periodo";',
+        { transaction: t }
+      );
+      await t.commit();
+    } catch (error) {
+      console.error(error);
+      await t.rollback();
+      throw error;
+    }
   }
 };

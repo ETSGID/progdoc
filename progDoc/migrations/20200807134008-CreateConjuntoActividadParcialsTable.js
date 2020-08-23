@@ -35,7 +35,21 @@ module.exports = {
     });
   },
 
-  down: queryInterface => {
-    return queryInterface.dropTable('ConjuntoActividadParcials');
+  down: async queryInterface => {
+    const t = await queryInterface.sequelize.transaction();
+    try {
+      await queryInterface.dropTable('ConjuntoActividadParcials', {
+        transaction: t
+      });
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS "enum_ConjuntoActividadParcials_semestre";',
+        { transaction: t }
+      );
+      await t.commit();
+    } catch (error) {
+      console.error(error);
+      await t.rollback();
+      throw error;
+    }
   }
 };

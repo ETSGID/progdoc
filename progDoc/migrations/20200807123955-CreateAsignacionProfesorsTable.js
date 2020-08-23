@@ -48,7 +48,19 @@ module.exports = {
     });
   },
 
-  down: queryInterface => {
-    return queryInterface.dropTable('AsignacionProfesors');
+  down: async queryInterface => {
+    const t = await queryInterface.sequelize.transaction();
+    try {
+      await queryInterface.dropTable('AsignacionProfesors', { transaction: t });
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS "enum_AsignacionProfesors_Dia";',
+        { transaction: t }
+      );
+      await t.commit();
+    } catch (error) {
+      console.error(error);
+      await t.rollback();
+      throw error;
+    }
   }
 };
