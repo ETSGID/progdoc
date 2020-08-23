@@ -49,4 +49,55 @@ router.post(
   aulaController.getAulas
 );
 
+// POST aula
+router.post(
+  '/',
+  (req, res, next) => {
+    res.locals.rols.push({
+      rol: enumsPD.rols.JefeEstudios,
+      PlanEstudioCodigo: null,
+      DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
+      condiciones: []
+    });
+    next();
+  },
+  rolController.comprobarRols,
+  aulaController.createAula
+);
+
+// UPDATE aula
+router.put(
+  '/:id',
+  (req, res, next) => {
+    res.locals.rols.push({
+      rol: enumsPD.rols.JefeEstudios,
+      PlanEstudioCodigo: null,
+      DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
+      condiciones: []
+    });
+    next();
+  },
+  rolController.comprobarRols,
+  aulaController.updateAula
+);
+
+// DELETE aula
+router.delete(
+  '/:id',
+  (req, res, next) => {
+    res.locals.rols.push({
+      rol: enumsPD.rols.JefeEstudios,
+      PlanEstudioCodigo: null,
+      DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
+      condiciones: []
+    });
+    next();
+  },
+  rolController.comprobarRols,
+  aulaController.deleteAula
+);
+
 module.exports = router;

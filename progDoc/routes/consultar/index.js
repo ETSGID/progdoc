@@ -2,6 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 
+const routerAula = require('./aula');
+
 const asignacionYTribunalController = require('../../controllers/asignacionYTribunal_controller');
 const progDocController = require('../../controllers/progDoc_controller');
 const planController = require('../../controllers/plan_controller');
@@ -12,7 +14,6 @@ const estadoController = require('../../controllers/estado_controller');
 const pdfController = require('../../controllers/pdf_controller');
 const examenController = require('../../controllers/examen_controller');
 const calendarioController = require('../../controllers/calendario_controller');
-const aulaController = require('../../controllers/aula_controller');
 const actividadParcialController = require('../../controllers/actividadParcial_controller');
 
 const enumsPD = require('../../enumsPD');
@@ -55,16 +56,8 @@ router.get(
   rolController.getRoles
 );
 
-// GET aulas
-router.get(
-  '/aulas',
-  (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.consultar.submenu.aula;
-    next();
-  },
-  planController.getPlanes,
-  aulaController.getAulas
-);
+// Aulas
+router.use('/aulas', routerAula);
 
 // GET grupos programacion docente
 router.get(

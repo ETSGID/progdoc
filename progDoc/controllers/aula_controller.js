@@ -32,6 +32,94 @@ const hashCode = s => {
   }, 0);
 };
 
+// convierte las aulas para poder ordenarlas bien
+// por ejemplo B1 sera B00001
+const prepareStringAula = aula => {
+  const convertNumber = match => {
+    return `00000${match}`.slice(-5);
+  };
+  return aula.replace(/\d+/g, convertNumber);
+};
+
+const getAllAulas = async () => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    return await models.Aula.findAll({ raw: true });
+  } catch (error) {
+    // se propaga el error lo captura el middleware
+    throw error;
+  }
+};
+
+exports.createAula = async (req, res) => {
+  if (!res.locals.permisoDenegado) {
+    const aulaToAnadir = {};
+    // eslint-disable-next-line no-restricted-globals
+    aulaToAnadir.cupo = isNaN(req.body.cupo) ? null : Number(req.body.cupo);
+    aulaToAnadir.identificador = req.body.identificador.replace(/([/])/g, '_');
+    try {
+      const nToAnadir = models.Aula.build(aulaToAnadir);
+      await nToAnadir.save();
+      res.json({
+        success: true
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      res.json({
+        success: false,
+        msg: 'Ha habido un error la acción no se ha podido completar'
+      });
+    }
+  } else {
+    res.json({ success: false, msg: 'No tiene permiso' });
+  }
+};
+
+exports.updateAula = async (req, res) => {
+  if (!res.locals.permisoDenegado) {
+    const aulaToUpdate = {};
+    // sino tiene asignaturaId se trata de una actividad de grupo
+    // eslint-disable-next-line no-restricted-globals
+    aulaToUpdate.cupo = isNaN(req.body.cupo) ? null : Number(req.body.cupo);
+    aulaToUpdate.identificador = req.body.identificador.replace(/([/])/g, '_');
+    try {
+      await models.Aula.update(aulaToUpdate, {
+        where: { identificador: req.params.id }
+      });
+      res.json({
+        success: true
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      res.json({
+        success: false,
+        msg: 'Ha habido un error la acción no se ha podido completar'
+      });
+    }
+  } else {
+    res.json({ success: false, msg: 'No tiene permiso' });
+  }
+};
+
+exports.deleteAula = async (req, res) => {
+  if (!res.locals.permisoDenegado) {
+    try {
+      await models.Aula.destroy({
+        where: { identificador: req.params.id }
+      });
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error:', error);
+      res.json({
+        success: false,
+        msg: 'Ha habido un error la acción no se ha podido completar'
+      });
+    }
+  } else {
+    res.json({ success: false, msg: 'No tiene permiso' });
+  }
+};
+
 // te da todos los grupos de las programciones docentes pasadas como array
 const getAllGruposConAula = async progDocs => {
   const gruposPorProgramacionDocente = {};
@@ -89,6 +177,10 @@ exports.getAulas = async (req, res, next) => {
     plan.color = paletaColores[hashCode(plan.codigo) % paletaColores.length];
   });
   try {
+    let aulas = await getAllAulas();
+    aulas = aulas.map(aula => {
+      return { ...aula, aulaOrder: prepareStringAula(aula.identificador) };
+    });
     const p = await progDocController.getAllProgramacionDocentes(
       planes,
       '1S',
@@ -143,18 +235,17 @@ exports.getAulas = async (req, res, next) => {
             return;
           }
           const { aula } = g;
-          let aulaOrder = g.aula
-            .split('.')
-            .join('')
-            .toLowerCase();
-          if (aula.length === 2) {
-            aulaOrder = `${aula[0]}00${aula[1]}`;
-          } else if (aula.length === 3) {
-            aulaOrder = `${aula[0]}0${aula[1]}${aula[2]}`;
-          }
           if (g.nombre.split('.')[1] === '1') {
             if (!aulas1.find(obj => obj.aula === aula)) {
-              aulas1.push({ aula, aulaOrder, planes: [] });
+              const aulaOriginal = aulas.find(
+                obj => obj.identificador === aula
+              );
+              aulas1.push({
+                aula,
+                aulaOrder: aulaOriginal.aulaOrder,
+                cupo: aulaOriginal.cupo,
+                planes: []
+              });
               gruposPorAula1[aula] = new Array(78);
             }
             const aulai = aulas1.find(obj => obj.aula === aula);
@@ -177,7 +268,15 @@ exports.getAulas = async (req, res, next) => {
               gruposPlanAula.push(g.nombre);
           } else {
             if (!aulas2.find(obj => obj.aula === aula)) {
-              aulas2.push({ aula, aulaOrder, planes: [] });
+              const aulaOriginal = aulas.find(
+                obj => obj.identificador === aula
+              );
+              aulas2.push({
+                aula,
+                aulaOrder: aulaOriginal.aulaOrder,
+                cupo: aulaOriginal.cupo,
+                planes: []
+              });
               gruposPorAula2[aula] = new Array(78);
             }
             const aulai = aulas2.find(obj => obj.aula === aula);
@@ -284,9 +383,11 @@ exports.getAulas = async (req, res, next) => {
     aulas1.sort((a, b) => (a.aulaOrder > b.aulaOrder ? 1 : -1));
     aulas2.sort((a, b) => (a.aulaOrder > b.aulaOrder ? 1 : -1));
     if (!req.body.generarPdf) {
+      aulas.sort((a, b) => (a.aulaOrder > b.aulaOrder ? 1 : -1));
       res.render('aulas/aulas', {
         CONTEXT,
         permisoDenegado: res.locals.permisoDenegado || null,
+        aulas,
         aulas1,
         aulas2,
         gruposPorAula1,
@@ -297,7 +398,7 @@ exports.getAulas = async (req, res, next) => {
         generarPdfpath: `${req.baseUrl}/pdf`
       });
     } else {
-      const aulas = cuatrimestreSeleccionado === '1S' ? aulas1 : aulas2;
+      aulas = cuatrimestreSeleccionado === '1S' ? aulas1 : aulas2;
       const gruposPorAula =
         cuatrimestreSeleccionado === '1S' ? gruposPorAula1 : gruposPorAula2;
       const htmlCode = await new Promise((resolve, reject) => {

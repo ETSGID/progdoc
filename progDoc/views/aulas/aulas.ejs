@@ -1,10 +1,49 @@
 <div class="contenido">
-    <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+    <%if(permisoDenegado && permisoDenegado !== null){%>
         <p><%=permisoDenegado%></p>
     <%}else{%>
         <input type="hidden" value="<%= anoSeleccionado %>" id="anoSeleccionado" />
         <h2>Aulas</h2>
-        <select id="anoSelector" onchange="changeAno()" style="margin-bottom: 1em;">
+        <% if (session.menuBar === 'gestion') { %>
+            <%- include ./aulaModal%>
+            <h3>Listado de aulas
+                <button type="button" class="btn btn-default" onclick = "MostrarOcultar('table_aulas')">
+                    <span id ='button_table_aulas'  class="glyphicon glyphicon-chevron-down"></span> 
+                </button>
+            </h3>
+            <div class='hidden' id='table_aulas'>
+                <button type="button" style="margin-bottom: 10px;"  class="btn btn-primary" onclick="anadirAula()">Añadir Aula</button>
+                <table class='table'>
+                    <tr>
+                        <th>Aula</th>
+                        <th>Cupo</th>
+                        <th>Acción</th>
+                    </tr>
+                    <% aulas.forEach(aula => { %>
+                        <tr>
+                            <td id='aula_<%=aula.identificador%>'><%=aula.identificador%></td>
+                            <td id='aula_<%=aula.identificador%>_cupo'><%= aula.cupo || '-' %></td>
+                            <td>
+                                <button type="button" class="btn btn-default" onclick = "editarAula('<%=aula.identificador%>')">
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </button>
+                                <button type="button" class="btn btn-default" onclick = "eliminarAula('<%=aula.identificador%>')">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </button>  
+                            </td>
+                        </tr>
+                    <% }) %>
+                </table>
+                <button type="button" style="margin-top: 10px;"  class="btn btn-primary" onclick="anadirAula()">Añadir Aula</button>
+            </div>
+            <h3>Asignación de aulas
+                <button type="button" class="btn btn-default" onclick = "MostrarOcultar('table_asignacionAulas')">
+                    <span id ='button_table_asignacionAulas'  class="glyphicon glyphicon-chevron-down"></span> 
+                </button>
+            </h3>
+        <% } %>
+        <div class=<%=session.menuBar === 'gestion' ? 'hidden' : ''%> id='table_asignacionAulas'>
+            <select id="anoSelector" onchange="changeAno()" style="margin-bottom: 1em;">
                 <option value="<%=ano2%>" selected><%=ano2.substring(2,5)%>/<%= parseInt(ano2.substring(2,5)) + 1%></option> 
                 <option value="<%=ano1%>" ><%=ano1.substring(2,5)%>/<%= parseInt(ano1.substring(2,5)) + 1%></option> 
         </select>
@@ -23,11 +62,11 @@
         <div id="aulas1">
             <%for (let i=0 ; i<aulas1.length; i++){%>
                 <div id="div-1-<%=aulas1[i].aula %>">
-                    <h3><%= aulas1[i].aula %>
+                    <h4><%= aulas1[i].aula %> | <small>Capacidad: <%= aulas1[i].cupo || '-' %></small>
                         <button type="button" class="btn btn-default" onclick = "MostrarOcultar('table_1_<%=aulas1[i].aula%>')">
                         <span id ='button_table_1_<%=aulas1[i].aula%>'  class="glyphicon glyphicon-chevron-down"></span> 
                         </button>
-                    </h3>
+                    </h4>
                     <p>
                     <span>Planes:</span>
                     <%for([index, plan] of aulas1[i].planes.entries()){%>
@@ -77,11 +116,11 @@
         <div id="aulas2">
             <%for (let i=0 ; i<aulas2.length; i++){%>
                 <div id="div-2-<%=aulas2[i].aula %>">
-                    <h3><%= aulas2[i].aula %>
+                    <h4><%= aulas2[i].aula %> | <small>Capacidad: <%= aulas2[i].cupo || '-' %></small>
                         <button type="button" class="btn btn-default" onclick = "MostrarOcultar('table_2_<%=aulas2[i].aula%>')">
                         <span id ='button_table_2_<%=aulas2[i].aula%>'  class="glyphicon glyphicon-chevron-down"></span> 
                         </button>
-                    </h3>
+                    </h4>
                     <p>
                     <span>Planes:</span>
                     <%for([index, plan] of aulas2[i].planes.entries()){%>
@@ -127,6 +166,7 @@
                     </div>
                 </div>
             <%}%>
+        </div>
         </div>
     <%}%>
 </div>
