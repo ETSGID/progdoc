@@ -1,3 +1,4 @@
+<%- include ../../public/js/helpers.ejs %>
 <div class="contenido">
     <%if(permisoDenegado && permisoDenegado !== null){%>
         <p><%=permisoDenegado%></p>
@@ -171,29 +172,8 @@
     <%}%>
 </div>
 <script>
+    let MostrarOcultar = <%-MostrarOcultar%>;
     document.getElementsByTagName('body')[0].onload = changeCuatrimestre();
-    function MostrarOcultar(id){
-        let divSemestre = document.getElementById(id);
-        let buttonSpan = document.getElementById('button_'+id)
-        let clases = divSemestre.className.split(" ");
-        let oculto = clases.find(function (obj) { return obj === 'hidden'});
-        //si estaba oculto debo quitarlo
-        if (oculto){
-            divSemestre.className = "";
-            for (let i =0; i<clases.length; i++){
-                if (clases[i] !== 'hidden'){
-                    divSemestre.className += " " +clases[i]
-                }    
-            }
-            
-            buttonSpan.className = "glyphicon glyphicon-chevron-up"
-        }
-        //debo ocultarlo
-        else{
-            divSemestre.className += " hidden"
-            buttonSpan.className = "glyphicon glyphicon-chevron-down"
-        }
-    }
     function buscadorOnKeyPress(key){
         if(key.keyCode == 13){
             $('#aulas1').children('div').each(function () {

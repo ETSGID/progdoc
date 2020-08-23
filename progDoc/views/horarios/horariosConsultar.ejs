@@ -9,7 +9,7 @@
                         <h3>Semestre <%= asignacionsHorario[i].semestres[j].semestre %></h3>
                         <% for (let k=0 ; k<asignacionsHorario[i].semestres[j].grupos.length; k++){%>
                             <h4><%= asignacionsHorario[i].semestres[j].grupos[k].grupoNombre %>  <%=asignacionsHorario[i].semestres[j].grupos[k].nombreItinerario%>  <%=asignacionsHorario[i].semestres[j].grupos[k].aula%>
-                            <button type="button" class="btn btn-default" onclick = "MostrarOcultar('div_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
+                            <button type="button" class="btn btn-default" onclick = "MostrarOcultarHorarios('div_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
                             <span id ='button_div_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>'  class="glyphicon glyphicon-chevron-down"></span> 
                             </button>
                             <button type="button" id='buttonSimplificar_table_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>' class="btn btn-default hidden" onclick = "simplificar('table_<%=asignacionsHorario[i].semestres[j].grupos[k].grupoCodigo%>')">
@@ -100,7 +100,7 @@
 let estado = <%-JSON.stringify(estado)%>
 let asignacionsHorario = <%-JSON.stringify(asignacionsHorario)%>;
 
-function MostrarOcultar(id){
+function MostrarOcultarHorarios(id){
     let table = document.getElementById(id);
     let buttonSpan = document.getElementById('button_'+id)
     let buttonSimplificar = document.getElementById('buttonSimplificar_table_'+id.split("_")[1])

@@ -149,27 +149,9 @@ let asignaturas = <%-JSON.stringify(asignaturas)%>;
 let planEstudios = <%-JSON.stringify(planEstudios)%>;
 let departamentos = <%-JSON.stringify(departamentos)%>;
 let confirmarSalirSinGuardar = <%-confirmarSalirSinGuardar%>;
+let MostrarOcultar = <%-MostrarOcultar%>;
 //se utiliza para disparar el evento de onbeforeunload
 let activado = true;
-
-function MostrarOcultar(id){
-    let divCurso = document.getElementById(id);
-    let buttonSpan = document.getElementById('button_'+id)
-    let clases = divCurso.className.split(" ");
-    let oculto = clases.find(function (obj) { return obj === 'hidden'});
-    //si estaba oculto debo quitarlo
-    if (oculto){
-        divCurso.className = "";        
-        buttonSpan.className = "glyphicon glyphicon-chevron-up"
-    }
-    //debo ocultarlo
-    else{
-        divCurso.className += " hidden"
-        buttonSpan.className = "glyphicon glyphicon-chevron-down"
-
-    }
-
-}
 
 //marcar los cambios si vuelve a la situacion inicial no lo marca
 function MarcarChangeAsignatura(id){

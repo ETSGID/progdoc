@@ -194,32 +194,12 @@ let aumentarDia = <%-aumentarDia%>
 let getDia = <%-getDia%>
 let nuevaDateFormat = <%-nuevaDateFormat%>
 let formatHora = <%-formatHora%>
+let MostrarOcultar = <%-MostrarOcultar%>;
 let pdID = <%-JSON.stringify(pdID)%>
 let anoInicial = 2000+ Number(pdID.split("_")[2][2]+""+pdID.split("_")[2][3])
 let anoFinal = 2000+ Number(pdID.split("_")[2][4]+""+pdID.split("_")[2][5])
 //las fecha limite para poner las actividades
 let fechasLimite =["01/09/"+anoInicial, "31/07/"+anoFinal]
-function MostrarOcultar(id){
-    let div = document.getElementById(id);
-    let buttonSpan = document.getElementById('button_'+id)
-    let clases = div.className.split(" ");
-    let oculto = clases.find(function (obj) { return obj === 'hidden'});
-    //si estaba oculto debo quitarlo
-    if (oculto){
-        div.className = "";
-        for (let i =0; i<clases.length; i++){
-            if (clases[i] !== 'hidden'){
-                div.className += " " +clases[i]
-            }    
-        }      
-        buttonSpan.className = "glyphicon glyphicon-chevron-up"
-    }
-    //debo ocultarlo
-    else{
-        div.className += " hidden"
-        buttonSpan.className = "glyphicon glyphicon-chevron-down"
-    }
-}
 
 function Enviar(){
   return confirm("Una vez aprobadas las actividades no podrá modificarlas ¿Seguro que quiere aprobarla?")

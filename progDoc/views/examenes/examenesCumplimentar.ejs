@@ -31,7 +31,7 @@
                 <div>
                     <% for (let i=0 ; i<asignacionsExamen.length; i++){%>
                         <h2><%= asignacionsExamen[i].periodoNombre %>
-                        <button type="button" class="btn btn-default" onclick = "MostrarOcultar('div_<%=asignacionsExamen[i].periodo%>')">
+                        <button type="button" class="btn btn-default" onclick = "MostrarOcultarCalendario('div_<%=asignacionsExamen[i].periodo%>')">
                         <span id ='button_div_<%=asignacionsExamen[i].periodo%>'  class="glyphicon glyphicon-chevron-down"></span> 
                         </button>
                         <button type="button" id='buttonCalendario_div_<%=asignacionsExamen[i].periodo%>' class="btn btn-default hidden" onclick = "mostrarCalendario('calendario_<%=asignacionsExamen[i].periodo%>')">
@@ -508,7 +508,7 @@ function Change2(id){
 }
 
 
-function MostrarOcultar(id){
+function MostrarOcultarCalendario(id){
     let div = document.getElementById(id);
     let buttonSpan = document.getElementById('button_'+id)
     let buttonCalendario = document.getElementById('buttonCalendario_'+id)

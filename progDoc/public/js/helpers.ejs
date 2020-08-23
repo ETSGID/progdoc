@@ -200,3 +200,26 @@ getLunesSiguiente = function(fecha) {
     return aumentarDia(fecha, offset)
 }
 %>
+
+<% MostrarOcultar = function(id){
+    let div = document.getElementById(id);
+    let buttonSpan = document.getElementById('button_'+id)
+    let clases = div.className.split(" ");
+    let oculto = clases.find(function (obj) { return obj === 'hidden'});
+    //si oculto mostrarlo
+    if (oculto){
+            div.className = "";
+            for (let i =0; i<clases.length; i++){
+                if (clases[i] !== 'hidden'){
+                    div.className += " " +clases[i]
+                }    
+            }
+            buttonSpan.className = "glyphicon glyphicon-chevron-up"
+    }
+    //ocultarlo
+    else{
+        div.className += " hidden"
+        buttonSpan.className = "glyphicon glyphicon-chevron-down"
+    }
+}
+%>
