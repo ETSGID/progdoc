@@ -1,5 +1,5 @@
 <!--Popover tipo de eventos-->
-<button type="button" class="btn btn-default" data-toggle="popover" title="Leyenda de colores" data-content="">Leyenda de colores</button>
+<button type="button" class="btn btn-default" data-toggle="popover" id='popoverCalendar' title="Leyenda de colores">Leyenda de colores</button>
 
 <div id="myPopoverContent" style="display: none;">
     <table border="1" style="width:100%;  font-size: 17px;">
@@ -36,12 +36,12 @@
 
 
 <script>
-$('[data-toggle=popover]').popover({
-
-content: $('#myPopoverContent').html(),
-html: true
-
-}).click(function() {
-$(this).popover('show');
+$(document).ready(function(){  
+    $('#popoverCalendar').popover({
+        html: true,
+        sanitize: false,
+        content: $('#myPopoverContent').html()
+    })
 });
+
 </script>
