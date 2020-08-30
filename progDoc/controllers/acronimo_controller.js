@@ -70,7 +70,7 @@ exports.actualizarAcronimos = async (req, res, next) => {
       const elementToActualizar = {};
       let codigo = element.split('_')[element.split('_').length - 1];
       let acronimo = req.body[element];
-      if (acronimo) acronimo = acronimo.replace(/_/g, '-');
+      if (acronimo) acronimo = acronimo.replace(/([/,_])/g, '-').trim();
       switch (element.split('_')[0]) {
         case 'departamento':
           elementToActualizar.acronimo = acronimo;
