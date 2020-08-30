@@ -324,6 +324,7 @@ function cambiarPorClase(clase_1, clase_2) {
         let selectedEliminar = $( this ).find('span').text();
         if (selectedEliminar != '-') {
             selectedEliminar.split('/').forEach((selected) => {
+                selected = selected.trim();
                 // Las buscamos en la variable asignaturas
                 let asignOld = asignaturas.find(function (obj) { return (obj.nombre === selected || obj.acronimo === selected) });
 
@@ -359,6 +360,7 @@ function cambiarPorClase(clase_1, clase_2) {
         let selectedAnadir = asigsTmp.get(index).textContent.trim();
         if (selectedAnadir != '-') {
             selectedAnadir.split('/').forEach((selected) => {
+                selected = selected.trim()
                 // Las buscamos en la variable asignaturas
                 let asignNew = asignaturas.find(function (obj) { return (obj.nombre === selected || obj.acronimo === selected) });
 
@@ -622,7 +624,7 @@ function simplificar(id){
 
 
 function Volver(cancelarpath){
-    activado = false
+    activado = false;
     window.location.replace(cancelarpath);
 }
 function Guardar(nuevopath){
