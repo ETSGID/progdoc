@@ -1,3 +1,5 @@
+const { UniqueConstraintError } = require('sequelize');
+
 module.exports = {
   up: async queryInterface => {
     try {
@@ -14,7 +16,11 @@ module.exports = {
         }
       ]);
     } catch (error) {
-      console.error(error);
+      if (error instanceof UniqueConstraintError) {
+        console.warn('Los departamentos ya existen');
+      } else {
+        console.error(error);
+      }
     }
   },
   down: async (queryInterface, Sequelize) => {
