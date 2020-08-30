@@ -1,0 +1,79 @@
+<%- include ../../public/js/helpers.ejs %>
+<div class ="contenido">
+    <% if (locals.estado && locals.estado !== null && session.menuBar === 'gestion') { %>
+      <p><%=estado%></p>
+    <%}else if(locals.existe && locals.existe !== null){%>
+      <p><%=existe%></p>
+    <%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%> 
+      <p><%=permisoDenegado%></p>
+    <%}else{%>
+        <% if (session.menuBar === 'gestion') { %>
+            <%- include ./grupoModal.ejs %>
+        <% } %>
+        <% cursosConGrupos.forEach(cursoConGrupos => { %>
+            <div>
+                <h2>Curso <%= cursoConGrupos.curso %></h2>
+                <% cursoConGrupos.semestres.forEach(semestre =>{ %>
+                    <h3>Semestre <%= semestre.semestre %>
+                    <button type="button" class="btn btn-default" onclick = "MostrarOcultar('table_<%= cursoConGrupos.curso %>_<%=semestre.semestre%>')">
+                    <span id ='button_table_<%= cursoConGrupos.curso %>_<%=semestre.semestre%>'  class="glyphicon glyphicon-chevron-down"></span> 
+                    </button>
+                    </h3>
+                    <div class="hidden" id="table_<%= cursoConGrupos.curso %>_<%=semestre.semestre%>">
+                        <% if (session.menuBar === 'gestion') { %>
+                            <button type="button" style="margin-bottom: 10px;"  class="btn btn-primary" onclick='anadirGrupo("<%= session.pdID %>","<%=cursoConGrupos.curso %>","<%=semestre.semestre%>")'>Añadir Grupo</button>
+                        <% } %>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Aula</th>
+                                    <th>Cupo Aula</th>
+                                    <th>Itinerario</th>
+                                    <th>Tipo</th>
+                                    <% if (session.menuBar === 'gestion') { %>
+                                    <th>Acción</th>
+                                    <% } %>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% semestre.grupos.forEach(grupo => { %>
+                                    <tr>
+                                        <td id='grupo_<%=grupo.grupoId%>_nombre'>
+                                            <%=grupo.nombre%>
+                                        </td>
+                                        <td id='grupo_<%=grupo.grupoId%>_aula'>
+                                            <%=grupo.aula%>
+                                        </td>
+                                        <td id='grupo_<%=grupo.grupoId%>_cupoAula'>
+                                            <%=grupo['Aula.cupo'] || '-'%>
+                                        </td>
+                                        <td id='grupo_<%=grupo.grupoId%>_nombreItinerario'>
+                                            <%=grupo.nombreItinerario%>
+                                        </td>
+                                        <td id='grupo_<%=grupo.grupoId%>_tipo'>
+                                            <%=Object.keys(tipoGrupo).find(tipo => tipoGrupo[tipo] === grupo.tipo) || 'General'%>
+                                        </td>
+                                        <% if (session.menuBar === 'gestion') { %>
+                                            <td style="min-width: 150px;">
+                                                <button type="button" class="btn btn-default" onclick = "editarGrupo('<%=grupo.grupoId%>')">
+                                                    <span class="glyphicon glyphicon-pencil"></span>
+                                                </button>
+                                                <button type="button" class="btn btn-default" onclick = "eliminarGrupo('<%=grupo.grupoId%>')">
+                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                </button>  
+                                            </td>
+                                        <% } %>
+                                    </tr>
+                            <%})%>
+                            </tbody>
+                        </table>
+                    </div>
+                <%})%>
+            </div>
+        <%})%>
+    <%}%>
+</div>
+<script>
+    let MostrarOcultar = <%-MostrarOcultar%>;
+</script>

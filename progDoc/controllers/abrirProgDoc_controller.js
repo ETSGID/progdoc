@@ -135,31 +135,34 @@ exports.abrirNuevaProgDoc = async (req, res, next) => {
     const pdToAnadir = models.ProgramacionDocente.build(nuevaPd);
     // se guarda en la bbdd la nueva progdoc, pero sin contenido
     await pdToAnadir.save();
-    // Los grupos terminan en .1 o .2 aunque sean para optativas.
-    let cursoGrupo = '%%';
+    let semestreGrupo1 = '';
+    let semestreGrupo2 = '';
     // se actualizan los identificadores de la(s) progdoc que se toma(n) como referencia
     if (pds[0]) pdId1 = pds[0].identificador;
     if (pds[1]) pdId2 = pds[1].identificador;
     switch (tipoPD) {
       case '1S':
-        cursoGrupo = '%.1';
+        semestreGrupo1 = '1S';
+        semestreGrupo2 = '1S';
         break;
       case '2S':
-        cursoGrupo = '%.2';
+        semestreGrupo1 = '2S';
+        semestreGrupo2 = '2S';
         break;
       case 'I':
-        cursoGrupo = '%%';
+        semestreGrupo1 = '1S';
+        semestreGrupo2 = '2S';
         break;
       default:
         break;
     }
     // obtener los grupos que deben crearse para la nueva progdoc
     const grupos = await models.sequelize.query(
-      `SELECT distinct  "nombre",
-      g."grupoId", "curso", "capacidad", "aula", "nombreItinerario", "idioma" FROM public."Grupos" g
-      WHERE (g."ProgramacionDocenteId" = :pdId1 or g."ProgramacionDocenteId" = :pdId2) 
-      and g."nombre" LIKE :cursoGrupo  ORDER BY g."nombre" ASC `,
-      { replacements: { pdId1, pdId2, cursoGrupo } }
+      `SELECT distinct  "nombre", "grupoId", "curso", "capacidad", "aula", "nombreItinerario", "idioma", "semestre", "tipo"
+      FROM public."Grupos"
+      WHERE "ProgramacionDocenteId" in (:pdId1, :pdId2)
+      and "semestre" in (:semestreGrupo1, :semestreGrupo2) ORDER BY "nombre" ASC `,
+      { replacements: { pdId1, pdId2, semestreGrupo1, semestreGrupo2 } }
     );
     grupos[0].forEach(g => {
       const newGrupo = {};
@@ -168,6 +171,8 @@ exports.abrirNuevaProgDoc = async (req, res, next) => {
       newGrupo.curso = g.curso;
       newGrupo.aula = g.aula;
       newGrupo.idioma = g.idioma;
+      newGrupo.semestre = g.semestre;
+      newGrupo.tipo = g.tipo;
       newGrupo.ProgramacionDocenteId = res.locals.identificador;
       newGrupo.ItinerarioIdentificador = g.ItinerarioIdentificador;
       newGrupo.nombreItinerario = g.nombreItinerario;
@@ -983,6 +988,8 @@ exports.abrirCopiaProgDoc = async (req, res, next) => {
         'curso',
         'aula',
         'idioma',
+        'semestre',
+        'tipo',
         'grupoId',
         'nombreItinerario'
       ],
@@ -998,6 +1005,8 @@ exports.abrirCopiaProgDoc = async (req, res, next) => {
       newGrupo.curso = g.curso;
       newGrupo.aula = g.aula;
       newGrupo.idioma = g.idioma;
+      newGrupo.semestre = g.semestre;
+      newGrupo.tipo = g.tipo;
       newGrupo.ProgramacionDocenteId = res.locals.identificador;
       newGrupo.ItinerarioIdentificador = g.ItinerarioIdentificador;
       newGrupo.nombreItinerario = g.nombreItinerario;

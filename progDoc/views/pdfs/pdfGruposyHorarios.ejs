@@ -52,7 +52,7 @@ let sortAsignaturasCodigo = function (a, b) {
 let getNumeroGruposNoOptativas = function (grupos){
   let found =grupos.filter(
   //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
-  grupo => (!grupo.nombre.toUpperCase().includes("OPT"))
+  grupo => (grupo.tipo === tipoGrupo.General)
   );
   return found.length;
 }%>

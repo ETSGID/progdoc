@@ -95,8 +95,7 @@ const getAsignacion = async (
         if (s1) {
           coincidenciasGrupos = gruposBBDD.filter(
             gr =>
-              Number(gr.curso) === Number(asigni.curso) &&
-              Number(gr.nombre.split('.')[1]) === 1
+              Number(gr.curso) === Number(asigni.curso) && gr.semestre === '1S'
           );
         }
         if (s2) {
@@ -104,7 +103,7 @@ const getAsignacion = async (
             gruposBBDD.filter(
               gr =>
                 Number(gr.curso) === Number(asigni.curso) &&
-                Number(gr.nombre.split('.')[1]) === 2
+                gr.semestre === '2S'
             )
           );
         }
@@ -240,7 +239,7 @@ exports.getAsignaciones = async (req, res, next) => {
       });
     } else {
       try {
-        gruposBBDD = await grupoController.getGrupos2(pdID);
+        gruposBBDD = await grupoController.getGruposAndAula(pdID);
         profesores = await personaYProfesorController.getProfesores();
         asignacions = await getAsignacion(
           pdID,
@@ -291,7 +290,7 @@ exports.editAsignacion = async (req, res, next) => {
   const asignaturaIdentificador = Number(req.query.asignatura);
   if (!res.locals.permisoDenegado) {
     try {
-      gruposBBDD = await grupoController.getGrupos2(pdID);
+      gruposBBDD = await grupoController.getGruposAndAula(pdID);
       profesores = await personaYProfesorController.getProfesores();
       asignacions = await getAsignacion(
         pdID,
@@ -354,7 +353,7 @@ exports.changeModeAsignacion = async (req, res, next) => {
   let asign;
   if (!res.locals.permisoDenegado) {
     try {
-      gruposBBDD = await grupoController.getGrupos2(pdID);
+      gruposBBDD = await grupoController.getGruposAndAula(pdID);
       profesores = await personaYProfesorController.getProfesores();
       asignacions = await getAsignacion(
         pdID,
@@ -420,7 +419,7 @@ exports.guardarAsignacion = async (req, res, next) => {
   const { pdID } = req.session;
   const { planID } = req.session;
   const { departamentoID } = req.session;
-  const gruposBBDD = await grupoController.getGrupos2(pdID);
+  const gruposBBDD = await grupoController.getGruposAndAula(pdID);
   const coordinador = req.body.coordinador
     ? Number(req.body.coordinador)
     : null;
@@ -534,8 +533,7 @@ exports.guardarAsignacion = async (req, res, next) => {
           if (s1) {
             coincidencias = gruposBBDD.filter(
               gr =>
-                Number(gr.curso) === Number(asig.curso) &&
-                Number(gr.nombre.split('.')[1]) === 1
+                Number(gr.curso) === Number(asig.curso) && gr.semestre === '1S'
             );
           }
           if (s2) {
@@ -543,7 +541,7 @@ exports.guardarAsignacion = async (req, res, next) => {
               gruposBBDD.filter(
                 gr =>
                   Number(gr.curso) === Number(asig.curso) &&
-                  Number(gr.nombre.split('.')[1]) === 2
+                  gr.semestre === '2S'
               )
             );
           }

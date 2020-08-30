@@ -117,8 +117,8 @@ Asignatura.belongsTo(ProgramacionDocente);
 // -----AULAS-----//
 
 // Relación 1 a N entre Aula y Grupo
-Aula.hasMany(Grupo, { foreignKey: 'aula' })
-Grupo.belongsTo(Aula, { foreignKey: 'aula' })
+Aula.hasMany(Grupo, { foreignKey: 'aula' });
+Grupo.belongsTo(Aula, { foreignKey: 'aula' });
 
 // -----ROLES-----//
 

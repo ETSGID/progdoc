@@ -68,7 +68,7 @@ exports.getActividadParcial = async (req, res, next) => {
       const c = await cursoController.getCursos(pdID);
       // los cursos de ese plan
       const cursos = c;
-      const g = await grupoController.getGrupos2(pdID);
+      const g = await grupoController.getGruposAndAula(pdID);
       // los grupos de las nuevas asignatuas
       grupos = g;
       const as = await asignaturaController.getAsignaturasProgDoc(pdID);

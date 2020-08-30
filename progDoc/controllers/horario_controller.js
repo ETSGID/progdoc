@@ -87,7 +87,7 @@ exports.getHorario = async (req, res, next) => {
       const asignaturas = []; // array con los acronimos de las asignaturas por separado
       let gruposBBDD;
       const { pdID } = req.session;
-      gruposBBDD = await grupoController.getGrupos2(pdID);
+      gruposBBDD = await grupoController.getGruposAndAula(pdID);
       const gruposBBDDConNotas = await getNotasGruposSinAsignatura(gruposBBDD);
       // eslint-disable-next-line no-use-before-define
       getAsignacionHorario(pdID);
@@ -142,7 +142,7 @@ exports.getHorario = async (req, res, next) => {
               include: [
                 {
                   model: models.Grupo,
-                  attributes: ['nombre']
+                  attributes: ['nombre', 'semestre', 'tipo']
                 }
               ]
             }
@@ -169,7 +169,7 @@ exports.getHorario = async (req, res, next) => {
                 coincidenciasGrupos = gruposBBDD.filter(
                   gr =>
                     Number(gr.curso) === Number(horarioAsignatura.curso) &&
-                    Number(gr.nombre.split('.')[1]) === 1
+                    gr.semestre === '1S'
                 );
                 // al reformatear el codigo pongo el grupoCodigo y el grupoNombre
                 coincidenciasGrupos = coincidenciasGrupos.map(e => {
@@ -186,7 +186,7 @@ exports.getHorario = async (req, res, next) => {
                 coincidenciasGrupos = gruposBBDD.filter(
                   gr =>
                     Number(gr.curso) === Number(horarioAsignatura.curso) &&
-                    Number(gr.nombre.split('.')[1]) === 2
+                    gr.semestre === '2S'
                 );
                 coincidenciasGrupos = coincidenciasGrupos.map(e => {
                   e.grupoNombre = e.nombre;
@@ -202,12 +202,12 @@ exports.getHorario = async (req, res, next) => {
                 coincidenciasGrupos1 = gruposBBDD.filter(
                   gr =>
                     Number(gr.curso) === Number(horarioAsignatura.curso) &&
-                    Number(gr.nombre.split('.')[1]) === 1
+                    gr.semestre === '1S'
                 );
                 coincidenciasGrupos2 = gruposBBDD.filter(
                   gr =>
                     Number(gr.curso) === Number(horarioAsignatura.curso) &&
-                    Number(gr.nombre.split('.')[1]) === 2
+                    gr.semestre === '2S'
                 );
                 coincidenciasGrupos1 = coincidenciasGrupos1.map(e => {
                   e.grupoNombre = e.nombre;
@@ -291,7 +291,9 @@ exports.getHorario = async (req, res, next) => {
           }
           if (GrupoNombre) {
             const s = c.semestres.find(
-              obj => obj.semestre === Number(GrupoNombre.split('.')[1])
+              obj =>
+                `${obj.semestre}S` ===
+                horarioAsignatura['AsignacionProfesors.Grupo.semestre']
             );
             if (s) {
               // busco el grupo ya se inició

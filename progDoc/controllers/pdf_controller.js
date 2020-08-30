@@ -302,21 +302,14 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
       if (curso) {
         // eslint-disable-next-line no-shadow
         const semestre = curso.semestres.find(
-          obj => obj.semestre === Number(g.nombre.split('.')[1])
+          obj => `${obj.semestre}S` === g.semestre
         );
         if (semestre) {
           let grupo = semestre.grupos.find(
             obj => obj.grupoId === Number(g.grupoId)
           );
           if (!grupo) {
-            const newGrupo = {};
-            newGrupo.grupoId = g.grupoId;
-            newGrupo.nombre = g.nombre;
-            newGrupo.capacidad = g.capacidad;
-            newGrupo.curso = g.curso;
-            newGrupo.aula = g.aula;
-            newGrupo.nombreItinerario = g.nombreItinerario;
-            newGrupo.idioma = g.idioma;
+            const newGrupo = g;
             newGrupo.horarios = [];
             newGrupo.asignaturas = [];
             semestre.grupos.push(newGrupo);
@@ -486,6 +479,7 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
             asignaturas,
             cursosConGrupos,
             profesores,
+            tipoGrupo: enumsPD.tipoGrupo,
             pdID
           },
           (err, str) => {

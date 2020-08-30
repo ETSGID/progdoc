@@ -44,7 +44,7 @@ function anadirAula(){
 
 function guardarAula(identificador){
     if(document.getElementById('formAula').reportValidity()){
-        const newIdentificador = $("#aulaModal_id").val().replace(/([/])/g, "_")
+        const newIdentificador = $("#aulaModal_id").val().replace(/([/,_])/g, '-').trim();
         let url = "<%= CONTEXT %>/gestion/aulas";
         url += identificador === false ? '' : '/' + identificador;
         $.ajax({

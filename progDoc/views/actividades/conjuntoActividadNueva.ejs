@@ -38,7 +38,7 @@ function anadirConjuntoActividad(id,conjuntoActividadParcialId){
       semestreCoincidente = conjuntoActividadParcial.semestre
       gruposCoincidentes = []
       conjuntoActividadParcial.grupos.forEach(function(g){gruposCoincidentes.push(g.identificador)})
-      gruposSeleccionables = grupos.filter(function( element ) {return Number(cursoCoincidente) === element.curso && Number(semestreCoincidente.split("S")[0]) === Number(element.nombre.split(".")[1]);});
+      gruposSeleccionables = grupos.filter(function( element ) {return Number(cursoCoincidente) === element.curso && semestreCoincidente === element.semestre;});
       let optionsGrupos= ``
     for (let i = 0; i<gruposSeleccionables.length; i++){
         optionsGrupos+=`<option value=${gruposSeleccionables[i].grupoId}>${gruposSeleccionables[i].nombre}</option>`

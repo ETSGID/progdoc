@@ -408,7 +408,8 @@ exports.getAsignaturasExamen = async (req, res, next) => {
 // codigoAsignatura es codigo de la asignatura
 // devuelve los profesores que dan una asignatura
 exports.getGruposAsignatura = async (req, res, next) => {
-  let semestreGrupo = '%%';
+  let semestreGrupo1 = '';
+  let semestreGrupo2 = '';
   let pdID1 = 'no programacion';
   let pdID2 = 'no programacion';
   let resp = {};
@@ -451,13 +452,16 @@ exports.getGruposAsignatura = async (req, res, next) => {
     }
     switch (req.params.semestre) {
       case '1S':
-        semestreGrupo = '.1';
+        semestreGrupo1 = '1S';
+        semestreGrupo2 = '1S';
         break;
       case '2S':
-        semestreGrupo = '.2';
+        semestreGrupo1 = '2S';
+        semestreGrupo2 = '2S';
         break;
       case 'I':
-        semestreGrupo = '.';
+        semestreGrupo1 = '1S';
+        semestreGrupo2 = '2S';
         break;
       default:
         respError = { error: 'Semestre incorrecto' };
@@ -466,21 +470,24 @@ exports.getGruposAsignatura = async (req, res, next) => {
 
     const grupos = await models.sequelize.query(
       `SELECT distinct 
-      a.identificador, a.codigo, a.nombre as "nombreAsignatura", 
+      (a.identificador), a.codigo, a.nombre as "nombreAsignatura", 
       a.acronimo, g.nombre, g."nombreItinerario", g.aula, g.capacidad, 
-      g."nombreItinerario", a."anoAcademico"
+      g."nombreItinerario", a."anoAcademico", au.cupo as "aulaCupo", au.identificador as "aulaIdentificador"
       FROM public."Asignaturas" as a
       left join public."AsignacionProfesors" as s on a.identificador = s."AsignaturaId"
       inner join public."Grupos" as g on s."GrupoId" = g."grupoId"
+      left join public."Aulas" as au on g."aula" = au."identificador"
       where a."ProgramacionDocenteIdentificador" in (:pdID1, :pdID2)
       and a.codigo = :codigo
+      and g.semestre in (:semestreGrupo1, :semestreGrupo2)
       and (s."Dia" IS NOT NULL or s."Nota" IS NOT NULL)
       order by a.codigo, g.nombre`,
       {
         replacements: {
           pdID1,
           pdID2,
-          semestre: semestreGrupo,
+          semestreGrupo1,
+          semestreGrupo2,
           codigo: req.params.codigoAsignatura
         }
       }
@@ -494,14 +501,15 @@ exports.getGruposAsignatura = async (req, res, next) => {
         asignatura.nombre = grupos[0][0].nombreAsignatura;
         asignatura.codigo = grupos[0][0].codigo;
         asignatura.acronimo = grupos[0][0].acronimo;
-        if (gr.nombre.includes(semestreGrupo)) {
-          asignatura.grupos.push({
-            nombre: gr.nombre,
-            aula: gr.aula,
-            capacidad: gr.capacidad,
-            itinerario: gr.nombreItinerario
-          });
-        }
+        asignatura.grupos.push({
+          nombre: gr.nombre,
+          capacidad: gr.capacidad,
+          itinerario: gr.nombreItinerario,
+          aula: {
+            identificador: gr.aulaIdentificador,
+            cupo: gr.aulaCupo
+          }
+        });
       }
     });
     resp = asignatura;

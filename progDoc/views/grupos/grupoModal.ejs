@@ -1,0 +1,131 @@
+<div id="grupoModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">  
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Grupos</h4>
+        </div>
+        <div class="modal-body" id="modal_actividad_body">
+            <form id="formGrupo" method="post" autocomplete="off">
+                <div class="form-group">
+                    <label>Nombre</label> 
+                    <input type='text' id='grupoModal_nombre' placeholder="Introducir nombre grupo" class="form-control" name="nombre" required/>
+                </div>
+                <div class="form-group">
+                    <label>Itinerario</label> 
+                    <input type='text' id='grupoModal_nombreItinerario' placeholder="Introducir nombre itinerario" class="form-control" name="nombreItinerario"/>
+                </div>
+                <div class="form-group">
+                    <label>Tipo Grupo</label>
+                    <select class="form-control" id="grupoModal_tipo">
+                        <% for (const tipo in tipoGrupo){ %>
+                            <option value=<%=tipoGrupo[tipo]%>><%=tipo%></option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Aula</label>
+                    <select class="form-control" id="grupoModal_aula">
+                        <option value>-</option>
+                        <% aulas.forEach(aula => { %>
+                            <option value="<%=aula.identificador%>"><%=aula.identificador%> (<%= aula.cupo? aula.cupo + ' alumnos' : 'Cupo no definido'%>)</option>
+                        <% }) %>
+                    </select>
+                </div>
+                <button type="button" id='grupoModal_button' class="btn btn-default" onclick = "guardarGrupo()">
+                    <span class="glyphicon glyphicon-ok"></span>
+                </button> 
+            </form>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+</div>
+
+<script>
+const tipoGrupo = <%-JSON.stringify(tipoGrupo)%>;
+function editarGrupo(identificador){
+    const nombre = document.getElementById(`grupo_${identificador}_nombre`).innerHTML.trim()
+    const nombreItinerario = document.getElementById(`grupo_${identificador}_nombreItinerario`).innerHTML.trim()
+    const tipo = tipoGrupo[document.getElementById(`grupo_${identificador}_tipo`).innerHTML.trim()]
+    const aula = document.getElementById(`grupo_${identificador}_aula`).innerHTML.trim()
+    $("#grupoModal_nombre").val(nombre);
+    $("#grupoModal_nombreItinerario").val(nombreItinerario);
+    $("#grupoModal_tipo").val(tipo);
+    $("#grupoModal_aula").val(aula);
+    $("#grupoModal_button").attr('onClick', `guardarGrupo(${identificador}, null, null, null);`)
+    $("#grupoModal").modal();
+}
+function anadirGrupo(pdID, curso, semestre){
+    document.getElementById('formGrupo').reset();
+    $("#grupoModal_button").attr('onClick', `guardarGrupo(${false}, '${pdID}', ${curso}, '${semestre}S');`)
+    $("#grupoModal").modal();
+}
+
+function guardarGrupo(identificador, pdID, curso, semestre){
+    if(document.getElementById('formGrupo').reportValidity()){
+        let url = "<%= CONTEXT %>/gestion/grupos";
+        url += identificador === false ? '' : '/' + identificador;
+        let data;
+        if (!identificador){
+            //create
+            data = {
+                nombre: $("#grupoModal_nombre").val().trim(),
+                nombreItinerario: $("#grupoModal_nombreItinerario").val().trim(),
+                tipo:  $("#grupoModal_tipo").val().trim(),
+                aula:  $("#grupoModal_aula").val(),
+                curso, 
+                semestre, 
+                ProgramacionDocenteId: pdID
+            }
+
+        } else {
+            //update
+            data = {
+                nombre: $("#grupoModal_nombre").val().trim(),
+                nombreItinerario: $("#grupoModal_nombreItinerario").val().trim(),
+                tipo:  $("#grupoModal_tipo").val().trim(),
+                aula:  $("#grupoModal_aula").val()
+            }
+        }
+        $.ajax({
+            url: url,
+            method: identificador === false ? 'POST' : 'PUT',
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(data)
+            }).done(function(res) {
+                if(!res.success){
+                    alert(res.msg)
+                }else{
+                    location.reload();
+                }
+            }).fail( function( jqXHR, textStatus, errorThrown ) {
+                alert("Ha habido un error:" + jqXHR.status + " " + textStatus + " " + errorThrown)
+            })
+    }
+}
+
+function eliminarGrupo(identificador){
+    if(confirm('Si elimina el grupo se perderá toda la información de la programación docente relativa al miso. ¿Quiere continuar?')){
+        let url = "<%= CONTEXT %>/gestion/grupos/" + identificador ;
+        $.ajax({
+            url: url,
+            method: 'DELETE',
+            dataType: "json",
+            contentType: "application/json",
+            }).done(function(res) {
+                if(!res.success){
+                    alert(res.msg)
+                }else{
+                    location.reload();
+                }
+            }).fail( function( jqXHR, textStatus, errorThrown ) {
+                alert("Ha habido un error:" + jqXHR.status + " " + textStatus + " " + errorThrown)
+            })
+    }
+}
+</script>

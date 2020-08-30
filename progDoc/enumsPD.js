@@ -1,3 +1,5 @@
+// ----- EXAMENES ----- //
+
 // diferenciamos los periodos de la programacion docente por semestre
 // y por ordinarios y extraordinarios
 exports.periodoPD = {
@@ -6,6 +8,8 @@ exports.periodoPD = {
   S2_O: '2S-O',
   S2_E: '2S-E'
 };
+
+// ----- PERMISOS ----- //
 
 const rols = {
   Admin: 'Admin',
@@ -38,7 +42,8 @@ exports.permisions = {
   cumplimentar: 'cumplimentar'
 };
 
-// type of menu
+// ----- MENU ----- //
+
 exports.menuBar = {
   consultar: {
     nombre: 'consultar',
@@ -88,6 +93,8 @@ exports.menuBar = {
   }
 };
 
+// ----- CALENDARIO ----- //
+
 exports.eventoGeneral = {
   NoEditable: 0,
   Editable: 1
@@ -121,4 +128,17 @@ exports.diasDeSemana = {
   Miercoles: 2,
   Jueves: 3,
   Viernes: 4
+};
+
+// ----- GRUPOS ----- //
+
+/**
+Especial se reserva para casos raros por ejemplo
+Una asingatura que se imparte para ciertos alumnos 
+independientemente del grupo pero que no es optativa
+*/
+exports.tipoGrupo = {
+  General: 1,
+  Optativa: 2,
+  Especial: 3
 };

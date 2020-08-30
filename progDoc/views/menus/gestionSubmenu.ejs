@@ -8,14 +8,6 @@
             </div>
         <%}%>
 <%        break;
-    case "Grupos":%>
-        <%if(!locals.estado && !locals.permisoDenegado && !locals.existe){%>
-            <div>
-                <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
-                <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
-            </div>
-        <%}%>  
-<%        break;
     default:
         break;
 }%>

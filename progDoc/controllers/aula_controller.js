@@ -44,7 +44,12 @@ const prepareStringAula = aula => {
 const getAllAulas = async () => {
   // eslint-disable-next-line no-useless-catch
   try {
-    return await models.Aula.findAll({ raw: true });
+    let aulas = await models.Aula.findAll({ raw: true });
+    aulas = aulas.map(aula => {
+      return { ...aula, aulaOrder: prepareStringAula(aula.identificador) };
+    });
+    aulas.sort((a, b) => (a.aulaOrder > b.aulaOrder ? 1 : -1));
+    return aulas;
   } catch (error) {
     // se propaga el error lo captura el middleware
     throw error;
@@ -56,7 +61,9 @@ exports.createAula = async (req, res) => {
     const aulaToAnadir = {};
     // eslint-disable-next-line no-restricted-globals
     aulaToAnadir.cupo = isNaN(req.body.cupo) ? null : Number(req.body.cupo);
-    aulaToAnadir.identificador = req.body.identificador.replace(/([/])/g, '_');
+    aulaToAnadir.identificador = req.body.identificador
+      .replace(/([/,_])/g, '-')
+      .trim();
     try {
       const nToAnadir = models.Aula.build(aulaToAnadir);
       await nToAnadir.save();
@@ -81,7 +88,9 @@ exports.updateAula = async (req, res) => {
     // sino tiene asignaturaId se trata de una actividad de grupo
     // eslint-disable-next-line no-restricted-globals
     aulaToUpdate.cupo = isNaN(req.body.cupo) ? null : Number(req.body.cupo);
-    aulaToUpdate.identificador = req.body.identificador.replace(/([/])/g, '_');
+    aulaToUpdate.identificador = req.body.identificador
+      .replace(/([/,_])/g, '-')
+      .trim();
     try {
       await models.Aula.update(aulaToUpdate, {
         where: { identificador: req.params.id }
@@ -121,6 +130,7 @@ exports.deleteAula = async (req, res) => {
 };
 
 // te da todos los grupos de las programciones docentes pasadas como array
+// que tengan aula asignada
 const getAllGruposConAula = async progDocs => {
   const gruposPorProgramacionDocente = {};
   // eslint-disable-next-line no-useless-catch
@@ -178,9 +188,6 @@ exports.getAulas = async (req, res, next) => {
   });
   try {
     let aulas = await getAllAulas();
-    aulas = aulas.map(aula => {
-      return { ...aula, aulaOrder: prepareStringAula(aula.identificador) };
-    });
     const p = await progDocController.getAllProgramacionDocentes(
       planes,
       '1S',
@@ -235,7 +242,7 @@ exports.getAulas = async (req, res, next) => {
             return;
           }
           const { aula } = g;
-          if (g.nombre.split('.')[1] === '1') {
+          if (g.semestre === '1S') {
             if (!aulas1.find(obj => obj.aula === aula)) {
               const aulaOriginal = aulas.find(
                 obj => obj.identificador === aula
@@ -327,7 +334,7 @@ exports.getAulas = async (req, res, next) => {
             const offsetHora =
               parseInt(horario.HoraInicio.substring(0, 2), 10) - 8;
             const offsetTotal = offsetHora + offsetDeDiasDeSemana[horario.Dia];
-            if (g.nombre.split('.')[1] === '1') {
+            if (g.semestre === '1S') {
               if (gruposPorAula1[aula][offsetTotal] === undefined) {
                 gruposPorAula1[aula][offsetTotal] = {};
                 gruposPorAula1[aula][offsetTotal].asignaturas = [
@@ -383,7 +390,6 @@ exports.getAulas = async (req, res, next) => {
     aulas1.sort((a, b) => (a.aulaOrder > b.aulaOrder ? 1 : -1));
     aulas2.sort((a, b) => (a.aulaOrder > b.aulaOrder ? 1 : -1));
     if (!req.body.generarPdf) {
-      aulas.sort((a, b) => (a.aulaOrder > b.aulaOrder ? 1 : -1));
       res.render('aulas/aulas', {
         CONTEXT,
         permisoDenegado: res.locals.permisoDenegado || null,
@@ -464,3 +470,5 @@ exports.getAulas = async (req, res, next) => {
     }
   }
 };
+
+exports.getAllAulas = getAllAulas;

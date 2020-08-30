@@ -107,7 +107,7 @@ exports.updateAsignaturasApiUpm = async (req, res, next) => {
       const whereEliminarActividadParcial = [];
       const response = await apiUpmController.getAsignaturasApiUpm(plan, ano);
       apiAsignaturas = response.data;
-      const grupos = grupoController.getGrupos2(pdID);
+      const grupos = await grupoController.getGruposAndAula(pdID);
       // los grupos de las nuevas asignatuas
 
       const asignaturasBBDD = await models.Asignatura.findAll({

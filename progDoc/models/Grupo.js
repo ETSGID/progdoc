@@ -25,6 +25,12 @@ module.exports = (sequelize, DataTypes) => {
         // en un principio los itinerarios se
         // incluyen aquí en un futuro igual con la entidad itinerario
         type: DataTypes.STRING
+      },
+      semestre: {
+        type: DataTypes.ENUM('1S', '2S', '1S-2S', 'A', 'I')
+      },
+      tipo: {
+        type: DataTypes.INTEGER
       }
     },
     {
