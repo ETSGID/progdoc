@@ -8,6 +8,22 @@
             </div>
         <%}%>
 <%        break;
+        case "Aulas":%>
+            <div>
+            <select id="selectAulas"  onchange="cambiarSelectAula('<%=selectAulapath%>')">
+                <option value="AsignacionAulas" title="AsignacionAulas" selected>Asignación Aulas</option>
+                <option value="Aulas" title="Aulas" selected>Aulas</option>      
+            </select>
+            </div>
+<%        break;
+        case "Aulas2":%>
+            <div>
+                <select id="selectAulas"  onchange="cambiarSelectAula('<%=selectAulapath%>')">
+                <option value="AsignacionAulas" title="AsignacionAulas" selected>Asignación Aulas</option>
+                <option value="Aulas" title="Aulas">Aulas</option>      
+                </select>
+            </div>
+    <%        break;
     default:
         break;
 }%>

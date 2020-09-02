@@ -156,6 +156,21 @@ const getAllGruposConAula = async progDocs => {
   }
 };
 
+exports.getAulas = async (req, res, next) => {
+  try {
+    const aulas = await getAllAulas();
+    res.render('aulas/aulas', {
+      CONTEXT,
+      permisoDenegado: res.locals.permisoDenegado || null,
+      aulas,
+      selectAulapath: `${req.baseUrl}/asignacion`
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
 /**
  * Esta funcion se encarga de obtener los grupos que hay en cada aula
  * y renderizar la página con el horario de las aulas.
@@ -165,7 +180,7 @@ const getAllGruposConAula = async progDocs => {
  * @param {*} next
  */
 
-exports.getAulas = async (req, res, next) => {
+exports.getAsignacionAulas = async (req, res, next) => {
   let anoSeleccionado = req.body.ano || req.query.ano;
   const cuatrimestreSeleccionado =
     req.body.cuatrimestre || 'Primer cuatrimestre';
@@ -390,7 +405,7 @@ exports.getAulas = async (req, res, next) => {
     aulas1.sort((a, b) => (a.aulaOrder > b.aulaOrder ? 1 : -1));
     aulas2.sort((a, b) => (a.aulaOrder > b.aulaOrder ? 1 : -1));
     if (!req.body.generarPdf) {
-      res.render('aulas/aulas', {
+      res.render('aulas/asignacionAulas', {
         CONTEXT,
         permisoDenegado: res.locals.permisoDenegado || null,
         aulas,
@@ -401,7 +416,8 @@ exports.getAulas = async (req, res, next) => {
         ano1: String(ano1),
         ano2: String(ano2),
         anoSeleccionado: String(anoSeleccionado),
-        generarPdfpath: `${req.baseUrl}/pdf`
+        generarPdfpath: `${req.baseUrl}/pdf`,
+        selectAulapath: `${req.baseUrl}`
       });
     } else {
       aulas = cuatrimestreSeleccionado === '1S' ? aulas1 : aulas2;

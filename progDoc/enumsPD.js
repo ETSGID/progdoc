@@ -51,6 +51,7 @@ exports.menuBar = {
       estado: 'Estado',
       rol: 'Roles',
       aula: 'Aulas',
+      aula2: 'Aulas2',
       grupo: 'Grupos',
       calendario: 'Calendario',
       profesor: 'Profesores',
@@ -85,7 +86,8 @@ exports.menuBar = {
       rol: 'Roles',
       acronimo: 'Acronimos',
       plan: 'Planes',
-      aula: 'Aulas'
+      aula: 'Aulas',
+      aula2: 'Aulas2'
     }
   },
   historial: {

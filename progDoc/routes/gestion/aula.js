@@ -31,6 +31,25 @@ router.get(
   aulaController.getAulas
 );
 
+// GET asignacion aulas
+router.get(
+  '/asignacion',
+  (req, res, next) => {
+    req.session.submenu = enumsPD.menuBar.gestion.submenu.aula2;
+    res.locals.rols.push({
+      rol: enumsPD.rols.JefeEstudios,
+      PlanEstudioCodigo: null,
+      DepartamentoCodigo: null,
+      tipo: enumsPD.permisions.cumplimentar,
+      condiciones: []
+    });
+    next();
+  },
+  planController.getPlanes,
+  rolController.comprobarRols,
+  aulaController.getAsignacionAulas
+);
+
 // POST pdf aulas
 router.post(
   '/pdf',
@@ -46,7 +65,7 @@ router.post(
   },
   planController.getPlanes,
   rolController.comprobarRols,
-  aulaController.getAulas
+  aulaController.getAsignacionAulas
 );
 
 // POST aula

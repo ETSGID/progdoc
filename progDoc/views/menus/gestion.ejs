@@ -119,6 +119,7 @@ let url = "<%=CONTEXT%>/gestion/aulas"
 window.location.replace(url);
 }
 
+
 }
 function cambiarPD(){
 let pAcronimo = document.getElementById("selectPlan").value;
@@ -140,8 +141,8 @@ if (element2){
     document.getElementById('selectPlan').value = selectPlanValue;
 }     
 let submenu = document.getElementById('submenu').value
-document.getElementById(submenu).style.display = "block";
-document.getElementById(submenu).className += " active";
+document.getElementById('submenu').style.display = "block";
+document.getElementById('submenu').className += " active";
 }
 
 

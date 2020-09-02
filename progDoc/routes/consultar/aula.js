@@ -12,9 +12,13 @@ router.all('*', (req, res, next) => {
   next();
 });
 // GET aulas
-router.get('/', planController.getPlanes, aulaController.getAulas);
+router.get('/', planController.getPlanes, aulaController.getAsignacionAulas);
 
 // POST pdf aulas
-router.post('/pdf', planController.getPlanes, aulaController.getAulas);
+router.post(
+  '/pdf',
+  planController.getPlanes,
+  aulaController.getAsignacionAulas
+);
 
 module.exports = router;
