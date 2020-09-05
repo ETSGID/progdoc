@@ -3,7 +3,7 @@
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8"> 
-  <!-- Despliegue -->
+  <!-- CSS -->
   <link rel='stylesheet' type="text/css" href='<%=CONTEXT%>/stylesheets/style.css' />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -15,6 +15,9 @@
   <script src="https://<%=pruebas%>.etsit.upm.es/<%=session.portal%>/static-button"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+
+  <!-- Javascript functions-->
+  <script src='<%=CONTEXT%>/js/helpers.js'></script>
   <title>Portal del Profesor</title>
   <style>
     .open-6659b527b8d152af596e174303b316a7{
@@ -43,10 +46,34 @@
         <% for(var i=0; i< session.menu.length; i++){ %>
           <input type="hidden" name="menu" value="<%=session.menu[i]%>">
         <% }%>
-    
       <%} else {%>
         <input type="hidden" name="menu">
       <%}%>
+      <% if (session.planID) { %>
+        <input id='plan' type="hidden" value="<%=session.planID%>">
+     <%} else {%>
+       <input id='plan' type="hidden">
+     <%}%>
+       <% if (session.submenu) { %>
+        <input id='submenu' type="hidden" value="<%=session.submenu%>">
+     <%} else {%>
+       <input id='submenu' type="hidden">
+     <%}%>
+     <% if (session.subsubmenu) { %>
+        <input id='subsubmenu' type="hidden" value="<%=session.subsubmenu%>">
+     <%} else {%>
+       <input id='subsubmenu' type="hidden">
+     <%}%>
+     <% if (session.departamentoID) { %>
+        <input id='departamento' type="hidden" value="<%=session.departamentoID%>">
+     <%} else {%>
+       <input id='departamento' type="hidden">
+     <%}%>
+     <% if (locals.ano) { %>
+      <input id='ano' type="hidden" value="<%=ano%>">
+    <%} else {%>
+        <input id='ano' type="hidden">
+    <%}%>
     </div>
     <div class="main">
      <div id="buttonMenuPortales123" style="position:fixed; z-index:4; text-align: right"></div>
@@ -80,35 +107,12 @@ for (i = 0; i < dropdown.length; i++) {
   });
 } 
 
-document.getElementsByTagName('body')[0].onload = actualizarMenu();
-function actualizarMenu(){
-let menu = document.getElementsByName("menu");
-menu.forEach(function(element,index){
-  if (element.value === ""){
-    return
-  }else{
-    if (element.value.split("_")[0] === "drop"){
-      let el = document.getElementById(element.value)
-      el.className += " active";
-      $(el).find('i').toggleClass('glyphicon-chevron-down').toggleClass('glyphicon-chevron-up');
-      let dropdownContent = el.nextElementSibling;
-      if (dropdownContent.style.display === "block") {
-        dropdownContent.style.display = "none";
-      } else {
-        dropdownContent.style.display = "block";
-      }
-    }if (element.value.split("_")[0] === "element"){
-      let el = document.getElementById(element.value)
-      el.className += " activeMenu";
-    }
-
-  }
-  });
-}
-
-$(document).ready(function(){  
+$(document).ready(function(){ 
+  actualizarMenu(); 
+  actualizarSelectyBarra();
   dibujarmenulateral("buttonMenuPortales123", CONTEXT+"/logout", '<%=session.user.uid%>', '<%=session.user.givenname%>', '<%=pruebasBoolean%>'); 
 });
+
 </script>
 
 </body>

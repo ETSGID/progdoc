@@ -11,7 +11,7 @@ const estados = require('../../estados');
 const enumsPD = require('../../enumsPD');
 
 router.all('*', (req, res, next) => {
-  req.session.submenu = enumsPD.menuBar.cumplimentar.submenu.profesor;
+  req.session.submenu = enumsPD.menuBar.cumplimentar.submenu.profesor.nombre;
   next();
 });
 
@@ -20,6 +20,8 @@ router.get(
   '/',
   progDocController.getProgramacionDocente,
   (req, res, next) => {
+    req.session.subsubmenu =
+      enumsPD.menuBar.cumplimentar.submenu.profesor.submenu.profesor.nombre;
     res.locals.rols.push({
       rol: enumsPD.rols.ResponsableDocente,
       PlanEstudioCodigo: req.session.planID,
@@ -113,7 +115,8 @@ router.get(
   '/asignatura',
   progDocController.getProgramacionDocente,
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.cumplimentar.submenu.profesor2;
+    req.session.subsubmenu =
+      enumsPD.menuBar.cumplimentar.submenu.profesor.submenu.cumplimentarProfesor.nombre;
     res.locals.rols.push({
       rol: enumsPD.rols.ResponsableDocente,
       PlanEstudioCodigo: req.session.planID,

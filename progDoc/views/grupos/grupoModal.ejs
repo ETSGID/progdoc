@@ -29,7 +29,7 @@
                     <select class="form-control" id="grupoModal_aula">
                         <option value>-</option>
                         <% aulas.forEach(aula => { %>
-                            <option value="<%=aula.identificador%>"><%=aula.identificador%> (<%= aula.cupo? aula.cupo + ' alumnos' : 'Cupo no definido'%>)</option>
+                            <option value="<%=aula.identificador%>"><%=aula.identificador%> (<%= aula.cupo? aula.cupo + ' alumnos' : 'Capacidad no definida'%>)</option>
                         <% }) %>
                     </select>
                 </div>

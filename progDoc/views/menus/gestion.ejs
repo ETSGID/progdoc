@@ -1,5 +1,4 @@
 <body>
-<%- include ../../public/js/helpersMenu.ejs %>
 <div class="myHeader">
     <p>Jefatura Estudios <% if ( session && session.pdID && (session.submenu === "Grupos")){ %>
     <%= session.pdID %>
@@ -7,7 +6,7 @@
     <%if (session.planID && locals.planEstudios && (session.submenu === "Grupos" || session.submenu === "Planes")) { %>
     <div class="row col-sm"  style="margin-left:0px">
         <div clas="container">
-            <select id="selectPlan" onchange="cambiarPD()">
+            <select id="selectPlan" onchange="cambiarPD(this.value)">
                 <option value="none" disabled>Plan...</option>
                 <% for(let i=0; i < planEstudios.length; i++) { 
                     if (planEstudios[i].nombre !== null){ %>
@@ -51,31 +50,13 @@
         <button id='Roles' class="tablinks" onclick="cambiarSubmenu(event, 'Roles')">Roles</button>
         <button id='Acronimos' class="tablinks" onclick="cambiarSubmenu(event, 'Acronimos')">Acrónimos</button>
         <button id='Planes' class="tablinks" onclick="cambiarSubmenu(event, 'Planes')">Planes</button>
-        <button id='Aulas' class="tablinks" onclick="cambiarSubmenu(event, 'Aulas')">Aulas</button>
+        <button id='Aulas' class="tablinks" onclick="cambiarSubmenu(event, 'Aulas', 'AsignacionAulas')">Aulas</button>
     </div>
-
-    <% if (session.planID) { %>
-        <input id='plan' type="hidden" value="<%=session.planID%>">
-    <%} else {%>
-        <input id='plan' type="hidden">
-    <%}%>
-    <% if (session.submenu) { %>
-        <input id='submenu' type="hidden" value="<%=session.submenu%>">
-    <%} else {%>
-    <input id='submenu' type="hidden">
-    <%}%>
-    <% if (locals.ano) { %>
-        <input id='ano' type="hidden" value="<%=ano%>">
-    <%} else {%>
-        <input id='ano' type="hidden">
-    <%}%>
     <%-include ./gestionSubmenu.ejs%>
 </div>
 <script>
-let parseQueryString = <%-parseQueryString%>
-let parseStringQuery = <%-parseStringQuery%>
 let selectPlanValue;
-function cambiarSubmenu(evt, submenu) {
+function cambiarSubmenu(evt, submenu, subsubmenu) {
 let elementPlan = document.getElementById("selectPlan")
 let pAcronimo = 'GITST';
 if (elementPlan){
@@ -115,36 +96,18 @@ let url = "<%=CONTEXT%>/gestion/plan"
 window.location.replace(url);
 }
 if (submenu === 'Aulas'){
-let url = "<%=CONTEXT%>/gestion/aulas"
+let url = "";
+if (subsubmenu === 'AsignacionAulas'){
+    url = "<%=CONTEXT%>/gestion/aulas/asignacion"
+}
+if (subsubmenu === 'Aulas'){
+    url = "<%=CONTEXT%>/gestion/aulas"
+}
 window.location.replace(url);
 }
 
 
 }
-function cambiarPD(){
-let pAcronimo = document.getElementById("selectPlan").value;
-let search = parseQueryString();
-delete search.pdID;
-search.planID = pAcronimo;
-let url = parseStringQuery(search);
-window.location.replace(url);
-
-}
-
-
-
-document.getElementsByTagName('body')[0].onload = actualizarSelectyBarra();
-function actualizarSelectyBarra() {
-selectPlanValue = document.getElementById('plan').value
-let element2 = document.getElementById('selectPlan')
-if (element2){
-    document.getElementById('selectPlan').value = selectPlanValue;
-}     
-let submenu = document.getElementById('submenu').value
-document.getElementById('submenu').style.display = "block";
-document.getElementById('submenu').className += " active";
-}
-
 
 function cambiarPlanCalendario(){
     let pAcronimo = document.getElementById("selectPlanCalendario").value;

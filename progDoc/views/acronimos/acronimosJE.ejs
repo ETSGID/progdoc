@@ -1,5 +1,4 @@
 
-<%- include ../../public/js/helpers.ejs %>
 <div class ="contenido2">
 <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
   <p><%=permisoDenegado%></p>
@@ -41,7 +40,7 @@
                 </table>
             </div>
             <h2 style="display:inline;">Plan</h2>
-            <select id="selectPlan" onchange="cambiarPD()">
+            <select id="selectPlan" onchange="cambiarPD(this.value)">
                 <option value="none" disabled>Plan...</option>
                 <% for(planEstudio of planEstudios) { 
                     if (planEstudio.nombre !== null && (session.planID !== planEstudio.codigo)){ %>
@@ -148,8 +147,6 @@
 let asignaturas = <%-JSON.stringify(asignaturas)%>;
 let planEstudios = <%-JSON.stringify(planEstudios)%>;
 let departamentos = <%-JSON.stringify(departamentos)%>;
-let confirmarSalirSinGuardar = <%-confirmarSalirSinGuardar%>;
-let MostrarOcultar = <%-MostrarOcultar%>;
 //se utiliza para disparar el evento de onbeforeunload
 let activado = true;
 

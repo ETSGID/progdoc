@@ -1,52 +1,4 @@
 <%
-/*si existen elementos con en el html con campo 'name' coincidente con
-lo que se pasa en el primer array
-y si activado es true 
-se muestra el mensaje, sino no.
-*/
-//names debe ser un array
-confirmarSalirSinGuardar = function(names, activado) { 
-    let areElements = false;
-    names.forEach(function (name) {
-       let element = document.getElementsByName(name);
-       /**miro si hay algun elemento que case con eso, en caso afirmativo
-        es que existe algo nuevo que no se ha guardado
-        **/
-        if (element.length > 0){
-           areElements = true;
-       }
-    })
-    if (areElements && activado){
-        return "Es posible que los cambios aplicados no se guarden"
-    }else{
-        return null;
-    }
-};
-
-/*si los elementos pasados en arrays alguno no está vacíos 
-y si activado es true 
-se muestra el mensaje, sino no.
-*/
-//elements debe ser un array de arrays
-confirmarSalirSinGuardarArrays = function(elements, activado) { 
-    let areElements = false;
-    elements.forEach(function (element) {
-        /**miro si hay algun elemento que case con eso, en caso afirmativo
-        es que existe algo nuevo que no se ha guardado
-        **/
-       if (element.length > 0){
-           areElements = true;
-       }
-    })
-    if (areElements && activado){
-        return "Es posible que los cambios aplicados no se guarden"
-    }else{
-        return null;
-    }
-};
-
-
-
 //le añade un 0 a la hora y a los minutos si solo tienen un digito
 formatHora = function(input) {
     if (input.value.length === 1) {
@@ -201,25 +153,5 @@ getLunesSiguiente = function(fecha) {
 }
 %>
 
-<% MostrarOcultar = function(id){
-    let div = document.getElementById(id);
-    let buttonSpan = document.getElementById('button_'+id)
-    let clases = div.className.split(" ");
-    let oculto = clases.find(function (obj) { return obj === 'hidden'});
-    //si oculto mostrarlo
-    if (oculto){
-            div.className = "";
-            for (let i =0; i<clases.length; i++){
-                if (clases[i] !== 'hidden'){
-                    div.className += " " +clases[i]
-                }    
-            }
-            buttonSpan.className = "glyphicon glyphicon-chevron-up"
-    }
-    //ocultarlo
-    else{
-        div.className += " hidden"
-        buttonSpan.className = "glyphicon glyphicon-chevron-down"
-    }
-}
+<% 
 %>

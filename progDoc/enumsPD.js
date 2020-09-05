@@ -48,46 +48,127 @@ exports.menuBar = {
   consultar: {
     nombre: 'consultar',
     submenu: {
-      estado: 'Estado',
-      rol: 'Roles',
-      aula: 'Aulas',
-      aula2: 'Aulas2',
-      grupo: 'Grupos',
-      calendario: 'Calendario',
-      profesor: 'Profesores',
-      tribunal: 'Tribunales',
-      horario: 'Horarios',
-      actividad: 'Actividades',
-      examen: 'Examenes',
-      pdf: 'PDF'
+      estado: {
+        nombre: 'Estado'
+      },
+      rol: {
+        nombre: 'Roles'
+      },
+      aula: {
+        nombre: 'Aulas',
+        submenu: {
+          aula: {
+            nombre: 'Aulas'
+          },
+          asignacionAulas: {
+            nombre: 'AsignacionAulas'
+          }
+        }
+      },
+      grupo: {
+        nombre: 'Grupos'
+      },
+      calendario: {
+        nombre: 'Calendario'
+      },
+      profesor: {
+        nombre: 'Profesores'
+      },
+      tribunal: {
+        nombre: 'Tribunales'
+      },
+      horario: {
+        nombre: 'Horarios'
+      },
+      actividad: {
+        nombre: 'Actividades'
+      },
+      examen: {
+        nombre: 'Examenes'
+      },
+      pdf: {
+        nombre: 'PDF'
+      }
     }
   },
+
   cumplimentar: {
     nombre: 'cumplimentar',
     submenu: {
-      estado: 'Estado',
-      calendario: 'Calendario',
-      profesor: 'Profesores',
-      profesor2: 'Profesores2',
-      tribunal: 'Tribunales',
-      horario: 'Horarios',
-      actividad: 'Actividades',
-      examen: 'Examenes',
-      examen2: 'Examenes2'
+      estado: {
+        nombre: 'Estado'
+      },
+      calendario: {
+        nombre: 'Calendario'
+      },
+      profesor: {
+        nombre: 'Profesores',
+        submenu: {
+          profesor: {
+            nombre: 'Profesores'
+          },
+          cumplimentarProfesor: {
+            nombre: 'CumplimentarProfesores'
+          }
+        }
+      },
+      tribunal: {
+        nombre: 'Tribunales'
+      },
+      horario: {
+        nombre: 'Horarios'
+      },
+      actividad: {
+        nombre: 'Actividades'
+      },
+      examen: {
+        nombre: 'Examenes',
+        submenu: {
+          examen: {
+            nombre: 'Examenes'
+          },
+          franja: {
+            nombre: 'Franjas'
+          }
+        }
+      }
     }
   },
   gestion: {
     nombre: 'gestion',
     submenu: {
-      estado: 'AbrirCerrar',
-      calendario: 'Calendario',
-      grupo: 'Grupos',
-      personal: 'Personal',
-      rol: 'Roles',
-      acronimo: 'Acronimos',
-      plan: 'Planes',
-      aula: 'Aulas',
-      aula2: 'Aulas2'
+      estado: {
+        nombre: 'AbrirCerrar'
+      },
+      calendario: {
+        nombre: 'Calendario'
+      },
+      grupo: {
+        nombre: 'Grupos'
+      },
+      personal: {
+        nombre: 'Personal'
+      },
+      rol: {
+        nombre: 'Roles'
+      },
+      acronimo: {
+        nombre: 'Acronimos'
+      },
+      plan: {
+        nombre: 'Planes'
+      },
+      aula: {
+        nombre: 'Aulas',
+        submenu: {
+          aula: {
+            nombre: 'Aulas'
+          },
+          asignacionAulas: {
+            nombre: 'AsignacionAulas'
+          }
+        }
+      }
     }
   },
   historial: {

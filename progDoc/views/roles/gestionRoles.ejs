@@ -195,7 +195,7 @@ return departamento
         </tbody>
     </table>
     <h3 style="display:inline;"><em>Roles específicos de titulación</em></h3>
-    <select id="selectCoordinador" onChange="cambiarPDCoordinador()" >
+    <select onChange="cambiarPD(this.value)" >
         <% for(let i=0; i < planEstudios.length; i++) { 
             if (planEstudios[i].nombre !== null && (session.planID !== planEstudios[i].codigo)){ %>
         <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option>
@@ -360,21 +360,12 @@ function cambioRol(input){
 function Guardar(formID, nuevopath){
     if(formID.split("_")[0] !== "JefeEstudios" || confirm("Seguro que quiere dejar su cargo de Jefe de Estudios, no podrá deshacer esta acción una vez aceptada")){
         let form2 = document.getElementById(formID);
-        let pAcronimo = document.getElementById("selectCoordinador").value;
+        let pAcronimo = document.getElementById("selectPlan").value;
         form2.setAttribute('action', nuevopath+"?planID="+pAcronimo);
         form2.submit();
     }
 }
-function cambiarPDCoordinador(){
-    let pAcronimo = document.getElementById("selectCoordinador").value;
-    let search = parseQueryString();
-    delete search.pdID;
-    search.planID = pAcronimo;
-    search.foco = true;
-    let url = parseStringQuery(search);
-    window.location.replace(url);
-    
-}
+
 
 function Volver(cancelarpath){
     window.location.replace(cancelarpath);

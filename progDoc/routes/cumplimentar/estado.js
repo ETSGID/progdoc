@@ -9,7 +9,7 @@ const estadoController = require('../../controllers/estado_controller');
 const enumsPD = require('../../enumsPD');
 
 router.all('*', (req, res, next) => {
-  req.session.submenu = enumsPD.menuBar.cumplimentar.submenu.estado;
+  req.session.submenu = enumsPD.menuBar.cumplimentar.submenu.estado.nombre;
   next();
 });
 

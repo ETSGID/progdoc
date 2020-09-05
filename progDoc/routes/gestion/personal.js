@@ -8,7 +8,7 @@ const personaYProfesorController = require('../../controllers/personaYProfesor_c
 const enumsPD = require('../../enumsPD');
 
 router.all('*', (req, res, next) => {
-  req.session.submenu = enumsPD.menuBar.gestion.submenu.personal;
+  req.session.submenu = enumsPD.menuBar.gestion.submenu.personal.nombre;
   next();
 });
 

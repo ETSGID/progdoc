@@ -9,7 +9,7 @@ const aulaController = require('../../controllers/aula_controller');
 const enumsPD = require('../../enumsPD');
 
 router.all('*', (req, res, next) => {
-  req.session.submenu = enumsPD.menuBar.gestion.submenu.aula;
+  req.session.submenu = enumsPD.menuBar.gestion.submenu.aula.nombre;
   next();
 });
 
@@ -17,6 +17,8 @@ router.all('*', (req, res, next) => {
 router.get(
   '/',
   (req, res, next) => {
+    req.session.subsubmenu =
+      enumsPD.menuBar.gestion.submenu.aula.submenu.aula.nombre;
     res.locals.rols.push({
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,
@@ -35,7 +37,8 @@ router.get(
 router.get(
   '/asignacion',
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.gestion.submenu.aula2;
+    req.session.subsubmenu =
+      enumsPD.menuBar.gestion.submenu.aula.submenu.asignacionAulas.nombre;
     res.locals.rols.push({
       rol: enumsPD.rols.JefeEstudios,
       PlanEstudioCodigo: null,

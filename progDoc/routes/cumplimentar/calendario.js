@@ -10,7 +10,7 @@ const calendarioController = require('../../controllers/calendario_controller');
 const enumsPD = require('../../enumsPD');
 
 router.all('*', (req, res, next) => {
-  req.session.submenu = enumsPD.menuBar.cumplimentar.submenu.calendario;
+  req.session.submenu = enumsPD.menuBar.cumplimentar.submenu.calendario.nombre;
   next();
 });
 

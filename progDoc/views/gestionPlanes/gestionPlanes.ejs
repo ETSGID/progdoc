@@ -1,4 +1,3 @@
-<%- include ../../public/js/helpers.ejs %>
 <div class ="contenido2">
 <%if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
   <p><%=permisoDenegado%></p>
@@ -31,7 +30,6 @@
 <%}%>
 <script>
 let path = <%-JSON.stringify(path)%>
-let MostrarOcultar = <%-MostrarOcultar%>;
 /**
 *para poner siempre el path inicial y no que quede el de otra ruta al darle a guardar
 *evitas que si recarga la pagina vuelva a hacer una accion que ya ha hecho

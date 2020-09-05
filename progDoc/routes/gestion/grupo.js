@@ -11,7 +11,7 @@ const enumsPD = require('../../enumsPD');
 const estados = require('../../estados');
 
 router.all('*', (req, res, next) => {
-  req.session.submenu = enumsPD.menuBar.gestion.submenu.grupo;
+  req.session.submenu = enumsPD.menuBar.gestion.submenu.grupo.nombre;
   next();
 });
 

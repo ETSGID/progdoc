@@ -36,7 +36,7 @@ router.get('/', (req, res) => {
 router.get(
   '/estado',
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.consultar.submenu.estado;
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.estado.nombre;
     next();
   },
   planController.getPlanes,
@@ -48,7 +48,7 @@ router.get(
 router.get(
   '/roles',
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.consultar.submenu.rol;
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.rol.nombre;
     next();
   },
   planController.getPlanes,
@@ -63,7 +63,7 @@ router.use('/aulas', routerAula);
 router.get(
   '/grupos',
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.consultar.submenu.grupo;
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.grupo.nombre;
     next();
   },
   planController.getPlanes,
@@ -75,7 +75,7 @@ router.get(
 router.get(
   '/calendario',
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.consultar.submenu.calendario;
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.calendario.nombre;
     next();
   },
   planController.getPlanes,
@@ -90,7 +90,7 @@ router.get(
 router.get(
   '/profesores',
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.consultar.submenu.profesor;
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.profesor.nombre;
     next();
   },
   planController.getPlanes,
@@ -102,7 +102,7 @@ router.get(
 router.get(
   '/tribunales',
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.consultar.submenu.tribunal;
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.tribunal.nombre;
     next();
   },
   planController.getPlanes,
@@ -114,7 +114,7 @@ router.get(
 router.get(
   '/horarios',
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.consultar.submenu.horario;
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.horario.nombre;
     next();
   },
   planController.getPlanes,
@@ -126,7 +126,7 @@ router.get(
 router.get(
   '/actividades',
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.consultar.submenu.actividad;
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.actividad.nombre;
     next();
   },
   planController.getPlanes,
@@ -138,7 +138,7 @@ router.get(
 router.get(
   '/examenes',
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.consultar.submenu.examen;
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.examen.nombre;
     next();
   },
   planController.getPlanes,
@@ -152,7 +152,7 @@ router.get(
 router.get(
   '/PDF',
   (req, res, next) => {
-    req.session.submenu = enumsPD.menuBar.consultar.submenu.pdf;
+    req.session.submenu = enumsPD.menuBar.consultar.submenu.pdf.nombre;
     next();
   },
   planController.getPlanes,

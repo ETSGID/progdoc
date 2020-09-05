@@ -10,7 +10,7 @@ const acronimoController = require('../../controllers/acronimo_controller');
 const enumsPD = require('../../enumsPD');
 
 router.all('*', (req, res, next) => {
-  req.session.submenu = enumsPD.menuBar.gestion.submenu.acronimo;
+  req.session.submenu = enumsPD.menuBar.gestion.submenu.acronimo.nombre;
   next();
 });
 

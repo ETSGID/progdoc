@@ -1,5 +1,4 @@
 <body>
-<%- include ../../public/js/helpersMenu.ejs %>
 <div class="myHeader">
     <p>Cumplimentar Programación:
     <% if ( session && session.pdID){ %>
@@ -7,8 +6,8 @@
     <% } %>
     </p>
     <div class="row col-sm"  style="margin-left:0px">
-        <% if (session.submenu !== "Profesores2") { %>
-         <select id="selectPlan" onchange="cambiarPD()">
+        <% if (session.submenu !== "Profesores" || session.subsubmenu !== "CumplimentarProfesores") { %>
+         <select id="selectPlan" onchange="cambiarPD(this.value)">
             <option value="none" disabled>Plan...</option>
                 <% for(let i=0; i < planEstudios.length; i++) { 
                     if (planEstudios[i].nombre !== null){ %>
@@ -23,7 +22,7 @@
 
     <%if (session.departamentoID && locals.departamentosResponsables && (session.submenu === "Profesores" || session.submenu === "Tribunales")) { %>
      <input id='departamentoResponsable' type="hidden" value="<%=session.departamentoID%>">
-         <select id="selectDepartamento"  onchange="cambiarDepart()">
+         <select id="selectDepartamento"  onchange="cambiarDepart(this.value)">
             <option value='none' disabled>Depart...</option>
             <% for(let i=0; i < departamentosResponsables.length; i++) { 
                 if (departamentosResponsables[i].acronimo !== null){ %>
@@ -35,39 +34,22 @@
          </select>
         <%}%>
     </div>
-    <div class="tab">
+    <div class="tab">   
         <button id='Estado' class="tablinks" onclick="cambiarSubmenu(event, 'Estado')">Estado</button>
         <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')">Calendario</button>
         <button id='Profesores' class="tablinks" onclick="cambiarSubmenu(event, 'Profesores')">Profesores</button>
         <button id='Tribunales' class="tablinks" onclick="cambiarSubmenu(event, 'Tribunales')">Tribunales</button>
         <button id='Horarios' class="tablinks" onclick="cambiarSubmenu(event, 'Horarios')">Horarios</button>
         <button id='Actividades' class="tablinks" onclick="cambiarSubmenu(event, 'Actividades')">Actividades</button>
-        <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Exámenes</button>
+        <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes', 'Examenes')">Exámenes</button>
     </div>
-    <% if (session.planID) { %>
-     <input id='plan' type="hidden" value="<%=session.planID%>">
-  <%} else {%>
-    <input id='plan' type="hidden">
-  <%}%>
-    <% if (session.submenu) { %>
-     <input id='submenu' type="hidden" value="<%=session.submenu%>">
-  <%} else {%>
-    <input id='submenu' type="hidden">
-  <%}%>
-  <% if (session.departamentoID) { %>
-     <input id='departamento' type="hidden" value="<%=session.departamentoID%>">
-  <%} else {%>
-    <input id='departamento' type="hidden">
-  <%}%>
    <%-include ./cumplimentarSubmenu.ejs%>
 </div>
 
 <script>
-let parseQueryString = <%-parseQueryString%>
-let parseStringQuery = <%-parseStringQuery%>
 let selectDepartamentoValue;
 let selectPlanValue;
-function cambiarSubmenu(evt, submenu) {
+function cambiarSubmenu(evt, submenu, subsubmenu) {
     let pAcronimo = document.getElementById("selectPlan").value;
     let departamento = document.getElementById('departamento');
     if(departamento){
@@ -90,7 +72,13 @@ function cambiarSubmenu(evt, submenu) {
         window.location.replace(url);
     }
     if (submenu === 'Examenes'){
-        let url = "<%=CONTEXT%>/cumplimentar/examenes?planID="+pAcronimo
+        let url = '';
+        if(subsubmenu === 'Examenes'){
+            url = "<%=CONTEXT%>/cumplimentar/examenes?planID="+pAcronimo
+        }
+        if(subsubmenu === 'Franjas'){
+            url = "<%=CONTEXT%>/cumplimentar/examenes/franjas?planID="+pAcronimo
+        }
         window.location.replace(url);
     }
     if (submenu === 'Estado'){
@@ -104,44 +92,6 @@ function cambiarSubmenu(evt, submenu) {
 
 
 
-}
-function cambiarPD(){
-    let pAcronimo = document.getElementById("selectPlan").value;
-    let search = parseQueryString();
-    delete search.pdID;
-    search.planID = pAcronimo;
-    let url = parseStringQuery(search);
-    window.location.replace(url);
-    
-}
-
-function cambiarDepart(){
-    let depart = document.getElementById("selectDepartamento").value;
-    let search = parseQueryString();
-    search.departamentoID = depart;
-    let url = parseStringQuery(search);
-    window.location.replace(url);
-}
-
-document.getElementsByTagName('body')[0].onload = actualizarSelectyBarra();
-function actualizarSelectyBarra() {
-    selectPlanValue = document.getElementById('plan').value
-    document.getElementById('selectPlan') ? document.getElementById('selectPlan').value = selectPlanValue : null;
-
-    let departamento = document.getElementById('departamento');
-    let selectDepartamento = document.getElementById('selectDepartamento');
-    if(departamento && selectDepartamento){
-        selectDepartamentoValue = departamento.value;
-        document.getElementById('selectDepartamento').value = selectDepartamentoValue;
-    }
-        
-    let submenu = document.getElementById('submenu').value
-    //para pintar profesores cuando este en asignacionProfesoresCumplimentar
-    if(submenu ==="Profesores2"){
-        submenu="Profesores"
-    }
-    document.getElementById('submenu').style.display = "block";
-    document.getElementById('submenu').className += " active";
 }
 
 

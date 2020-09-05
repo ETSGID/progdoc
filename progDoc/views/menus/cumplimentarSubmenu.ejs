@@ -1,6 +1,7 @@
 <%if(!locals.estado && !locals.permisoDenegado && !locals.existe){%>
     <%switch (session.submenu){
         case "Profesores":%>
+            <% if(session.subsubmenu === 'Profesores'){ %>
             <div>
                 <% if(estadoProfesores[session.departamentoID] === estadosProfesor.abierto && estadoProgDoc === estadosProgDoc.abierto ) { %>
                     <form autocomplete="off" action="<%= aprobarpath %>" method="post" onsubmit="return Enviar()">
@@ -18,12 +19,12 @@
                         <p>La asignación de profesores ya ha sido aprobada por el director del departamento</p>
                     <%}%>
             </div>
-    <%        break;
-        case "Profesores2":%>
+        <% } if (session.subsubmenu === 'CumplimentarProfesores'){ %>
             <div>
                 <button type='button'  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
                 <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
             </div>
+        <% } %>
     <%        break;
         case "Tribunales":%>
             <div>
@@ -67,25 +68,16 @@
     <%        break;
         case "Examenes":%>
             <div>
-            <select id="selectExamenes"  onchange="cambiarSelectExamen('<%=selectExamenespath%>')">
-                <option value="Examenes" title="Examenes" selected>Exámenes</option>
-                <option value="FranjaExamenes" title="FranjaExamenes">Franja Exámenes</option>      
-            </select>
-                <%if(estadoExamenes === estadosExamen.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
+                <div class="subsubmenu">
+                    <button id='subsubmenu_Examenes' onclick="cambiarSubmenu(event, 'Examenes', 'Examenes')" class="btn btn-default">Exámenes</button>
+                    <span>/</span>
+                    <button id='subsubmenu_Franjas' onclick="cambiarSubmenu(event, 'Examenes', 'Franjas')" class="btn btn-default">Franja Exámenes</button>
+                </div>
+                <%if(estadoExamenes === estadosExamen.abierto && estadoProgDoc === estadosProgDoc.abierto && session.subsubmenu === 'Examenes') {%>
                     <button type='button'  class="btn btn-primary" onclick="Enviar('<%= aprobarpath %>')" >Confirmar exámenes</button>
                 <%}%>
                 <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
                 <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
-            </div>
-    <%        break;
-        case "Examenes2":%>
-            <div>
-                <select id="selectExamenes"  onchange="cambiarSelectExamen('<%=selectExamenespath%>')">
-                <option value="Examenes" title="Examenes">Exámenes</option>
-                <option value="FranjaExamenes" title="FranjaExamenes" selected>Franja Exámenes</option>      
-                </select>
-                    <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
-                    <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
             </div>
     <%        break;
         default:

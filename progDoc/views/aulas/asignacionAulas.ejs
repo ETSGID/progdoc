@@ -1,11 +1,9 @@
 <%- include ./aulasHelpers.ejs %>
-<%- include ../../public/js/helpers.ejs %>
 <div class="contenido">
     <%if(permisoDenegado && permisoDenegado !== null){%>
         <p><%=permisoDenegado%></p>
     <%}else{%>
         <input type="hidden" value="<%= anoSeleccionado %>" id="anoSeleccionado" />
-            <h2>Asignación de aulas</h2>
         <div id='table_asignacionAulas'>
             <select id="anoSelector" onchange="changeAno()" style="margin-bottom: 1em;">
                 <option value="<%=ano2%>" selected><%=ano2.substring(2,5)%>/<%= parseInt(ano2.substring(2,5)) + 1%></option> 
@@ -135,7 +133,6 @@
     <%}%>
 </div>
 <script>
-     let MostrarOcultar = <%-MostrarOcultar%>;
     document.getElementsByTagName('body')[0].onload = changeCuatrimestre();
     function buscadorOnKeyPress(key){
         if(key.keyCode == 13){

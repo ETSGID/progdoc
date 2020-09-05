@@ -6,7 +6,6 @@
         <% if (session.menuBar === 'gestion') { %>
             <%- include ./aulaModal%>
         <% } %>
-        <h2>Listado de aulas</h2>
         <div id='table_aulas'>
             <% if (session.menuBar === 'gestion') { %>
                 <button type="button" style="margin-bottom: 10px;"  class="btn btn-primary" onclick="anadirAula()">Añadir Aula</button>
@@ -15,12 +14,15 @@
                 <tr>
                     <th>Aula</th>
                     <th>Capacidad</th>
-                    <th>Acción</th>
+                    <% if (session.menuBar === 'gestion') { %>
+                        <th>Acción</th>
+                    <% } %>
                 </tr>
                 <% aulas.forEach(aula => { %>
                     <tr>
                         <td id='aula_<%=aula.identificador%>'><%=aula.identificador%></td>
                         <td id='aula_<%=aula.identificador%>_cupo'><%= aula.cupo || '-' %></td>
+                        <% if (session.menuBar === 'gestion') { %>
                         <td>
                             <button type="button" class="btn btn-default" onclick = "editarAula('<%=aula.identificador%>')">
                                 <span class="glyphicon glyphicon-pencil"></span>
@@ -29,6 +31,7 @@
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>  
                         </td>
+                    <% } %>
                     </tr>
                 <% }) %>
             </table>

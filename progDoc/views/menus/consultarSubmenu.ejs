@@ -1,13 +1,5 @@
 
 <%switch (session.submenu){
-    case "Acronimos":%>
-        <%if(!locals.permisoDenegado){%>
-            <div>
-                <button type="button"  class="btn btn-default" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
-                <button type="button"  class="btn btn-default" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
-            </div>
-        <%}%>
-    <%        break;
     case "Aulas":%>
             <div>
                 <div class="subsubmenu">

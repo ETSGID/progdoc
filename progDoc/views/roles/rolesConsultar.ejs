@@ -147,7 +147,7 @@ return departamento
         </tbody>
     </table>
     <h3 style="display:inline;"><em>Roles específicos de titulación</em></h3>
-    <select id="selectCoordinador" onChange="cambiarPDCoordinador()" >
+    <select id="selectPlan" onChange="cambiarPD(this.value)" >
         <% for(let i=0; i < planEstudios.length; i++) { 
             if (planEstudios[i].nombre !== null && (session.planID !== planEstudios[i].codigo)){ %>
         <option id="<%=planEstudios[i].codigo%>" value="<%=planEstudios[i].codigo%>" title="<%=planEstudios[i].nombreCompleto%> (<%=planEstudios[i].codigo%>)"><%=planEstudios[i].nombre%></option>
@@ -229,19 +229,8 @@ return departamento
 //se utiliza para que al cambiar plan el foco vaya a donde estabas
 let foco = <%- JSON.stringify(foco) %>
 
-function cambiarPDCoordinador(){
-    let pAcronimo = document.getElementById("selectCoordinador").value;
-    let search = parseQueryString();
-    delete search.pdID;
-    search.planID = pAcronimo;
-    search.foco = true;
-    let url = parseStringQuery(search);
-    window.location.replace(url);
-    
-}
 
 $(function() {
-
     if (foco)window.scrollTo(0, document.getElementById('foco').offsetTop + 20);
 });
     
