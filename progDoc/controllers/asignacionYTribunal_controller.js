@@ -27,6 +27,9 @@ const getAsignacion = async (
   try {
     const asigns = await models.Asignatura.findAll({
       where: {
+        acronimo: {
+          [op.ne]: null
+        },
         // se obtendrá con req D510 1
         ProgramacionDocenteIdentificador,
         DepartamentoResponsable,
@@ -752,6 +755,9 @@ exports.getTribunales = async (req, res, next) => {
         const profesores = await personaYProfesorController.getProfesores();
         const asigns = await models.Asignatura.findAll({
           where: {
+            acronimo: {
+              [op.ne]: null
+            },
             // se obtendrá con req D510 1
             ProgramacionDocenteIdentificador: {
               [op.in]: ProgramacionDocentesIdentificador

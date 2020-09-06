@@ -71,7 +71,9 @@ exports.getActividadParcial = async (req, res, next) => {
       const g = await grupoController.getGruposAndAula(pdID);
       // los grupos de las nuevas asignatuas
       grupos = g;
-      const as = await asignaturaController.getAsignaturasProgDoc(pdID);
+      const as = await asignaturaController.getAsignaturasProgDoc(pdID, {
+        acronimo: { [op.ne]: null }
+      });
       asignaturas = as;
       // eslint-disable-next-line no-use-before-define
       const conjuntoActividadesParcial = await getAllActividadParcial([pdID]);

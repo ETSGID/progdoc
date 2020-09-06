@@ -14,6 +14,7 @@ exports.getAsignaturasPD = async (req, res, next) => {
   let pdID1 = 'no programacion';
   let pdID2 = 'no programacion';
   const filtro = {};
+  filtro.acronimo = { [op.ne]: null };
   const semestreAsignatura = ['I', 'A', '1S-2S'];
   let resp = {};
   let respError;
@@ -111,6 +112,7 @@ exports.getAsignaturasHorario = async (req, res, next) => {
   let pdID1 = 'no programacion';
   let pdID2 = 'no programacion';
   const filtro = {};
+  filtro.acronimo = { [op.ne]: null };
   const semestreAsignatura = ['I', 'A', '1S-2S'];
   const asignaturas = req.params.codigoAsignaturas.split(',');
   filtro.codigo = { [op.or]: asignaturas };
@@ -266,6 +268,7 @@ exports.getAsignaturasExamen = async (req, res, next) => {
   let pdID1 = 'no programacion';
   let pdID2 = 'no programacion';
   const filtro = {};
+  filtro.acronimo = { [op.ne]: null };
   const semestreAsignatura = ['I', 'A', '1S-2S'];
   const asignaturas = req.params.codigoAsignaturas.split(',');
   const periodosExamen = [];

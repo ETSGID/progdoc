@@ -1,15 +1,17 @@
 const Sequelize = require('sequelize');
+
+const op = Sequelize.Op;
 const models = require('../models');
 
 // recuperar las asignaturas de una progdoc
-exports.getAsignaturasProgDoc = async pdID => {
+exports.getAsignaturasProgDoc = async (pdID, filter) => {
   if (pdID) {
     // eslint-disable-next-line no-useless-catch
     try {
+      const filtro = filter || {};
+      filtro.ProgramacionDocenteIdentificador = pdID;
       const asign = await models.Asignatura.findAll({
-        where: {
-          ProgramacionDocenteIdentificador: pdID
-        },
+        where: filtro,
         attributes: [
           'identificador',
           'codigo',
@@ -84,7 +86,10 @@ exports.getCoordinadoresAsignaturasProgDoc = async pdID => {
     try {
       const asign = await models.Asignatura.findAll({
         where: {
-          ProgramacionDocenteIdentificador: pdID
+          ProgramacionDocenteIdentificador: pdID,
+          acronimo: {
+            [op.ne]: null
+          }
         },
         attributes: [
           'codigo',

@@ -34,7 +34,7 @@ exports.getAcronimos = async (req, res, next) => {
       });
     } else {
       const pdID = res.locals.progDoc['ProgramacionDocentes.identificador'];
-      const asign = await asignaturaController.getAsignaturasProgDoc(pdID);
+      const asign = await asignaturaController.getAsignaturasProgDoc(pdID, {});
       asign.forEach(as => {
         if (asignaturasPorCursos[as.curso] == null) {
           asignaturasPorCursos[as.curso] = [];
@@ -94,6 +94,8 @@ exports.actualizarAcronimos = async (req, res, next) => {
           break;
         case 'asignatura':
           elementToActualizar.acronimo = acronimo;
+          if (acronimo === 'null' || acronimo.trim('').trim() === '')
+            elementToActualizar.acronimo = null;
           codigo = Number(codigo);
           promises.push(
             models.Asignatura.update(

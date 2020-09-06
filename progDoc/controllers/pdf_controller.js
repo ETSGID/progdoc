@@ -217,6 +217,9 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
         },
         DepartamentoResponsable: {
           [op.ne]: null
+        },
+        acronimo: {
+          [op.ne]: null
         }
       },
       order: [

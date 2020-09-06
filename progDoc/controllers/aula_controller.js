@@ -337,6 +337,11 @@ exports.getAsignacionAulas = async (req, res, next) => {
             include: [
               {
                 model: models.Asignatura,
+                where: {
+                  acronimo: {
+                    [op.ne]: null
+                  }
+                },
                 attributes: ['nombre', 'acronimo'],
                 required: true // inner join
               }

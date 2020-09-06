@@ -39,6 +39,15 @@
                     </tbody>
                 </table>
             </div>
+            <hr>
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Importante</h3>
+                </div>
+                <div class="panel-body">
+                Los planes y asignaturas que <b>no tengan acrónimo</b> no se mostrarán en las programaciones docentes.
+                </div>
+            </div>
             <h2 style="display:inline;">Plan</h2>
             <select id="selectPlan" onchange="cambiarPD(this.value)">
                 <option value="none" disabled>Plan...</option>
@@ -158,7 +167,7 @@ function MarcarChangeAsignatura(id){
     let acronimoNuevo = document.getElementsByName("asignatura_"+curso+"_"+identificador)[0].value;
     let inputElement = document.getElementById(id);
     if(acronimoNuevo.trim() === ""){
-        acronimoNuevo = document.getElementsByName("asignatura_"+curso+"_"+identificador)[0].placeholder === '-' ? null : document.getElementsByName("asignatura_"+curso+"_"+identificador)[0].placeholder;
+        acronimoNuevo = null;
     }
     if(asignatura && acronimoNuevo !== asignatura.acronimo){
         inputElement.name = 'actualizar'

@@ -57,6 +57,7 @@ exports.getProfesorAsignaturas = async (req, res, next) => {
       }
       const asignaciones = await models.Asignatura.findAll({
         where: {
+          acronimo: { [op.ne]: null },
           ProgramacionDocenteIdentificador: {
             [op.or]: pds
           },

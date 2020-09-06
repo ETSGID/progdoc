@@ -177,6 +177,9 @@ exports.getExamenes = async (req, res, next) => {
             ProgramacionDocenteIdentificador,
             DepartamentoResponsable: {
               [op.ne]: null
+            },
+            acronimo: {
+              [op.ne]: null
             }
           },
           attributes: [

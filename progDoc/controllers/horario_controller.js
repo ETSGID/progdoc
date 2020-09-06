@@ -106,6 +106,9 @@ exports.getHorario = async (req, res, next) => {
             },
             semestre: {
               [op.ne]: null
+            },
+            acronimo: {
+              [op.ne]: null
             }
           },
           attributes: [
