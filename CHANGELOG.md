@@ -6,16 +6,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [1.0.7] - 2020-09-07
+### Added
+- Subsubmenu en sesión.
+- **Migración trasladar aulas y modificar Grupos**.
+- **Comparar tribunales con la versión anterior y curso anterior en pdf**.
+- **Generar toda la base de datos con migraciones**.
+- **Borrar progdocs y calendarios antiguas**.
+- **Borrar progdoc sin cambios o incidencia**.
+- Añadir información en pestaña retraer estado.
+- **Seeders TFG y TFM**.
+### Changed
+- Cambiar de exámenes a franjas con botones en vez de select.
+- **Sólo mostrar asignaturas con acrónimos**.
+- **Pestaña Aulas**.
+- Actualizar versión de Bootstrap y Bootsrap-select a la versión 3.4.1.
+- Modo de conexión a la base de datos desde el Backend.
+- Renombrar functions.js(.ejs) to helpers.js(.ejs).
+- Estilo CSS.
+- **Separar routers en *Consultar, Cumplimentar, Gestión e Historial***.
+- Tareas cron a las 00:00:00 todos los días.
+- Update README.md
+- Modificar orden pestañas Consultar.
+- Cambiar *Gestión* por *Jefatura Estudios*.
+- Backend Calendario.
+- Cambiar textos *Aprobar* por *Confirmar* en Cumplimentar.
+- Actualizar pdf ayuda.
+- Modificar orden pestañas Cumplimentar.
+### Fixed
+- Bug intercambio horarios cuando hay varias asignaturas en misma hora.
+- Sanetizar acrónimos para cambiar `_` y  `/` por `-`
+- Poblemas estilo Eslint.
+- Warning trasladar calendario al tratar fechas.
+- Datepicker position.
+
 ## [1.0.6] - 2020-07-08
 ### Added
 - **.dockerignore**
 ### Changed
-- Colores de **Aulas** .
-- Orden pestañas de **Jefatura Estudios**.
+- Colores de Aulas .
+- Orden pestañas de Jefatura Estudios.
 - **Dockerfile** instalación módulos con *npm ci*.
 ### Fixed
-- Modal **Actividades** calendario *orientation top*.
-- Bug intercambios **Horarios**.
+- Modal Actividades calendario *orientation top*.
+- Bug intercambios Horarios.
 
 ## [1.0.5] - 2020-06-30
 ### Added
