@@ -97,7 +97,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
       <td>
         <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_incidencia"  method="post">
         <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
-        <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>"> 
+        <input type="hidden" name="pdIdentificador" value="<%=pds[i].identificador%>"> 
         <button type="button"  class="btn btn-warning" 
         onclick="AbrirIncidencia('plan_<%=pds[i].PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>', '<%=pds[i].identificador%>')"   
         title="Abrirá incidencia de <%=pds[i].identificador%>">
@@ -109,7 +109,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
       <td>
         <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_reabierto"  method="post">
         <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
-        <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">        
+        <input type="hidden" name="pdIdentificador" value="<%=pds[i].identificador%>">        
         <button type="button"  class="btn btn-success" 
           onclick="AbrirReabierto('plan_<%=pds[i].PlanEstudioId%>_reabierto', '<%=reabrirpath%>', '<%=pds[i].identificador%>')"
           title="Reabrirá la programación <%=pds[i].identificador%>" >
@@ -140,7 +140,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
     <td>
       <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_gestionar"  method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
-      <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">
+      <input type="hidden" name="pdIdentificador" value="<%=pds[i].identificador%>">
       <%if ( pdAnterior && pdAnterior.estadoProGDoc === estadosProgDoc.incidencia){%> 
       <button type="button"  class="btn btn-default"  title="Debe cerrar la incidencia primero" disabled>Cerrar</button>
       <%}else{%>
@@ -154,7 +154,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
         <% if (pdAnterior){ %>
           <form autocomplete="off" id="plan_<%=pdAnterior.PlanEstudioId%>_incidencia"  method="post">
           <input type="hidden" name="plan" value="<%=pdAnterior.PlanEstudioId%>">
-          <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pdAnterior.identificador%>">     
+          <input type="hidden" name="pdIdentificador" value="<%=pdAnterior.identificador%>">     
           <%if (pdAnterior.estadoProGDoc === estadosProgDoc.cerrado){%>
             <button type="button"  class="btn btn-warning" 
             onclick="AbrirIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>', '<%=pdAnterior.identificador%>')"   
@@ -177,7 +177,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
       <% if (pdAnterior && pdAnterior.estadoProGDoc === estadosProgDoc.incidencia) {%>
         <form autocomplete="off" id="plan_<%=pdAnterior.PlanEstudioId%>_eliminar" method="post"> 
         <input type="hidden" name="plan" value="<%=pdAnterior.PlanEstudioId%>">
-        <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pdAnterior.identificador%>">
+        <input type="hidden" name="pdIdentificador" value="<%=pdAnterior.identificador%>">
         <button type="button"  class="btn btn-danger"  
         onclick="Eliminar('plan_<%=pdAnterior.PlanEstudioId%>_eliminar', '<%=eliminarpath%>', '<%=pdAnterior.identificador%>')" 
         title="Eliminar programación docente <%=pdAnterior.identificador%>">
@@ -190,7 +190,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
     </td>
   <% } else if(pds[i].estadoProGDoc === estadosProgDoc.abierto) { %>
     <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>"> 
-    <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>"> 
+    <input type="hidden" name="pdIdentificador" value="<%=pds[i].identificador%>"> 
     <% if (pdAnterior && pdAnterior.estadoProGDoc === estadosProgDoc.incidencia){ %>
     <td><%=pdAnterior.anoAcademico%></td>
     <td><%=pdAnterior.semestre%></td>
@@ -201,7 +201,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
     <td>
       <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_gestionar"  method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
-      <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>"> 
+      <input type="hidden" name="pdIdentificador" value="<%=pds[i].identificador%>"> 
       <button type="button"  class="btn btn-default" disabled title="La programación docente aun no ha sido rellenada">Cerrar</button>
       </form>
     </td>
@@ -209,7 +209,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
       <%  if (pdAnterior){ %>
           <form autocomplete="off" id="plan_<%=pdAnterior.PlanEstudioId%>_incidencia"  method="post">
           <input type="hidden" name="plan" value="<%=pdAnterior.PlanEstudioId%>">
-          <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pdAnterior.identificador%>">
+          <input type="hidden" name="pdIdentificador" value="<%=pdAnterior.identificador%>">
           <%if (pdAnterior.estadoProGDoc === estadosProgDoc.cerrado){%>
             <button type="button"  class="btn btn-warning" 
             onclick="AbrirIncidencia('plan_<%=pdAnterior.PlanEstudioId%>_incidencia', '<%=abririncidenciapath%>', '<%=pdAnterior.identificador%>')"  
@@ -232,7 +232,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
       <% if (pdAnterior && pdAnterior.estadoProGDoc === estadosProgDoc.incidencia){%>
         <form autocomplete="off" id="plan_<%=pdAnterior.PlanEstudioId%>_eliminar" method="post"> 
         <input type="hidden" name="plan" value="<%=pdAnterior.PlanEstudioId%>">
-        <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pdAnterior.identificador%>">        
+        <input type="hidden" name="pdIdentificador" value="<%=pdAnterior.identificador%>">        
         <button type="button"  class="btn btn-danger"  
         onclick="Eliminar('plan_<%=pdAnterior.PlanEstudioId%>_eliminar', '<%=eliminarpath%>', '<%=pdAnterior.identificador%>')" 
         title="Eliminar programación docente <%=pdAnterior.identificador%>">
@@ -242,7 +242,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
       <% } else if (pds[i].isPDInitialState) { %>
         <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_eliminar" method="post"> 
         <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
-        <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">     
+        <input type="hidden" name="pdIdentificador" value="<%=pds[i].identificador%>">     
         <button type="button"  class="btn btn-danger"  
         onclick="Eliminar('plan_<%=pds[i].PlanEstudioId%>_eliminar', '<%=eliminarpath%>', '<%=pds[i].identificador%>')" 
         title="Eliminar programación docente <%=pds[i].identificador%>">
@@ -265,7 +265,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
     <td>
       <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_incidencia"  method="post">
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">  
-      <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">        
+      <input type="hidden" name="pdIdentificador" value="<%=pds[i].identificador%>">        
       <button type="button"  class="btn btn-warning" 
       onclick="CerrarIncidencia('plan_<%=pds[i].PlanEstudioId%>_incidencia', '<%=cerrarincidenciapath%>', '<%=pds[i].identificador%>')"  
       title="Cerrará la incidencia <%=pds[i].identificador%>">
@@ -276,7 +276,7 @@ let incidencia = (pds[i].estadoProGDoc === estadosProgDoc.incidencia || (pdAnter
     <td>
       <form autocomplete="off" id="plan_<%=pds[i].PlanEstudioId%>_eliminar" method="post"> 
       <input type="hidden" name="plan" value="<%=pds[i].PlanEstudioId%>">
-      <input type="hidden" name="pdIdentificador" value="pdIdentificador-<%=pds[i].identificador%>">       
+      <input type="hidden" name="pdIdentificador" value="<%=pds[i].identificador%>">       
       <button type="button"  class="btn btn-danger"  
       onclick="Eliminar('plan_<%=pds[i].PlanEstudioId%>_eliminar', '<%=eliminarpath%>', '<%=pds[i].identificador%>')" 
       title="Eliminar programación docente <%=pds[i].identificador%>">

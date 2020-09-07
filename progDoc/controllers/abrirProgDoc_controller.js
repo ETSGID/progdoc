@@ -913,7 +913,7 @@ Abrir copia de progdoc
 No traslada fechas al año siguiente
 */
 exports.abrirCopiaProgDoc = async (req, res, next) => {
-  const pdIDanterior = req.body.pdIdentificador.split('-')[1];
+  const pdIDanterior = req.body.pdIdentificador;
   const tipoPD = progDocController.getTipoPd(pdIDanterior);
   const plan = progDocController.getPlanPd(pdIDanterior);
   const ano = progDocController.getAnoPd(pdIDanterior);

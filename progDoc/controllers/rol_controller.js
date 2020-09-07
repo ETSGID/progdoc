@@ -52,6 +52,8 @@ exports.getRolsPersonaView = async (req, res, next) => {
 };
 
 // comprueba el rol o si es delegado de dicho rol en función del estado de la PD pasada
+// comprueba ademas condiciones previas (array de condiciones con resultado booleano)
+// comprueba condiciones en funcion del estado de la programacion docente
 exports.comprobarRols = async (req, res, next) => {
   try {
     req.session.user.rols = await getRolsPersona(req.session.user.PersonaId);
@@ -92,6 +94,13 @@ exports.comprobarRols = async (req, res, next) => {
       );
       if (rolExistente) {
         let cumple = true;
+        if (Array.isArray(r.condicionesPrevias)) {
+          for (let i = 0; i < r.condicionesPrevias.length; i++) {
+            if (!r.condicionesPrevias[i].resultado) {
+              cumple = false;
+            }
+          }
+        }
         if (Array.isArray(r.condiciones)) {
           for (let i = 0; i < r.condiciones.length; i++) {
             const condic = r.condiciones[i].condicion;

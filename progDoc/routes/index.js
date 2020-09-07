@@ -61,6 +61,7 @@ router.get(
     req.session.menu = [];
     req.session.menuBar = null;
     req.session.submenu = null;
+    req.session.subsubmenu = null;
     next();
   },
   rolController.getRolsPersonaView

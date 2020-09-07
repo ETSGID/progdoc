@@ -202,7 +202,7 @@ exports.abrirProgDoc = async (req, res, next) => {
 exports.cerrarProgDoc = async (req, res, next) => {
   try {
     if (!res.locals.permisoDenegado) {
-      const pdID = req.body.pdIdentificador.split('-')[1];
+      const pdID = req.body.pdIdentificador;
       const pd = await models.ProgramacionDocente.findOne({
         where: { identificador: pdID },
         include: [
@@ -272,7 +272,7 @@ exports.abrirIncidenciaProgDoc = async (req, res, next) => {
 exports.cerrarIncidenciaProgDoc = async (req, res, next) => {
   try {
     if (!res.locals.permisoDenegado) {
-      const pdID = req.body.pdIdentificador.split('-')[1];
+      const pdID = req.body.pdIdentificador;
       // debo guardarla para generar los csv de los examenes
       req.session.pdID = pdID;
       const pd = await models.ProgramacionDocente.findOne({

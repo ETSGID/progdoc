@@ -76,12 +76,6 @@ const getProgramacionDocenteById = async pdID => {
     // eslint-disable-next-line no-useless-catch
     try {
       const pd = await models.ProgramacionDocente.findOne({
-        attributes: [
-          'identificador',
-          'semestre',
-          'estadoProfesores',
-          'reabierto'
-        ],
         where: {
           identificador: pdID
         },
@@ -271,14 +265,15 @@ exports.isPDLista = async (progID, thenFunction) => {
 // o si es una incidencia
 exports.isPDInitialState = progdoc => {
   return (
-    (progdoc.estadoProGDoc === estados.estadoProgDoc.abierto &&
+    progdoc &&
+    ((progdoc.estadoProGDoc === estados.estadoProgDoc.abierto &&
       CumpleTodos(estados.estadoProfesor.abierto, progdoc.estadoProfesores) &&
       CumpleTodos(estados.estadoTribunal.abierto, progdoc.estadoTribunales) &&
       progdoc.estadoHorarios === estados.estadoHorario.abierto &&
       progdoc.estadoExamenes === estados.estadoExamen.abierto &&
       // calendario de actividades
       progdoc.estadoCalendario === estados.estadoCalendario.abierto) ||
-    progdoc.estadoProGDoc === estados.estadoProgDoc.incidencia
+      progdoc.estadoProGDoc === estados.estadoProgDoc.incidencia)
   );
 };
 
