@@ -169,7 +169,7 @@ function actualizarSelectyBarra() {
     document.getElementById(submenu).className += ' active';
   }
   const subsubmenu = document.getElementById('subsubmenu').value;
-  if (subsubmenu) {
+  if (subsubmenu && document.getElementById(`subsubmenu_${subsubmenu}`)) {
     document.getElementById(`subsubmenu_${subsubmenu}`).className += ' active';
   }
 }
