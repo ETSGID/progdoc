@@ -409,7 +409,7 @@ exports.getAsignaturasExamen = async (req, res, next) => {
 // anoAcademico 201819
 // semestre 1S 2S I
 // codigoAsignatura es codigo de la asignatura
-// devuelve los profesores que dan una asignatura
+// devuelve los grupos que dan una asignatura
 exports.getGruposAsignatura = async (req, res, next) => {
   let semestreGrupo1 = '';
   let semestreGrupo2 = '';
