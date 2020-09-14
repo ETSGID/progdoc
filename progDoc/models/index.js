@@ -227,8 +227,19 @@ Grupo.belongsToMany(ConjuntoActividadParcial, {
   foreignKey: 'GrupoId'
 });
 
-// If you want to create de schema
-sequelizeSession.sync();
+(async () => {
+  try {
+    // If you want to create de schema
+    await sequelizeSession.sync();
+    await sequelize.authenticate();
+    await sequelizeSession.authenticate();
+    // eslint-disable-next-line no-console
+    console.log('Se ha conectado con las bases de datos');
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+})();
 
 // Exportamos modelos
 exports.Profesor = Profesor; // exportar definición de tabla Profesor

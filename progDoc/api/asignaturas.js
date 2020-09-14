@@ -211,7 +211,7 @@ exports.getAsignaturasHorario = async (req, res, next) => {
           include: [
             {
               model: models.Grupo,
-              attributes: ['nombre']
+              attributes: ['nombre', 'semestre', 'tipo', 'nombreItinerario']
             }
           ]
         }
@@ -229,17 +229,32 @@ exports.getAsignaturasHorario = async (req, res, next) => {
         asignNueva.curso = asign.curso;
         asignNueva.semestre = asign.semestre;
         asignNueva.nombreIngles = asign.nombreIngles;
-        asignNueva.grupos = {};
+        asignNueva.grupos = [];
         resp[asign.codigo] = asignNueva;
       }
       as = resp[asign.codigo];
       if (asign['AsignacionProfesors.Grupo.nombre']) {
-        if (!as.grupos[asign['AsignacionProfesors.Grupo.nombre']])
-          as.grupos[asign['AsignacionProfesors.Grupo.nombre']] = {
+        if (
+          !as.grupos.find(
+            g => g.nombre === asign['AsignacionProfesors.Grupo.nombre']
+          )
+        ) {
+          as.grupos.push({
+            nombre: asign['AsignacionProfesors.Grupo.nombre'],
+            semestre: asign['AsignacionProfesors.Grupo.semestre'],
+            tipo: Object.keys(enumsPD.tipoGrupo).find(
+              key =>
+                enumsPD.tipoGrupo[key] ===
+                asign['AsignacionProfesors.Grupo.tipo']
+            ),
+            itinerario: asign['AsignacionProfesors.Grupo.nombreItinerario'],
             horario: [],
             nota: []
-          };
-        grupo = as.grupos[asign['AsignacionProfesors.Grupo.nombre']];
+          });
+        }
+        grupo = as.grupos.find(
+          g => g.nombre === asign['AsignacionProfesors.Grupo.nombre']
+        );
         if (asign['AsignacionProfesors.Dia'])
           grupo.horario.push({
             dia: asign['AsignacionProfesors.Dia'],
@@ -474,7 +489,7 @@ exports.getGruposAsignatura = async (req, res, next) => {
     const grupos = await models.sequelize.query(
       `SELECT distinct 
       (a.identificador), a.codigo, a.nombre as "nombreAsignatura", 
-      a.acronimo, g.nombre, g."nombreItinerario", g.aula, g.capacidad, 
+      a.acronimo, g.nombre, g."nombreItinerario", g.aula, g.capacidad, g.semestre, g.tipo, 
       g."nombreItinerario", a."anoAcademico", au.cupo as "aulaCupo", au.identificador as "aulaIdentificador"
       FROM public."Asignaturas" as a
       left join public."AsignacionProfesors" as s on a.identificador = s."AsignaturaId"
@@ -508,6 +523,10 @@ exports.getGruposAsignatura = async (req, res, next) => {
           nombre: gr.nombre,
           capacidad: gr.capacidad,
           itinerario: gr.nombreItinerario,
+          semestre: gr.semestre,
+          tipo: Object.keys(enumsPD.tipoGrupo).find(
+            key => enumsPD.tipoGrupo[key] === gr.tipo
+          ),
           aula: {
             identificador: gr.aulaIdentificador,
             cupo: gr.aulaCupo
