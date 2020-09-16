@@ -51,7 +51,7 @@ return found;
         <tbody>
         <% for (let k=0; k< asignaturasEncontradas.length; k++){ 
           let [asignVieja, asignViejaAno] = getViejaAsignaturas(asignaturasEncontradas[k])
-          if(!asignVieja && asignaturasViejas.length !== 0 ){%>
+          if((!asignVieja || !asignViejaAno) && asignaturasViejas.length !== 0 ){%>
             <tr class="nuevaAsignatura">
           <%}else{%>
             <tr>
