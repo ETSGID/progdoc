@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [1.0.8] - 2020-09-16
+### Changed
+- **API REST endpoints**
+- Mostrar en el pdf de color verde todas las asignaturas nuevas comparando con versión 0 y versión anterior.
+
+
 ## [1.0.7] - 2020-09-07
 ### Added
 - Subsubmenu en sesión.
