@@ -4,7 +4,7 @@ services:
 
   db:
     container_name: gestiondoc_db
-    image: postgres:9.6
+    image: postgres:11
     restart: always
     volumes:
       - dbdata:/var/lib/postgresql/data
