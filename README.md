@@ -61,7 +61,7 @@ En **producción** deben realizarse copias de seguridad de la base de datos que 
 Con esta estrategia se evita que el número de copias aumente con el paso del tiempo. En este caso será constante y contará con 20 copias (7 diarias, 12 mensuales, 1 anual).
 
 ### Inicialización de la base de datos
-** La primera vez que se ejecute el proyecto ** es necesario generar el esqueleto de la base de datos y rellenar alguna información adicional. Para ello se usarán las migraciones y seeders. Las migraciones y los seeders se ejecutan automáticamente al inicializar el proyecto con docker. Además existen los siguientes scripts definidos en el `package.json`:
+**La primera vez que se ejecute el proyecto** es necesario generar el esqueleto de la base de datos y rellenar alguna información adicional. Para ello se usarán las migraciones y seeders. Las migraciones y los seeders se ejecutan automáticamente al inicializar el proyecto con docker. Además existen los siguientes scripts definidos en el `package.json`:
 
 ```shell
 #./node_modules/.bin/sequelize  db:seed:all --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB
@@ -90,6 +90,13 @@ psql -U [userpostgres] -h localhost  [database] < [file.sql]
 #file.sql puede contener toda la base de datos, el esquema o solo los datos. En docker se debe borrar el volumen dbdata de la bbdd ya que sino seguirá la versión anterior.
 ```
 Dependiendo del caso será necesario eliminar las migraciones y/o los seeders antes de restaurarla ya que puede dar fallos si ya existen las tablas y las intenta volver a crear o sí los seeders ya han creado los datos e intenta volver a crearlos.
+
+**Si la base de datos está en un contenedor Docker**: 
+
+1. Debe eliminarse el volumen inicial de la base datos y detener la ejecución de los contenedores: `docker-compose down --v`
+1. Debe arrancarse la base de datos sin el contenedor de la aplicación: `docker-compose up -d db`
+1. Importar la base de datos completa (esquema + datos): `psql -U [userpostgres] -h localhost  [database] < [file.sql]`
+1. Arrancar todo el escenario de nuevo: `docker-compose up -d`
 
 ## Almacenamiento de ficheros (pdfs y csv)
 Los pdfs se almacenan en el volumen `progdoc:/storage/progdoc`
