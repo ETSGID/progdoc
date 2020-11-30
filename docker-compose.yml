@@ -3,7 +3,7 @@ version: '3'
 services: 
 
   dbsession:
-    image: postgres:11
+    image: postgres:9.6
     restart: always
     
   progdoc:
