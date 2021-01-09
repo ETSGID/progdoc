@@ -1,6 +1,5 @@
-[[_TOC_]]
-
 # Progdoc
+[[_TOC_]]
 
 ## Descripción
 Servicio que permite consultar y planificar el curso académico actual y siguiente de todos los planes impartidos en la escuela. La aplicación está accesible desde el [portal del PDI en la página de la ETSIT](https://portal.etsit.upm.es/pdi/)
