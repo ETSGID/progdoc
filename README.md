@@ -1,36 +1,6 @@
+[[_TOC_]]
+
 # Progdoc
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Tabla de contenidos**
-
-- [Descripción](#descripci%C3%B3n)
-- [Consideraciones previas](#consideraciones-previas)
-- [Puertos](#puertos)
-- [Bases de datos](#bases-de-datos)
-  - [Requisitos de las bases de datos](#requisitos-de-las-bases-de-datos)
-  - [Inicialización de la base de datos](#inicializaci%C3%B3n-de-la-base-de-datos)
-  - [Restore datos](#restore-datos)
-- [Almacenamiento de ficheros (pdfs y csv)](#almacenamiento-de-ficheros-pdfs-y-csv)
-  - [Requisitos de almacenamiento de ficheros](#requisitos-de-almacenamiento-de-ficheros)
-- [Gestión de roles](#gesti%C3%B3n-de-roles)
-- [Configuración de entornos](#configuraci%C3%B3n-de-entornos)
-  - [Producción](#producci%C3%B3n)
-    - [docker-compose.override.yml](#docker-composeoverrideyml)
-    - [Variables de entorno (DEV=false,PRUEBAS=false, DOCKER=true)](#variables-de-entorno-devfalsepruebasfalse-dockertrue)
-    - [Ejecución](#ejecuci%C3%B3n)
-  - [Pruebas: host27](#pruebas-host27)
-    - [docker-compose.override.yml](#docker-composeoverrideyml-1)
-    - [Variables de entorno (DEV=false,PRUEBAS=true, DOCKER=true)](#variables-de-entorno-devfalsepruebastrue-dockertrue)
-    - [Ejecución](#ejecuci%C3%B3n-1)
-    - [Generar imagen para producción](#generar-imagen-para-producci%C3%B3n)
-  - [Localhost](#localhost)
-    - [Variables de entorno (DEV=true, PRUEBAS=false, DOCKER=false)](#variables-de-entorno-devtrue-pruebasfalse-dockerfalse)
-    - [Ejecución](#ejecuci%C3%B3n-2)
-- [Estilo del código](#estilo-del-c%C3%B3digo)
-- [Enlaces relevantes](#enlaces-relevantes)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Descripción
 Servicio que permite consultar y planificar el curso académico actual y siguiente de todos los planes impartidos en la escuela. La aplicación está accesible desde el [portal del PDI en la página de la ETSIT](https://portal.etsit.upm.es/pdi/)
@@ -39,8 +9,8 @@ Servicio que permite consultar y planificar el curso académico actual y siguien
 En la [Wiki general](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/home) de los proyectos se incluye alguna información de utilidad:
 - Mapeo de puertos proxy inverso de la ETSIT: [Entorno de desarrollo, pruebas, producción y local](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/Entorno-de-desarrollo,-pruebas,-producci%C3%B3n-y-local).
 - Servicios y servidor CAS: [Entorno de desarrollo, pruebas, producción y local](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/Entorno-de-desarrollo,-pruebas,-producci%C3%B3n-y-local).
-- Conexión con el servidor CAS: [CAS, Central Authentication Service](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/CAS,-Central-Authentication-Service).
-- Campos devueltos por el CAS: [CAS, Central Authentication Service](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/CAS,-Central-Authentication-Service).
+- Conexión con el servidor CAS: [CAS, Central Authentication Service](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/Servicios-externos/CAS,-Central-Authentication-Service).
+- Campos devueltos por el CAS: [CAS, Central Authentication Service](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/Servicios-externos/CAS,-Central-Authentication-Service).
 
 
 ## Puertos
