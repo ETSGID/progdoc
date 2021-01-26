@@ -168,26 +168,6 @@
 
             document.getElementById("formularioEventoPersonalizado").style.display = "block"
 
-            //SI SE SELECCIONA EL EVENTO "NAVIDADES", SE PRESENTA UN FORMULARIO PARA ESTE EVENTO (EDITABLE, DIARIO)
-        } else if (document.getElementById("eventoTipo").value === "Navidades") {
-            document.getElementById("tipoDeEvento").value = "navidades";
-            document.getElementById("text-formularioEvento").innerHTML = "Periodo festivo de navidades:";
-
-            document.getElementById("eventoNombreInput").value = "Navidades";
-            document.getElementById("div-eventoNombre").style.display = "none";
-
-            if (document.getElementById("editableCheck")) {
-                document.getElementById("editableCheck").checked = true;
-            }
-
-            document.getElementById("diarioCheck").checked = false;
-            document.getElementById("div-diarioCheck").style.display = "none";
-            document.getElementById("text-fechaInicio").innerHTML = "Fecha de comienzo: " + dia;
-
-            document.getElementById("div-finEvento").style.display = "block";
-
-            document.getElementById("formularioEventoPersonalizado").style.display = "block"
-
         } else if (document.getElementById("eventoTipo").value === "Comienzo del curso") {
             document.getElementById("tipoDeEvento").value = "curso";
             document.getElementById("text-formularioEvento").innerHTML = "Comienzo del curso:";
@@ -453,8 +433,6 @@
                     evento = "tft//" + evento;
                 } else if (document.getElementById("tipoDeEvento").value == "ajuste") {
                     evento = "ajuste//" + evento;
-                } else if (document.getElementById("tipoDeEvento").value == "navidades") {
-                    evento = "festivo//Periodo festivo de navidades"
                 }
                 let url = ""
                 // si existe check de editable es Jefatura de estudios si no es coordinadores

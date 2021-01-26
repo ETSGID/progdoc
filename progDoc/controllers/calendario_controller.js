@@ -49,17 +49,18 @@ const bisiesto = year => {
 const generarArrayDias = (dic_eventos, ano) => {
   /* Primero generamos un array de enteros que sean todos los dias del año */
   const uno_septiembre = new Date(parseInt(ano, 10), 8, 1);
-  const dia_de_semana = uno_septiembre.getDay();
+  // array udimensional con todas las casillas que habra desde
+  // desde el lunes de la semana del 1 de Septiembre
+  // hasta el domingo de la semana del 31 de julio
   let array_numeros = [];
   // Esta variable se requiere luego
-  let dia = 0;
+  let dia = uno_septiembre.getDay();
   // eslint-disable-next-line eqeqeq
-  if (dia_de_semana == 0) {
-    dia = 6;
+  if (dia == 0) {
+    // si es domingo habra 6 casillas en blanco
     array_numeros = new Array(6);
   } else {
-    dia = dia_de_semana - 1;
-    array_numeros = new Array(dia_de_semana - 1);
+    array_numeros = new Array(dia - 1);
   }
   const mes_30_dias = Array.from(new Array(30), (val, index) => index + 1);
   const meses_30 = ['0', '2', '7', '9'];
@@ -110,7 +111,9 @@ const generarArrayDias = (dic_eventos, ano) => {
   ];
   // eslint-disable-next-line no-param-reassign
   ano = parseInt(ano, 10);
-  let dic_dias = {
+
+  // dicionarios con los contadores de dias de 1S y 2S
+  const dic_dias_1 = {
     0: 0,
     1: 0,
     2: 0,
@@ -119,8 +122,7 @@ const generarArrayDias = (dic_eventos, ano) => {
     5: 0,
     6: 0
   };
-  // se inicializa
-  let dic_dias_1 = {
+  const dic_dias_2 = {
     0: 0,
     1: 0,
     2: 0,
@@ -129,26 +131,27 @@ const generarArrayDias = (dic_eventos, ano) => {
     5: 0,
     6: 0
   };
-  //
-  let contar = false;
+  // Indica si el dia se incluye entre en el contador de Lunes, Martes...
+  // Se cuentan por semestre, todos los dias que estén dentro del periodo de inicio y fin del semestre
+  // Excepto: festivos y no lectivos
+  let contar;
   // En esta variable se guardan los eventos que nos diarios
   let buffer_eventos = [];
   let vacaciones_offset = 0;
   const semanas = [];
+  // contador de semanas por semestre
   let contador_semanas = 1;
-  // cuando vale 6 significa que el contador de semanas aumenta 1
-  let contador_dias_semana = 0;
-  let in_periodo_lectivo = false;
+  // periodo lectivo sera 0 "1S" y "2S"
+  let in_periodo_lectivo = null;
+  // dia de la semana a incrementar en el contador
+  let dayToIncrement;
+  // boolean for last day event in semester
+  let lastDay;
+
   for (let i = 0; i < array_numeros.length; i++) {
-    contador_dias_semana = (contador_dias_semana + 1) % 7;
-    if (contador_dias_semana === 0) {
-      if (in_periodo_lectivo) {
-        semanas.push(contador_semanas);
-        contador_semanas += 1;
-      } else {
-        semanas.push('');
-      }
-    }
+    contar = true;
+    lastDay = false;
+    dayToIncrement = dia;
     if (array_numeros[i] === undefined) {
       array_calendario.push(undefined);
     } else {
@@ -170,121 +173,87 @@ const generarArrayDias = (dic_eventos, ano) => {
       const codigo = `${ano}-${mes_codigo}-${numero}`;
       const eventos =
         dic_eventos[codigo] === undefined ? [] : dic_eventos[codigo];
-      // eventos de un dia
-      if (contar) {
-        // noContar=true si ese dia no se cuenta como dia en el que se da clase normal. Se usa para dic_dias
-        let noContar = false;
-        for (let j = 0; j < eventos.length; j++) {
-          const evento = eventos[j];
-          if (evento.nombre === 'Fin del periodo lectivo') {
-            contar = false;
-            noContar = true;
-            in_periodo_lectivo = false;
-            dic_dias[dia] += 1;
-          }
-          if (evento.nombre === 'Final del primer cuatrimestre') {
-            contar = false;
-            noContar = true;
-            dic_dias[dia] += 1;
-            dic_dias_1 = dic_dias;
+      if (vacaciones_offset > 0) {
+        vacaciones_offset -= 1;
+        contar = false;
+      }
+      // eslint-disable-next-line no-loop-func
+      eventos.forEach(evento => {
+        switch (evento.nombre) {
+          case 'Inicio de las clases':
+            in_periodo_lectivo = '1S';
             contador_semanas = 1;
-            dic_dias = {
-              0: 0,
-              1: 0,
-              2: 0,
-              3: 0,
-              4: 0,
-              5: 0,
-              6: 0
-            };
-            in_periodo_lectivo = false;
-          }
-          if (evento.tipo === 'festivo') {
-            noContar = true;
+            break;
+          case 'Comienzo del segundo cuatrimestre':
+            in_periodo_lectivo = '2S';
+            contador_semanas = 1;
+            break;
+          case 'Final del primer cuatrimestre':
+            lastDay = true;
+            break;
+          case 'Fin del periodo lectivo':
+            lastDay = true;
+            break;
+          default:
+            break;
+        }
+        switch (evento.tipo) {
+          case 'festivo':
+            contar = false;
             if (evento.fechaFin !== 'Evento de dia') {
-              // periodos de vacaciones
-              contar = false;
-              if (evento.nombre !== 'Periodo festivo de navidades') {
-                vacaciones_offset =
-                  (Date.parse(evento.fechaFin) -
-                    Date.parse(evento.fechaInicio)) /
-                  86400000;
+              // cuando es un festivo prolongado
+              const periodoFestivo =
+                (Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio)) /
+                86400000;
+              // En caso de que se solapen vacaciones
+              if (vacaciones_offset < periodoFestivo) {
+                vacaciones_offset = periodoFestivo;
               }
             }
-          }
-          try {
-            // dias especiales (por ejemplo dia de Lunes un Martes)
-            if (evento.nombre.substring(0, 6) === 'Día de') {
-              if (evento.nombre.length === 12) {
-                noContar = true;
-                dic_dias[enumsPD.diasDeSemana.Lunes] += 1;
-              } else if (evento.nombre.length === 13) {
-                noContar = true;
-                if (evento.nombre.substring(7, 13) === 'Martes') {
-                  dic_dias[enumsPD.diasDeSemana.Martes] += 1;
-                } else {
-                  dic_dias[enumsPD.diasDeSemana.Jueves] += 1;
-                }
-              } else if (evento.nombre.length === 14) {
-                noContar = true;
-                dic_dias[enumsPD.diasDeSemana.Viernes] += 1;
-              } else if (evento.nombre.length === 16) {
-                noContar = true;
-                dic_dias[enumsPD.diasDeSemana.Miercoles] += 1;
-              }
+            break;
+          case 'especial':
+            try {
+              // Día de Martes por ejemplo
+              // Sanetiza los dias de la semana para quitar caracteres raros como acentos
+              // y buscarlos en el enum
+              dayToIncrement =
+                enumsPD.diasDeSemana[
+                  evento.nombre
+                    .split(' ')[2]
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                ];
+            } catch (error) {
+              console.error(error);
             }
-          } catch (error) {
-            console.error(error);
-          }
-        }
-        if (!noContar) {
-          dic_dias[dia] += 1;
-        }
-      } else {
-        // Podría ocurrir que el final de un semestre lectivo esté puesto en periodo de vacaciones. Por eso se debe comprobar aquí
-        for (let j = 0; j < eventos.length; j++) {
-          const evento = eventos[j];
-          if (evento.nombre === 'Fin del periodo lectivo') {
-            contar = false;
-            in_periodo_lectivo = false;
             break;
-          }
-          if (evento.nombre === 'Final del primer cuatrimestre') {
-            contar = false;
-            dic_dias_1 = dic_dias;
-            contador_semanas = 1;
-            dic_dias = {
-              0: 0,
-              1: 0,
-              2: 0,
-              3: 0,
-              4: 0,
-              5: 0,
-              6: 0
-            };
-            in_periodo_lectivo = false;
+          default:
             break;
-          }
         }
-        if (vacaciones_offset > 1) {
-          vacaciones_offset -= 1;
-        } else if (vacaciones_offset === 1) {
-          vacaciones_offset = 0;
-          contar = true;
-        } else if (eventos.length !== 0) {
-          for (let j = 0; j < eventos.length; j++) {
-            const evento = eventos[j];
+      });
+      if (contar) {
+        switch (in_periodo_lectivo) {
+          case '1S':
+            dic_dias_1[dayToIncrement] += 1;
+            break;
+          case '2S':
+            dic_dias_2[dayToIncrement] += 1;
+            break;
+          default:
+            break;
+        }
+      }
 
-            if (
-              evento.nombre === 'Inicio de las clases' ||
-              evento.nombre === 'Comienzo del segundo cuatrimestre'
-            ) {
-              in_periodo_lectivo = true;
-              contar = true;
-              dic_dias[dia] += 1;
-            }
-          }
+      if (dia === 0) {
+        if (in_periodo_lectivo) {
+          semanas.push(contador_semanas);
+          contador_semanas += 1;
+        } else {
+          semanas.push('');
         }
+      }
+      if (lastDay) {
+        in_periodo_lectivo = null;
       }
       dia = (dia + 1) % 7;
       const comprobarColorArray = comprobarColor(
@@ -310,7 +279,7 @@ const generarArrayDias = (dic_eventos, ano) => {
       array_calendario.push(objeto);
     }
   }
-  return [array_calendario, array_numeros, dic_dias_1, dic_dias, semanas];
+  return [array_calendario, array_numeros, dic_dias_1, dic_dias_2, semanas];
 };
 
 /**
