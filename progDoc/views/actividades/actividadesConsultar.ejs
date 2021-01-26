@@ -67,7 +67,6 @@
     let f1= conjuntoActividadParcial.fechaInicio
     let f2= conjuntoActividadParcial.fechaFin
     f1 = getLunesAnterior(f1)
-    f2 = getLunesAnterior(f2)
     let diaActual = f1;
     let contador = 0;
     let coincidenciasProgramadas = []
@@ -87,7 +86,6 @@
       coincidenciasEval = coincidenciasEval.concat(conjuntoActividadParcial.actividades.filter(
       act => (act.tipo === 'eval' && act.fecha === diaActual)
       ));
-      diaActual = aumentarDia(diaActual,1)
       //llego a lunes y debo reiniciar sino aumento un dia
       if(contador === 6 || (nuevaDateFormat(diaActual) >= nuevaDateFormat(f2))){
       contador = 0;
@@ -141,6 +139,7 @@
       <%}else{
         contador ++;
       }
+      diaActual = aumentarDia(diaActual,1)
     }%>
     </tbody>
     <%}%>
