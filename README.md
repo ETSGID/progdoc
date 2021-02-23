@@ -13,7 +13,11 @@ En la [Wiki general](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wik
 
 
 ## Puertos
-El puerto en el que corre la aplicación dentro del contenedor es el `3000` (Ver fichero `progDoc/file.env`). Por defecto este puerto se mapea en el `docker-compose-yml` al puerto `3000` del host. Para cambiarlo, modificar el primero de los dos puertos, es decir `"HOST:CONTAINER"`. 
+### Docker
+El puerto en el que corre la aplicación dentro del contenedor es el `3000` (Ver fichero `progDoc/file.env`). Por defecto este puerto se mapea en el `docker-compose-yml` al puerto `3000` del host. Para cambiarlo, modificar el primero de los dos puertos, es decir `"HOST:CONTAINER"`. No modificar el puerto de dentro del contenedor.
+
+### Sin Docker
+El puerto por defecto es el `3000`. Para cambiarlo, modificar el la variable de entorno PORT [Ver sección de despliegue en localhost](#Desarrollo: localhost).
 
 ## Bases de datos
 Existen dos bases de datos una para almacenar las sesiones y otra con la información de la aplicación.
@@ -30,24 +34,19 @@ En **producción** deben realizarse copias de seguridad de la base de datos que 
 Con esta estrategia se evita que el número de copias aumente con el paso del tiempo. En este caso será constante y contará con 20 copias (7 diarias, 12 mensuales, 1 anual).
 
 ### Inicialización de la base de datos
-**La primera vez que se ejecute el proyecto** es necesario generar el esqueleto de la base de datos y rellenar alguna información adicional. Para ello se usarán las migraciones y seeders. Las migraciones y los seeders se ejecutan automáticamente al inicializar el proyecto con docker. Además existen los siguientes scripts definidos en el `package.json`:
+#### Con Docker
+Se crea automáticamente la base de datos y se ejecutan las migraciones y los seeders.
 
-```shell
-#./node_modules/.bin/sequelize  db:seed:all --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB
-npm run seeders
+#### Sin Docker
+**La primera vez que se ejecute el proyecto** es necesario generar el esqueleto de la base de datos y rellenar alguna información adicional. Para ello se usarán las migraciones y seeders.
+1. Configurar las variables de entorno. [Ver sección de despliegue en localhost](#Desarrollo: localhost).
+1. Crear manualmente el usuario de la base de datos si no existe
+1. Crear las bases de datos: `npm run createDb`  y `npm run createDbSession`
+1. Ejecutar migraciones `npm run migrations`
+1. Ejecutar seeders `npm run seeders`
 
- #./node_modules/.bin/sequelize db:seed:undo:all --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB
- npm run seeders:undo
- 
- #./node_modules/.bin/sequelize  db:migrate --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB
-npm run migrations
+En `package.json` están la **lista de comandos disponibles completa.**
 
-#./node_modules/.bin/sequelize  db:migrate:undo --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB
-npm run migrations:undo
-
-#./node_modules/.bin/sequelize  db:migrate:undo:all --url postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$POSTGRES_DB
-npm run migrations:undo:all
-```
 
 ### Restore datos
 
@@ -77,7 +76,7 @@ En **producción** deben realizarse copias de seguridad del sistema de ficheros 
 
 
 ## Gestión de roles
-En desarrollo se puede utilizar` USER_DEV` para simular cualquier ROL
+En desarrollo se puede utilizar `USER_DEV` para simular cualquier ROL
 Además en desarrollo/pruebas si se crea el user Admin en la tabla roles y deja realizar todas las acciones
 Otra opción en desarrollo es meter en la base de datos a la persona y asignarle el rol deseado.
 Por ejemplo:
@@ -135,7 +134,6 @@ PATH_PDF=/storage/progdoc
 DEV=false
 PRUEBAS=false
 DOCKER=true
-PORT=3000
 
 ```
 
@@ -159,6 +157,8 @@ git.etsit.upm.es:4567/grupointegraciondigital/gestiondoc:stable
 # Arrancar los contenedores llamando a los ficheros de configuracón creados en la carpeta externa al proyecto
 docker-compose up -d
 ```
+
+Conectarse en http://portal.etsit.upm.es/pdi/progdoc
 
 ### Pruebas: host27
 
@@ -218,7 +218,6 @@ PATH_PDF=/storage/progdoc
 DEV=false
 PRUEBAS=true
 DOCKER=true
-PORT=3000
 
 ```
 `gestionDocDB.env`
@@ -254,6 +253,7 @@ Alternativamente
 ```
 docker-compose up -d --build
 ```
+Conectarse en http://pruebas.etsit.upm.es/pdi/progdoc (necesario estar en la red de la UPM)
 
 #### Generar imagen para producción
 
@@ -262,12 +262,16 @@ docker-compose up -d --build
 - Generar las imágenes y subirlas a gitlab. Para ello se deben seguir las instrucciones especificadas en la [wiki general](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/Docker#container-registry-gitlab)
 
 
-### Localhost
+### Desarrollo: localhost
 
 En localhost **no existe** la autenticación a través del servidor CAS, por esa razón hay que especificar el usuario que se desea utilizar: `USER_DEV` y `USER_DEV_ROLS`
 
 #### Variables de entorno (DEV=true, PRUEBAS=false, DOCKER=false)
-En `progDoc/file.env` se define el modelo a seguir para configurar el .env (incluído en el `.gitignore` para así no exponer datos sensibles)
+Son necesariuos **tres** archivos para configurar el entorno
+
+`.env`
+
+En `progDoc/file.env` se define el modelo a seguir para configurar el `.env` (incluído en el `.gitignore` para así no exponer datos sensibles)
 ```shell
 POSTGRES_DB=programacion_docente
 POSTGRESSESION_DB=progdocsession
@@ -303,6 +307,7 @@ npm install
 npm start
 
 ```
+Conectarse en http://localhost:3000/pdi/progdoc/
 
 ## Estilo del código
 El proyecto está configurado para utilizar la guía de estilos de `airbnb` usando `eslint`. Existen dos scripts para comprobar la sintaxis y el estilo del código en el `package.json`

@@ -1,4 +1,4 @@
-const enumsPD = require('../enumsPD');
+const enumsPD = require('../../../enumsPD');
 
 module.exports = {
   up: (queryInterface, Sequelize) => {

@@ -1,19 +1,24 @@
-/* global DEV, DOCKER */
+/* global DEV */
 const path = require('path');
 const Sequelize = require('sequelize');
-
+const configDatabase = require('../dbs/db/config').config;
+const configDatabaseSession = require('../dbs/db_session/config').config;
 // Cargar ORM
 
-//    DATABASE_URL = postgres://user:passwd@host:port/database
+// Database
 // eslint-disable-next-line no-unneeded-ternary
 const logs = DEV === 'true' ? false : false;
-const DB_USERNAME = process.env.DB_USERNAME || 'progdoc';
-const DB_PASSWORD = process.env.DB_PASSWORD || 'progdoc';
-const DB_HOST = process.env.DB_HOST || 'db';
-const POSTGRES_DB = process.env.POSTGRES_DB || 'progdoc';
-const DBSESSION_USERNAME = process.env.DBSESSION_USERNAME || 'progdoc';
-const DBSESSION_PASSWORD = process.env.DBSESSION_PASSWORD || 'progdoc';
-const POSTGRESSESION_DB = process.env.POSTGRESSESION_DB || 'progdocsession';
+const DB_USERNAME = configDatabase.username;
+const DB_PASSWORD = configDatabase.password;
+const DB_HOST = configDatabase.host;
+const POSTGRES_DB = configDatabase.database;
+
+// Session database
+const DBSESSION_USERNAME = configDatabaseSession.username;
+const DBSESSION_PASSWORD = configDatabaseSession.password;
+const DBSESSION_HOST = configDatabaseSession.host;
+const POSTGRESSESION_DB = configDatabaseSession.database;
+
 const sequelize = new Sequelize(POSTGRES_DB, DB_USERNAME, DB_PASSWORD, {
   host: DB_HOST,
   dialect: 'postgres',
@@ -24,7 +29,7 @@ const sequelizeSession = new Sequelize(
   DBSESSION_USERNAME,
   DBSESSION_PASSWORD,
   {
-    host: DOCKER === 'true' ? 'dbsession' : DB_HOST,
+    host: DBSESSION_HOST,
     dialect: 'postgres',
     logging: logs
   }
@@ -229,7 +234,7 @@ Grupo.belongsToMany(ConjuntoActividadParcial, {
 
 (async () => {
   try {
-    // If you want to create de schema
+    // Create schema of sequelizeSession
     await sequelizeSession.sync();
     await sequelize.authenticate();
     await sequelizeSession.authenticate();

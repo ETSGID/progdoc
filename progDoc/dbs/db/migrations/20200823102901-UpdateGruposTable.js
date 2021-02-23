@@ -1,4 +1,4 @@
-const enumTipoGrupo = require('../enumsPD').tipoGrupo;
+const enumTipoGrupo = require('../../../enumsPD').tipoGrupo;
 
 // update grupo table to add tipo and semestre
 module.exports = {
