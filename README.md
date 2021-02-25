@@ -39,7 +39,7 @@ Se crea automáticamente la base de datos y se ejecutan las migraciones y los se
 
 #### Sin Docker
 **La primera vez que se ejecute el proyecto** es necesario generar el esqueleto de la base de datos y rellenar alguna información adicional. Para ello se usarán las migraciones y seeders.
-1. Configurar las variables de entorno. [Ver sección de despliegue en localhost](#Desarrollo: localhost).
+1. Configurar las variables de entorno. [Ver sección de despliegue en localhost](#desarrollo-localhost).
 1. Crear manualmente el usuario de la base de datos si no existe
 1. Crear las bases de datos: `npm run createDb`  y `npm run createDbSession`
 1. Ejecutar migraciones `npm run migrations`
