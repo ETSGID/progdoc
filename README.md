@@ -17,7 +17,7 @@ En la [Wiki general](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wik
 El puerto en el que corre la aplicación dentro del contenedor es el `3000` (Ver fichero `progDoc/file.env`). Por defecto este puerto se mapea en el `docker-compose-yml` al puerto `3000` del host. Para cambiarlo, modificar el primero de los dos puertos, es decir `"HOST:CONTAINER"`. No modificar el puerto de dentro del contenedor.
 
 ### Sin Docker
-El puerto por defecto es el `3000`. Para cambiarlo, modificar el la variable de entorno PORT [Ver sección de despliegue en localhost](#Desarrollo: localhost).
+El puerto por defecto es el `3000`. Para cambiarlo, modificar el la variable de entorno PORT [Ver sección de despliegue en localhost](#desarrollo-localhost).
 
 ## Bases de datos
 Existen dos bases de datos una para almacenar las sesiones y otra con la información de la aplicación.
