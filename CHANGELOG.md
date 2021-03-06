@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [1.0.10] - 2021-03-06
+### Added
+- Log de cada usuario de la primera vez en cada sesión
+### Changed
+- Estructura migraciones, seeders y configuración de conexión a las bases de datos
+
 ## [1.0.9] - 2021-01-29
 ### Fixed
 - Mostrar actividades la última semana
