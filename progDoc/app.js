@@ -166,6 +166,7 @@ app.use(async (req, res, next) => {
       } else {
         req.session.user.PersonaId = null;
       }
+      console.log(req.session.user);
       req.session.user.noFirst = true;
       // para que no haya problemas de que cosas no se han iniciado en la sesión
       req.session.save(() => {

@@ -4,6 +4,11 @@
 ## Descripción
 Servicio que permite consultar y planificar el curso académico actual y siguiente de todos los planes impartidos en la escuela. La aplicación está accesible desde el [portal del PDI en la página de la ETSIT](https://portal.etsit.upm.es/pdi/)
 
+## Requisitos de SW
+- Servidor PostgreSQL versión 11
+- Node.js versión 12
+- npm versión  6
+
 ## Consideraciones previas
 En la [Wiki general](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/home) de los proyectos se incluye alguna información de utilidad:
 - Mapeo de puertos proxy inverso de la ETSIT: [Entorno de desarrollo, pruebas, producción y local](https://git.etsit.upm.es/grupointegraciondigital/wiki/-/wikis/Entorno-de-desarrollo,-pruebas,-producci%C3%B3n-y-local).
