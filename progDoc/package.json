@@ -15,7 +15,7 @@
     "createDbSession": "./node_modules/.bin/sequelize --options-path ./.sequelizerc_dbSession  db:create"
   },
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "body-parser": "^1.18.2",
     "bootstrap": "^3.4.1",
     "bootstrap-select": "^1.13.18",

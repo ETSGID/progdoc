@@ -62,6 +62,7 @@ exports.actualizarAcronimos = async (req, res, next) => {
   const { planID } = req.session;
   let toActualizar = req.body.actualizar;
   const promises = [];
+  const format = /[a-zA-Z0-9]/;
   if (toActualizar && !res.locals.permisoDenegado) {
     if (!Array.isArray(toActualizar)) {
       toActualizar = [toActualizar];
@@ -83,7 +84,7 @@ exports.actualizarAcronimos = async (req, res, next) => {
           break;
         case 'plan':
           elementToActualizar.nombre = acronimo;
-          if (acronimo === 'null' || acronimo.trim('').trim() === '')
+          if (acronimo === 'null' || !format.test(acronimo))
             elementToActualizar.nombre = null;
           promises.push(
             models.PlanEstudio.update(
@@ -94,7 +95,7 @@ exports.actualizarAcronimos = async (req, res, next) => {
           break;
         case 'asignatura':
           elementToActualizar.acronimo = acronimo;
-          if (acronimo === 'null' || acronimo.trim('').trim() === '')
+          if (acronimo === 'null' || !format.test(acronimo))
             elementToActualizar.acronimo = null;
           codigo = Number(codigo);
           promises.push(
