@@ -167,7 +167,7 @@ exports.comprobarRolYPersona = async (req, res, next) => {
   next();
 };
 
-// funcion de getRoles para directores de departamentos jefe de estudios y subdirector de posgrado
+// funcion de getRoles para directores de departamentos jefe de estudios
 exports.getRoles = async (req, res, next) => {
   const responsablesDocentes = [];
   let profesores;

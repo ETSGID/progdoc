@@ -80,7 +80,7 @@ return departamento
                 </td>
                 </tr>           
             <% 
-            rol = rolesEnum.SubdirectorPosgrado
+            rol = rolesEnum.Admin
             departamento = null
             plan = null
             rols = filterByRol(roles, rol, plan, departamento)
@@ -89,7 +89,7 @@ return departamento
             %>
                 <tr>
                 <td>
-                SubdirectorPosgrado
+                Administrador
                 </td>
                 <td id="td_<%=rol%>_<%=index%>">
                 <%prof = buscaPers(profesores, r.PersonaId) %>

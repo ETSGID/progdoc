@@ -1,4 +1,3 @@
-/* global DEV, PRUEBAS */
 const express = require('express');
 
 const router = express.Router();
@@ -30,24 +29,16 @@ router.all('*', (req, res, next) => {
   }
   req.session.planID = planID;
   req.session.departamentoID = departamentoID;
-  // roles que pueden hacer todo son admin y subdirector de posgrado
+  // roles que pueden hacer todo son admin
   res.locals.rols = [];
-  if (DEV === 'true' || PRUEBAS === 'true') {
-    res.locals.rols.push({
-      rol: enumsPD.rols.Admin,
-      PlanEstudioCodigo: null,
-      DepartamentoCodigo: null,
-      tipo: enumsPD.permisions.cumplimentar,
-      condiciones: []
-    });
-  }
   res.locals.rols.push({
-    rol: enumsPD.rols.SubdirectorPosgrado,
+    rol: enumsPD.rols.Admin,
     PlanEstudioCodigo: null,
     DepartamentoCodigo: null,
     tipo: enumsPD.permisions.cumplimentar,
     condiciones: []
   });
+
   next();
 });
 

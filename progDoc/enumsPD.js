@@ -20,8 +20,7 @@ const rols = {
   DirectorDepartamentoX2: 'DirectorDepartamentoDelegado',
   CoordinadorTitulacion: 'CoordinadorTitulacion',
   CoordinadorTitulacionX2: 'CoordinadorTitulacionDelegado',
-  SecretarioTitulacion: 'SecretarioTitulacion',
-  SubdirectorPosgrado: 'SubdirectorPosgrado'
+  SecretarioTitulacion: 'SecretarioTitulacion'
 };
 
 exports.rols = rols;
@@ -32,8 +31,7 @@ exports.delegacion = {
   [rols.JefeEstudios]: [rols.SecretarioTitulacion],
   [rols.DirectorDepartamento]: [rols.DirectorDepartamentoX2],
   [rols.CoordinadorTitulacion]: [rols.CoordinadorTitulacionX2],
-  [rols.ResponsableDocente]: [rols.ResponsableDocenteX2],
-  [rols.SubdirectorPosgrado]: []
+  [rols.ResponsableDocente]: [rols.ResponsableDocenteX2]
 };
 
 // type of permissions
