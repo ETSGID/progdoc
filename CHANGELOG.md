@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [1.0.11] - 2021-04-26
+### Fixed
+- Sanetizar acronimos plan y asignaturas
+### Changed
+- Rol SubdirectorPosgrado por rol Admin
+
 ## [1.0.10] - 2021-03-06
 ### Added
 - Log de cada usuario de la primera vez en cada sesión
