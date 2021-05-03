@@ -9,8 +9,8 @@
 <td>
 </td>
 </tr>
-<%let rol2 = rolesEnum.ResponsableDocenteX2 
-delegado = filterByRol(roles, rol2, plan, departamento)
+<%let rolResponsable2 = rolesEnum.ResponsableDocenteX2 
+delegado = filterByRol(roles, rolResponsable2, plan, departamento)
 if (delegado.length === 0) prof = buscaPers(profesores, null)
 else prof = buscaPers(profesores, delegado[0].PersonaId);
 %>
@@ -18,8 +18,8 @@ else prof = buscaPers(profesores, delegado[0].PersonaId);
 <td style="border: 0; padding-left:5em">
 <em>Delegado en<em>
 </td>
-<td id="td_<%=rol2%>_<%=index%>">
-<p id="p_<%=rol2%>_<%=index%>"><%=prof.nombreCorregido%></p>
+<td id="td_<%=rolResponsable2%>_<%=index%>">
+<p id="p_<%=rolResponsable2%>_<%=index%>"><%=prof.nombreCorregido%></p>
 </td>
 <td>
 </td>

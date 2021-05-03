@@ -6,7 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## [1.0.11] - 2021-04-26
+## [1.0.11] - 2021-05-03
+### Added
+- Roles delegados JefeEstudios y SecretaroJefeEstudios
 ### Fixed
 - Sanetizar acronimos plan y asignaturas
 ### Changed

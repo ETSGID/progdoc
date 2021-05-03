@@ -6,6 +6,7 @@
     "start": "node ./bin/www",
     "lint": "eslint ./",
     "lint:fix": "eslint ./ --fix",
+    "ejslint": "./node_modules/.bin/ejslint ./views --preprocessor-include",
     "seeders": "./node_modules/.bin/sequelize  db:seed:all",
     "seeders:undo": "./node_modules/.bin/sequelize db:seed:undo:all",
     "migrations": "./node_modules/.bin/sequelize  db:migrate",
@@ -48,6 +49,7 @@
     "serve-favicon": "^2.5.0"
   },
   "devDependencies": {
+    "ejs-lint": "^1.2.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.10.0",

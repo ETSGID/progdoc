@@ -14,13 +14,15 @@ exports.periodoPD = {
 const rols = {
   Admin: 'Admin',
   JefeEstudios: 'JefeEstudios',
+  JefeEstudiosX2: 'JefeEstudiosDelegado',
   ResponsableDocente: 'ResponsableDocente',
   ResponsableDocenteX2: 'ResponsableDocenteDelegado',
   DirectorDepartamento: 'DirectorDepartamento',
   DirectorDepartamentoX2: 'DirectorDepartamentoDelegado',
   CoordinadorTitulacion: 'CoordinadorTitulacion',
   CoordinadorTitulacionX2: 'CoordinadorTitulacionDelegado',
-  SecretarioTitulacion: 'SecretarioTitulacion'
+  SecretarioTitulacion: 'SecretarioTitulacion',
+  SecretarioTitulacionX2: 'SecretarioTitulacionDelegado'
 };
 
 exports.rols = rols;
@@ -28,10 +30,12 @@ exports.rols = rols;
 // en delegacion se fija un array con los posibles roles delegados. Los delegados pueden hacer todo.
 exports.delegacion = {
   [rols.Admin]: [],
-  [rols.JefeEstudios]: [rols.SecretarioTitulacion],
+  [rols.JefeEstudios]: [rols.JefeEstudiosX2, rols.SecretarioTitulacion, rols.SecretarioTitulacionX2],
   [rols.DirectorDepartamento]: [rols.DirectorDepartamentoX2],
   [rols.CoordinadorTitulacion]: [rols.CoordinadorTitulacionX2],
-  [rols.ResponsableDocente]: [rols.ResponsableDocenteX2]
+  [rols.ResponsableDocente]: [rols.ResponsableDocenteX2],
+
+  
 };
 
 // type of permissions
