@@ -407,8 +407,8 @@
                     fechaInicio = document.getElementById("inicioEvento").value;
                 }
                 let fechaFin = document.getElementById("finEvento").value;
-                if (new Date(fechaFin) - new Date(fechaInicio) < 0) {
-                    document.getElementById("mensajeErrorEvento").innerHTML = "La fecha final debe ser posterior a la de inicio."
+                if (new Date(fechaFin) - new Date(fechaInicio) <= 0) {
+                    document.getElementById("mensajeErrorEvento").innerHTML = "La fecha final debe ser posterior a la de inicio o seleccione evento diario."
                     document.getElementById("mensajeErrorEvento").style.display = "flex";
                     return;
                 }

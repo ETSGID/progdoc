@@ -133,7 +133,7 @@ const generarArrayDias = (dic_eventos, ano) => {
   };
   // Indica si el dia se incluye entre en el contador de Lunes, Martes...
   // Se cuentan por semestre, todos los dias que estén dentro del periodo de inicio y fin del semestre
-  // Excepto: festivos y no lectivos
+  // Excepto: festivos y no lectivos (ajuste)
   let contar;
   // En esta variable se guardan los eventos que nos diarios
   let buffer_eventos = [];
@@ -199,15 +199,16 @@ const generarArrayDias = (dic_eventos, ano) => {
         }
         switch (evento.tipo) {
           case 'festivo':
+          case 'ajuste':
             contar = false;
             if (evento.fechaFin !== 'Evento de dia') {
               // cuando es un festivo prolongado
-              const periodoFestivo =
+              const periodoFestivoOrAjuste =
                 (Date.parse(evento.fechaFin) - Date.parse(evento.fechaInicio)) /
                 86400000;
               // En caso de que se solapen vacaciones
-              if (vacaciones_offset < periodoFestivo) {
-                vacaciones_offset = periodoFestivo;
+              if (vacaciones_offset < periodoFestivoOrAjuste) {
+                vacaciones_offset = periodoFestivoOrAjuste;
               }
             }
             break;
