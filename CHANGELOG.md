@@ -6,13 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## [1.0.11] - 2021-05-03
+## [1.0.11] - 2021-05-04
 ### Added
 - Roles delegados JefeEstudios y SecretaroJefeEstudios
 ### Fixed
 - Sanetizar acronimos plan y asignaturas
 ### Changed
 - Rol SubdirectorPosgrado por rol Admin
+- Días de ajuste no se contabilizan en el calendario
 
 ## [1.0.10] - 2021-03-06
 ### Added
