@@ -159,19 +159,19 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
         });
         asignacionsExamen.push({
           periodo: enumsPD.periodoPD.S1_E,
-          periodoNombre: `Periodo Extraordinario 1º Semestre (Julio ${anoFinal})`,
+          periodoNombre: `Periodo Extraordinario 1º Semestre (Junio/Julio ${anoFinal})`,
           asignaturas: [],
           examenes: []
         });
         asignacionsExamen.push({
           periodo: enumsPD.periodoPD.S2_O,
-          periodoNombre: `Periodo Ordinario 2º Semestre (Junio ${anoFinal})`,
+          periodoNombre: `Periodo Ordinario 2º Semestre (Mayo/Junio ${anoFinal})`,
           asignaturas: [],
           examenes: []
         });
         asignacionsExamen.push({
           periodo: enumsPD.periodoPD.S2_E,
-          periodoNombre: `Periodo Extraordinario 2º Semestre (Julio ${anoFinal})`,
+          periodoNombre: `Periodo Extraordinario 2º Semestre (Junio/Julio ${anoFinal})`,
           asignaturas: [],
           examenes: []
         });
@@ -185,7 +185,7 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
         });
         asignacionsExamen.push({
           periodo: enumsPD.periodoPD.S1_E,
-          periodoNombre: `Periodo Extraordinario 1º Semestre (Julio ${anoFinal})`,
+          periodoNombre: `Periodo Extraordinario 1º Semestre (Junio/Julio ${anoFinal})`,
           asignaturas: [],
           examenes: []
         });
@@ -193,13 +193,13 @@ const generatePDFFile = async (pdID, tipoPDF, calendario) => {
       case '2S':
         asignacionsExamen.push({
           periodo: enumsPD.periodoPD.S2_O,
-          periodoNombre: `Periodo Ordinario 2º Semestre (Junio ${anoFinal})`,
+          periodoNombre: `Periodo Ordinario 2º Semestre (Mayo/Junio ${anoFinal})`,
           asignaturas: [],
           examenes: []
         });
         asignacionsExamen.push({
           periodo: enumsPD.periodoPD.S2_E,
-          periodoNombre: `Periodo Extraordinario 2º Semestre (Julio ${anoFinal})`,
+          periodoNombre: `Periodo Extraordinario 2º Semestre (Junio/Julio ${anoFinal})`,
           asignaturas: [],
           examenes: []
         });
