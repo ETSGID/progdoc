@@ -1,7 +1,7 @@
 <div style="margin:20px">
 <h1>Bienvenido a la aplicación de Programación Docente.</h1>
 <p>Puede consultar el estado de las programaciones docentes y el historial a través del 
-    <button style="background:none;border:none;outline:none;" onclick="clickButton('drop_ProgDoc')"><b><u>menu de la izquierda</u></b></button>,
+    <button style="background:none;border:none;outline:none;padding:0" onclick="clickButton('drop_ProgDoc')"><b><u>menu de la izquierda</u></b></button>,
     en las secciones <b><u><a style="color: black;" href="<%=CONTEXT%>/consultar">'Consultar'</a></u></b> e <b><u><a style="color: black;" href="<%=CONTEXT%>/historial">'Historial'</a></u></b>.
 </p>
 <%if (session.user.PersonaId === null){%>
@@ -29,7 +29,7 @@
 <%}%>
 <p>Si considera que debería tener un rol distinto (responsable docente, coordinador de titulación, delegado, etc.)  contacte con Jefatura de Estudios para otorgar los permisos pertinentes.</p>
 <p>Puede consultar los roles y sus permisos en la sección  
-    <button style="background:none;border:none;outline:none;" onclick="clickButton('element_ProgDocAyuda')"><b><u>'Ayuda'</u></b></button>.
+    <button style="background:none;border:none;outline:none;padding:0" onclick="clickButton('element_ProgDocAyuda')"><b><u>'Ayuda'</u></b></button>.
 </p>
 
 </div>
