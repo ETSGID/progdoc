@@ -5,6 +5,7 @@ echo "Executing migrations..."
 npm run migrations
 echo "Executing seeders..."
 npm run seeders
+echo "Everything is ready, let's go..."
 npm start 
 echo "all Done."
 exit 0
